@@ -1,0 +1,65 @@
+{
+  "author": {
+    "name": "28msec",
+    "email": "hello@28.io",
+    "url": "http://28.io"
+  },
+  "name": "nolap-report-editor",
+  "description": "NoLAP Report Editor",
+  "version": "0.0.1",
+  "keywords": [
+    "jsoniq",
+    "xquery",
+    "dev",
+    "cloud"
+  ],
+  "homepage": "https://28.io",
+  "bugs": "https://github.com/28msec/nolap-report-editor/issues",
+  "repository": {
+    "url": "https://github.com/28msec/angularjs"
+  },
+  "postinstall": "bower install",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-jshint": "~0.6.3",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "karma": "~0.12.0",
+    "grunt-karma": "~0.8.0",
+    "grunt-cli": "~0.1.8",
+    "phantomjs": "~1.9.2-2",
+    "time-grunt": "~0.1.1",
+    "load-grunt-tasks": "~0.2.0",
+    "grunt-karma-coveralls": "~2.0.2",
+    "grunt-contrib-concat": "~0.3.0",
+    "request": "~2.33.0",
+    "grunt-jsdoc": "~0.5.1",
+    "grunt-gh-pages": "~0.9.0",
+    "karma-script-launcher": "~0.1.0",
+    "karma-phantomjs-launcher": "~0.1.2",
+    "karma-chrome-launcher": "~0.1.2",
+    "karma-firefox-launcher": "~0.1.3",
+    "karma-html2js-preprocessor": "~0.1.0",
+    "karma-jasmine": "~0.1.5",
+    "requirejs": "~2.1.11",
+    "karma-requirejs": "~0.2.1",
+    "karma-coverage": "~0.2.1"
+  },
+  "contributors": [
+    {
+      "name": "William Candillon",
+      "email": "w@28.io"
+    }
+  ],
+  "licenses": [
+    {
+      "type": "Apache 2",
+      "url": "https://github.com/28msec/28.io-angularjs/blob/master/LICENSE"
+    }
+  ],
+  "scripts": {
+    "test": "grunt"
+  }
+}
