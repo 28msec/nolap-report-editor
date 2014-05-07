@@ -1,5 +1,5 @@
-#NoLAP Report Editor
 
+#NoLAP Report Editor [![Build Status](https://travis-ci.org/28msec/nolap-report-editor.png?branch=master)](https://travis-ci.org/28msec/nolap-report-editor)
 ## Development
 
 ```bash
