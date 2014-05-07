@@ -2,14 +2,11 @@ var fail = function (msg) {
     expect('should not reach this!: ' + msg).toEqual('failure');
 };
 
-var Report = {}, $rootScope, $httpBackend, $cacheFactory;
-beforeEach(module('nolap.report.editor'));
+var Report;
+beforeEach(module('nolapReportEditor'));
 
-beforeEach(inject(function (_$rootScope_, _$httpBackend_, _$cacheFactory_, Report) {
-    $rootScope = _$rootScope_;
-    $httpBackend = _$httpBackend_;
-    $cacheFactory = _$cacheFactory_;
-    API.Report = Report;
+beforeEach(inject(function (_Report_) {
+    Report = _Report_;
 }));
 
 afterEach(function () {});

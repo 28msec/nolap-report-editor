@@ -10,7 +10,7 @@ module.exports = function (grunt) {
 
         jsdoc: {
            docs: {
-             src: ['src/nolap-report-editor.js'],
+             src: ['src/editor.js', 'src/report.js'],
              options: {
                destination: 'out'
              }
@@ -37,7 +37,7 @@ module.exports = function (grunt) {
                 separator: ''
             },
             dist: {
-                src: ['src/report.js'],
+                src: ['src/editor.js', 'src/report.js'],
                 dest: 'dist/nolap-report-editor.js'
             }
         },

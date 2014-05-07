@@ -1,4 +1,6 @@
 angular
+.module('nolapReportEditor', [])
+;angular
 .module('nolapReportEditor')
 .factory('Report', function(){
 
