@@ -106,6 +106,20 @@ describe('Concepts Model API Tests', function () {
         expect(report.existsElementInTree('Presentation',element.Id)).toBe(true);
     });
 
+    it('Add another root presentation element', function () {
+        expect(report).not.toBeNull();
+        var name = 'fac:Root2';
+        var label = 'Another root';
+        report.addConcept(name, label, true);
+
+        var element = report.addTreeChild('Presentation', null, name);
+        expect(element).not.toBeNull();
+        expect(element.Id).not.toBeNull();
+        expect(element.Id).toBeDefined();
+        expect(element.Order).toBe(1);
+        expect(report.existsElementInTree('Presentation',element.Id)).toBe(true);
+    });
+
     it('Add presentation element to non-abstract', function () {
         expect(report).not.toBeNull();
         var name = 'fac:Test';
@@ -115,7 +129,28 @@ describe('Concepts Model API Tests', function () {
         } catch (ex) {
           expect(ex.message.match(/"fac:Leaf" is not abstract/g)).not.toBeNull();
         }
-                      
+    });
+
+    it('Change order of element', function () {
+        expect(report).not.toBeNull();
+        var name = 'fac:Leaf';
+        var order = 2;
+        var elementID = report.findInTree('Presentation',name)[0];
+        var element = report.getElementFromTree('Presentation',elementID);
+        expect(element.Order).toBe(3);
+
+        report.setTreeElementOrder('Presentation',elementID, 2);
+        expect(element.Order).toBe(2);
+    });
+
+    it('Move Subtree', function () {
+        expect(report).not.toBeNull();
+        var name1 = 'fac:Leaf';
+        var name2 = 'fac:Root2';
+        var subtreeID = report.findInTree('Presentation',name1)[0];
+        var newParentID = report.findInTree('Presentation',name2)[0];
+        report.moveTreeBranch('Presentation', subtreeID, newParentID);
+
         console.log(JSON.stringify(report));
     });
 
