@@ -148,10 +148,73 @@ describe('Concepts Model API Tests', function () {
         var name1 = 'fac:Leaf';
         var name2 = 'fac:Root2';
         var subtreeID = report.findInTree('Presentation',name1)[0];
+        var oldParent = report.getParentElementFromTree('Presentation', subtreeID);
         var newParentID = report.findInTree('Presentation',name2)[0];
+        var newParent = report.getElementFromTree('Presentation', newParentID);
+
+        expect(Object.keys(oldParent.To).length).toBe(2);
+        expect(newParent.To === undefined).toBe(true);
+
         report.moveTreeBranch('Presentation', subtreeID, newParentID);
 
-        console.log(JSON.stringify(report));
+        expect(Object.keys(oldParent.To).length).toBe(1);
+        expect(Object.keys(newParent.To).length).toBe(1);
     });
 
+    // concept maps
+    it('add a concept map', function () {
+        expect(report).not.toBeNull();
+        var from = 'fac:Leaf';
+        var to = [ 'us-gaap:Assets', 'us-gaap:Something' ];
+        report.addConceptMap(from, to);
+
+        expect(report.existsConceptMap(from)).toBe(true);
+        expect(report.findInConceptMap('us-gaap:Assets')[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Something')[0]).toBe('fac:Leaf');
+    });
+
+    it('add another concept map', function () {
+        expect(report).not.toBeNull();
+        var from = 'fac:Leaf2';
+        var label = 'Another test leaf';
+        var to = [ 'us-gaap:Revenues', 'us-gaap:Liabilities' ];
+        report.addConcept(from, label, false);
+        report.addConceptMap(from, to);
+
+        expect(report.existsConceptMap(from)).toBe(true);
+        expect(report.findInConceptMap('us-gaap:Assets')[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Something')[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Revenues')[0]).toBe('fac:Leaf2');
+        expect(report.findInConceptMap('us-gaap:Liabilities')[0]).toBe('fac:Leaf2');
+    });
+
+    it('update concept map', function () {
+        expect(report).not.toBeNull();
+        var from = 'fac:Leaf';
+        var to = [ 'us-gaap:CurrentAssets', 'us-gaap:Something2' ];
+        report.updateConceptMap(from, to);
+
+        expect(report.existsConceptMap(from)).toBe(true);
+        expect(report.findInConceptMap('us-gaap:Assets')[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:Something')[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:CurrentAssets')[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Something2')[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Revenues')[0]).toBe('fac:Leaf2');
+        expect(report.findInConceptMap('us-gaap:Liabilities')[0]).toBe('fac:Leaf2');
+    });
+
+    it('remove concept map', function () {
+        expect(report).not.toBeNull();
+        var name = 'fac:Leaf';
+        report.removeConceptMap(name);
+
+        expect(report.existsConceptMap(name)).toBe(false);
+        expect(report.findInConceptMap('us-gaap:Assets')[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:Something')[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:CurrentAssets')[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:Something2')[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:Revenues')[0]).toBe('fac:Leaf2');
+        expect(report.findInConceptMap('us-gaap:Liabilities')[0]).toBe('fac:Leaf2');
+        console.log(JSON.stringify(report));
+    });
 });
