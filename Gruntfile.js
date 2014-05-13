@@ -237,5 +237,5 @@ module.exports = function (grunt) {
     grunt.registerTask('test', ['karma:1.2.0']);
     grunt.registerTask('release', ['clean:pre', 'concat', 'test', 'jsdoc', 'clean:post']);//uglify
     grunt.registerTask('build', ['clean:pre', 'release']);
-    grunt.registerTask('default', ['build']);
+    grunt.registerTask('default', ['jshint', 'build']);
 };
