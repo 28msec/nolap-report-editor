@@ -1,4 +1,5 @@
 describe('Concepts Model API Tests', function () {
+    'use strict';
 
     var report = null;
 
@@ -134,7 +135,7 @@ describe('Concepts Model API Tests', function () {
         try {
             report.addTreeChild('Presentation', parentID[0], name, 2);
         } catch (ex) {
-          expect(ex.message.match(/"fac:Leaf" is not abstract/g)).not.toBeNull();
+            expect(ex.message.match(/"fac:Leaf" is not abstract/g)).not.toBeNull();
         }
     });
 

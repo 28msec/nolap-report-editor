@@ -1,3 +1,5 @@
+"use strict";
+
 var fail = function (msg) {
     expect('should not reach this!: ' + msg).toEqual('failure');
 };

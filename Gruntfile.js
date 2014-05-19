@@ -24,12 +24,12 @@ module.exports = function (grunt) {
             all: {}
         },
         jsdoc: {
-           docs: {
-             src: ['src/editor.js', 'src/report.js'],
-             options: {
-               destination: 'out'
-             }
-           }
+            docs: {
+                src: ['src/editor.js', 'src/report.js'],
+                options: {
+                    destination: 'out'
+                }
+            }
         },
         'gh-pages': {
             docs: {

@@ -5,18 +5,18 @@ angular
 .factory('Report', function(){
 
     //Constructor
-    var Report = function(model_or_name, label, description, role){
-        if ( model_or_name === null) {
+    var Report = function(modelOrName, label, description, role){
+        if ( modelOrName === null) {
             throw new Error('new Report creation with null');
-        } else if (typeof model_or_name !== 'object' &&
-                   typeof model_or_name !== 'string') {
-            throw new Error('new Report creation with invalid type ' + typeof model_or_name);
-        } else if (typeof model_or_name === 'object') {
-            this.model = model_or_name;
-        } else if (typeof model_or_name === 'string'){
+        } else if (typeof modelOrName !== 'object' &&
+                   typeof modelOrName !== 'string') {
+            throw new Error('new Report creation with invalid type ' + typeof modelOrName);
+        } else if (typeof modelOrName === 'object') {
+            this.model = modelOrName;
+        } else if (typeof modelOrName === 'string'){
             this.model =
                 {
-                    '_id' : model_or_name,
+                    '_id' : modelOrName,
                     'Archive' : null,
                     'Label' : label,
                     'Description': description,
@@ -40,7 +40,8 @@ angular
                             'ShortName' : 'ConceptMap',
                             'CyclesAllowed' : 'undirected',
                             'Trees' : {}
-                        }],
+                        }
+                    ],
                     'Hypercubes' : {
                         'xbrl:DefaultHypercube' : {
                             'Name' : 'xbrl:DefaultHypercube',
@@ -58,12 +59,12 @@ angular
                                     }
                                 },
                                 'xbrl:Period' : {
-                                  'Name' : 'xbrl:Period',
-                                  'Label' : 'Implicit XBRL Period Dimension'
+                                    'Name' : 'xbrl:Period',
+                                    'Label' : 'Implicit XBRL Period Dimension'
                                 },
                                 'xbrl:Entity' : {
-                                  'Name' : 'xbrl:Entity',
-                                  'Label' : 'Implicit XBRL Entity Dimension'
+                                    'Name' : 'xbrl:Entity',
+                                    'Label' : 'Implicit XBRL Entity Dimension'
                                 }
                             }
                         }
@@ -74,8 +75,8 @@ angular
     };
 
     var ConceptIsStillReferencedError = function(message, referencesInConceptMapsArray, referencesInPresentationArray, referencesInRulesArray) {
-        this.name = "ConceptIsStillReferencedError";
-        this.message = (message || "");
+        this.name = 'ConceptIsStillReferencedError';
+        this.message = (message || '');
         this.references = {
             'Presentation': referencesInPresentationArray,
             'ConceptMaps' : referencesInConceptMapsArray,
@@ -86,17 +87,17 @@ angular
 
     // helper function to check parameters
     var ensureNetworkShortName = function(networkShortName, paramName, functionName) {
-        ensureParameter(networkShortName, paramName, 'string', functionName, /^(Presentation)|(ConceptMap)$/g, 
+        ensureParameter(networkShortName, paramName, 'string', functionName, /^(Presentation)|(ConceptMap)$/g,
             'invalid networkShortName parameter value passed "' + networkShortName + '" (allowed values: Presentation, ConceptMap).');
     };
 
     var ensureConceptName = function(conceptName, paramName, functionName) {
-        ensureParameter(conceptName, paramName, 'string', functionName, /^\w(\w|\d|[-_])*:(\w|\d|[-_])*$/g, 
+        ensureParameter(conceptName, paramName, 'string', functionName, /^\w(\w|\d|[-_])*:(\w|\d|[-_])*$/g,
             'function called with mandatory "' + paramName + '" parameter which is not a QName: ' + conceptName);
     };
     
     var ensureRuleType = function(ruleType, paramName, functionName) {
-        ensureParameter(ruleType, paramName, 'string', functionName, /^(xbrl28:validation)|(xbrl28:formula)$/g, 
+        ensureParameter(ruleType, paramName, 'string', functionName, /^(xbrl28:validation)|(xbrl28:formula)$/g,
             'rule type "' + ruleType + '" is not a valid type (allowed types: xbrl28:validation, xbrl28:formula)');
     };
 
@@ -126,14 +127,14 @@ angular
         // thanks to https://gist.github.com/ae6rt/7894539
         // http://www.ietf.org/rfc/rfc4122.txt
         var s = [];
-        var hexDigits = "0123456789abcdef";
+        var hexDigits = '0123456789abcdef';
         for (var i = 0; i < 36; i++) {
             s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
         }
-        s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
+        s[14] = '4';  // bits 12-15 of the time_hi_and_version field to 0010
         s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
-        s[8] = s[13] = s[18] = s[23] = "-";
-        return s.join("");
+        s[8] = s[13] = s[18] = s[23] = '-';
+        return s.join('');
     };
 
     Report.prototype.getModel = function(){
@@ -152,7 +153,7 @@ angular
             throw new Error('addConcept: concept with name "' + name + '" already exists.');
 
         var model = this.getModel();
-        var concept = 
+        var concept =
             {
                 'Name': name,
                 'Label': label,
@@ -178,8 +179,9 @@ angular
         ensureParameter(label, 'label', 'string', 'updateConcept');
         ensureParameter(abstract, 'abstract', 'boolean', 'updateConcept');
 
-        if(!this.existsConcept(name))
+        if(!this.existsConcept(name)) {
             throw new Error('updateConcept: cannot update concept with name "' + name + '" because it doesn\'t exist.');
+        }
        
         var model = this.getModel();
         var concept = this.getConcept(name);
@@ -213,8 +215,9 @@ angular
 
         var model = this.getModel();
         var concept = this.getConcept(conceptName);
-        if(concept !== null && typeof concept === 'object')
-          return true;
+        if(concept !== null && typeof concept === 'object') {
+            return true;
+        }
         return false;
     };
 
@@ -223,17 +226,17 @@ angular
 
         var model = this.getModel();
         if(model === null || model === undefined) {
-          return null;
+            return null;
         }
 
-        var concept = 
+        var concept =
           model.Hypercubes['xbrl:DefaultHypercube']
               .Aspects['xbrl:Concept']
               .Domains['xbrl:ConceptDomain']
               .Members[conceptName];
 
         if(concept === null || concept === undefined) {
-          return null;
+            return null;
         }
         return concept;
     };
@@ -246,7 +249,7 @@ angular
             return result;
         }
 
-        var members = 
+        var members =
             model.Hypercubes['xbrl:DefaultHypercube']
                 .Aspects['xbrl:Concept']
                 .Domains['xbrl:ConceptDomain']
@@ -305,7 +308,7 @@ angular
 
     Report.prototype.findInSubTree = function(conceptName, subtree) {
         var result = [];
-        if(subtree.Name == conceptName){
+        if(subtree.Name === conceptName){
             result.push(subtree.Id);
         }
         var children = subtree.To;
@@ -350,7 +353,7 @@ angular
 
     Report.prototype.getElementFromTree = function(networkShortName, elementID) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'getElementFromTree');
-        ensureParameter(elementID, 'elementID', 'string', 'getElementFromTree');  
+        ensureParameter(elementID, 'elementID', 'string', 'getElementFromTree');
         
         var network = this.getNetwork(networkShortName);
         var element = null;
@@ -358,8 +361,9 @@ angular
         for(var child in children){
             if(children.hasOwnProperty(child)) {
                 var childresult = getElementByIdFromSubTree(elementID, children[child]);
-                if(childresult !== null)
+                if(childresult !== null) {
                     element = childresult;
+                }
             }
         }
         return element;
@@ -370,11 +374,12 @@ angular
         for(var child in children){
             if(children.hasOwnProperty(child)) {
                 if(children[child].Id === elementID) {
-                  return subtree;
+                    return subtree;
                 } else {
-                  var childresult = getParentElementFromSubTree(elementID, children[child]);
-                  if(childresult !== null)
-                      return childresult;
+                    var childresult = getParentElementFromSubTree(elementID, children[child]);
+                    if(childresult !== null) {
+                        return childresult;
+                    }
                 }
             }
         }
@@ -383,7 +388,7 @@ angular
 
     Report.prototype.getParentElementFromTree = function(networkShortName, elementID) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'getParentElementFromTree');
-        ensureParameter(elementID, 'elementID', 'string', 'getParentElementFromTree');  
+        ensureParameter(elementID, 'elementID', 'string', 'getParentElementFromTree');
         
         var network = this.getNetwork(networkShortName);
         var parent = null;
@@ -391,8 +396,9 @@ angular
         for(var child in children){
             if(children.hasOwnProperty(child)) {
                 var result = getParentElementFromSubTree(elementID, children[child]);
-                if(result !== null)
+                if(result !== null) {
                     parent = result;
+                }
             }
         }
         return parent;
@@ -400,20 +406,20 @@ angular
 
     Report.prototype.existsElementInTree = function(networkShortName, elementID) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'existsElementInTree');
-        ensureParameter(elementID, 'elementID', 'string', 'existsElementInTree');  
+        ensureParameter(elementID, 'elementID', 'string', 'existsElementInTree');
         
         var element = this.getElementFromTree(networkShortName, elementID);
         if(element !== null && typeof element === 'object') {
-          return true;
+            return true;
         }
         return false;
     };
 
     var createNewElement = function(concept, order) {
-        ensureParameter(concept, 'concept', 'object', 'createNewElement'); 
+        ensureParameter(concept, 'concept', 'object', 'createNewElement');
         var _order = 1;
         if(order !== undefined) {
-            ensureParameter(order, 'order', 'number', 'createNewElement'); 
+            ensureParameter(order, 'order', 'number', 'createNewElement');
             _order = order;
         }
         var element = {
@@ -440,19 +446,19 @@ angular
 
         } else {
             // add child to existing tree
-            ensureParameter(parentElementID, 'parentElementID', 'string', 'addTreeChild');  
+            ensureParameter(parentElementID, 'parentElementID', 'string', 'addTreeChild');
         
             var parent = this.getElementFromTree(networkShortName, parentElementID);
             ensureExists(parent, 'object', 'addTreeChild', 'cannot add child to tree. Parent with id "' + parentElementID + '" doesn\'t exist.');
             var parentConcept = this.getConcept(parent.Name);
             if(!parentConcept.IsAbstract) {
-                throw new Error('addTreeChild: cannot add child to parent "' + parentElementID + 
+                throw new Error('addTreeChild: cannot add child to parent "' + parentElementID +
                     '". Reason: Parent concept "' + parent.Name  + '" is not abstract.');
             }
 
             var element = createNewElement(concept, order);
             if(parent.To === undefined || parent.To === null) {
-              parent.To = {};
+                parent.To = {};
             }
             parent.To[conceptName] = element;
 
@@ -465,7 +471,7 @@ angular
         ensureParameter(elementID, 'elementID', 'string', 'setTreeElementOrder');
         var _order = 1;
         if(order !== undefined) {
-            ensureParameter(order, 'order', 'number', 'setTreeElementOrder'); 
+            ensureParameter(order, 'order', 'number', 'setTreeElementOrder');
             _order = order;
         }
         var element = this.getElementFromTree(networkShortName, elementID);
@@ -482,7 +488,7 @@ angular
         ensureExists(newParent, 'object', 'moveTreeBranch', 'Cannot move element with id "' + subtreeRootElementID + '" to new parent element with id "' + newParentElementID + '": Parent element doesn\'t exist.');
         var parentConcept = this.getConcept(newParent.Name);
         if(!parentConcept.IsAbstract) {
-            throw new Error('moveTreeBranch: cannot move element to target parent "' + newParentElementID + 
+            throw new Error('moveTreeBranch: cannot move element to target parent "' + newParentElementID +
                 '". Reason: Parent concept "' + newParent.Name  + '" is not abstract.');
         }
 
@@ -522,9 +528,9 @@ angular
  
         var map = network.Trees[conceptName];
         if(map === null || map === undefined) {
-          return null;
+            return null;
         } else {
-          return map;
+            return map;
         }
     };
 
@@ -537,8 +543,8 @@ angular
         }
         
         for (var conceptname in network.Trees) {
-          var map = network.Trees[conceptname];
-          result.push(map);
+            var map = network.Trees[conceptname];
+            result.push(map);
         }
         return result;
     };
@@ -548,7 +554,7 @@ angular
 
         var map = this.getConceptMap(conceptName);
         if(map === null || map === undefined) {
-          return false;
+            return false;
         }
         return true;
     };
@@ -567,8 +573,8 @@ angular
             var name = toConceptNamesArray[i];
             ensureConceptName(name, 'toConceptNamesArray', 'addConceptMap');
             toObj[name] = { 
-              'Name': name,
-              'Order': parseInt(i, 10) + 1
+                'Name': name,
+                'Order': parseInt(i, 10) + 1
             };
         }
         var conceptMap = {
@@ -599,8 +605,8 @@ angular
             var name = toConceptNamesArray[i];
             ensureConceptName(name, 'toConceptNamesArray', 'updateConceptMap');
             toObj[name] = { 
-              'Name': name,
-              'Order': parseInt(i, 10) + 1
+                'Name': name,
+                'Order': parseInt(i, 10) + 1
             };
         }
         conceptMap.To = toObj;
@@ -647,14 +653,14 @@ angular
 
         var model = this.getModel();
         if(model === null || model === undefined || model.Rules === null || model.Rules === undefined || model.Rules.length === 0) {
-          return null;
+            return null;
         }
 
         for (var i in model.Rules) {
-          var rule = model.Rules[i];
-          if(rule.Id === id) {
-            return rule;
-          }
+            var rule = model.Rules[i];
+            if(rule.Id === id) {
+                return rule;
+            }
         }
         return null;
     };
@@ -664,14 +670,14 @@ angular
 
         var model = this.getModel();
         if(model === null || model === undefined || model.Rules === null || model.Rules === undefined || model.Rules.length === 0) {
-          return;
+            return;
         }
         for (var i in model.Rules) {
-          var rule = model.Rules[i];
-          if(rule.Id === id) {
-            // remove rule from array
-            model.Rules.splice(i,1);
-          }
+            var rule = model.Rules[i];
+            if(rule.Id === id) {
+                // remove rule from array
+                model.Rules.splice(i,1);
+            }
         }
     };
 
@@ -680,7 +686,7 @@ angular
 
         var rule = this.getRule(id);
         if(rule !== null && typeof rule === 'object') {
-          return true;
+            return true;
         }
         return false;
     };
@@ -693,7 +699,7 @@ angular
         ensureExists(model, 'object', 'computableByRules', 'Report doesn\'t have a model.');
 
         if(model.Rules === null || model.Rules === undefined || model.Rules.length === 0) {
-          return result;
+            return result;
         }
 
         for (var i in model.Rules) {
@@ -716,7 +722,7 @@ angular
         ensureExists(model, 'object', 'computableByRules', 'Report doesn\'t have a model.');
 
         if(model.Rules === null || model.Rules === undefined || model.Rules.length === 0) {
-          return result;
+            return result;
         }
 
         for (var i in model.Rules) {
@@ -785,13 +791,13 @@ angular
         }
         
         var rule = {
-          'Id': id,
-          'Label': label,
-          'Description': description,
-          'Type': type,
-          'Formula': formula,
-          'ComputableConcepts': computableConceptsArray,
-          'DependsOn': dependingConceptsArray
+            'Id': id,
+            'Label': label,
+            'Description': description,
+            'Type': type,
+            'Formula': formula,
+            'ComputableConcepts': computableConceptsArray,
+            'DependsOn': dependingConceptsArray
         };
 
         if(type === 'xbrl28:validation') {
