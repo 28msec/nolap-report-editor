@@ -54,7 +54,7 @@ module.exports = function (grunt) {
                 separator: ''
             },
             dist: {
-                src: ['src/editor.js', 'src/report.js'],
+                src: ['src/editor.js', 'src/swagger/ReportAPI.js', 'src/report.js'],
                 dest: 'dist/nolap-report-editor.js'
             }
         },
@@ -246,7 +246,7 @@ module.exports = function (grunt) {
         },
         coveralls: {
             options: {
-                coverage_dir: 'coverage'
+                'coverage_dir': 'coverage'
             }
         }
     });

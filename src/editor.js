@@ -9,8 +9,12 @@ angular
             'reportApi': '=api',
             'reportApiToken': '=token'
         },
-        link: function(){
-            //ReportAPI
+        link: function($scope){
+            ReportAPI.listReports()
+            .then(function(reports){
+                console.log(reports);
+                $scope.reports = reports;
+            });
         }
     };
 })

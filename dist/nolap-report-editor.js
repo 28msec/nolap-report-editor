@@ -1,3 +1,5 @@
+'use strict';
+
 angular
 .module('nolapReportEditor', ['reports.api.28.io'])
 .directive('reports', function(ReportAPI){
@@ -13,6 +15,84 @@ angular
     };
 })
 ;
+angular.module('reports.api.28.io', [])
+/**
+ * <p>This API can be used to manage reports.</p> <p>This API is only accesible for users having granted priviliges to work with reports.</p> <p>Note, that the POST method can be simulated by using GET and adding the _method=POST parameter to the HTTP request.</p>
+ */
+.factory('ReportAPI', function($q, $http, $rootScope){
+    /**
+     * @class ReportAPI
+     * @param {string} domain - The project domain
+     */
+    return function(domain) {
+        if(typeof(domain) !== 'string') {
+            throw new Error('Domain parameter must be specified as a string.');
+        }
+
+        var root = '';
+
+        this.$on = function($scope, path, handler) {
+            var url = domain + path;
+            $scope.$on(url, function(event, data){
+                handler(data);
+            });
+            return this;
+        };
+
+        this.$broadcast = function(path, data){
+            var url = domain + path;
+            $rootScope.$broadcast(url, data);
+            return this;
+        };
+
+        /**
+         * 
+         * @method
+         * @name ReportAPI#listReports
+         * @param {string} name - A report name (e.g. FundamentalAccountingConcepts),
+         * 
+         */
+        this.listReports = function(parameters){
+            var deferred = $q.defer();
+            var that = this;
+            var path = '/reports.jq'
+            var url = domain + path;
+            var params = {};
+            params['name'] = parameters['name'];
+            var body = null;
+            var method = 'GET'.toUpperCase();
+            if (parameters.$method)
+            {
+                params['_method'] = parameters.$method;
+                method = 'GET';
+            }
+            var cached = parameters.$cache && parameters.$cache.get(url);
+            if(method === 'GET' && cached !== undefined && parameters.$refresh !== true) {
+                deferred.resolve(cached);
+            } else {
+            $http({
+                method: method,
+                url: url,
+                params: params,
+                cache: (parameters.$refresh !== true)
+            })
+            .success(function(data, status, headers, config){
+                deferred.resolve(data);
+                //that.$broadcast(url);
+                if(parameters.$cache !== undefined) parameters.$cache.put(url, data, parameters.$cacheItemOpts ?
+parameters.$cacheItemOpts : {});
+            })
+            .error(function(data, status, headers, config){
+                deferred.reject({data: data, status: status, headers: headers, config: config});
+                //cache.removeAll();
+            })
+            ;
+            }
+            return deferred.promise;
+        };
+    };
+});'use strict';
+
 angular
 .module('nolapReportEditor')
 .factory('Report', function(){
