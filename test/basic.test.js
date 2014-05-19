@@ -1,4 +1,8 @@
 describe('Basic Test', function () {
+    'use strict';
+
+    /* global Report */
+
     it('Create a New Report', function () {
         var report = new Report({
             '_id' : 'ReportName',

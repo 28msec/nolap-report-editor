@@ -1,6 +1,7 @@
 describe('Concepts Model API Tests', function () {
     'use strict';
 
+    /* global Report */
     var report = null;
 
     it('Create a New Report', function () {
