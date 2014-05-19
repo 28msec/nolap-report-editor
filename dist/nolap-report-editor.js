@@ -1,5 +1,10 @@
 angular
 .module('nolapReportEditor', [])
+.directive('reportEditor', function(){
+    return {
+        
+    };
+})
 ;angular
 .module('nolapReportEditor')
 .factory('Report', function(){

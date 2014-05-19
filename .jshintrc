@@ -35,6 +35,8 @@
         "jasmine"
     ],
     "globals": {
-        "angular": false
+        "angular": false,
+        "module": false,
+        "require": false
     }
 }

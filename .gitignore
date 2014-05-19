@@ -1,3 +1,4 @@
+src/swagger
 node_modules
 bower_components
 coverage

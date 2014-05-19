@@ -4,10 +4,25 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
     require('time-grunt')(grunt);
 
+    grunt.task.loadTasks('tasks');
+    
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-
+        swagger: {
+            options: {
+                apis: [
+                    {
+                        swagger: 'swagger/reports.json',
+                        module: 'reports.api.28.io',
+                        newModule: true,
+                        service: 'Reports'
+                    }
+                ],
+                dest: 'src/swagger'
+            },
+            dist: {}
+        },
         jsdoc: {
            docs: {
              src: ['src/editor.js', 'src/report.js'],
@@ -29,7 +44,7 @@ module.exports = function (grunt) {
             post: []
         },
         jshint: {
-            all: ['Gruntfile.js', 'src/**/*.js', 'test/*.js'],
+            all: ['Gruntfile.js', 'src/**/*.js', 'test/*.js', 'tasks/*.js'],
             jshintrc: '.jshintrc'
         },
         concat: {
@@ -236,6 +251,6 @@ module.exports = function (grunt) {
 
     grunt.registerTask('test', ['karma:1.2.0']);
     grunt.registerTask('release', ['clean:pre', 'concat', 'test', 'jsdoc', 'clean:post']);//uglify
-    grunt.registerTask('build', ['clean:pre', 'release']);
+    grunt.registerTask('build', ['clean:pre', 'swagger', 'release']);
     grunt.registerTask('default', ['jshint', 'build']);
 };
