@@ -16,12 +16,12 @@ module.exports = function (grunt) {
                         swagger: 'swagger/reports.json',
                         module: 'reports.api.28.io',
                         newModule: true,
-                        service: 'Reports'
+                        service: 'ReportAPI'
                     }
                 ],
                 dest: 'src/swagger'
             },
-            dist: {}
+            all: {}
         },
         jsdoc: {
            docs: {
@@ -44,8 +44,10 @@ module.exports = function (grunt) {
             post: []
         },
         jshint: {
-            all: ['Gruntfile.js', 'src/**/*.js', 'test/*.js', 'tasks/*.js'],
-            jshintrc: '.jshintrc'
+            options: {
+                jshintrc: '.jshintrc'
+            },
+            src: ['Gruntfile.js', 'src/**/*.js', 'test/*.js', 'tasks/*.js'],
         },
         concat: {
             options: {

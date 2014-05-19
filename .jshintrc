@@ -16,9 +16,9 @@
     "regexp": true,
     "undef": true,
     "unused": true,
-    "strict": true,
     "trailing": true,
     "smarttabs": true,
+    "strict": true, 
     "predef": [
         "inject",
         "describe",
@@ -35,8 +35,6 @@
         "jasmine"
     ],
     "globals": {
-        "angular": false,
-        "module": false,
-        "require": false
+        "angular": false
     }
 }

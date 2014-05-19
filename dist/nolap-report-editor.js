@@ -1,11 +1,19 @@
 angular
-.module('nolapReportEditor', [])
-.directive('reportEditor', function(){
+.module('nolapReportEditor', ['reports.api.28.io'])
+.directive('reports', function(ReportAPI){
     return {
-        
+        restrict: 'A',
+        scope: {
+            'reportApi': '=api',
+            'reportApiToken': '=token'
+        },
+        link: function(){
+            //ReportAPI
+        }
     };
 })
-;angular
+;
+angular
 .module('nolapReportEditor')
 .factory('Report', function(){
 
