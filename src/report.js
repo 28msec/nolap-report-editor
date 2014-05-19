@@ -71,23 +71,39 @@ angular
         } // if
     };
 
+    var ConceptIsStillReferencedError = function(message, referencesInConceptMapsArray, referencesInPresentationArray, referencesInRulesArray) {
+        this.name = "ConceptIsStillReferencedError";
+        this.message = (message || "");
+        this.references = {
+            'Presentation': referencesInPresentationArray,
+            'ConceptMaps' : referencesInConceptMapsArray,
+            'Rules': referencesInRulesArray
+        };
+    };
+    ConceptIsStillReferencedError.prototype = new Error();
+
     // helper function to check parameters
     var ensureNetworkShortName = function(networkShortName, paramName, functionName) {
         ensureParameter(networkShortName, paramName, 'string', functionName, /^(Presentation)|(ConceptMap)$/g, 
-            'invalid networkShortName parameter value passed "' + networkShortName + '" (allowed values: Presentation).');
+            'invalid networkShortName parameter value passed "' + networkShortName + '" (allowed values: Presentation, ConceptMap).');
     };
 
     var ensureConceptName = function(conceptName, paramName, functionName) {
         ensureParameter(conceptName, paramName, 'string', functionName, /^\w(\w|\d|[-_])*:(\w|\d|[-_])*$/g, 
             'function called with mandatory "' + paramName + '" parameter which is not a QName: ' + conceptName);
     };
+    
+    var ensureRuleType = function(ruleType, paramName, functionName) {
+        ensureParameter(ruleType, paramName, 'string', functionName, /^(xbrl28:validation)|(xbrl28:formula)$/g, 
+            'rule type "' + ruleType + '" is not a valid type (allowed types: xbrl28:validation, xbrl28:formula)');
+    };
 
     var ensureParameter = function(paramValue, paramName, paramType, functionName, regex, regexErrorMessage) {
         if(paramValue === null || paramValue === undefined) {
-            throw new Error(functionName + ': function called without mandatory ' + paramName + ' parameter.');
+            throw new Error(functionName + ': function called without mandatory "' + paramName + '" parameter.');
         }
         if(typeof paramValue !== paramType) {
-            throw new Error(functionName + ': function called with mandatory name parameter of type ' + typeof paramValue + ' instead of ' + paramType + '.');
+            throw new Error(functionName + ': function called with mandatory "' + paramName + '" parameter which is of wrong type "' + typeof paramValue + '" (should be of type "' + paramType + '" instead).');
         }
         if(regex !== undefined && paramValue.match(regex) === null) {
             throw new Error(functionName + ': ' + regexErrorMessage);
@@ -172,8 +188,16 @@ angular
     Report.prototype.removeConcept = function(name) {
         ensureConceptName(name, 'name', 'removeConcept');
 
-        if(!this.existsConcept(name))
+        if(!this.existsConcept(name)){
             throw new Error('removeConcept: cannot remove concept with name "' + name + '" from model because it doesn\'t exist.');
+        }
+
+        var referencesInConceptMapsArray = this.findInConceptMap(name);
+        var referencesInPresentationArray = this.findInTree('Presentation', name);
+        var referencesInRulesArray = this.findInRules(name);
+        if(referencesInConceptMapsArray.length > 0 || referencesInPresentationArray.length > 0 || referencesInRulesArray.length > 0){
+            throw new ConceptIsStillReferencedError('removeConcept: cannot remove concept with name "' + name + '" from model because it is still referenced in the report.', referencesInConceptMapsArray, referencesInPresentationArray, referencesInRulesArray);
+        }
 
         var model = this.getModel();
         delete model.Hypercubes['xbrl:DefaultHypercube']
@@ -196,12 +220,44 @@ angular
         ensureConceptName(conceptName, 'conceptName', 'getConcept');
 
         var model = this.getModel();
+        if(model === null || model === undefined) {
+          return null;
+        }
+
         var concept = 
           model.Hypercubes['xbrl:DefaultHypercube']
               .Aspects['xbrl:Concept']
               .Domains['xbrl:ConceptDomain']
               .Members[conceptName];
+
+        if(concept === null || concept === undefined) {
+          return null;
+        }
         return concept;
+    };
+
+    Report.prototype.listConcepts = function() {
+
+        var result = [];
+        var model = this.getModel();
+        if(model === null || model === undefined) {
+            return result;
+        }
+
+        var members = 
+            model.Hypercubes['xbrl:DefaultHypercube']
+                .Aspects['xbrl:Concept']
+                .Domains['xbrl:ConceptDomain']
+                .Members;
+        if(members === null || members === undefined) {
+            return result;
+        }
+
+        for(var conceptname in members) {
+            var concept = members[conceptname];
+            result.push(concept);
+        }
+        return result;
     };
 
     /**********************
@@ -211,7 +267,15 @@ angular
         ensureNetworkShortName(networkShortName, 'networkShortName', 'getNetwork');
         
         var model = this.getModel();
+        if(model === null || model === undefined) {
+            return null;
+        }
+
         var networks = model.Networks;
+        if(networks === null || networks === undefined) {
+            return null;
+        }
+
         for(var i in networks) {
             var network = networks[i];
             if(networks.hasOwnProperty(i) &&
@@ -219,6 +283,22 @@ angular
                 return network;
             }
         }
+    };
+
+    Report.prototype.listTrees = function(networkShortName) {
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'listTrees');
+        
+        var result = [];
+        var network = this.getNetwork(networkShortName);
+        if(network === null || network === undefined) {
+            return result;
+        }
+
+        for(var treeroot in network.Trees) {
+            var tree = network.Trees[treeroot];
+            result.push(tree);
+        }
+        return result;
     };
 
     Report.prototype.findInSubTree = function(conceptName, subtree) {
@@ -327,7 +407,7 @@ angular
         return false;
     };
 
-    Report.prototype.createNewElement = function(concept, order) {
+    var createNewElement = function(concept, order) {
         ensureParameter(concept, 'concept', 'object', 'createNewElement'); 
         var _order = 1;
         if(order !== undefined) {
@@ -352,7 +432,7 @@ angular
         if(parentElementID === undefined || parentElementID === null) {
             // add a root element
             var network = this.getNetwork(networkShortName);
-            var rootElement = this.createNewElement(concept, order);
+            var rootElement = createNewElement(concept, order);
             network.Trees[conceptName] = rootElement;
             return rootElement;
 
@@ -368,7 +448,7 @@ angular
                     '". Reason: Parent concept "' + parent.Name  + '" is not abstract.');
             }
 
-            var element = this.createNewElement(concept, order);
+            var element = createNewElement(concept, order);
             if(parent.To === undefined || parent.To === null) {
               parent.To = {};
             }
@@ -444,6 +524,21 @@ angular
         } else {
           return map;
         }
+    };
+
+    Report.prototype.listConceptMaps = function() {
+
+        var result = [];
+        var network = this.getNetwork('ConceptMap');
+        if(network === null || network === undefined || network.Trees === null || network.Trees === undefined) {
+            return result;
+        }
+        
+        for (var conceptname in network.Trees) {
+          var map = network.Trees[conceptname];
+          result.push(map);
+        }
+        return result;
     };
 
     Report.prototype.existsConceptMap = function(conceptName) {
@@ -523,7 +618,9 @@ angular
                 var map = network.Trees[child];
                 var to = map.To;
                 if(to !== null && to !== undefined && to[conceptName] !== null && typeof to[conceptName] === 'object') {
-                  result.push(child);
+                    result.push(child);
+                } else if (child === conceptName){
+                    result.push(child);
                 }
             }
         }
@@ -538,6 +635,237 @@ angular
 
         var network = this.getNetwork('ConceptMap');
         return delete network.Trees[conceptName];
+    };
+
+    /**********************
+     ** Rules API
+     **********************/
+    Report.prototype.getRule = function(id) {
+        ensureParameter(id, 'id', 'string', 'getRule');
+
+        var model = this.getModel();
+        if(model === null || model === undefined || model.Rules === null || model.Rules === undefined || model.Rules.length === 0) {
+          return null;
+        }
+
+        for (var i in model.Rules) {
+          var rule = model.Rules[i];
+          if(rule.Id === id) {
+            return rule;
+          }
+        }
+        return null;
+    };
+
+    Report.prototype.removeRule = function(id) {
+        ensureParameter(id, 'id', 'string', 'removeRule');
+
+        var model = this.getModel();
+        if(model === null || model === undefined || model.Rules === null || model.Rules === undefined || model.Rules.length === 0) {
+          return;
+        }
+        for (var i in model.Rules) {
+          var rule = model.Rules[i];
+          if(rule.Id === id) {
+            // remove rule from array
+            model.Rules.splice(i,1);
+          }
+        }
+    };
+
+    Report.prototype.existsRule = function(id) {
+        ensureParameter(id, 'id', 'string', 'existsRule');
+
+        var rule = this.getRule(id);
+        if(rule !== null && typeof rule === 'object') {
+          return true;
+        }
+        return false;
+    };
+
+    Report.prototype.computableByRules = function(conceptName) {
+        ensureConceptName(conceptName, 'conceptName', 'computableByRules');
+
+        var result = [];
+        var model = this.getModel();
+        ensureExists(model, 'object', 'computableByRules', 'Report doesn\'t have a model.');
+
+        if(model.Rules === null || model.Rules === undefined || model.Rules.length === 0) {
+          return result;
+        }
+
+        for (var i in model.Rules) {
+            var rule = model.Rules[i];
+            // indexOf not supported in IE<9
+            for(var j in rule.ComputableConcepts){
+                if(rule.ComputableConcepts[j] === conceptName) {
+                    result.push(rule);
+                }
+            }
+        }
+        return result;
+    };
+
+    Report.prototype.findInRules = function(conceptName) {
+        ensureConceptName(conceptName, 'conceptName', 'findInRules');
+
+        var result = [];
+        var model = this.getModel();
+        ensureExists(model, 'object', 'computableByRules', 'Report doesn\'t have a model.');
+
+        if(model.Rules === null || model.Rules === undefined || model.Rules.length === 0) {
+          return result;
+        }
+
+        for (var i in model.Rules) {
+            var rule = model.Rules[i];
+            var found = false;
+            // indexOf not supported in IE<9
+            for(var j in rule.ComputableConcepts){
+                if(rule.ComputableConcepts[j] === conceptName) {
+                    result.push(rule.Id);
+                    found = true;
+                    break;
+                }
+            }
+            if(!found && rule.DependsOn !== null && typeof rule.DependsOn === 'object') {
+                for(var x in rule.DependsOn){
+                    if(rule.DependsOn[x] === conceptName) {
+                        result.push(rule.Id);
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if(!found && rule.ValidatedConcepts !== null && typeof rule.ValidatedConcepts === 'object') {
+                for(var y in rule.ValidatedConcepts){
+                    if(rule.ValidatedConcepts[y] === conceptName) {
+                        result.push(rule.Id);
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
+    };
+
+    var createNewRule = function(id, label, description, type, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray, report) {
+        ensureParameter(id, 'id', 'string', 'createNewRule');
+        ensureParameter(label, 'label', 'string', 'createNewRule');
+        ensureParameter(description, 'description', 'string', 'createNewRule');
+        ensureRuleType(type, 'type', 'createNewRule');
+        ensureParameter(formula, 'formula', 'string', 'createNewRule');
+        ensureExists(computableConceptsArray, 'object', 'createNewRule', 'function called without computableConceptsArray.');
+
+        for(var i in computableConceptsArray) {
+            var cname = computableConceptsArray[i];
+            ensureConceptName(cname, 'computableConceptsArray', 'createNewRule');
+            var rulesComputableConcepts = report.computableByRules(cname);
+            if(rulesComputableConcepts.lenght > 0 && rulesComputableConcepts[0].Id !== id) {
+                throw new Error('createNewRule: A rule which can compute facts of concept "' + cname + '" exists already: "' + rulesComputableConcepts[0] + '. Currently, only one rule must be able to compute a fact for a certain concept.');
+            }
+        }
+        if(dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
+            for(var j in dependingConceptsArray) {
+                var dname = dependingConceptsArray[i];
+                ensureConceptName(dname, 'dependingConceptsArray', 'createNewRule');
+            }
+        }
+        if(validatedConceptsArray !== null && typeof validatedConceptsArray === 'object') {
+            for(var x in validatedConceptsArray) {
+                var vname = validatedConceptsArray[x];
+                ensureConceptName(vname, 'validatedConceptsArray', 'createNewRule');
+            }
+        }
+        if(computableConceptsArray.length === 0) {
+            throw new Error('createNewRule: rule of type "' + type + '" must have at least one computable concept. Function createNewRule was called with empty computableConceptsArray.');
+        }
+        
+        var rule = {
+          'Id': id,
+          'Label': label,
+          'Description': description,
+          'Type': type,
+          'Formula': formula,
+          'ComputableConcepts': computableConceptsArray,
+          'DependsOn': dependingConceptsArray
+        };
+
+        if(type === 'xbrl28:validation') {
+            ensureExists(validatedConceptsArray, 'object', 'createNewRule', 'function called without validatedConceptsArray.');
+            if(validatedConceptsArray.length === 0) {
+                throw new Error('validatedConceptsArray: rule of type "' + type + '" must have at least one validateble concept. Function createNewRule was called with empty validatedConceptsArray.');
+            }
+            rule.ValidatedConcepts = validatedConceptsArray;
+        }
+        return rule;
+    };
+
+    Report.prototype.setFormulaRule = function(id, label, description, formula, computableConceptsArray, dependingConceptsArray){
+        // sanity checks are done in createNewRule
+        var rule = createNewRule(id, label, description, 'xbrl28:formula', formula, computableConceptsArray, dependingConceptsArray, null, this);
+
+        var model = this.getModel();
+        ensureExists(model, 'object', 'setFormulaRule', 'Report doesn\'t have a model.');
+
+        if(model.Rules === null || model.Rules === undefined) {
+            model.Rules = [];
+        }
+        if(this.existsRule(id)) {
+            this.removeRule(id);
+        }
+        model.Rules.push(rule);
+    };
+
+    Report.prototype.setValidationRule = function(id, label, description, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray){
+        // sanity checks are done in createNewRule
+        var rule = createNewRule(id, label, description, 'xbrl28:validation', formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray, this);
+
+        var model = this.getModel();
+        ensureExists(model, 'object', 'setValidationRule', 'Report doesn\'t have a model.');
+
+        if(model.Rules === null || model.Rules === undefined) {
+            model.Rules = [];
+        }
+        if(this.existsRule(id)) {
+            this.removeRule(id);
+        }
+        model.Rules.push(rule);
+    };
+
+    Report.prototype.listRules = function(){
+
+        var result = [];
+        var model = this.getModel();
+        if(model === null || model === undefined || model.Rules === null || model.Rules === undefined) {
+            return result;
+        }
+        return model.Rules;
+    };
+
+    Report.prototype.listFormulaRules = function(){
+        var result = [];
+        var rules = this.listRules();
+        for(var i in rules) {
+            var rule = rules[i];
+            if(rule.Type === 'xbrl28:formula'){
+                result.push(rule);
+            }
+        }
+        return result;
+    };
+
+    Report.prototype.listValidationRules = function(){
+        var result = [];
+        var rules = this.listRules();
+        for(var i in rules) {
+            var rule = rules[i];
+            if(rule.Type === 'xbrl28:validation'){
+                result.push(rule);
+            }
+        }
+        return result;
     };
 
     return Report;
