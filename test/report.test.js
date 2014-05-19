@@ -147,8 +147,8 @@ describe('Concepts Model API Tests', function () {
         var element = report.getElementFromTree('Presentation',elementID);
         expect(element.Order).toBe(3);
 
-        report.setTreeElementOrder('Presentation',elementID, 2);
-        expect(element.Order).toBe(2);
+        report.setTreeElementOrder('Presentation',elementID, order);
+        expect(element.Order).toBe(order);
     });
 
     it('Move Subtree', function () {
@@ -195,7 +195,7 @@ describe('Concepts Model API Tests', function () {
         var to = [ 'us-gaap:Revenues', 'us-gaap:Liabilities' ];
         report.addConcept(from, label, false);
         var root2ID = report.findInTree('Presentation','fac:Root2')[0];
-        var element = report.addTreeChild('Presentation', root2ID, from, 3);
+        report.addTreeChild('Presentation', root2ID, from, 3);
         report.addConceptMap(from, to);
 
         expect(report.existsConceptMap(from)).toBe(true);

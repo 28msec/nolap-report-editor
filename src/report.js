@@ -138,7 +138,7 @@ angular
     };
 
     Report.prototype.getModel = function(){
-        return this.model;    
+        return this.model;
     };
 
     /**********************
@@ -149,8 +149,9 @@ angular
         ensureParameter(label, 'label', 'string', 'addConcept');
         ensureParameter(abstract, 'abstract', 'boolean', 'addConcept');
         
-        if(this.existsConcept(name))
+        if(this.existsConcept(name)) {
             throw new Error('addConcept: concept with name "' + name + '" already exists.');
+        }
 
         var model = this.getModel();
         var concept =
@@ -183,7 +184,6 @@ angular
             throw new Error('updateConcept: cannot update concept with name "' + name + '" because it doesn\'t exist.');
         }
        
-        var model = this.getModel();
         var concept = this.getConcept(name);
         concept.Label = label;
         concept.IsAbstract = abstract;
@@ -213,7 +213,6 @@ angular
     Report.prototype.existsConcept = function(conceptName) {
         ensureConceptName(conceptName, 'conceptName', 'existsConcept');
 
-        var model = this.getModel();
         var concept = this.getConcept(conceptName);
         if(concept !== null && typeof concept === 'object') {
             return true;
@@ -344,8 +343,9 @@ angular
         for(var child in children){
             if(children.hasOwnProperty(child)) {
                 var childresult = getElementByIdFromSubTree(elementID, children[child]);
-                if(childresult !== null)
+                if(childresult !== null) {
                     return childresult;
+                }
             }
         }
         return null;
@@ -564,7 +564,7 @@ angular
         var fromConcept = this.getConcept(fromConceptName);
         ensureExists(fromConcept, 'object', 'addConceptMap', 'concept with name "' + fromConceptName + '" doesn\'t exist.');
         if(fromConcept.IsAbstract) {
-            throw new Error('addConceptMap: cannot add a concept map for concept "' + fromConceptName + 
+            throw new Error('addConceptMap: cannot add a concept map for concept "' + fromConceptName +
                 '". Reason: Concept is abstract.');
         }
 
@@ -572,7 +572,7 @@ angular
         for(var i in toConceptNamesArray) {
             var name = toConceptNamesArray[i];
             ensureConceptName(name, 'toConceptNamesArray', 'addConceptMap');
-            toObj[name] = { 
+            toObj[name] = {
                 'Name': name,
                 'Order': parseInt(i, 10) + 1
             };
@@ -604,7 +604,7 @@ angular
         for(var i in toConceptNamesArray) {
             var name = toConceptNamesArray[i];
             ensureConceptName(name, 'toConceptNamesArray', 'updateConceptMap');
-            toObj[name] = { 
+            toObj[name] = {
                 'Name': name,
                 'Order': parseInt(i, 10) + 1
             };
@@ -776,7 +776,7 @@ angular
         }
         if(dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
             for(var j in dependingConceptsArray) {
-                var dname = dependingConceptsArray[i];
+                var dname = dependingConceptsArray[j];
                 ensureConceptName(dname, 'dependingConceptsArray', 'createNewRule');
             }
         }
