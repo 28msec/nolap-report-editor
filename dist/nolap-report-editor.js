@@ -10,7 +10,10 @@ angular
             'reportApiToken': '=token'
         },
         link: function($scope){
-            ReportAPI.listReports()
+            var api = new ReportAPI($scope.api);
+            api.listReports({
+                token: $scope.token
+            })
             .then(function(reports){
                 console.log(reports);
                 $scope.reports = reports;
