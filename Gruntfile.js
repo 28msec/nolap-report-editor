@@ -9,6 +9,18 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        peg: {
+            // https://github.com/dvberkel/grunt-peg
+            options: { trackLineAndColumn: true },
+            formulaGrammar : {
+                src: "pegjs/formulaGrammar.pegjs",
+                dest: "src/pegjs/formulaGrammar.js",
+                angular: {
+                    module: "reports.api.28.io",
+                    factory: "FormulaParser"
+                }
+            }
+        },
         swagger: {
             options: {
                 apis: [
@@ -253,6 +265,6 @@ module.exports = function (grunt) {
 
     grunt.registerTask('test', ['karma:1.2.0']);
     grunt.registerTask('release', ['clean:pre', 'concat', 'test', 'jsdoc', 'clean:post']);//uglify
-    grunt.registerTask('build', ['clean:pre', 'swagger', 'release']);
+    grunt.registerTask('build', ['clean:pre', 'peg', 'swagger', 'release']);
     grunt.registerTask('default', ['jshint', 'build']);
 };
