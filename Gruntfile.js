@@ -13,11 +13,11 @@ module.exports = function (grunt) {
             // https://github.com/dvberkel/grunt-peg
             options: { trackLineAndColumn: true },
             formulaGrammar : {
-                src: "pegjs/formulaGrammar.pegjs",
-                dest: "src/pegjs/formulaGrammar.js",
+                src: 'pegjs/formulaGrammar.pegjs',
+                dest: 'src/pegjs/formulaGrammar.js',
                 angular: {
-                    module: "reports.api.28.io",
-                    factory: "FormulaParser"
+                    module: 'reports.api.28.io',
+                    factory: 'FormulaParser'
                 }
             }
         },
