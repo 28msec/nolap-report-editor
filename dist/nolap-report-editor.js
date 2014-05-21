@@ -57,6 +57,7 @@ angular.module('reports.api.28.io', [])
          * @method
          * @name ReportAPI#listReports
          * @param {string} name - A report name (e.g. FundamentalAccountingConcepts),
+         * @param {string} token - The token of the current session,
          * 
          */
         this.listReports = function(parameters){
@@ -66,6 +67,7 @@ angular.module('reports.api.28.io', [])
             var url = domain + path;
             var params = {};
             params['name'] = parameters['name'];
+            params['token'] = parameters['token'];
             var body = null;
             var method = 'GET'.toUpperCase();
             if (parameters.$method)
@@ -88,6 +90,110 @@ angular.module('reports.api.28.io', [])
                 //that.$broadcast(url);
                 if(parameters.$cache !== undefined) parameters.$cache.put(url, data, parameters.$cacheItemOpts ?
 parameters.$cacheItemOpts : {});
+            })
+            .error(function(data, status, headers, config){
+                deferred.reject({data: data, status: status, headers: headers, config: config});
+                //cache.removeAll();
+            })
+            ;
+            }
+            return deferred.promise;
+        };
+
+        /**
+         * 
+         * @method
+         * @name ReportAPI#addOrReplaceOrValidateReport
+         * @param {object} report - A JSON object containing the report,
+         * @param {boolean} validation-only - This parameter is either given without any value (means: on) or absent (means: off) or its value is castable to a boolean. Turns validation-only mode on or off.,
+         * @param {string} token - The token of the current session,
+         * 
+         */
+        this.addOrReplaceOrValidateReport = function(parameters){
+            var deferred = $q.defer();
+            var that = this;
+            var path = '/add-report.jq'
+            var url = domain + path;
+            var params = {};
+            if(parameters['report'] === undefined) {
+                deferred.reject(new Error('The report parameter is required'));
+                return deferred.promise;
+            } else {
+                params['report'] = parameters['report'];
+            }
+            params['validation-only'] = parameters['validationOnly'];
+            params['token'] = parameters['token'];
+            var body = null;
+            var method = 'POST'.toUpperCase();
+            if (parameters.$method)
+            {
+                params['_method'] = parameters.$method;
+                method = 'GET';
+            }
+            var cached = parameters.$cache && parameters.$cache.get(url);
+            if(method === 'GET' && cached !== undefined && parameters.$refresh !== true) {
+                deferred.resolve(cached);
+            } else {
+            $http({
+                method: method,
+                url: url,
+                params: params,
+                cache: (parameters.$refresh !== true)
+            })
+            .success(function(data, status, headers, config){
+                deferred.resolve(data);
+                //cache.removeAll();
+            })
+            .error(function(data, status, headers, config){
+                deferred.reject({data: data, status: status, headers: headers, config: config});
+                //cache.removeAll();
+            })
+            ;
+            }
+            return deferred.promise;
+        };
+
+        /**
+         * 
+         * @method
+         * @name ReportAPI#removeReport
+         * @param {string} name - A report name (e.g. FundamentalAccountingConcepts),
+         * @param {string} token - The token of the current session,
+         * 
+         */
+        this.removeReport = function(parameters){
+            var deferred = $q.defer();
+            var that = this;
+            var path = '/delete-report.jq'
+            var url = domain + path;
+            var params = {};
+            if(parameters['name'] === undefined) {
+                deferred.reject(new Error('The name parameter is required'));
+                return deferred.promise;
+            } else {
+                params['name'] = parameters['name'];
+            }
+            params['token'] = parameters['token'];
+            var body = null;
+            var method = 'POST'.toUpperCase();
+            if (parameters.$method)
+            {
+                params['_method'] = parameters.$method;
+                method = 'GET';
+            }
+            var cached = parameters.$cache && parameters.$cache.get(url);
+            if(method === 'GET' && cached !== undefined && parameters.$refresh !== true) {
+                deferred.resolve(cached);
+            } else {
+            $http({
+                method: method,
+                url: url,
+                params: params,
+                cache: (parameters.$refresh !== true)
+            })
+            .success(function(data, status, headers, config){
+                deferred.resolve(data);
+                //cache.removeAll();
             })
             .error(function(data, status, headers, config){
                 deferred.reject({data: data, status: status, headers: headers, config: config});

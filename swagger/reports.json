@@ -23,6 +23,13 @@
                             "required": false,
                             "type": "string",
                             "paramType": "query"
+                        },
+                        {
+                            "name": "token",
+                            "description": "The token of the current session",
+                            "required": false,
+                            "type": "string",
+                            "paramType": "query"
                         }
                     ],
                     "responseMessages": [
@@ -64,6 +71,161 @@
                             "title": "Retrieve all reports",
                             "description": "Retrieve the schemas of all reports. Return the result as JSON.",
                             "request": "[API_URL]/_queries/public/reports/reports.jq?token=00000-00-000-00000",
+                            "response": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/add-report.jq",
+            "description": "Add/Update/Validate Reports",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "Add a new, update an existing report or validates a report on the fly",
+                    "nickname": "addOrReplaceOrValidateReport",
+                    "parameters": [
+                        {
+                            "name": "report",
+                            "description": "A JSON object containing the report",
+                            "required": true,
+                            "type": "object",
+                            "paramType": "query"
+                        },
+                        {
+                            "name": "validation-only",
+                            "description": "This parameter is either given without any value (means: on) or absent (means: off) or its value is castable to a boolean. Turns validation-only mode on or off.",
+                            "required": false,
+                            "type": "boolean",
+                            "paramType": "query"
+                        },
+                        {
+                            "name": "token",
+                            "description": "The token of the current session",
+                            "required": false,
+                            "type": "string",
+                            "paramType": "query"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 401,
+                            "message": "Unauthorized: the specified project token is invalid, expired, or missing",
+                            "responseModel": "Error"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden: the specified project token doesn't have sufficient privileges",
+                            "responseModel": "Error"
+                        },
+                        {
+                            "code": 400,
+                            "message": "Bad Request: A mandatory parameter is missing or a given parameter is invalid",
+                            "responseModel": "Error"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An internal error occurred during the processing of the request.",
+                            "responseModel": "Error"
+                        }
+                    ],
+                    "successMessages": [
+                        {
+                            "code": 200,
+                            "message": "Returns the report as it was stored. Or, the validation results in an array."
+                        }
+                    ],
+                    "examples": [
+                        {
+                            "title": "Add or replace a report",
+                            "description": "Add a new report or replace an existing one. Return the stored report as JSON.",
+                            "request": "[API_URL]/_queries/public/reports/add-report.jq?report=%7B%27_id%27%3A%20%27FundamentalAccountingConcepts%27%7D&token=00000-00-000-00000",
+                            "response": "{Name: 'FundamentalAccountingConcepts'}"
+                        },
+                        {
+                            "title": "Validate a report",
+                            "description": "Validate the structure of a report JSON object. Return warnings and errors in a JSON Array.",
+                            "request": "[API_URL]/_queries/public/reports/add-report.jq?validation-only&report=%7B%27_id%27%3A%20%27FundamentalAccountingConcepts%27%7D&token=00000-00-000-00000",
+                            "response": "[
+                            {
+                              'type' : 'ERROR', 
+                              'context' : 'Presentation', 
+                              'identifier' : 'fac:Root', 
+                              'message' : 'Concept is not in the hypercube value space: fac:Root2'
+                            }, {
+                              'type' : 'INFO', 
+                              'context' : 'Presentation', 
+                              'identifier' : 'fac:Test', 
+                              'message' : 'Duplicate concept: fac:Test'
+                            }]"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/delete-report.jq",
+            "description": "Remove an existing Report",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "Delete an existing report",
+                    "nickname": "removeReport",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "description": "A report name (e.g. FundamentalAccountingConcepts)",
+                            "required": true,
+                            "type": "string",
+                            "paramType": "query"
+                        },
+                        {
+                            "name": "token",
+                            "description": "The token of the current session",
+                            "required": false,
+                            "type": "string",
+                            "paramType": "query"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 400,
+                            "message": "Bad Request: a mandatory parameter is missing or a given parameter is not valid",
+                            "responseModel": "Error"
+                        },
+                        {
+                            "code": 401,
+                            "message": "Unauthorized: the specified project token is invalid, expired, or missing",
+                            "responseModel": "Error"
+                        },
+                        {
+                            "code": 403,
+                            "message": "Forbidden: the specified project token doesn't have sufficient privileges",
+                            "responseModel": "Error"
+                        },
+                        {
+                            "code": 404,
+                            "message": "Not found: a report name was given as parameter, but a report with the specified name could not be found",
+                            "responseModel": "Error"
+                        },
+                        {
+                            "code": 500,
+                            "message": "An internal error occurred during the processing of the request.",
+                            "responseModel": "Error"
+                        }
+                    ],
+                    "successMessages": [
+                        {
+                            "code": 204,
+                            "message": "Report has been deleted. Empty response."
+                        }
+                    ],
+                    "examples": [
+                        {
+                            "title": "Delete a report",
+                            "description": "Remove report with name FundamentalAccountingConcepts.",
+                            "request": "[API_URL]/_queries/public/reports/delete-report.jq?name=FundamentalAccountingConcepts&token=00000-00-000-00000",
                             "response": ""
                         }
                     ]
