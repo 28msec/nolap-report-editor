@@ -14,7 +14,7 @@ module.exports = function (grunt) {
             options: { trackLineAndColumn: true },
             formulaGrammar : {
                 src: 'pegjs/formulaGrammar.pegjs',
-                dest: 'src/pegjs/formulaGrammar.js',
+                dest: 'src/pegjs/formulaParser.js',
                 angular: {
                     module: 'reports.api.28.io',
                     factory: 'FormulaParser'

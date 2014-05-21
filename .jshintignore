@@ -1,2 +1,2 @@
 src/swagger/ReportAPI.js
-src/pegjs/formulaGrammar.js
+src/pegjs/formulaParser.js
