@@ -7,19 +7,58 @@
     return {Type: type, Children: [one]};
   }
 
+  function createAtomic(val) {
+    return {Type: "atomic", Value: val};
+  }
+
+
   function createVar(name) {
     return {Type: "variable", ConceptName: name};
+  }
+
+  
+  function createFun(name, params) {
+    return {Type: "function", Name: name, Params: [params]};
   }
 
 }
 
 start
-  = subadd
+  = equation
+
+equation
+  = equation_single / equation_double1 / equation_double2 / subadd
+
+equation_single
+  = _ left:subadd _ sign:([<=>]) _ right:subadd _
+    {
+      switch(sign[0])
+      {
+        case '=': return create("eq", left, right);
+        case '>': return create("gt", left, right);
+        case '<': return create("lt", left, right);
+        default : return undefined;
+      }
+    }
+
+equation_double1
+  = _ left:subadd _ sign:([<>] "=") _ right:subadd _
+    {
+      switch(sign[0])
+      {
+        case '>': return create("ge", left, right);
+        case '<': return create("le", left, right);
+        default : return undefined;
+      }
+    }
+
+equation_double2
+  = _ left:subadd _ sign:"<>" _ right:subadd _ { return create("ne", left, right); }
 
 subadd
   = _ left:muldiv _ sign:[+-] _ right:subadd _
-    { 
-      if (sign == "+") 
+    {
+      if (sign == "+")
       { return create("add", left, right); }
       else
       { return create("sub", left, right); }
@@ -28,8 +67,8 @@ subadd
 
 muldiv
   = _ left:primary _ sign:[*/] _ right:muldiv _
-    { 
-      if (sign == "*") 
+    {
+      if (sign == "*")
       { return create("mul", left, right); }
       else
       { return create("div", left, right); }
@@ -37,7 +76,7 @@ muldiv
   / primary
 
 primary
-  = integer / block / variable
+  = integer / block / variable / function
 
 block
   = "(" _ block:subadd _ ")" { return createOne("block", block); }
@@ -46,11 +85,30 @@ variable
   = _ name:( "$" [a-zA-Z] [a-zA-Z0-9]* ":" [a-zA-Z0-9_-]+) _ { return createVar(name[1] + name[2].join("") + name[3] + name[4].join("")); }
 
 integer "integer"
-  = digits:[0-9.]+ { return parseFloat(digits.join(""), 10); }
+  = digits:[0-9.]+ { return createAtomic(parseFloat(digits.join(""), 10)); }
+
+function
+  = fun_and / fun_or
+    / fun_exists
+
+fun_and
+  = _ name:"and" _ "(" _ params:parameter+ _ ")" { return createFun(name, params); }
+
+fun_or
+  = _ name:"or" _ "(" _ params:parameter+ _ ")" { return createFun(name, params); }
+
+fun_exists
+  = _ "exists" _ "(" _ param:parameter _ ")" { return createFun("exists", param); }
+
+parameter 
+  = comma? param:equation { return param; }
 
 ws
- = [ \t\r\n]
+  = [ \t\r\n]
 
 _
- = (ws)*
+  = (ws)*
 
+comma 
+  = _ "," _
+  

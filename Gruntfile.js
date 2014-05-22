@@ -16,7 +16,7 @@ module.exports = function (grunt) {
                 src: 'pegjs/formulaGrammar.pegjs',
                 dest: 'src/pegjs/formulaParser.js',
                 angular: {
-                    module: 'reports.api.28.io',
+                    module: 'formulaParser',
                     factory: 'FormulaParser'
                 }
             }
