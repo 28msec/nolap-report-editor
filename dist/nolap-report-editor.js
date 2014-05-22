@@ -4,20 +4,26 @@ angular
 .module('nolapReportEditor', ['reports.api.28.io'])
 .directive('reports', function(ReportAPI){
     return {
-        restrict: 'A',
+        restrict: 'E',
+        transclude: true,
+        template: '<div class="reports" ng-transclude></div>',
         scope: {
-            'reportApi': '=api',
-            'reportApiToken': '=token'
+            'reportApi': '@',
+            'reportApiToken': '@'
         },
-        link: function($scope){
-            var api = new ReportAPI($scope.api);
+        controller: function($scope){
+
+            $scope.reports = [{ Label: 'Hello' }, { Label: 'World' }];
+            var api = new ReportAPI($scope.reportApi);
             api.listReports({
-                token: $scope.token
+                token: $scope.reportApiToken,
+                $method: 'POST'
             })
             .then(function(reports){
+                $scope.$parent.reports = reports;
                 console.log(reports);
-                $scope.reports = reports;
             });
+            
         }
     };
 })
