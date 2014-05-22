@@ -6,13 +6,14 @@ angular
     return {
         restrict: 'A',
         scope: {
-            'reportApi': '=api',
-            'reportApiToken': '=token'
+            'reportApi': '=',
+            'reportApiToken': '='
         },
         link: function($scope){
-            var api = new ReportAPI($scope.api);
+            console.log($scope.api);
+            var api = new ReportAPI($scope.reportApi);
             api.listReports({
-                token: $scope.token
+                token: $scope.reportApiToken
             })
             .then(function(reports){
                 console.log(reports);
