@@ -2,16 +2,15 @@
 
 angular
 .module('nolapReportEditor', ['reports.api.28.io'])
-.directive('reports', function(ReportAPI){
+//http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
+.directive('reports', function($compile, ReportAPI){
     return {
-        restrict: 'E',
-        transclude: true,
-        replace: true,
-        template: '<div class="reports" ng-transclude></div>',
+        restrict: 'A',
         scope: {
             'reportApi': '@',
             'reportApiToken': '@'
         },
+        transclude: true,
         controller: function($scope){
             var api = new ReportAPI($scope.reportApi);
             api.listReports({
@@ -19,9 +18,13 @@ angular
                 $method: 'POST'
             })
             .then(function(reports){
-                $scope.$parent.reports = reports;
+                $scope.reports = reports;
             });
-            
+        },
+        link: function($scope, element, attrs, ctrl, $transclude){
+            $transclude($scope, function(clone, $scope) {
+                element.append(clone);
+            });
         }
     };
 })
