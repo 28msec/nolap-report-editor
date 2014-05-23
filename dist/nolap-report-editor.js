@@ -19,6 +19,9 @@ angular
             })
             .then(function(reports){
                 $scope.reports = reports;
+            })
+            .catch(function(error){
+                $scope.error = error;
             });
         },
         link: function($scope, element, attrs, ctrl, $transclude){
@@ -39,13 +42,33 @@ angular
         },
         controller: function($scope){
             var api = new ReportAPI($scope.reportApi);
+
+            $scope.$watch('dirtyModel', function(dirtyModel){
+                api.addOrReplaceOrValidateReport({
+                    report: dirtyModel,
+                    token: $scope.reportApiToken,
+                    $method: 'POST'
+                })
+                .then(function(){
+                    $scope.model = angular.copy(dirtyModel);
+                })
+                .catch(function(){
+                    $scope.dirtyModel = angular.copy($scope.model);
+                });
+            });
+
             api.listReports({
                 name: $scope.reportId,
                 token: $scope.reportApiToken,
                 $method: 'POST'
             })
             .then(function(reports){
-                $scope.report = new Report(reports[0]);
+                $scope.model = reports[0];
+                $scope.dirtyModel = angular.copy($scope.model);
+                $scope.report = new Report($scope.dirtyModel);
+            })
+            .catch(function(error){
+                $scope.error = error;
             });
         },
         link: function($scope, element, attrs, ctrl, $transclude){
@@ -90,7 +113,7 @@ angular.module('reports.api.28.io', [])
          * 
          * @method
          * @name ReportAPI#listReports
-         * @param {string} name - A report name (e.g. FundamentalAccountingConcepts),
+         * @param {string} _id - A report id (e.g. FundamentalAccountingConcepts),
          * @param {string} token - The token of the current session,
          * 
          */
@@ -100,7 +123,7 @@ angular.module('reports.api.28.io', [])
             var path = '/reports.jq'
             var url = domain + path;
             var params = {};
-            params['name'] = parameters['name'];
+            params['_id'] = parameters['_id'];
             params['token'] = parameters['token'];
             var body = null;
             var method = 'GET'.toUpperCase();
@@ -191,7 +214,7 @@ parameters.$cacheItemOpts : {});
          * 
          * @method
          * @name ReportAPI#removeReport
-         * @param {string} name - A report name (e.g. FundamentalAccountingConcepts),
+         * @param {string} _id - A report id (e.g. FundamentalAccountingConcepts),
          * @param {string} token - The token of the current session,
          * 
          */
@@ -201,11 +224,11 @@ parameters.$cacheItemOpts : {});
             var path = '/delete-report.jq'
             var url = domain + path;
             var params = {};
-            if(parameters['name'] === undefined) {
-                deferred.reject(new Error('The name parameter is required'));
+            if(parameters['_id'] === undefined) {
+                deferred.reject(new Error('The _id parameter is required'));
                 return deferred.promise;
             } else {
-                params['name'] = parameters['name'];
+                params['_id'] = parameters['_id'];
             }
             params['token'] = parameters['token'];
             var body = null;
