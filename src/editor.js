@@ -19,6 +19,9 @@ angular
             })
             .then(function(reports){
                 $scope.reports = reports;
+            })
+            .catch(function(error){
+                $scope.error = error;
             });
         },
         link: function($scope, element, attrs, ctrl, $transclude){
@@ -39,13 +42,33 @@ angular
         },
         controller: function($scope){
             var api = new ReportAPI($scope.reportApi);
+
+            $scope.$watch('dirtyModel', function(dirtyModel){
+                api.addOrReplaceOrValidateReport({
+                    report: dirtyModel,
+                    token: $scope.reportApiToken,
+                    $method: 'POST'
+                })
+                .then(function(){
+                    $scope.model = angular.copy(dirtyModel);
+                })
+                .catch(function(){
+                    $scope.dirtyModel = angular.copy($scope.model);
+                });
+            });
+
             api.listReports({
                 name: $scope.reportId,
                 token: $scope.reportApiToken,
                 $method: 'POST'
             })
             .then(function(reports){
-                $scope.report = new Report(reports[0]);
+                $scope.model = reports[0];
+                $scope.dirtyModel = angular.copy($scope.model);
+                $scope.report = new Report($scope.dirtyModel);
+            })
+            .catch(function(error){
+                $scope.error = error;
             });
         },
         link: function($scope, element, attrs, ctrl, $transclude){
