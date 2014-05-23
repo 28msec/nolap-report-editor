@@ -22,18 +22,16 @@ angular
             });
         },
         link: function($scope, element, attrs, ctrl, $transclude){
-            $transclude($scope, function(clone, $scope) {
+            $transclude($scope, function(clone) {
                 element.append(clone);
             });
         }
     };
 })
-.directive('report', function(ReportAPI){
+.directive('report', function(Report, ReportAPI){
     return {
         restrict: 'E',
         transclude: true,
-        replace: true,
-        template: '<div class="report" ng-transclude></div>',
         scope: {
             'reportApi': '@',
             'reportApiToken': '@',
@@ -46,8 +44,13 @@ angular
                 token: $scope.reportApiToken,
                 $method: 'POST'
             })
-            .then(function(report){
-                console.log(report)
+            .then(function(reports){
+                $scope.report = new Report(reports[0]);
+            });
+        },
+        link: function($scope, element, attrs, ctrl, $transclude){
+            $transclude($scope, function(clone) {
+                element.append(clone);
             });
         }
     };
