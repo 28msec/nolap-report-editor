@@ -44,6 +44,10 @@ angular
             var api = new ReportAPI($scope.reportApi);
 
             $scope.$watch('dirtyModel', function(dirtyModel){
+                console.log('dirtyModel');
+                console.log(dirtyModel);
+                return;
+                /*
                 api.addOrReplaceOrValidateReport({
                     report: dirtyModel,
                     token: $scope.reportApiToken,
@@ -55,10 +59,11 @@ angular
                 .catch(function(){
                     $scope.dirtyModel = angular.copy($scope.model);
                 });
+                */
             });
 
             api.listReports({
-                name: $scope.reportId,
+                _id: $scope.reportId,
                 token: $scope.reportApiToken,
                 $method: 'POST'
             })
@@ -66,6 +71,7 @@ angular
                 $scope.model = reports[0];
                 $scope.dirtyModel = angular.copy($scope.model);
                 $scope.report = new Report($scope.dirtyModel);
+                $scope.concepts = $scope.report.listConcepts();
             })
             .catch(function(error){
                 $scope.error = error;
@@ -76,6 +82,49 @@ angular
                 element.append(clone);
             });
         }
+    };
+})
+.directive('presentationTree', function(PresentationTreeTpl){
+    return {
+        restrict: 'E',
+        template: PresentationTreeTpl,
+        requires: '^report',
+        scope: {
+            selected: '='
+        },
+        link: function($scope) {
+
+            //$rootScope.$on('selectTreeItem', function(e, branch){
+            //   $scope.selected = branch;
+            //    branch.onSelect(branch);
+            //}); 
+    
+            $scope.select = function(row) {
+                if(row.branch.children.length > 0) {
+                    row.branch.expanded = !row.branch.expanded;
+                } else {
+                    $scope.$emit('selectTreeItem', row.branch);
+                }   
+            };  
+    
+            var setRows = function(branches, level, visible){
+                branches.forEach(function(branch){
+                    $scope.rows.push({ branch: branch, level: level, visible: visible }); 
+                    if(branch.children.length === 0) {
+                        branch.expanded = true;
+                    }   
+                    setRows(branch.children, level + 1, visible === false ? false : branch.expanded);
+                }); 
+            };  
+    
+            var onChange = function(){
+                $scope.rows = []; 
+                setRows($scope.treeData, 1, true);
+            };  
+    
+            //$scope.Path = Path;
+            return $scope.$watch('treeData', onChange, true);
+        }   
     };
 })
 ;
@@ -261,7 +310,11 @@ parameters.$cacheItemOpts : {});
             return deferred.promise;
         };
     };
-});'use strict';
+});angular.module("nolapReportEditor")
+
+.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree\">\n    <li ng-repeat=\"row in rows | filter:{visible:true} track by row.branch.id\"  ng-class=\"'level-' + {{ row.level }} + (selected.id === row.branch.id ? ' active':'')\" class=\"abn-tree-row\">\n        <a ng-click=\"select(row)\" ng-class=\"row.branch.id.replace('/', '_')\">\n            <i ng-class=\"{ 'icon-caret-right': !row.branch.expanded && row.branch.children.length > 0, 'icon-caret-down':  row.branch.expanded && row.branch.children.length > 0 }\" class=\"indented tree-icon\"></i>\n            <span class=\"indented tree-label\">{{Path.decode(row.branch.label)}}</span>\n        </a>\n    </li>\n</ul>\n")
+
+;'use strict';
 
 angular
 .module('nolapReportEditor')

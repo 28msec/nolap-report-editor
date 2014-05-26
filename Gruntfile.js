@@ -9,6 +9,19 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        ngconstant: {
+            options: {
+                space: '    ',
+                deps: false
+            },
+            tpl: {
+                name: 'nolapReportEditor',
+                dest: 'src/tpl.js',
+                constants: {
+                    PresentationTreeTpl: grunt.file.read('tpl/tree.html')
+                }
+            }
+        },
         swagger: {
             options: {
                 apis: [
@@ -54,7 +67,7 @@ module.exports = function (grunt) {
                 separator: ''
             },
             dist: {
-                src: ['src/editor.js', 'src/swagger/ReportAPI.js', 'src/report.js'],
+                src: ['src/editor.js', 'src/swagger/ReportAPI.js', 'src/tpl.js', 'src/report.js'],
                 dest: 'dist/nolap-report-editor.js'
             }
         },
@@ -253,6 +266,6 @@ module.exports = function (grunt) {
 
     grunt.registerTask('test', ['karma:1.2.0']);
     grunt.registerTask('release', ['clean:pre', 'concat', 'test', 'jsdoc', 'clean:post']);//uglify
-    grunt.registerTask('build', ['clean:pre', 'swagger', 'release']);
+    grunt.registerTask('build', ['clean:pre', 'ngconstant:tpl', 'swagger', 'release']);
     grunt.registerTask('default', ['jshint', 'build']);
 };
