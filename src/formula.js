@@ -16,11 +16,45 @@ angular.module('formulaEditor',[])
     };
 
     //Constructor
-    var Formula = function(id){
-        ensureParameter(id, 'id', 'string', 'Formula (Constr.)');
-        this.model = { 'Id': id };
+    var Formula = function(type){
+        ensureParameter(type, 'type', 'string', 'Formula (Const.)');
+        this.model = {
+            'Id': '',
+            'Type': type,
+            'Label': '',
+            'Description': '',
+            'ComputableConcepts': [],
+            'DependsOn': [],
+            'AllowCrossPeriod': false,
+            'Formulae': [
+                {
+                    'PrereqSrc': '',
+                    'Prereq': {},
+                    'SourceFact': [],
+                    'BodySrc': '',
+                    'Body': {}
+                }
+            ]
+        };
     };
 
+    Formula.prototype.updateView = function() {
+        this.view = JSON.stringify(this.model, null, ' ');
+    };
+
+    Formula.prototype.getModel = function () {
+        return this.model;
+    };
+
+    Formula.prototype.setModel = function (model) {
+        ensureParameter(model, 'model', 'object', 'setModel');
+        this.model = model;
+    };
+
+    Formula.prototype.Id = function() {
+        return this.model.Id;
+    };
     return Formula;
 });
+
 

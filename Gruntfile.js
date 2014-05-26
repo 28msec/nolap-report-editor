@@ -12,6 +12,14 @@ module.exports = function (grunt) {
         peg: {
             // https://github.com/dvberkel/grunt-peg
             options: { trackLineAndColumn: true },
+            excelGrammar : {
+                src: 'pegjs/excelGrammar.pegjs',
+                dest: 'src/pegjs/excelParser.js',
+                angular: {
+                    module: 'excelParser',
+                    factory: 'ExcelParser'
+                }
+            },
             formulaGrammar : {
                 src: 'pegjs/formulaGrammar.pegjs',
                 dest: 'src/pegjs/formulaParser.js',
