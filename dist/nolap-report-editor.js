@@ -21,6 +21,7 @@ angular
                 $scope.reports = reports;
             })
             .catch(function(error){
+                console.error(error);
                 $scope.error = error;
             });
         },
@@ -35,19 +36,11 @@ angular
     return {
         restrict: 'E',
         transclude: true,
-        scope: {
-            'reportApi': '@',
-            'reportApiToken': '@',
-            'reportId': '@'
-        },
-        controller: function($scope){
-            var api = new ReportAPI($scope.reportApi);
-
+        /*
             $scope.$watch('dirtyModel', function(dirtyModel){
-                console.log('dirtyModel');
-                console.log(dirtyModel);
+                //console.log('dirtyModel');
+                //console.log(dirtyModel);
                 return;
-                /*
                 api.addOrReplaceOrValidateReport({
                     report: dirtyModel,
                     token: $scope.reportApiToken,
@@ -59,12 +52,19 @@ angular
                 .catch(function(){
                     $scope.dirtyModel = angular.copy($scope.model);
                 });
-                */
             });
-
+        },
+        */
+        controller: function($scope){
+            this.getPresentationTree = function(){
+                return $scope.report.getNetwork('Presentation').Trees;
+            };
+        },
+        link: function($scope, element, attrs, ctrl, $transclude){
+            var api = new ReportAPI(attrs.reportApi);
             api.listReports({
-                _id: $scope.reportId,
-                token: $scope.reportApiToken,
+                _id: attrs.reportId,
+                token: attrs.reportApiToken,
                 $method: 'POST'
             })
             .then(function(reports){
@@ -74,10 +74,10 @@ angular
                 $scope.concepts = $scope.report.listConcepts();
             })
             .catch(function(error){
+                console.error(error);
                 $scope.error = error;
             });
-        },
-        link: function($scope, element, attrs, ctrl, $transclude){
+            
             $transclude($scope, function(clone) {
                 element.append(clone);
             });
@@ -88,16 +88,9 @@ angular
     return {
         restrict: 'E',
         template: PresentationTreeTpl,
-        requires: '^report',
-        scope: {
-            selected: '='
-        },
-        link: function($scope) {
-
-            //$rootScope.$on('selectTreeItem', function(e, branch){
-            //   $scope.selected = branch;
-            //    branch.onSelect(branch);
-            //}); 
+        require: '^report',
+        link: function($scope, element, attrs, reportCtrl) {
+            var tree = reportCtrl.getPresentationTree();
     
             $scope.select = function(row) {
                 if(row.branch.children.length > 0) {
@@ -105,21 +98,37 @@ angular
                 } else {
                     $scope.$emit('selectTreeItem', row.branch);
                 }   
-            };  
+            };
+            
+            var guid = (function() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+               .toString(16)
+               .substring(1);
+  }
+  return function() {
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+           s4() + '-' + s4() + s4() + s4();
+  };
+})();
     
-            var setRows = function(branches, level, visible){
-                branches.forEach(function(branch){
-                    $scope.rows.push({ branch: branch, level: level, visible: visible }); 
-                    if(branch.children.length === 0) {
-                        branch.expanded = true;
-                    }   
-                    setRows(branch.children, level + 1, visible === false ? false : branch.expanded);
-                }); 
+            var setRows = function(tree, level, visible){
+                console.log(tree);
+                Object.keys(tree).forEach(function(leaf){
+                    var branch = tree[leaf];
+                    $scope.rows.push({ branch: branch, level: level, visible: visible, id: guid() }); 
+                    if(branch.To === undefined) {//if(Object.keys(branch.To).length === 0) {
+                        visible = true;
+                    } else {
+                        setRows(branch.To, level + 1, visible);
+                    }
+                });
+                console.log($scope.rows);
             };  
     
             var onChange = function(){
                 $scope.rows = []; 
-                setRows($scope.treeData, 1, true);
+                setRows(tree, 1, true);
             };  
     
             //$scope.Path = Path;
@@ -127,8 +136,7 @@ angular
         }   
     };
 })
-;
-angular.module('reports.api.28.io', [])
+;angular.module('reports.api.28.io', [])
 /**
  * <p>This API can be used to manage reports.</p> <p>This API is only accesible for users having granted priviliges to work with reports.</p> <p>Note, that the POST method can be simulated by using GET and adding the _method=POST parameter to the HTTP request.</p>
  */
@@ -312,7 +320,7 @@ parameters.$cacheItemOpts : {});
     };
 });angular.module("nolapReportEditor")
 
-.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree\">\n    <li ng-repeat=\"row in rows | filter:{visible:true} track by row.branch.id\"  ng-class=\"'level-' + {{ row.level }} + (selected.id === row.branch.id ? ' active':'')\" class=\"abn-tree-row\">\n        <a ng-click=\"select(row)\" ng-class=\"row.branch.id.replace('/', '_')\">\n            <i ng-class=\"{ 'icon-caret-right': !row.branch.expanded && row.branch.children.length > 0, 'icon-caret-down':  row.branch.expanded && row.branch.children.length > 0 }\" class=\"indented tree-icon\"></i>\n            <span class=\"indented tree-label\">{{Path.decode(row.branch.label)}}</span>\n        </a>\n    </li>\n</ul>\n")
+.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree\">\n    <li ng-repeat=\"row in rows | filter:{visible:true} track by row.id\"  ng-class=\"'level-' + {{ row.level }} + (selected.id === row.branch.id ? ' active':'')\" class=\"abn-tree-row\">\n        <a ng-click=\"select(row)\" ng-class=\"row.id.replace('/', '_')\">\n            <i ng-class=\"{ 'icon-caret-right': !row.branch.expanded && row.branch.To, 'icon-caret-down':  row.branch.expanded && row.branch.To }\" class=\"indented tree-icon\"></i>\n            <span class=\"indented tree-label\">{{Path.decode(row.branch.label)}}</span>\n        </a>\n    </li>\n</ul>\n")
 
 ;'use strict';
 
