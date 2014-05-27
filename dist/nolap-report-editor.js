@@ -56,8 +56,12 @@ angular
         },
         */
         controller: function($scope){
+            this.getReport = function(){
+                return $scope.report;
+            };
+            
             this.getPresentationTree = function(){
-                return $scope.report.getNetwork('Presentation').Trees;
+                return this.getReport().getNetwork('Presentation').Trees;
             };
         },
         link: function($scope, element, attrs, ctrl, $transclude){
@@ -90,49 +94,36 @@ angular
         template: PresentationTreeTpl,
         require: '^report',
         link: function($scope, element, attrs, reportCtrl) {
-            var tree = reportCtrl.getPresentationTree();
-    
+
+            $scope.presentationTree = reportCtrl.getPresentationTree();
+
             $scope.select = function(row) {
-                if(row.branch.children.length > 0) {
+                if(row.branch.To) {
                     row.branch.expanded = !row.branch.expanded;
                 } else {
-                    $scope.$emit('selectTreeItem', row.branch);
-                }   
+                    $scope.selected = row.branch;
+                    console.log($scope.selected.Id);
+                }
             };
-            
-            var guid = (function() {
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-               .toString(16)
-               .substring(1);
-  }
-  return function() {
-    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-           s4() + '-' + s4() + s4() + s4();
-  };
-})();
-    
+
             var setRows = function(tree, level, visible){
-                console.log(tree);
+                var parentExpanded = tree.expanded !== undefined ?  tree.expanded : true;
                 Object.keys(tree).forEach(function(leaf){
                     var branch = tree[leaf];
-                    $scope.rows.push({ branch: branch, level: level, visible: visible, id: guid() }); 
-                    if(branch.To === undefined) {//if(Object.keys(branch.To).length === 0) {
-                        visible = true;
-                    } else {
-                        setRows(branch.To, level + 1, visible);
+                    branch.expanded = branch.expanded !== undefined ? branch.expanded : true;
+                    $scope.rows.push({ branch: branch, level: level, visible: visible });
+                    if(branch.To){
+                        setRows(branch.To, level + 1, visible === false ? false : branch.expanded);
                     }
                 });
-                console.log($scope.rows);
-            };  
+            };
     
-            var onChange = function(){
+            var onChange = function(tree){
                 $scope.rows = []; 
                 setRows(tree, 1, true);
-            };  
-    
-            //$scope.Path = Path;
-            return $scope.$watch('treeData', onChange, true);
+            };
+
+            return $scope.$watch('presentationTree', onChange, true);
         }   
     };
 })
@@ -320,7 +311,7 @@ parameters.$cacheItemOpts : {});
     };
 });angular.module("nolapReportEditor")
 
-.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree\">\n    <li ng-repeat=\"row in rows | filter:{visible:true} track by row.id\"  ng-class=\"'level-' + {{ row.level }} + (selected.id === row.branch.id ? ' active':'')\" class=\"abn-tree-row\">\n        <a ng-click=\"select(row)\" ng-class=\"row.id.replace('/', '_')\">\n            <i ng-class=\"{ 'icon-caret-right': !row.branch.expanded && row.branch.To, 'icon-caret-down':  row.branch.expanded && row.branch.To }\" class=\"indented tree-icon\"></i>\n            <span class=\"indented tree-label\">{{Path.decode(row.branch.label)}}</span>\n        </a>\n    </li>\n</ul>\n")
+.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree\">\n    <li ng-repeat=\"row in rows | filter:{visible:true} track by row.branch.Id\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\" ng-bind=\"row.branch.Label\"></span>\n        </a>\n    </li>\n</ul>")
 
 ;'use strict';
 
