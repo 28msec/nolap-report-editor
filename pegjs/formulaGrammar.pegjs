@@ -24,79 +24,72 @@
 }
 
 start
-  = equation
+  = subadd
 
-equation
-  = equation_single / equation_double1 / equation_double2 / subadd
 
-equation_single
-  = _ left:subadd _ sign:([<=>]) _ right:subadd _
-    {
-      switch(sign[0])
-      {
-        case '=': return create("eq", left, right);
-        case '>': return create("gt", left, right);
-        case '<': return create("lt", left, right);
-        default : return undefined;
-      }
-    }
-equation_double1
-  = _ left:subadd _ sign:([<>] "=") _ right:subadd _
-    {
-      switch(sign[0])
-      {
-        case '>': return create("ge", left, right);
-        case '<': return create("le", left, right);
-        default : return undefined;
-      }
-    }
-
-equation_double2
-  = _ left:subadd _ sign:"<>" _ right:subadd _ { return create("ne", left, right); }
-
+/*******************
+    arithmetics 
+*******************/
 subadd
-  = _ left:muldiv _ sign:[+-] _ right:subadd _
+  = _ left:muldivcomplog _ sign:[+-] _ right:subadd _
     {
-      if (sign == "+")
+      if (sign === "+")
       { return create("add", left, right); }
       else
       { return create("sub", left, right); }
     }
-  / muldiv
+  / muldivcomplog
 
-muldiv
-  = _ left:primary _ sign:[*/] _ right:muldiv _
-    {
-      if (sign == "*")
-      { return create("mul", left, right); }
-      else
-      { return create("div", left, right); }
-    }
-  / logical
+muldivcomplog
+  = _ left:primary _ operator:( op_muldiv / op_comparator / op_logical ) _ right:muldivcomplog _
+    { return create(operator, left, right); }
+  / primary
 
-logical
-  = log_and / log_or / primary
 
-log_and
-  = _ left:primary _ "and" _ right:equation _
-    {
-      return create("and", left, right);
-    }
+/*******************
+    Operators
+*******************/
+op_muldiv
+  = sign:[*/] { if (sign === "*"){ return "mul"; } else { return "div"; } }
 
-log_or
-  = _ left:primary _ "or" _ right:equation _
-    {
-      return create("or", left, right);
-    }
 
+op_comparator
+  = op_comparator_le_ge/ op_comparator_not_equal / op_comparator_single
+
+op_comparator_le_ge
+  = double:( [<>] "=" ){ switch(double.join("")){
+                           case "<=": return "le";
+                           case ">=": return "ge";
+                         };
+                       }
+
+op_comparator_not_equal 
+  = "<>" { return "ne"; }
+
+op_comparator_single
+  = single:[<=>] { return single; } 
+
+op_logical 
+  = op_log_and / op_log_or
+
+op_log_and
+  = "and" { return "and"; }
+
+op_log_or
+  = "or" { return "or"; }
+
+
+/*******************
+    Primaries
+*******************/
 primary
   = integer / block / variable / function
 
 block
-  = "(" _ block:equation _ ")" { return createOne("block", block); }
+  = "(" _ block:subadd _ ")" { return createOne("block", block); }
 
 variable
-  = _ name:( "$" [a-zA-Z] [a-zA-Z0-9]* ":" [a-zA-Z0-9_-]+) _ { return createVar(name[1] + name[2].join("") + name[3] + name[4].join("")); }
+  = _ name:( "$" [a-zA-Z] [a-zA-Z0-9]* ":" [a-zA-Z0-9_]+) _ { return createVar(name[1] + name[2].join("") + name[3] + name[4].join("")); }
 
 integer "integer"
   = digits:[0-9.]+ { return createAtomic(parseFloat(digits.join(""), 10)); }
@@ -109,7 +102,7 @@ fun_exists
   = _ "exists" _ "(" _ param:parameter _ ")" { return createFun("exists", param); }
 
 parameter
-  = comma? param:equation { return param; }
+  = comma? param:subadd { return param; }
 
 ws
   = [ \t\r\n]

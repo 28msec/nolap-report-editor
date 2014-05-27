@@ -33,82 +33,66 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
         peg$startRuleFunction  = peg$parsestart,
 
         peg$c0 = peg$FAILED,
-        peg$c1 = /^[<=>]/,
-        peg$c2 = { type: "class", value: "[<=>]", description: "[<=>]" },
-        peg$c3 = function(left, sign, right) {
-              switch(sign[0])
-              {
-                case '=': return create("eq", left, right);
-                case '>': return create("gt", left, right);
-                case '<': return create("lt", left, right);
-                default : return undefined;
-              }
-            },
-        peg$c4 = /^[<>]/,
-        peg$c5 = { type: "class", value: "[<>]", description: "[<>]" },
-        peg$c6 = "=",
-        peg$c7 = { type: "literal", value: "=", description: "\"=\"" },
-        peg$c8 = function(left, sign, right) {
-              switch(sign[0])
-              {
-                case '>': return create("ge", left, right);
-                case '<': return create("le", left, right);
-                default : return undefined;
-              }
-            },
-        peg$c9 = "<>",
-        peg$c10 = { type: "literal", value: "<>", description: "\"<>\"" },
-        peg$c11 = function(left, sign, right) { return create("ne", left, right); },
-        peg$c12 = /^[+\-]/,
-        peg$c13 = { type: "class", value: "[+\\-]", description: "[+\\-]" },
-        peg$c14 = function(left, sign, right) {
-              if (sign == "+")
-              { return create("add", left, right); }
-              else
-              { return create("sub", left, right); }
-            },
-        peg$c15 = /^[*\/]/,
-        peg$c16 = { type: "class", value: "[*\\/]", description: "[*\\/]" },
-        peg$c17 = function(left, sign, right) {
-              if (sign == "*")
-              { return create("mul", left, right); }
-              else
-              { return create("div", left, right); }
-            },
-        peg$c18 = "(",
-        peg$c19 = { type: "literal", value: "(", description: "\"(\"" },
-        peg$c20 = ")",
-        peg$c21 = { type: "literal", value: ")", description: "\")\"" },
-        peg$c22 = function(block) { return createOne("block", block); },
-        peg$c23 = [],
-        peg$c24 = /^[a-zA-Z0-9._]/,
-        peg$c25 = { type: "class", value: "[a-zA-Z0-9._]", description: "[a-zA-Z0-9._]" },
-        peg$c26 = function(name) { return createVar(name.join("")); },
-        peg$c27 = { type: "other", description: "integer" },
-        peg$c28 = /^[0-9.]/,
-        peg$c29 = { type: "class", value: "[0-9.]", description: "[0-9.]" },
-        peg$c30 = function(digits) { return createAtomic(parseFloat(digits.join(""), 10)); },
-        peg$c31 = /^[aA]/,
-        peg$c32 = { type: "class", value: "[aA]", description: "[aA]" },
-        peg$c33 = /^[nN]/,
-        peg$c34 = { type: "class", value: "[nN]", description: "[nN]" },
-        peg$c35 = /^[dD]/,
-        peg$c36 = { type: "class", value: "[dD]", description: "[dD]" },
-        peg$c37 = function(name, params) { return createFun(name.join("").toLowerCase(), params); },
-        peg$c38 = "or",
-        peg$c39 = { type: "literal", value: "or", description: "\"or\"" },
-        peg$c40 = function(name, params) { return createFun(name, params); },
-        peg$c41 = "not",
-        peg$c42 = { type: "literal", value: "not", description: "\"not\"" },
-        peg$c43 = function(name, param) { return createFun(name, param); },
-        peg$c44 = "isblank",
-        peg$c45 = { type: "literal", value: "isblank", description: "\"isblank\"" },
-        peg$c46 = null,
-        peg$c47 = function(param) { return param; },
-        peg$c48 = /^[ \t\r\n]/,
-        peg$c49 = { type: "class", value: "[ \\t\\r\\n]", description: "[ \\t\\r\\n]" },
-        peg$c50 = ",",
-        peg$c51 = { type: "literal", value: ",", description: "\",\"" },
+        peg$c1 = function(left, operator, right) { return create(operator, left, right); },
+        peg$c2 = /^[+\-]/,
+        peg$c3 = { type: "class", value: "[+\\-]", description: "[+\\-]" },
+        peg$c4 = function(sign) { if (sign === "+"){ return "add"; } else { return "sub"; } },
+        peg$c5 = /^[*\/]/,
+        peg$c6 = { type: "class", value: "[*\\/]", description: "[*\\/]" },
+        peg$c7 = function(sign) { if (sign === "*"){ return "mul"; } else { return "div"; } },
+        peg$c8 = /^[<>]/,
+        peg$c9 = { type: "class", value: "[<>]", description: "[<>]" },
+        peg$c10 = "=",
+        peg$c11 = { type: "literal", value: "=", description: "\"=\"" },
+        peg$c12 = function(double) { switch(double.join("")){
+                                   case "<=": return "le";
+                                   case ">=": return "ge";
+                                 };
+                               },
+        peg$c13 = "<>",
+        peg$c14 = { type: "literal", value: "<>", description: "\"<>\"" },
+        peg$c15 = function() { return "ne"; },
+        peg$c16 = /^[<=>]/,
+        peg$c17 = { type: "class", value: "[<=>]", description: "[<=>]" },
+        peg$c18 = function(single) { return single; },
+        peg$c19 = "(",
+        peg$c20 = { type: "literal", value: "(", description: "\"(\"" },
+        peg$c21 = ")",
+        peg$c22 = { type: "literal", value: ")", description: "\")\"" },
+        peg$c23 = function(block) { return createOne("block", block); },
+        peg$c24 = [],
+        peg$c25 = /^[a-zA-Z0-9._]/,
+        peg$c26 = { type: "class", value: "[a-zA-Z0-9._]", description: "[a-zA-Z0-9._]" },
+        peg$c27 = void 0,
+        peg$c28 = /^[^(]/,
+        peg$c29 = { type: "class", value: "[^(]", description: "[^(]" },
+        peg$c30 = function(name) { return createVar(name[0].join("")); },
+        peg$c31 = { type: "other", description: "integer" },
+        peg$c32 = /^[0-9.]/,
+        peg$c33 = { type: "class", value: "[0-9.]", description: "[0-9.]" },
+        peg$c34 = function(digits) { return createAtomic(parseFloat(digits.join(""), 10)); },
+        peg$c35 = /^[aA]/,
+        peg$c36 = { type: "class", value: "[aA]", description: "[aA]" },
+        peg$c37 = /^[nN]/,
+        peg$c38 = { type: "class", value: "[nN]", description: "[nN]" },
+        peg$c39 = /^[dD]/,
+        peg$c40 = { type: "class", value: "[dD]", description: "[dD]" },
+        peg$c41 = function(name, params) { return createFun(name.join("").toLowerCase(), params); },
+        peg$c42 = /^[oO]/,
+        peg$c43 = { type: "class", value: "[oO]", description: "[oO]" },
+        peg$c44 = /^[rR]/,
+        peg$c45 = { type: "class", value: "[rR]", description: "[rR]" },
+        peg$c46 = "not",
+        peg$c47 = { type: "literal", value: "not", description: "\"not\"" },
+        peg$c48 = function(name, param) { return createFun(name, param); },
+        peg$c49 = "isblank",
+        peg$c50 = { type: "literal", value: "isblank", description: "\"isblank\"" },
+        peg$c51 = null,
+        peg$c52 = function(param) { return param; },
+        peg$c53 = /^[ \t\r\n]/,
+        peg$c54 = { type: "class", value: "[ \\t\\r\\n]", description: "[ \\t\\r\\n]" },
+        peg$c55 = ",",
+        peg$c56 = { type: "literal", value: ",", description: "\",\"" },
 
         peg$currPos          = 0,
         peg$reportedPos      = 0,
@@ -279,221 +263,7 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
     function peg$parsestart() {
       var s0;
 
-      s0 = peg$parseequation();
-
-      return s0;
-    }
-
-    function peg$parseequation() {
-      var s0;
-
-      s0 = peg$parseequation_single();
-      if (s0 === peg$FAILED) {
-        s0 = peg$parseequation_double1();
-        if (s0 === peg$FAILED) {
-          s0 = peg$parseequation_double2();
-          if (s0 === peg$FAILED) {
-            s0 = peg$parsesubadd();
-          }
-        }
-      }
-
-      return s0;
-    }
-
-    function peg$parseequation_single() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-
-      s0 = peg$currPos;
-      s1 = peg$parse_();
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parsesubadd();
-        if (s2 !== peg$FAILED) {
-          s3 = peg$parse_();
-          if (s3 !== peg$FAILED) {
-            if (peg$c1.test(input.charAt(peg$currPos))) {
-              s4 = input.charAt(peg$currPos);
-              peg$currPos++;
-            } else {
-              s4 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c2); }
-            }
-            if (s4 !== peg$FAILED) {
-              s5 = peg$parse_();
-              if (s5 !== peg$FAILED) {
-                s6 = peg$parsesubadd();
-                if (s6 !== peg$FAILED) {
-                  s7 = peg$parse_();
-                  if (s7 !== peg$FAILED) {
-                    peg$reportedPos = s0;
-                    s1 = peg$c3(s2, s4, s6);
-                    s0 = s1;
-                  } else {
-                    peg$currPos = s0;
-                    s0 = peg$c0;
-                  }
-                } else {
-                  peg$currPos = s0;
-                  s0 = peg$c0;
-                }
-              } else {
-                peg$currPos = s0;
-                s0 = peg$c0;
-              }
-            } else {
-              peg$currPos = s0;
-              s0 = peg$c0;
-            }
-          } else {
-            peg$currPos = s0;
-            s0 = peg$c0;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$c0;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$c0;
-      }
-
-      return s0;
-    }
-
-    function peg$parseequation_double1() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-
-      s0 = peg$currPos;
-      s1 = peg$parse_();
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parsesubadd();
-        if (s2 !== peg$FAILED) {
-          s3 = peg$parse_();
-          if (s3 !== peg$FAILED) {
-            s4 = peg$currPos;
-            if (peg$c4.test(input.charAt(peg$currPos))) {
-              s5 = input.charAt(peg$currPos);
-              peg$currPos++;
-            } else {
-              s5 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c5); }
-            }
-            if (s5 !== peg$FAILED) {
-              if (input.charCodeAt(peg$currPos) === 61) {
-                s6 = peg$c6;
-                peg$currPos++;
-              } else {
-                s6 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c7); }
-              }
-              if (s6 !== peg$FAILED) {
-                s5 = [s5, s6];
-                s4 = s5;
-              } else {
-                peg$currPos = s4;
-                s4 = peg$c0;
-              }
-            } else {
-              peg$currPos = s4;
-              s4 = peg$c0;
-            }
-            if (s4 !== peg$FAILED) {
-              s5 = peg$parse_();
-              if (s5 !== peg$FAILED) {
-                s6 = peg$parsesubadd();
-                if (s6 !== peg$FAILED) {
-                  s7 = peg$parse_();
-                  if (s7 !== peg$FAILED) {
-                    peg$reportedPos = s0;
-                    s1 = peg$c8(s2, s4, s6);
-                    s0 = s1;
-                  } else {
-                    peg$currPos = s0;
-                    s0 = peg$c0;
-                  }
-                } else {
-                  peg$currPos = s0;
-                  s0 = peg$c0;
-                }
-              } else {
-                peg$currPos = s0;
-                s0 = peg$c0;
-              }
-            } else {
-              peg$currPos = s0;
-              s0 = peg$c0;
-            }
-          } else {
-            peg$currPos = s0;
-            s0 = peg$c0;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$c0;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$c0;
-      }
-
-      return s0;
-    }
-
-    function peg$parseequation_double2() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
-
-      s0 = peg$currPos;
-      s1 = peg$parse_();
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parsesubadd();
-        if (s2 !== peg$FAILED) {
-          s3 = peg$parse_();
-          if (s3 !== peg$FAILED) {
-            if (input.substr(peg$currPos, 2) === peg$c9) {
-              s4 = peg$c9;
-              peg$currPos += 2;
-            } else {
-              s4 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c10); }
-            }
-            if (s4 !== peg$FAILED) {
-              s5 = peg$parse_();
-              if (s5 !== peg$FAILED) {
-                s6 = peg$parsesubadd();
-                if (s6 !== peg$FAILED) {
-                  s7 = peg$parse_();
-                  if (s7 !== peg$FAILED) {
-                    peg$reportedPos = s0;
-                    s1 = peg$c11(s2, s4, s6);
-                    s0 = s1;
-                  } else {
-                    peg$currPos = s0;
-                    s0 = peg$c0;
-                  }
-                } else {
-                  peg$currPos = s0;
-                  s0 = peg$c0;
-                }
-              } else {
-                peg$currPos = s0;
-                s0 = peg$c0;
-              }
-            } else {
-              peg$currPos = s0;
-              s0 = peg$c0;
-            }
-          } else {
-            peg$currPos = s0;
-            s0 = peg$c0;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$c0;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$c0;
-      }
+      s0 = peg$parsesubadd();
 
       return s0;
     }
@@ -504,17 +274,11 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
       s0 = peg$currPos;
       s1 = peg$parse_();
       if (s1 !== peg$FAILED) {
-        s2 = peg$parsemuldiv();
+        s2 = peg$parsemuldivcomplog();
         if (s2 !== peg$FAILED) {
           s3 = peg$parse_();
           if (s3 !== peg$FAILED) {
-            if (peg$c12.test(input.charAt(peg$currPos))) {
-              s4 = input.charAt(peg$currPos);
-              peg$currPos++;
-            } else {
-              s4 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c13); }
-            }
+            s4 = peg$parseop_subadd();
             if (s4 !== peg$FAILED) {
               s5 = peg$parse_();
               if (s5 !== peg$FAILED) {
@@ -523,7 +287,7 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
                   s7 = peg$parse_();
                   if (s7 !== peg$FAILED) {
                     peg$reportedPos = s0;
-                    s1 = peg$c14(s2, s4, s6);
+                    s1 = peg$c1(s2, s4, s6);
                     s0 = s1;
                   } else {
                     peg$currPos = s0;
@@ -554,13 +318,13 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
         s0 = peg$c0;
       }
       if (s0 === peg$FAILED) {
-        s0 = peg$parsemuldiv();
+        s0 = peg$parsemuldivcomplog();
       }
 
       return s0;
     }
 
-    function peg$parsemuldiv() {
+    function peg$parsemuldivcomplog() {
       var s0, s1, s2, s3, s4, s5, s6, s7;
 
       s0 = peg$currPos;
@@ -570,22 +334,19 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
         if (s2 !== peg$FAILED) {
           s3 = peg$parse_();
           if (s3 !== peg$FAILED) {
-            if (peg$c15.test(input.charAt(peg$currPos))) {
-              s4 = input.charAt(peg$currPos);
-              peg$currPos++;
-            } else {
-              s4 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c16); }
+            s4 = peg$parseop_muldiv();
+            if (s4 === peg$FAILED) {
+              s4 = peg$parseop_comparator();
             }
             if (s4 !== peg$FAILED) {
               s5 = peg$parse_();
               if (s5 !== peg$FAILED) {
-                s6 = peg$parsemuldiv();
+                s6 = peg$parsemuldivcomplog();
                 if (s6 !== peg$FAILED) {
                   s7 = peg$parse_();
                   if (s7 !== peg$FAILED) {
                     peg$reportedPos = s0;
-                    s1 = peg$c17(s2, s4, s6);
+                    s1 = peg$c1(s2, s4, s6);
                     s0 = s1;
                   } else {
                     peg$currPos = s0;
@@ -622,6 +383,140 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
       return s0;
     }
 
+    function peg$parseop_subadd() {
+      var s0, s1;
+
+      s0 = peg$currPos;
+      if (peg$c2.test(input.charAt(peg$currPos))) {
+        s1 = input.charAt(peg$currPos);
+        peg$currPos++;
+      } else {
+        s1 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c3); }
+      }
+      if (s1 !== peg$FAILED) {
+        peg$reportedPos = s0;
+        s1 = peg$c4(s1);
+      }
+      s0 = s1;
+
+      return s0;
+    }
+
+    function peg$parseop_muldiv() {
+      var s0, s1;
+
+      s0 = peg$currPos;
+      if (peg$c5.test(input.charAt(peg$currPos))) {
+        s1 = input.charAt(peg$currPos);
+        peg$currPos++;
+      } else {
+        s1 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c6); }
+      }
+      if (s1 !== peg$FAILED) {
+        peg$reportedPos = s0;
+        s1 = peg$c7(s1);
+      }
+      s0 = s1;
+
+      return s0;
+    }
+
+    function peg$parseop_comparator() {
+      var s0;
+
+      s0 = peg$parseop_comparator_le_ge();
+      if (s0 === peg$FAILED) {
+        s0 = peg$parseop_comparator_not_equal();
+        if (s0 === peg$FAILED) {
+          s0 = peg$parseop_comparator_single();
+        }
+      }
+
+      return s0;
+    }
+
+    function peg$parseop_comparator_le_ge() {
+      var s0, s1, s2, s3;
+
+      s0 = peg$currPos;
+      s1 = peg$currPos;
+      if (peg$c8.test(input.charAt(peg$currPos))) {
+        s2 = input.charAt(peg$currPos);
+        peg$currPos++;
+      } else {
+        s2 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c9); }
+      }
+      if (s2 !== peg$FAILED) {
+        if (input.charCodeAt(peg$currPos) === 61) {
+          s3 = peg$c10;
+          peg$currPos++;
+        } else {
+          s3 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c11); }
+        }
+        if (s3 !== peg$FAILED) {
+          s2 = [s2, s3];
+          s1 = s2;
+        } else {
+          peg$currPos = s1;
+          s1 = peg$c0;
+        }
+      } else {
+        peg$currPos = s1;
+        s1 = peg$c0;
+      }
+      if (s1 !== peg$FAILED) {
+        peg$reportedPos = s0;
+        s1 = peg$c12(s1);
+      }
+      s0 = s1;
+
+      return s0;
+    }
+
+    function peg$parseop_comparator_not_equal() {
+      var s0, s1;
+
+      s0 = peg$currPos;
+      if (input.substr(peg$currPos, 2) === peg$c13) {
+        s1 = peg$c13;
+        peg$currPos += 2;
+      } else {
+        s1 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c14); }
+      }
+      if (s1 !== peg$FAILED) {
+        peg$reportedPos = s0;
+        s1 = peg$c15();
+      }
+      s0 = s1;
+
+      return s0;
+    }
+
+    function peg$parseop_comparator_single() {
+      var s0, s1;
+
+      s0 = peg$currPos;
+      if (peg$c16.test(input.charAt(peg$currPos))) {
+        s1 = input.charAt(peg$currPos);
+        peg$currPos++;
+      } else {
+        s1 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c17); }
+      }
+      if (s1 !== peg$FAILED) {
+        peg$reportedPos = s0;
+        s1 = peg$c18(s1);
+      }
+      s0 = s1;
+
+      return s0;
+    }
+
     function peg$parseprimary() {
       var s0;
 
@@ -629,9 +524,9 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
       if (s0 === peg$FAILED) {
         s0 = peg$parseblock();
         if (s0 === peg$FAILED) {
-          s0 = peg$parsefunction();
+          s0 = peg$parsevariable();
           if (s0 === peg$FAILED) {
-            s0 = peg$parsevariable();
+            s0 = peg$parsefunction();
           }
         }
       }
@@ -644,29 +539,29 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
 
       s0 = peg$currPos;
       if (input.charCodeAt(peg$currPos) === 40) {
-        s1 = peg$c18;
+        s1 = peg$c19;
         peg$currPos++;
       } else {
         s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c19); }
+        if (peg$silentFails === 0) { peg$fail(peg$c20); }
       }
       if (s1 !== peg$FAILED) {
         s2 = peg$parse_();
         if (s2 !== peg$FAILED) {
-          s3 = peg$parseequation();
+          s3 = peg$parsesubadd();
           if (s3 !== peg$FAILED) {
             s4 = peg$parse_();
             if (s4 !== peg$FAILED) {
               if (input.charCodeAt(peg$currPos) === 41) {
-                s5 = peg$c20;
+                s5 = peg$c21;
                 peg$currPos++;
               } else {
                 s5 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c21); }
+                if (peg$silentFails === 0) { peg$fail(peg$c22); }
               }
               if (s5 !== peg$FAILED) {
                 peg$reportedPos = s0;
-                s1 = peg$c22(s3);
+                s1 = peg$c23(s3);
                 s0 = s1;
               } else {
                 peg$currPos = s0;
@@ -693,38 +588,81 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
     }
 
     function peg$parsevariable() {
-      var s0, s1, s2, s3;
+      var s0, s1, s2, s3, s4, s5, s6, s7;
 
       s0 = peg$currPos;
       s1 = peg$parse_();
       if (s1 !== peg$FAILED) {
-        s2 = [];
-        if (peg$c24.test(input.charAt(peg$currPos))) {
-          s3 = input.charAt(peg$currPos);
+        s2 = peg$currPos;
+        s3 = [];
+        if (peg$c25.test(input.charAt(peg$currPos))) {
+          s4 = input.charAt(peg$currPos);
           peg$currPos++;
         } else {
-          s3 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c25); }
+          s4 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c26); }
         }
-        if (s3 !== peg$FAILED) {
-          while (s3 !== peg$FAILED) {
-            s2.push(s3);
-            if (peg$c24.test(input.charAt(peg$currPos))) {
-              s3 = input.charAt(peg$currPos);
+        if (s4 !== peg$FAILED) {
+          while (s4 !== peg$FAILED) {
+            s3.push(s4);
+            if (peg$c25.test(input.charAt(peg$currPos))) {
+              s4 = input.charAt(peg$currPos);
               peg$currPos++;
             } else {
-              s3 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c25); }
+              s4 = peg$FAILED;
+              if (peg$silentFails === 0) { peg$fail(peg$c26); }
             }
           }
         } else {
+          s3 = peg$c0;
+        }
+        if (s3 !== peg$FAILED) {
+          s4 = peg$currPos;
+          peg$silentFails++;
+          s5 = peg$currPos;
+          s6 = peg$parse_();
+          if (s6 !== peg$FAILED) {
+            if (peg$c28.test(input.charAt(peg$currPos))) {
+              s7 = input.charAt(peg$currPos);
+              peg$currPos++;
+            } else {
+              s7 = peg$FAILED;
+              if (peg$silentFails === 0) { peg$fail(peg$c29); }
+            }
+            if (s7 !== peg$FAILED) {
+              s6 = [s6, s7];
+              s5 = s6;
+            } else {
+              peg$currPos = s5;
+              s5 = peg$c0;
+            }
+          } else {
+            peg$currPos = s5;
+            s5 = peg$c0;
+          }
+          peg$silentFails--;
+          if (s5 !== peg$FAILED) {
+            peg$currPos = s4;
+            s4 = peg$c27;
+          } else {
+            s4 = peg$c0;
+          }
+          if (s4 !== peg$FAILED) {
+            s3 = [s3, s4];
+            s2 = s3;
+          } else {
+            peg$currPos = s2;
+            s2 = peg$c0;
+          }
+        } else {
+          peg$currPos = s2;
           s2 = peg$c0;
         }
         if (s2 !== peg$FAILED) {
           s3 = peg$parse_();
           if (s3 !== peg$FAILED) {
             peg$reportedPos = s0;
-            s1 = peg$c26(s2);
+            s1 = peg$c30(s2);
             s0 = s1;
           } else {
             peg$currPos = s0;
@@ -748,22 +686,22 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
       peg$silentFails++;
       s0 = peg$currPos;
       s1 = [];
-      if (peg$c28.test(input.charAt(peg$currPos))) {
+      if (peg$c32.test(input.charAt(peg$currPos))) {
         s2 = input.charAt(peg$currPos);
         peg$currPos++;
       } else {
         s2 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c29); }
+        if (peg$silentFails === 0) { peg$fail(peg$c33); }
       }
       if (s2 !== peg$FAILED) {
         while (s2 !== peg$FAILED) {
           s1.push(s2);
-          if (peg$c28.test(input.charAt(peg$currPos))) {
+          if (peg$c32.test(input.charAt(peg$currPos))) {
             s2 = input.charAt(peg$currPos);
             peg$currPos++;
           } else {
             s2 = peg$FAILED;
-            if (peg$silentFails === 0) { peg$fail(peg$c29); }
+            if (peg$silentFails === 0) { peg$fail(peg$c33); }
           }
         }
       } else {
@@ -771,13 +709,13 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
       }
       if (s1 !== peg$FAILED) {
         peg$reportedPos = s0;
-        s1 = peg$c30(s1);
+        s1 = peg$c34(s1);
       }
       s0 = s1;
       peg$silentFails--;
       if (s0 === peg$FAILED) {
         s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c27); }
+        if (peg$silentFails === 0) { peg$fail(peg$c31); }
       }
 
       return s0;
@@ -807,28 +745,28 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
       s1 = peg$parse_();
       if (s1 !== peg$FAILED) {
         s2 = peg$currPos;
-        if (peg$c31.test(input.charAt(peg$currPos))) {
+        if (peg$c35.test(input.charAt(peg$currPos))) {
           s3 = input.charAt(peg$currPos);
           peg$currPos++;
         } else {
           s3 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c32); }
+          if (peg$silentFails === 0) { peg$fail(peg$c36); }
         }
         if (s3 !== peg$FAILED) {
-          if (peg$c33.test(input.charAt(peg$currPos))) {
+          if (peg$c37.test(input.charAt(peg$currPos))) {
             s4 = input.charAt(peg$currPos);
             peg$currPos++;
           } else {
             s4 = peg$FAILED;
-            if (peg$silentFails === 0) { peg$fail(peg$c34); }
+            if (peg$silentFails === 0) { peg$fail(peg$c38); }
           }
           if (s4 !== peg$FAILED) {
-            if (peg$c35.test(input.charAt(peg$currPos))) {
+            if (peg$c39.test(input.charAt(peg$currPos))) {
               s5 = input.charAt(peg$currPos);
               peg$currPos++;
             } else {
               s5 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c36); }
+              if (peg$silentFails === 0) { peg$fail(peg$c40); }
             }
             if (s5 !== peg$FAILED) {
               s3 = [s3, s4, s5];
@@ -849,11 +787,11 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
           s3 = peg$parse_();
           if (s3 !== peg$FAILED) {
             if (input.charCodeAt(peg$currPos) === 40) {
-              s4 = peg$c18;
+              s4 = peg$c19;
               peg$currPos++;
             } else {
               s4 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c19); }
+              if (peg$silentFails === 0) { peg$fail(peg$c20); }
             }
             if (s4 !== peg$FAILED) {
               s5 = peg$parse_();
@@ -872,15 +810,15 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
                   s7 = peg$parse_();
                   if (s7 !== peg$FAILED) {
                     if (input.charCodeAt(peg$currPos) === 41) {
-                      s8 = peg$c20;
+                      s8 = peg$c21;
                       peg$currPos++;
                     } else {
                       s8 = peg$FAILED;
-                      if (peg$silentFails === 0) { peg$fail(peg$c21); }
+                      if (peg$silentFails === 0) { peg$fail(peg$c22); }
                     }
                     if (s8 !== peg$FAILED) {
                       peg$reportedPos = s0;
-                      s1 = peg$c37(s2, s6);
+                      s1 = peg$c41(s2, s6);
                       s0 = s1;
                     } else {
                       peg$currPos = s0;
@@ -924,22 +862,42 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
       s0 = peg$currPos;
       s1 = peg$parse_();
       if (s1 !== peg$FAILED) {
-        if (input.substr(peg$currPos, 2) === peg$c38) {
-          s2 = peg$c38;
-          peg$currPos += 2;
+        s2 = peg$currPos;
+        if (peg$c42.test(input.charAt(peg$currPos))) {
+          s3 = input.charAt(peg$currPos);
+          peg$currPos++;
         } else {
-          s2 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c39); }
+          s3 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c43); }
+        }
+        if (s3 !== peg$FAILED) {
+          if (peg$c44.test(input.charAt(peg$currPos))) {
+            s4 = input.charAt(peg$currPos);
+            peg$currPos++;
+          } else {
+            s4 = peg$FAILED;
+            if (peg$silentFails === 0) { peg$fail(peg$c45); }
+          }
+          if (s4 !== peg$FAILED) {
+            s3 = [s3, s4];
+            s2 = s3;
+          } else {
+            peg$currPos = s2;
+            s2 = peg$c0;
+          }
+        } else {
+          peg$currPos = s2;
+          s2 = peg$c0;
         }
         if (s2 !== peg$FAILED) {
           s3 = peg$parse_();
           if (s3 !== peg$FAILED) {
             if (input.charCodeAt(peg$currPos) === 40) {
-              s4 = peg$c18;
+              s4 = peg$c19;
               peg$currPos++;
             } else {
               s4 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c19); }
+              if (peg$silentFails === 0) { peg$fail(peg$c20); }
             }
             if (s4 !== peg$FAILED) {
               s5 = peg$parse_();
@@ -958,15 +916,15 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
                   s7 = peg$parse_();
                   if (s7 !== peg$FAILED) {
                     if (input.charCodeAt(peg$currPos) === 41) {
-                      s8 = peg$c20;
+                      s8 = peg$c21;
                       peg$currPos++;
                     } else {
                       s8 = peg$FAILED;
-                      if (peg$silentFails === 0) { peg$fail(peg$c21); }
+                      if (peg$silentFails === 0) { peg$fail(peg$c22); }
                     }
                     if (s8 !== peg$FAILED) {
                       peg$reportedPos = s0;
-                      s1 = peg$c40(s2, s6);
+                      s1 = peg$c41(s2, s6);
                       s0 = s1;
                     } else {
                       peg$currPos = s0;
@@ -1010,22 +968,22 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
       s0 = peg$currPos;
       s1 = peg$parse_();
       if (s1 !== peg$FAILED) {
-        if (input.substr(peg$currPos, 3) === peg$c41) {
-          s2 = peg$c41;
+        if (input.substr(peg$currPos, 3) === peg$c46) {
+          s2 = peg$c46;
           peg$currPos += 3;
         } else {
           s2 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c42); }
+          if (peg$silentFails === 0) { peg$fail(peg$c47); }
         }
         if (s2 !== peg$FAILED) {
           s3 = peg$parse_();
           if (s3 !== peg$FAILED) {
             if (input.charCodeAt(peg$currPos) === 40) {
-              s4 = peg$c18;
+              s4 = peg$c19;
               peg$currPos++;
             } else {
               s4 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c19); }
+              if (peg$silentFails === 0) { peg$fail(peg$c20); }
             }
             if (s4 !== peg$FAILED) {
               s5 = peg$parse_();
@@ -1035,15 +993,15 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
                   s7 = peg$parse_();
                   if (s7 !== peg$FAILED) {
                     if (input.charCodeAt(peg$currPos) === 41) {
-                      s8 = peg$c20;
+                      s8 = peg$c21;
                       peg$currPos++;
                     } else {
                       s8 = peg$FAILED;
-                      if (peg$silentFails === 0) { peg$fail(peg$c21); }
+                      if (peg$silentFails === 0) { peg$fail(peg$c22); }
                     }
                     if (s8 !== peg$FAILED) {
                       peg$reportedPos = s0;
-                      s1 = peg$c43(s2, s6);
+                      s1 = peg$c48(s2, s6);
                       s0 = s1;
                     } else {
                       peg$currPos = s0;
@@ -1087,22 +1045,22 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
       s0 = peg$currPos;
       s1 = peg$parse_();
       if (s1 !== peg$FAILED) {
-        if (input.substr(peg$currPos, 7) === peg$c44) {
-          s2 = peg$c44;
+        if (input.substr(peg$currPos, 7) === peg$c49) {
+          s2 = peg$c49;
           peg$currPos += 7;
         } else {
           s2 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c45); }
+          if (peg$silentFails === 0) { peg$fail(peg$c50); }
         }
         if (s2 !== peg$FAILED) {
           s3 = peg$parse_();
           if (s3 !== peg$FAILED) {
             if (input.charCodeAt(peg$currPos) === 40) {
-              s4 = peg$c18;
+              s4 = peg$c19;
               peg$currPos++;
             } else {
               s4 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c19); }
+              if (peg$silentFails === 0) { peg$fail(peg$c20); }
             }
             if (s4 !== peg$FAILED) {
               s5 = peg$parse_();
@@ -1112,15 +1070,15 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
                   s7 = peg$parse_();
                   if (s7 !== peg$FAILED) {
                     if (input.charCodeAt(peg$currPos) === 41) {
-                      s8 = peg$c20;
+                      s8 = peg$c21;
                       peg$currPos++;
                     } else {
                       s8 = peg$FAILED;
-                      if (peg$silentFails === 0) { peg$fail(peg$c21); }
+                      if (peg$silentFails === 0) { peg$fail(peg$c22); }
                     }
                     if (s8 !== peg$FAILED) {
                       peg$reportedPos = s0;
-                      s1 = peg$c43(s2, s6);
+                      s1 = peg$c48(s2, s6);
                       s0 = s1;
                     } else {
                       peg$currPos = s0;
@@ -1164,13 +1122,13 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
       s0 = peg$currPos;
       s1 = peg$parsecomma();
       if (s1 === peg$FAILED) {
-        s1 = peg$c46;
+        s1 = peg$c51;
       }
       if (s1 !== peg$FAILED) {
-        s2 = peg$parseequation();
+        s2 = peg$parsesubadd();
         if (s2 !== peg$FAILED) {
           peg$reportedPos = s0;
-          s1 = peg$c47(s2);
+          s1 = peg$c52(s2);
           s0 = s1;
         } else {
           peg$currPos = s0;
@@ -1187,12 +1145,12 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
     function peg$parsews() {
       var s0;
 
-      if (peg$c48.test(input.charAt(peg$currPos))) {
+      if (peg$c53.test(input.charAt(peg$currPos))) {
         s0 = input.charAt(peg$currPos);
         peg$currPos++;
       } else {
         s0 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c49); }
+        if (peg$silentFails === 0) { peg$fail(peg$c54); }
       }
 
       return s0;
@@ -1218,11 +1176,11 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return funct
       s1 = peg$parse_();
       if (s1 !== peg$FAILED) {
         if (input.charCodeAt(peg$currPos) === 44) {
-          s2 = peg$c50;
+          s2 = peg$c55;
           peg$currPos++;
         } else {
           s2 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c51); }
+          if (peg$silentFails === 0) { peg$fail(peg$c56); }
         }
         if (s2 !== peg$FAILED) {
           s3 = peg$parse_();

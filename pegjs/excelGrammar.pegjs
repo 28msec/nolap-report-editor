@@ -24,65 +24,60 @@
 }
 
 start
-  = equation
+  = subadd
 
-equation
-  = equation_single / equation_double1 / equation_double2 / subadd
 
-equation_single
-  = _ left:subadd _ sign:([<=>]) _ right:subadd _
-    {
-      switch(sign[0])
-      {
-        case '=': return create("eq", left, right);
-        case '>': return create("gt", left, right);
-        case '<': return create("lt", left, right);
-        default : return undefined;
-      }
-    }
-
-equation_double1
-  = _ left:subadd _ sign:([<>] "=") _ right:subadd _
-    {
-      switch(sign[0])
-      {
-        case '>': return create("ge", left, right);
-        case '<': return create("le", left, right);
-        default : return undefined;
-      }
-    }
-
-equation_double2
-  = _ left:subadd _ sign:"<>" _ right:subadd _ { return create("ne", left, right); }
-
+/*******************
+    arithmetics 
+*******************/
 subadd
-  = _ left:muldiv _ sign:[+-] _ right:subadd _
-    {
-      if (sign == "+")
-      { return create("add", left, right); }
-      else
-      { return create("sub", left, right); }
-    }
-  / muldiv
+  = _ left:muldivcomplog _ operator:(op_subadd) _ right:subadd _
+    { return create(operator, left, right); }
+  / muldivcomplog
 
-muldiv
-  = _ left:primary _ sign:[*/] _ right:muldiv _
-    {
-      if (sign == "*")
-      { return create("mul", left, right); }
-      else
-      { return create("div", left, right); }
-    }
+muldivcomplog
+  = _ left:primary _ operator:( op_muldiv / op_comparator ) _ right:muldivcomplog _
+    { return create(operator, left, right); }
   / primary
 
+
+/*******************
+    Operators
+*******************/
+op_subadd
+  = sign:[+-] { if (sign === "+"){ return "add"; } else { return "sub"; } }
+
+op_muldiv
+  = sign:[*/] { if (sign === "*"){ return "mul"; } else { return "div"; } }
+
+op_comparator
+  = op_comparator_le_ge/ op_comparator_not_equal / op_comparator_single
+
+op_comparator_le_ge
+  = double:( [<>] "=" ){ switch(double.join("")){
+                           case "<=": return "le";
+                           case ">=": return "ge";
+                         };
+                       }
+
+op_comparator_not_equal 
+  = "<>" { return "ne"; }
+
+op_comparator_single
+  = single:[<=>] { return single; } 
+
+
+/*******************
+    Primaries
+*******************/
 primary
-  = integer / block / function / variable
+  = integer / block / variable / function
 
 block
-  = "(" _ block:equation _ ")" { return createOne("block", block); }
+  = "(" _ block:subadd _ ")" { return createOne("block", block); }
 
 variable
-  = _ name:( [a-zA-Z0-9._]+ ) _ { return createVar(name.join("")); }
+  = _ name:( [a-zA-Z0-9._]+ & ( _ [^(] ) ) _ { return createVar(name[0].join("")); }
 
 integer "integer"
   = digits:[0-9.]+ { return createAtomic(parseFloat(digits.join(""), 10)); }
@@ -96,7 +91,7 @@ fun_and
     { return createFun(name.join("").toLowerCase(), params); }
 
 fun_or
-  = _ name:"or" _ "(" _ params:parameter+ _ ")" { return createFun(name, params); }
+  = _ name:([oO][rR]) _ "(" _ params:parameter+ _ ")" { return createFun(name.join("").toLowerCase(), params); }
 
 fun_not
   = _ name:"not" _ "(" _ param:parameter _ ")" { return createFun(name, param); }
@@ -105,7 +100,7 @@ fun_isblank
   = _ name:"isblank" _ "(" _ param:parameter _ ")" { return createFun(name, param); }
 
 parameter 
-  = comma? param:equation { return param; }
+  = comma? param:subadd { return param; }
 
 ws
   = [ \t\r\n]
@@ -116,3 +111,4 @@ _
 comma 
   = _ "," _
   
+
