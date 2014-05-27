@@ -16,7 +16,7 @@
     return {Type: "variable", ConceptName: name};
   }
 
-  
+
   function createFun(name, params) {
     return {Type: "function", Name: name, Params: [params]};
   }
@@ -40,7 +40,6 @@ equation_single
         default : return undefined;
       }
     }
-
 equation_double1
   = _ left:subadd _ sign:([<>] "=") _ right:subadd _
     {
@@ -73,13 +72,28 @@ muldiv
       else
       { return create("div", left, right); }
     }
-  / primary
+  / logical
+
+logical
+  = log_and / log_or / primary
+
+log_and
+  = _ left:primary _ "and" _ right:equation _
+    {
+      return create("and", left, right);
+    }
+
+log_or
+  = _ left:primary _ "or" _ right:equation _
+    {
+      return create("or", left, right);
+    }
 
 primary
   = integer / block / variable / function
 
 block
-  = "(" _ block:subadd _ ")" { return createOne("block", block); }
+  = "(" _ block:equation _ ")" { return createOne("block", block); }
 
 variable
   = _ name:( "$" [a-zA-Z] [a-zA-Z0-9]* ":" [a-zA-Z0-9_-]+) _ { return createVar(name[1] + name[2].join("") + name[3] + name[4].join("")); }
@@ -87,20 +101,14 @@ variable
 integer "integer"
   = digits:[0-9.]+ { return createAtomic(parseFloat(digits.join(""), 10)); }
 
+
 function
-  = fun_and / fun_or
-    / fun_exists
-
-fun_and
-  = _ name:"and" _ "(" _ params:parameter+ _ ")" { return createFun(name, params); }
-
-fun_or
-  = _ name:"or" _ "(" _ params:parameter+ _ ")" { return createFun(name, params); }
+  = fun_exists
 
 fun_exists
   = _ "exists" _ "(" _ param:parameter _ ")" { return createFun("exists", param); }
 
-parameter 
+parameter
   = comma? param:equation { return param; }
 
 ws
@@ -109,6 +117,6 @@ ws
 _
   = (ws)*
 
-comma 
+comma
   = _ "," _
-  
+

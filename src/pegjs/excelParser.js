@@ -653,7 +653,7 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
       if (s1 !== peg$FAILED) {
         s2 = peg$parse_();
         if (s2 !== peg$FAILED) {
-          s3 = peg$parsesubadd();
+          s3 = peg$parseequation();
           if (s3 !== peg$FAILED) {
             s4 = peg$parse_();
             if (s4 !== peg$FAILED) {

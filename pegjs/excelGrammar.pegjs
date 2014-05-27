@@ -79,7 +79,7 @@ primary
   = integer / block / function / variable
 
 block
-  = "(" _ block:subadd _ ")" { return createOne("block", block); }
+  = "(" _ block:equation _ ")" { return createOne("block", block); }
 
 variable
   = _ name:( [a-zA-Z0-9._]+ ) _ { return createVar(name.join("")); }
