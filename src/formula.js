@@ -62,9 +62,11 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         var deferred = $q.defer();
 
         $log.log('starting compilation');
-        for (var i = 0; i < this.model.Formulae.length; ++i) {
-            this.compilePrereq(i);
-            this.compileBody(i);
+        if(this.model.Formulae !== undefined && this.model.Formulae !== null) {
+            for (var i = 0; i < this.model.Formulae.length; ++i) {
+                this.compilePrereq(i);
+                this.compileBody(i);
+            }
         }
 
         return deferred.promise;
@@ -174,4 +176,5 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
     };
     return Formula;
 }]);
+
 
