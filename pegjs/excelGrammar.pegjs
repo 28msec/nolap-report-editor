@@ -76,13 +76,16 @@ op_comparator_single
     Primaries
 *******************/
 primary
-  = integer / block / variable / function
+  = integer / block / variable / function / variable2
 
 block
   = "(" _ block:comparison _ ")" { return createOne("block", block); }
 
 variable
   = _ name:( [a-zA-Z0-9._]+ & ( _ [^(] ) ) _ { return createVar(name[0].join("")); }
+
+variable2
+  = _ name:( [a-zA-Z0-9._]+ ) _ { return createVar(name.join("")); }
 
 integer "integer"
   = digits:[0-9.]+ { return createAtomic(parseFloat(digits.join(""), 10)); }
