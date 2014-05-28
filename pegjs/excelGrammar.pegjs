@@ -24,19 +24,24 @@
 }
 
 start
-  = subadd
+  = comparison
 
 
 /*******************
     arithmetics 
 *******************/
-subadd
-  = _ left:muldivcomplog _ operator:(op_subadd) _ right:subadd _
+comparison
+  = _ left:subadd _ operator:(op_comparator) _ right:comparison _
     { return create(operator, left, right); }
-  / muldivcomplog
+  / subadd
 
-muldivcomplog
-  = _ left:primary _ operator:( op_muldiv / op_comparator ) _ right:muldivcomplog _
+subadd
+  = _ left:muldiv _ operator:(op_subadd) _ right:subadd _
+    { return create(operator, left, right); }
+  / muldiv
+
+muldiv
+  = _ left:primary _ operator:( op_muldiv ) _ right:muldiv _
     { return create(operator, left, right); }
   / primary
 
@@ -74,7 +79,7 @@ primary
   = integer / block / variable / function
 
 block
-  = "(" _ block:subadd _ ")" { return createOne("block", block); }
+  = "(" _ block:comparison _ ")" { return createOne("block", block); }
 
 variable
   = _ name:( [a-zA-Z0-9._]+ & ( _ [^(] ) ) _ { return createVar(name[0].join("")); }
@@ -83,24 +88,24 @@ integer "integer"
   = digits:[0-9.]+ { return createAtomic(parseFloat(digits.join(""), 10)); }
 
 function
-  = fun_and / fun_or /fun_not
-    / fun_isblank 
+  = _ ( fun_and / fun_or /fun_not
+    / fun_isblank ) _
 
 fun_and
-  = _ name:([aA][nN][dD]) _ "(" _ params:parameter+ _ ")" 
+  = name:([aA][nN][dD]) _ "(" _ params:parameter+ _ ")" 
     { return createFun(name.join("").toLowerCase(), params); }
 
 fun_or
-  = _ name:([oO][rR]) _ "(" _ params:parameter+ _ ")" { return createFun(name.join("").toLowerCase(), params); }
+  = name:([oO][rR]) _ "(" _ params:parameter+ _ ")" { return createFun(name.join("").toLowerCase(), params); }
 
 fun_not
-  = _ name:"not" _ "(" _ param:parameter _ ")" { return createFun(name, param); }
+  = name:"not" _ "(" _ param:parameter _ ")" { return createFun(name, param); }
 
 fun_isblank
-  = _ name:"isblank" _ "(" _ param:parameter _ ")" { return createFun(name, param); }
+  = name:"isblank" _ "(" _ param:parameter _ ")" { return createFun(name, param); }
 
 parameter 
-  = comma? param:subadd { return param; }
+  = comma? param:comparison { return param; }
 
 ws
   = [ \t\r\n]
