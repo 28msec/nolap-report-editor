@@ -1,4 +1,4 @@
-<ul class="nav nav-list nav-pills nav-stacked abn-tree">
+<ul class="nav nav-list nav-pills nav-stacked abn-tree" ui-sortable="sortableOptions" ng-model="rows">
     <li ng-repeat="row in rows | filter:{visible:true} track by row.branch.Id"  ng-class="'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')" class="abn-tree-row">
         <a ng-click="select(row)">
             <i ng-class="{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }" class="indented tree-icon fa"></i>

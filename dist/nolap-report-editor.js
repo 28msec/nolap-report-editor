@@ -36,26 +36,8 @@ angular
     return {
         restrict: 'E',
         transclude: true,
-        /*
-            $scope.$watch('dirtyModel', function(dirtyModel){
-                //console.log('dirtyModel');
-                //console.log(dirtyModel);
-                return;
-                api.addOrReplaceOrValidateReport({
-                    report: dirtyModel,
-                    token: $scope.reportApiToken,
-                    $method: 'POST'
-                })
-                .then(function(){
-                    $scope.model = angular.copy(dirtyModel);
-                })
-                .catch(function(){
-                    $scope.dirtyModel = angular.copy($scope.model);
-                });
-            });
-        },
-        */
         controller: function($scope){
+
             this.getReport = function(){
                 return $scope.report;
             };
@@ -85,6 +67,26 @@ angular
             $transclude($scope, function(clone) {
                 element.append(clone);
             });
+            
+            $scope.$watch('dirtyModel', function(dirtyModel, previousVersion){
+                if(previousVersion === undefined) {
+                    return;
+                }
+                api.addOrReplaceOrValidateReport({
+                    report: dirtyModel,
+                    token: attrs.reportApiToken,
+                    $method: 'POST'
+                })
+                .then(function(){
+                    $scope.model = angular.copy(dirtyModel);
+                    $scope.concepts = $scope.report.listConcepts();
+                })
+                .catch(function(error){
+                    console.error(error);
+                    $scope.dirtyModel = angular.copy($scope.model);
+                    $scope.concepts = $scope.report.listConcepts();
+                });
+            }, true);
         }
     };
 })
@@ -96,6 +98,18 @@ angular
         link: function($scope, element, attrs, reportCtrl) {
 
             $scope.presentationTree = reportCtrl.getPresentationTree();
+            $scope.sortableOptions = {
+                update: function(e, ui){
+                    console.log('update');
+                    console.log(e);
+                    console.log(ui);
+                },
+                stop: function(e, ui){
+                    console.log('update');
+                    console.log(e);
+                    console.log(ui);
+                }
+            };
 
             $scope.select = function(row) {
                 if(row.branch.To) {
@@ -107,7 +121,6 @@ angular
             };
 
             var setRows = function(tree, level, visible){
-                var parentExpanded = tree.expanded !== undefined ?  tree.expanded : true;
                 Object.keys(tree).forEach(function(leaf){
                     var branch = tree[leaf];
                     branch.expanded = branch.expanded !== undefined ? branch.expanded : true;
@@ -119,10 +132,22 @@ angular
             };
     
             var onChange = function(tree){
-                $scope.rows = []; 
                 setRows(tree, 1, true);
             };
 
+            $scope.rows = [];
+            
+            var tmpList = [];
+  
+  for (var i = 1; i <= 6; i++){
+    tmpList.push({
+      text: 'Item ' + i,
+      value: i
+    });
+  }
+  
+  $scope.list = tmpList;
+  
             return $scope.$watch('presentationTree', onChange, true);
         }   
     };
@@ -220,20 +245,14 @@ parameters.$cacheItemOpts : {});
             var path = '/add-report.jq'
             var url = domain + path;
             var params = {};
-            if(parameters['report'] === undefined) {
-                deferred.reject(new Error('The report parameter is required'));
-                return deferred.promise;
-            } else {
-                params['report'] = parameters['report'];
-            }
             params['validation-only'] = parameters['validationOnly'];
             params['token'] = parameters['token'];
-            var body = null;
+            var body = parameters['report'];
             var method = 'POST'.toUpperCase();
             if (parameters.$method)
             {
                 params['_method'] = parameters.$method;
-                method = 'GET';
+                method = 'POST';
             }
             var cached = parameters.$cache && parameters.$cache.get(url);
             if(method === 'GET' && cached !== undefined && parameters.$refresh !== true) {
@@ -243,6 +262,7 @@ parameters.$cacheItemOpts : {});
                 method: method,
                 url: url,
                 params: params,
+data: body,
                 cache: (parameters.$refresh !== true)
             })
             .success(function(data, status, headers, config){
@@ -311,7 +331,7 @@ parameters.$cacheItemOpts : {});
     };
 });angular.module("nolapReportEditor")
 
-.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree\">\n    <li ng-repeat=\"row in rows | filter:{visible:true} track by row.branch.Id\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\" ng-bind=\"row.branch.Label\"></span>\n        </a>\n    </li>\n</ul>")
+.constant("PresentationTreeTpl", "    <ul ui-sortable=\"sortableOptions\" ng-model=\"list\" class=\"list\">\n      <li ng-repeat=\"item in list\" class=\"item\">\n        {{item.text}}\n      </li>\n    </ul>\n<ul class=\"nav nav-list nav-pills nav-stacked abn-tree\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows | filter:{visible:true} track by row.branch.Id\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\" ng-bind=\"row.branch.Label\"></span>\n        </a>\n    </li>\n</ul>")
 
 ;'use strict';
 

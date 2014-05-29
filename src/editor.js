@@ -36,26 +36,8 @@ angular
     return {
         restrict: 'E',
         transclude: true,
-        /*
-            $scope.$watch('dirtyModel', function(dirtyModel){
-                //console.log('dirtyModel');
-                //console.log(dirtyModel);
-                return;
-                api.addOrReplaceOrValidateReport({
-                    report: dirtyModel,
-                    token: $scope.reportApiToken,
-                    $method: 'POST'
-                })
-                .then(function(){
-                    $scope.model = angular.copy(dirtyModel);
-                })
-                .catch(function(){
-                    $scope.dirtyModel = angular.copy($scope.model);
-                });
-            });
-        },
-        */
         controller: function($scope){
+
             this.getReport = function(){
                 return $scope.report;
             };
@@ -85,6 +67,26 @@ angular
             $transclude($scope, function(clone) {
                 element.append(clone);
             });
+            
+            $scope.$watch('dirtyModel', function(dirtyModel, previousVersion){
+                if(previousVersion === undefined) {
+                    return;
+                }
+                api.addOrReplaceOrValidateReport({
+                    report: dirtyModel,
+                    token: attrs.reportApiToken,
+                    $method: 'POST'
+                })
+                .then(function(){
+                    $scope.model = angular.copy(dirtyModel);
+                    $scope.concepts = $scope.report.listConcepts();
+                })
+                .catch(function(error){
+                    console.error(error);
+                    $scope.dirtyModel = angular.copy($scope.model);
+                    $scope.concepts = $scope.report.listConcepts();
+                });
+            }, true);
         }
     };
 })
@@ -96,6 +98,18 @@ angular
         link: function($scope, element, attrs, reportCtrl) {
 
             $scope.presentationTree = reportCtrl.getPresentationTree();
+            $scope.sortableOptions = {
+                update: function(e, ui){
+                    console.log('update');
+                    console.log(e);
+                    console.log(ui);
+                },
+                stop: function(e, ui){
+                    console.log('update');
+                    console.log(e);
+                    console.log(ui);
+                }
+            };
 
             $scope.select = function(row) {
                 if(row.branch.To) {
@@ -107,7 +121,6 @@ angular
             };
 
             var setRows = function(tree, level, visible){
-                var parentExpanded = tree.expanded !== undefined ?  tree.expanded : true;
                 Object.keys(tree).forEach(function(leaf){
                     var branch = tree[leaf];
                     branch.expanded = branch.expanded !== undefined ? branch.expanded : true;
@@ -119,10 +132,10 @@ angular
             };
     
             var onChange = function(tree){
-                $scope.rows = []; 
                 setRows(tree, 1, true);
             };
 
+            $scope.rows = [];
             return $scope.$watch('presentationTree', onChange, true);
         }   
     };

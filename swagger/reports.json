@@ -91,7 +91,7 @@
                             "description": "A JSON object containing the report",
                             "required": true,
                             "type": "object",
-                            "paramType": "query"
+                            "paramType": "body"
                         },
                         {
                             "name": "validation-only",
