@@ -91,7 +91,7 @@ angular
         }
     };
 })
-.directive('presentationTree', function(PresentationTreeTpl){
+.directive('presentationTree', function($rootScope, PresentationTreeTpl){
     return {
         restrict: 'E',
         template: PresentationTreeTpl,
@@ -116,8 +116,9 @@ angular
                                     parentIdx--;
                                     parent = $scope.rows[parentIdx];
                                 }
-                                reportCtrl.getReport().moveTreeBranch('Presentation', subtreeRootElementID, parent.branch.Id, parentIdx - siblingIdx + 1);
+                                reportCtrl.getReport().moveTreeBranch('Presentation', subtreeRootElementID, parent.branch.Id, siblingIdx - parentIdx);
                             }
+                            //$scope.presentationTree = reportCtrl.getPresentationTree();
                             return false;
                         }
                     });
@@ -131,6 +132,10 @@ angular
                 } else {
                     $scope.selected = row.branch;
                 }
+            };
+            
+            $scope.remove = function(id){
+                $rootScope.$emit('removeConceptFromPresentationTree', id);  
             };
 
             var setRows = function(tree, level, visible, rows){
@@ -336,7 +341,7 @@ data: body,
     };
 });angular.module("nolapReportEditor")
 
-.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row\" id=\"{{row.branch.Id}}\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\" ng-bind=\"row.branch.Label\"></span>\n        </a>\n    </li>\n</ul>")
+.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row\" id=\"{{row.branch.Id}}\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\" ng-bind=\"row.branch.Label\"></span>\n            <span class=\"remove-concept indented fa fa-times\" ng-click=\"remove(row.branch.Id)\"></span>\n        </a>\n    </li>\n</ul>")
 
 ;'use strict';
 

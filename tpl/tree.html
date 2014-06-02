@@ -3,6 +3,7 @@
         <a ng-click="select(row)">
             <i ng-class="{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }" class="indented tree-icon fa"></i>
             <span class="indented tree-label" ng-bind="row.branch.Label"></span>
+            <span class="remove-concept indented fa fa-times" ng-click="remove(row.branch.Id)"></span>
         </a>
     </li>
 </ul>

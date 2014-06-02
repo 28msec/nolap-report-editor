@@ -91,7 +91,7 @@ angular
         }
     };
 })
-.directive('presentationTree', function(PresentationTreeTpl){
+.directive('presentationTree', function($rootScope, PresentationTreeTpl){
     return {
         restrict: 'E',
         template: PresentationTreeTpl,
@@ -116,8 +116,9 @@ angular
                                     parentIdx--;
                                     parent = $scope.rows[parentIdx];
                                 }
-                                reportCtrl.getReport().moveTreeBranch('Presentation', subtreeRootElementID, parent.branch.Id, parentIdx - siblingIdx + 1);
+                                reportCtrl.getReport().moveTreeBranch('Presentation', subtreeRootElementID, parent.branch.Id, siblingIdx - parentIdx);
                             }
+                            //$scope.presentationTree = reportCtrl.getPresentationTree();
                             return false;
                         }
                     });
@@ -131,6 +132,10 @@ angular
                 } else {
                     $scope.selected = row.branch;
                 }
+            };
+            
+            $scope.remove = function(id){
+                $rootScope.$emit('removeConceptFromPresentationTree', id);  
             };
 
             var setRows = function(tree, level, visible, rows){
