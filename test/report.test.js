@@ -83,7 +83,8 @@ describe('Concepts Model API Tests', function () {
     it('Add a presentation element', function () {
         expect(report).not.toBeNull();
         var name = 'fac:Test';
-        var element = report.addTreeChild('Presentation', null, name, 4);
+        var offset = 0;
+        var element = report.addTreeChild('Presentation', null, name, offset);
                       
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
@@ -95,7 +96,8 @@ describe('Concepts Model API Tests', function () {
         expect(report).not.toBeNull();
         var name = 'fac:Leaf';
         var parentID = report.findInTree('Presentation','fac:Test');
-        var element = report.addTreeChild('Presentation', parentID[0], name, 3);
+        var offset = 0;
+        var element = report.addTreeChild('Presentation', parentID[0], name, offset);
                       
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
@@ -107,7 +109,7 @@ describe('Concepts Model API Tests', function () {
         expect(report).not.toBeNull();
         var name = 'fac:Test';
         var parentID = report.findInTree('Presentation','fac:Test');
-        var element = report.addTreeChild('Presentation', parentID[0], name, 2);
+        var element = report.addTreeChild('Presentation', parentID[0], name, 1);
                       
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
@@ -134,7 +136,7 @@ describe('Concepts Model API Tests', function () {
         var name = 'fac:Test';
         var parentID = report.findInTree('Presentation','fac:Leaf');
         try {
-            report.addTreeChild('Presentation', parentID[0], name, 2);
+            report.addTreeChild('Presentation', parentID[0], name);
         } catch (ex) {
             expect(ex.message.match(/"fac:Leaf" is not abstract/g)).not.toBeNull();
         }
@@ -143,13 +145,14 @@ describe('Concepts Model API Tests', function () {
     it('Change order of element', function () {
         expect(report).not.toBeNull();
         var name = 'fac:Leaf';
-        var order = 2;
+        var newOffset = 1;
         var elementID = report.findInTree('Presentation',name)[0];
         var element = report.getElementFromTree('Presentation',elementID);
-        expect(element.Order).toBe(3);
+        var parent = report.getParentElementFromTree('Presentation', elementID);
+        expect(element.Order).toBe(1);
 
-        report.setTreeElementOrder('Presentation',elementID, order);
-        expect(element.Order).toBe(order);
+        report.moveTreeBranch('Presentation', elementID, parent.Id, newOffset);
+        expect(element.Order).toBe(newOffset + 1);
     });
 
     it('Move Subtree', function () {
@@ -196,7 +199,7 @@ describe('Concepts Model API Tests', function () {
         var to = [ 'us-gaap:Revenues', 'us-gaap:Liabilities' ];
         report.addConcept(from, label, false);
         var root2ID = report.findInTree('Presentation','fac:Root2')[0];
-        report.addTreeChild('Presentation', root2ID, from, 3);
+        report.addTreeChild('Presentation', root2ID, from);
         report.addConceptMap(from, to);
 
         expect(report.existsConceptMap(from)).toBe(true);
@@ -401,7 +404,7 @@ describe('Concepts Model API Tests', function () {
             }
         }
 
-        // console.log(JSON.stringify(report));
+        //console.log(JSON.stringify(report));
     });
 
 });

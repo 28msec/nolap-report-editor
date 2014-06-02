@@ -371,24 +371,53 @@ angular
         return element;
     };
 
-    Report.prototype.enforceStrictChildOrder = function(networkShortName, parentID) {
+    var enforceStrictChildOrderAndShift = function(report, networkShortName, parentID, shiftOffset) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'enforceStrictChildOrder');
-        ensureParameter(parentID, 'parentID', 'string', 'enforceStrictChildOrder');
-        
-        var parent = this.getElementFromTree(networkShortName, parentID);
-        var children = parent.To;
-        var order = 0;
+
+        if(shiftOffset === undefined || shiftOffset === null){
+            shiftOffset = -1;
+        }
+        var network = report.getNetwork(networkShortName);
+        var children = network.Trees;
+        if(parentID !== undefined && parentID !== null) {
+            ensureParameter(parentID, 'parentID', 'string', 'enforceStrictChildOrder');
+            var parent = report.getElementFromTree(networkShortName, parentID);
+            ensureExists(parent, 'object', 'enforceStrictChildOrder', 'cannot enforce strict child order. Parent with id "' + parentID + '" doesn\'t exist.');
+            children = parent.To;
+        }
+
+        var ordered = [];
         for(var child in children){
             if(children.hasOwnProperty(child)) {
-                var currentOrder = 1;
-                if(child.Order !== undefined && child.Order !== null){
-                    currentOrder = parseInt(child.Order, 10);
-                }
-                if(currentOrder > order){
-                    order = currentOrder;
-                } else {
-                    child.Order = ++order;
-                }
+                ordered.push(children[child]);
+            }
+        }
+        ordered.sort(function(elem1, elem2){
+            var order1 = elem1.Order;
+            if(order1 === undefined || order1 === null){
+                order1 = 1;
+            } else if(typeof order1 !== 'number'){
+                order1 = parseInt(order1, 10);
+            }
+            var order2 = elem2.Order;
+            if(order2 === undefined || order2 === null){
+                order2 = 1;
+            } else if(typeof order2 !== 'number'){
+                order2 = parseInt(order2, 10);
+            }
+            if (order1 < order2){
+                return -1;
+            }
+            if (order1 > order2){
+                return 1;
+            }
+            return 0;
+        });
+        for (var i = 0; i < ordered.length; i++) {
+            if(shiftOffset !== -1 && i >= shiftOffset){
+                ordered[i].Order = i + 2;
+            } else {
+                ordered[i].Order = i + 1;
             }
         }
     };
@@ -455,12 +484,42 @@ angular
         return element;
     };
 
-    Report.prototype.addTreeChild = function(networkShortName, parentElementID, conceptName, order) {
+    var getMaxOrder = function(report, networkShortName, parentElementID){
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'getMaxOrder');
+        var network = report.getNetwork(networkShortName);
+        var children = network.Trees;
+        if(parentElementID !== undefined && parentElementID !== null) {
+            var parent = report.getElementFromTree(networkShortName, parentElementID);
+            children = parent.To;
+        }
+        var count = 0, child;
+        for (child in children) {
+            if (children.hasOwnProperty(child)) {
+                count += 1;
+            }
+        }
+        return count;
+    };
+
+    Report.prototype.addTreeChild = function(networkShortName, parentElementID, conceptName, offset) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'addTreeChild');
         ensureConceptName(conceptName, 'conceptName', 'addTreeChild');
         var concept = this.getConcept(conceptName);
         ensureExists(concept, 'object', 'addTreeChild', 'concept with name "' + conceptName + '" doesn\'t exist.');
 
+        var order = 1;
+        var maxOrder = getMaxOrder(this, networkShortName, parentElementID);
+        if(offset !== undefined && offset !== null){
+            ensureParameter(offset, 'offset', 'number', 'addTreeChild');
+            order = offset + 1;
+        } else {
+            offset = 0; // default
+        }
+        if(offset > (maxOrder)){
+            throw new Error('addTreeChild: offset out of bounds: ' + offset +
+                ' (Max offset is ' + maxOrder + ' for parent ' + parentElementID  + '.');
+        }
+        enforceStrictChildOrderAndShift(this, networkShortName, parentElementID, offset);
         if(parentElementID === undefined || parentElementID === null) {
             // add a root element
             var network = this.getNetwork(networkShortName);
@@ -490,23 +549,22 @@ angular
         }
     };
 
-    Report.prototype.setTreeElementOrder = function(networkShortName, elementID, order) {
-        ensureNetworkShortName(networkShortName, 'networkShortName', 'setTreeElementOrder');
-        ensureParameter(elementID, 'elementID', 'string', 'setTreeElementOrder');
-        var _order = 1;
-        if(order !== undefined) {
-            ensureParameter(order, 'order', 'number', 'setTreeElementOrder');
-            _order = order;
-        }
-        var element = this.getElementFromTree(networkShortName, elementID);
-        ensureExists(element, 'object', 'setTreeElementOrder', 'Cannot set order. Element with id "' + elementID + '" doesn\'t exist.');
-        element.Order = _order;
-    };
-
-    Report.prototype.moveTreeBranch = function(networkShortName, subtreeRootElementID, newParentElementID) {
+    Report.prototype.moveTreeBranch = function(networkShortName, subtreeRootElementID, newParentElementID, newOffset) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'moveTreeBranch');
         ensureParameter(subtreeRootElementID, 'subtreeRootElementID', 'string', 'moveTreeBranch');
 
+        var newOrder = 1;
+        var maxOrder = getMaxOrder(this, networkShortName, newParentElementID);
+        if(newOffset !== undefined && newOffset !== null){
+            ensureParameter(newOffset, 'newOffset', 'number', 'moveTreeBranch');
+            newOrder = newOffset + 1;
+        } else {
+            newOffset = 0; // default
+        }
+        if(newOffset > (maxOrder)){
+            throw new Error('moveTreeBranch: offset out of bounds: ' + newOffset +
+                ' (Max offset is ' + maxOrder + ' for parent ' + newParentElementID  + '.');
+        }
         if(newParentElementID !== undefined && newParentElementID !== null){
             ensureParameter(newParentElementID, 'newParentElementID', 'string', 'moveTreeBranch');
 
@@ -519,6 +577,8 @@ angular
             }
 
             var element = this.removeTreeBranch(networkShortName, subtreeRootElementID);
+            enforceStrictChildOrderAndShift(this, networkShortName, newParentElementID, newOffset);
+            element.Order = newOrder;
             if(newParent.To === undefined || newParent.To === null) {
                 newParent.To = {};
             }
@@ -527,6 +587,8 @@ angular
             // no new parent given -> make it a root element
             var network = this.getNetwork(networkShortName);
             var element2 = this.removeTreeBranch(networkShortName, subtreeRootElementID);
+            enforceStrictChildOrderAndShift(this, networkShortName, newParentElementID, newOffset);
+            element2.Order = newOrder;
             if(network.Trees === undefined || network.Trees === null) {
                 network.Trees = [];
             }
