@@ -67,7 +67,7 @@ angular
             $transclude($scope, function(clone) {
                 element.append(clone);
             });
-            
+
             $scope.$watch('dirtyModel', function(dirtyModel, previousVersion){
                 if(previousVersion === undefined) {
                     return;
@@ -78,6 +78,7 @@ angular
                     $method: 'POST'
                 })
                 .then(function(){
+                    console.log('new model saved');
                     $scope.model = angular.copy(dirtyModel);
                     $scope.concepts = $scope.report.listConcepts();
                 })
@@ -96,59 +97,63 @@ angular
         template: PresentationTreeTpl,
         require: '^report',
         link: function($scope, element, attrs, reportCtrl) {
-
             $scope.presentationTree = reportCtrl.getPresentationTree();
             $scope.sortableOptions = {
-                update: function(e, ui){
-                    console.log('update');
-                    console.log(e);
-                    console.log(ui);
-                },
                 stop: function(e, ui){
-                    console.log('update');
-                    console.log(e);
-                    console.log(ui);
+                    var item = angular.element(ui.item);
+                    var subtreeRootElementID = item.attr('id');
+                    $scope.rows.forEach(function(row, index){
+                        if(row.branch.Id === subtreeRootElementID) {
+                            if(index === 0){
+                                reportCtrl.getReport().moveTreeBranch('Presentation', subtreeRootElementID);
+                            } else {
+                                //var currentLevel = row.level;
+                                var siblingIdx = index - 1;
+                                var parentIdx = index - 1;
+                                //var sibling = $scope.rows[siblingIdx];
+                                var parent = $scope.rows[parentIdx];
+                                while(parent.level === row.level){
+                                    parentIdx--;
+                                    parent = $scope.rows[parentIdx];
+                                }
+                                reportCtrl.getReport().moveTreeBranch('Presentation', subtreeRootElementID, parent.branch.Id, parentIdx - siblingIdx + 1);
+                            }
+                            return false;
+                        }
+                    });
                 }
             };
 
             $scope.select = function(row) {
                 if(row.branch.To) {
                     row.branch.expanded = !row.branch.expanded;
+                    $scope.rows = setRows($scope.presentationTree, 1, true, []);
                 } else {
                     $scope.selected = row.branch;
-                    console.log($scope.selected.Id);
                 }
             };
 
-            var setRows = function(tree, level, visible){
+            var setRows = function(tree, level, visible, rows){
+                if(visible === false) {
+                    return; 
+                }
                 Object.keys(tree).forEach(function(leaf){
                     var branch = tree[leaf];
                     branch.expanded = branch.expanded !== undefined ? branch.expanded : true;
-                    $scope.rows.push({ branch: branch, level: level, visible: visible });
+                    rows.push({ branch: branch, level: level, visible: visible });
                     if(branch.To){
-                        setRows(branch.To, level + 1, visible === false ? false : branch.expanded);
+                        setRows(branch.To, level + 1, visible === false ? false : branch.expanded, rows);
                     }
                 });
-            };
-    
-            var onChange = function(tree){
-                setRows(tree, 1, true);
+                return rows;
             };
 
-            $scope.rows = [];
-            
-            var tmpList = [];
-  
-  for (var i = 1; i <= 6; i++){
-    tmpList.push({
-      text: 'Item ' + i,
-      value: i
-    });
-  }
-  
-  $scope.list = tmpList;
-  
-            return $scope.$watch('presentationTree', onChange, true);
+            //$scope.rows = [];
+            var onChange = function(tree){
+                $scope.rows = setRows(tree, 1, true, []);
+            };
+
+            $scope.$watch('presentationTree', onChange, true);
         }   
     };
 })
@@ -331,7 +336,7 @@ data: body,
     };
 });angular.module("nolapReportEditor")
 
-.constant("PresentationTreeTpl", "    <ul ui-sortable=\"sortableOptions\" ng-model=\"list\" class=\"list\">\n      <li ng-repeat=\"item in list\" class=\"item\">\n        {{item.text}}\n      </li>\n    </ul>\n<ul class=\"nav nav-list nav-pills nav-stacked abn-tree\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows | filter:{visible:true} track by row.branch.Id\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\" ng-bind=\"row.branch.Label\"></span>\n        </a>\n    </li>\n</ul>")
+.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row\" id=\"{{row.branch.Id}}\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\" ng-bind=\"row.branch.Label\"></span>\n        </a>\n    </li>\n</ul>")
 
 ;'use strict';
 
