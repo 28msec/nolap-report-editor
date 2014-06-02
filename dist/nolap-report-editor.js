@@ -829,21 +829,32 @@ angular
     Report.prototype.moveTreeBranch = function(networkShortName, subtreeRootElementID, newParentElementID) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'moveTreeBranch');
         ensureParameter(subtreeRootElementID, 'subtreeRootElementID', 'string', 'moveTreeBranch');
-        ensureParameter(newParentElementID, 'newParentElementID', 'string', 'moveTreeBranch');
 
-        var newParent = this.getElementFromTree(networkShortName, newParentElementID);
-        ensureExists(newParent, 'object', 'moveTreeBranch', 'Cannot move element with id "' + subtreeRootElementID + '" to new parent element with id "' + newParentElementID + '": Parent element doesn\'t exist.');
-        var parentConcept = this.getConcept(newParent.Name);
-        if(!parentConcept.IsAbstract) {
-            throw new Error('moveTreeBranch: cannot move element to target parent "' + newParentElementID +
-                '". Reason: Parent concept "' + newParent.Name  + '" is not abstract.');
-        }
+        if(newParentElementID !== undefined && newParentElementID !== null){
+            ensureParameter(newParentElementID, 'newParentElementID', 'string', 'moveTreeBranch');
 
-        var element = this.removeTreeBranch(networkShortName, subtreeRootElementID);
-        if(newParent.To === undefined || newParent.To === null) {
-            newParent.To = {};
+            var newParent = this.getElementFromTree(networkShortName, newParentElementID);
+            ensureExists(newParent, 'object', 'moveTreeBranch', 'Cannot move element with id "' + subtreeRootElementID + '" to new parent element with id "' + newParentElementID + '": Parent element doesn\'t exist.');
+            var parentConcept = this.getConcept(newParent.Name);
+            if(!parentConcept.IsAbstract) {
+                throw new Error('moveTreeBranch: cannot move element to target parent "' + newParentElementID +
+                    '". Reason: Parent concept "' + newParent.Name  + '" is not abstract.');
+            }
+
+            var element = this.removeTreeBranch(networkShortName, subtreeRootElementID);
+            if(newParent.To === undefined || newParent.To === null) {
+                newParent.To = {};
+            }
+            newParent.To[element.Name] = element;
+        } else {
+            // no new parent given -> make it a root element
+            var network = this.getNetwork(networkShortName);
+            var element2 = this.removeTreeBranch(networkShortName, subtreeRootElementID);
+            if(network.Trees === undefined || network.Trees === null) {
+                network.Trees = [];
+            }
+            network.Trees[element2.Name] = element2;
         }
-        newParent.To[element.Name] = element;
     };
 
     Report.prototype.removeTreeBranch = function(networkShortName,subtreeRootElementID) {
