@@ -136,18 +136,6 @@ angular
             };
 
             $scope.rows = [];
-            
-            var tmpList = [];
-  
-  for (var i = 1; i <= 6; i++){
-    tmpList.push({
-      text: 'Item ' + i,
-      value: i
-    });
-  }
-  
-  $scope.list = tmpList;
-  
             return $scope.$watch('presentationTree', onChange, true);
         }   
     };
@@ -331,7 +319,7 @@ data: body,
     };
 });angular.module("nolapReportEditor")
 
-.constant("PresentationTreeTpl", "    <ul ui-sortable=\"sortableOptions\" ng-model=\"list\" class=\"list\">\n      <li ng-repeat=\"item in list\" class=\"item\">\n        {{item.text}}\n      </li>\n    </ul>\n<ul class=\"nav nav-list nav-pills nav-stacked abn-tree\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows | filter:{visible:true} track by row.branch.Id\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\" ng-bind=\"row.branch.Label\"></span>\n        </a>\n    </li>\n</ul>")
+.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows | filter:{visible:true} track by row.branch.Id\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\" ng-bind=\"row.branch.Label\"></span>\n        </a>\n    </li>\n</ul>")
 
 ;'use strict';
 
@@ -704,6 +692,28 @@ angular
             }
         }
         return element;
+    };
+
+    Report.prototype.enforceStrictChildOrder = function(networkShortName, parentID) {
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'enforceStrictChildOrder');
+        ensureParameter(parentID, 'parentID', 'string', 'enforceStrictChildOrder');
+        
+        var parent = this.getElementFromTree(networkShortName, parentID);
+        var children = parent.To;
+        var order = 0;
+        for(var child in children){
+            if(children.hasOwnProperty(child)) {
+                var currentOrder = 1;
+                if(child.Order !== undefined && child.Order !== null){
+                    currentOrder = parseInt(child.Order, 10);
+                }
+                if(currentOrder > order){
+                    order = currentOrder;
+                } else {
+                    child.Order = ++order;
+                }
+            }
+        }
     };
 
     var getParentElementFromSubTree = function(elementID, subtree) {

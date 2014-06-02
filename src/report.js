@@ -371,6 +371,28 @@ angular
         return element;
     };
 
+    Report.prototype.enforceStrictChildOrder = function(networkShortName, parentID) {
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'enforceStrictChildOrder');
+        ensureParameter(parentID, 'parentID', 'string', 'enforceStrictChildOrder');
+        
+        var parent = this.getElementFromTree(networkShortName, parentID);
+        var children = parent.To;
+        var order = 0;
+        for(var child in children){
+            if(children.hasOwnProperty(child)) {
+                var currentOrder = 1;
+                if(child.Order !== undefined && child.Order !== null){
+                    currentOrder = parseInt(child.Order, 10);
+                }
+                if(currentOrder > order){
+                    order = currentOrder;
+                } else {
+                    child.Order = ++order;
+                }
+            }
+        }
+    };
+
     var getParentElementFromSubTree = function(elementID, subtree) {
         var children = subtree.To;
         for(var child in children){
