@@ -95,13 +95,23 @@ angular
         }
     };
 })
-.directive('presentationTree', function($rootScope, PresentationTreeTpl){
+.directive('presentationTree', function($rootScope, PresentationTreeTpl) {
+
+    var safeApply = function(scope, fn){
+        scope.$apply(function(){
+            try {
+                fn();
+            } catch (e) {
+                $rootScope.$emit('error', 500, e.message);
+            }
+        });
+    };
+
     return {
         restrict: 'E',
         template: PresentationTreeTpl,
         require: '^report',
         link: function($scope, element, attrs, reportCtrl) {
-            $scope.presentationTree = reportCtrl.getPresentationTree();
             $scope.sortableOptions = {
                 placeholder: "sortable",
                 connectWith: ".sortable-container",
@@ -116,7 +126,10 @@ angular
                         parent = $scope.rows[parentIdx];
                     }
                     //networkShortName, parentElementID, conceptName, offset
-                    reportCtrl.getReport().addTreeChild('Presentation', parent.branch.Id, concept.Name, dropIdx - 1 - parentIdx);
+                    //safeApply($scope, function(){
+                        reportCtrl.getReport().addTreeChild('Presentation', parent.branch.Id, concept.Name, dropIdx - 1 - parentIdx);
+                        ui.item.sortable.cancel();
+                    //});
                 },
                 stop: function(e, ui){
                     var item = angular.element(ui.item);
@@ -124,7 +137,7 @@ angular
                     $scope.rows.forEach(function(row, index){
                         if(row.branch.Id === subtreeRootElementID) {
                             if(index === 0){
-                                $scope.$apply(function(){
+                                safeApply($scope, function(){
                                     reportCtrl.getReport().moveTreeBranch('Presentation', subtreeRootElementID);
                                 });
                             } else {
@@ -137,9 +150,7 @@ angular
                                     parentIdx--;
                                     parent = $scope.rows[parentIdx];
                                 }
-                                $scope.$apply(function(){
-                                    console.log(parent.branch.id);
-                                    console.log('Offset: ' + (siblingIdx - parentIdx));
+                                safeApply($scope, function(){
                                     reportCtrl.getReport().moveTreeBranch('Presentation', subtreeRootElementID, parent.branch.Id, siblingIdx - parentIdx);
                                 });
                             }
@@ -205,7 +216,9 @@ angular
                 $scope.rows = setRows(tree, 1, true, []);
             };
 
-            $scope.$watch('presentationTree', onChange, true);
+            $scope.$watch(function(){
+                return reportCtrl.getPresentationTree();
+            }, onChange, true);
         }   
     };
 })
@@ -388,7 +401,7 @@ data: body,
     };
 });angular.module("nolapReportEditor")
 
-.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree sortable-container\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row sortable\" id=\"{{row.branch.Id}}\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\">{{row.branch.Label}} ({{row.branch.Name}})</span>\n            <span class=\"remove-concept indented fa fa-times\" ng-click=\"remove(row.branch.Id)\"></span>\n        </a>\n    </li>\n</ul>")
+.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree sortable-container\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row sortable\" id=\"{{row.branch.Id}}\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\"><span class=\"branch-label\">{{row.branch.Label}}</span> ({{row.branch.Name}})</span>\n            <span class=\"remove-concept indented fa fa-times\" ng-click=\"remove(row.branch.Id)\"></span>\n        </a>\n    </li>\n</ul>")
 
 ;'use strict';
 
