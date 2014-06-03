@@ -2,23 +2,203 @@
 
 angular
 .module('nolapReportEditor', ['reports.api.28.io'])
-.directive('reports', function(ReportAPI){
+//http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
+.directive('reports', function($compile, ReportAPI){
     return {
         restrict: 'A',
         scope: {
-            'reportApi': '=api',
-            'reportApiToken': '=token'
+            'reportApi': '@',
+            'reportApiToken': '@'
         },
-        link: function($scope){
-            var api = new ReportAPI($scope.api);
+        transclude: true,
+        controller: function($scope){
+            var api = new ReportAPI($scope.reportApi);
             api.listReports({
-                token: $scope.token
+                token: $scope.reportApiToken,
+                $method: 'POST'
             })
             .then(function(reports){
-                console.log(reports);
                 $scope.reports = reports;
+            })
+            .catch(function(error){
+                console.error(error);
+                $scope.error = error;
+            });
+        },
+        link: function($scope, element, attrs, ctrl, $transclude){
+            $transclude($scope, function(clone) {
+                element.append(clone);
             });
         }
+    };
+})
+.directive('report', function($rootScope, Report, ReportAPI){
+    return {
+        restrict: 'E',
+        transclude: true,
+        controller: function($scope){
+
+            this.getReport = function(){
+                return $scope.report;
+            };
+            
+            this.getPresentationTree = function(){
+                return this.getReport().getNetwork('Presentation').Trees;
+            };
+        },
+        link: function($scope, element, attrs, ctrl, $transclude){
+            var api = new ReportAPI(attrs.reportApi);
+
+            api.listReports({
+                _id: attrs.reportId,
+                token: attrs.reportApiToken,
+                $method: 'POST'
+            })
+            .then(function(reports){
+                $scope.model = reports[0];
+                $scope.dirtyModel = angular.copy($scope.model);
+                $scope.report = new Report($scope.dirtyModel);
+                $scope.concepts = $scope.report.listConcepts();
+            })
+            .catch(function(error){
+                console.error(error);
+                $scope.error = error;
+            });
+            
+            $transclude($scope, function(clone) {
+                element.append(clone);
+            });
+
+            $scope.$watch('dirtyModel', function(dirtyModel, previousVersion){
+                if(previousVersion === undefined) {
+                    return;
+                }
+                $rootScope.$emit('saving');
+                api.addOrReplaceOrValidateReport({
+                    report: dirtyModel,
+                    token: attrs.reportApiToken,
+                    $method: 'POST'
+                })
+                .then(function(){
+                    $rootScope.$emit('saved');
+                    console.log('new model saved');
+                    $scope.model = angular.copy(dirtyModel);
+                    $scope.concepts = $scope.report.listConcepts();
+                })
+                .catch(function(error){
+                    $rootScope.$emit('savingError');
+                    console.error(error);
+                    $scope.dirtyModel = angular.copy($scope.model);
+                    $scope.concepts = $scope.report.listConcepts();
+                });
+            }, true);
+        }
+    };
+})
+.directive('presentationTree', function($rootScope, PresentationTreeTpl){
+    return {
+        restrict: 'E',
+        template: PresentationTreeTpl,
+        require: '^report',
+        link: function($scope, element, attrs, reportCtrl) {
+            $scope.presentationTree = reportCtrl.getPresentationTree();
+            $scope.sortableOptions = {
+                //placeholder: "sortable",
+                //connectWith: ".sortable-container",
+                receive: function(e, ui){
+                    //var conceptName = angular.element(ui.item).attr('id');
+                    angular.element(ui.item).attr('id');
+                    //reportCtrl.getReport().addTreeChild();
+                },
+                stop: function(e, ui){
+                    var item = angular.element(ui.item);
+                    var subtreeRootElementID = item.attr('id');
+                    $scope.rows.forEach(function(row, index){
+                        if(row.branch.Id === subtreeRootElementID) {
+                            if(index === 0){
+                                $scope.$apply(function(){
+                                    reportCtrl.getReport().moveTreeBranch('Presentation', subtreeRootElementID);
+                                });
+                            } else {
+                                //var currentLevel = row.level;
+                                var siblingIdx = index - 1;
+                                var parentIdx = index - 1;
+                                //var sibling = $scope.rows[siblingIdx];
+                                var parent = $scope.rows[parentIdx];
+                                while(parent.level === row.level){
+                                    parentIdx--;
+                                    parent = $scope.rows[parentIdx];
+                                }
+                                $scope.$apply(function(){
+                                    console.log(parent.branch.id);
+                                    console.log('Offset: ' + (siblingIdx - parentIdx));
+                                    reportCtrl.getReport().moveTreeBranch('Presentation', subtreeRootElementID, parent.branch.Id, siblingIdx - parentIdx);
+                                });
+                            }
+                            //$scope.presentationTree = reportCtrl.getPresentationTree();
+                            return false;
+                        }
+                    });
+                }
+            };
+
+            $scope.select = function(row) {
+                if(row.branch.To) {
+                    row.branch.expanded = !row.branch.expanded;
+                    $scope.rows = setRows($scope.presentationTree, 1, true, []);
+                } else {
+                    $scope.selected = row.branch;
+                }
+            };
+            
+            $scope.remove = function(id){
+                $rootScope.$emit('removeConceptFromPresentationTree', id);  
+            };
+
+            var setRows = function(tree, level, visible, rows){
+                if(visible === false) {
+                    return; 
+                }
+                Object.keys(tree).sort(function(elem1, elem2){
+                    elem1 = tree[elem1];
+                    elem2 = tree[elem2];
+                    var order1 = elem1.Order;
+                    if(order1 === undefined || order1 === null){
+                        order1 = 1;
+                    } else if(typeof order1 !== 'number'){
+                        order1 = parseInt(order1, 10);
+                    }
+                    var order2 = elem2.Order;
+                    if(order2 === undefined || order2 === null){
+                        order2 = 1;
+                    } else if(typeof order2 !== 'number'){
+                        order2 = parseInt(order2, 10);
+                    }
+                    if (order1 < order2){
+                        return -1;
+                    }
+                    if (order1 > order2){
+                        return 1;
+                    }
+                    return 0;
+                }).forEach(function(leaf){
+                    var branch = tree[leaf];
+                    branch.expanded = branch.expanded !== undefined ? branch.expanded : true;
+                    rows.push({ branch: branch, level: level, visible: visible });
+                    if(branch.To){
+                        setRows(branch.To, level + 1, visible === false ? false : branch.expanded, rows);
+                    }
+                });
+                return rows;
+            };
+
+            //$scope.rows = [];
+            var onChange = function(tree){
+                $scope.rows = setRows(tree, 1, true, []);
+            };
+
+            $scope.$watch('presentationTree', onChange, true);
+        }   
     };
 })
 ;
@@ -56,7 +236,7 @@ angular.module('reports.api.28.io', [])
          * 
          * @method
          * @name ReportAPI#listReports
-         * @param {string} name - A report name (e.g. FundamentalAccountingConcepts),
+         * @param {string} _id - A report id (e.g. FundamentalAccountingConcepts),
          * @param {string} token - The token of the current session,
          * 
          */
@@ -66,7 +246,7 @@ angular.module('reports.api.28.io', [])
             var path = '/reports.jq'
             var url = domain + path;
             var params = {};
-            params['name'] = parameters['name'];
+            params['_id'] = parameters['_id'];
             params['token'] = parameters['token'];
             var body = null;
             var method = 'GET'.toUpperCase();
@@ -115,20 +295,14 @@ parameters.$cacheItemOpts : {});
             var path = '/add-report.jq'
             var url = domain + path;
             var params = {};
-            if(parameters['report'] === undefined) {
-                deferred.reject(new Error('The report parameter is required'));
-                return deferred.promise;
-            } else {
-                params['report'] = parameters['report'];
-            }
             params['validation-only'] = parameters['validationOnly'];
             params['token'] = parameters['token'];
-            var body = null;
+            var body = parameters['report'];
             var method = 'POST'.toUpperCase();
             if (parameters.$method)
             {
                 params['_method'] = parameters.$method;
-                method = 'GET';
+                method = 'POST';
             }
             var cached = parameters.$cache && parameters.$cache.get(url);
             if(method === 'GET' && cached !== undefined && parameters.$refresh !== true) {
@@ -138,6 +312,7 @@ parameters.$cacheItemOpts : {});
                 method: method,
                 url: url,
                 params: params,
+data: body,
                 cache: (parameters.$refresh !== true)
             })
             .success(function(data, status, headers, config){
@@ -157,7 +332,7 @@ parameters.$cacheItemOpts : {});
          * 
          * @method
          * @name ReportAPI#removeReport
-         * @param {string} name - A report name (e.g. FundamentalAccountingConcepts),
+         * @param {string} _id - A report id (e.g. FundamentalAccountingConcepts),
          * @param {string} token - The token of the current session,
          * 
          */
@@ -167,11 +342,11 @@ parameters.$cacheItemOpts : {});
             var path = '/delete-report.jq'
             var url = domain + path;
             var params = {};
-            if(parameters['name'] === undefined) {
-                deferred.reject(new Error('The name parameter is required'));
+            if(parameters['_id'] === undefined) {
+                deferred.reject(new Error('The _id parameter is required'));
                 return deferred.promise;
             } else {
-                params['name'] = parameters['name'];
+                params['_id'] = parameters['_id'];
             }
             params['token'] = parameters['token'];
             var body = null;
@@ -204,7 +379,11 @@ parameters.$cacheItemOpts : {});
             return deferred.promise;
         };
     };
-});'use strict';
+});angular.module("nolapReportEditor")
+
+.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree sortable-container\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row sortable\" id=\"{{row.branch.Id}}\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\" ng-bind=\"row.branch.Label\"></span>\n            <span class=\"remove-concept indented fa fa-times\" ng-click=\"remove(row.branch.Id)\"></span>\n        </a>\n    </li>\n</ul>")
+
+;'use strict';
 
 angular
 .module('nolapReportEditor')
@@ -338,7 +517,9 @@ angular
             s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
         }
         s[14] = '4';  // bits 12-15 of the time_hi_and_version field to 0010
+        /* jslint bitwise: true */
         s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
+        /* jslint bitwise: false */
         s[8] = s[13] = s[18] = s[23] = '-';
         return s.join('');
     };
@@ -575,6 +756,57 @@ angular
         return element;
     };
 
+    var enforceStrictChildOrderAndShift = function(report, networkShortName, parentID, shiftOffset) {
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'enforceStrictChildOrder');
+
+        if(shiftOffset === undefined || shiftOffset === null){
+            shiftOffset = -1;
+        }
+        var network = report.getNetwork(networkShortName);
+        var children = network.Trees;
+        if(parentID !== undefined && parentID !== null) {
+            ensureParameter(parentID, 'parentID', 'string', 'enforceStrictChildOrder');
+            var parent = report.getElementFromTree(networkShortName, parentID);
+            ensureExists(parent, 'object', 'enforceStrictChildOrder', 'cannot enforce strict child order. Parent with id "' + parentID + '" doesn\'t exist.');
+            children = parent.To;
+        }
+
+        var ordered = [];
+        for(var child in children){
+            if(children.hasOwnProperty(child)) {
+                ordered.push(children[child]);
+            }
+        }
+        ordered.sort(function(elem1, elem2){
+            var order1 = elem1.Order;
+            if(order1 === undefined || order1 === null){
+                order1 = 1;
+            } else if(typeof order1 !== 'number'){
+                order1 = parseInt(order1, 10);
+            }
+            var order2 = elem2.Order;
+            if(order2 === undefined || order2 === null){
+                order2 = 1;
+            } else if(typeof order2 !== 'number'){
+                order2 = parseInt(order2, 10);
+            }
+            if (order1 < order2){
+                return -1;
+            }
+            if (order1 > order2){
+                return 1;
+            }
+            return 0;
+        });
+        for (var i = 0; i < ordered.length; i++) {
+            if(shiftOffset !== -1 && i >= shiftOffset){
+                ordered[i].Order = i + 2;
+            } else {
+                ordered[i].Order = i + 1;
+            }
+        }
+    };
+
     var getParentElementFromSubTree = function(elementID, subtree) {
         var children = subtree.To;
         for(var child in children){
@@ -637,12 +869,42 @@ angular
         return element;
     };
 
-    Report.prototype.addTreeChild = function(networkShortName, parentElementID, conceptName, order) {
+    var getMaxOrder = function(report, networkShortName, parentElementID){
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'getMaxOrder');
+        var network = report.getNetwork(networkShortName);
+        var children = network.Trees;
+        if(parentElementID !== undefined && parentElementID !== null) {
+            var parent = report.getElementFromTree(networkShortName, parentElementID);
+            children = parent.To;
+        }
+        var count = 0, child;
+        for (child in children) {
+            if (children.hasOwnProperty(child)) {
+                count += 1;
+            }
+        }
+        return count;
+    };
+
+    Report.prototype.addTreeChild = function(networkShortName, parentElementID, conceptName, offset) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'addTreeChild');
         ensureConceptName(conceptName, 'conceptName', 'addTreeChild');
         var concept = this.getConcept(conceptName);
         ensureExists(concept, 'object', 'addTreeChild', 'concept with name "' + conceptName + '" doesn\'t exist.');
 
+        var order = 1;
+        var maxOrder = getMaxOrder(this, networkShortName, parentElementID);
+        if(offset !== undefined && offset !== null){
+            ensureParameter(offset, 'offset', 'number', 'addTreeChild');
+            order = offset + 1;
+        } else {
+            offset = 0; // default
+        }
+        if(offset > (maxOrder)){
+            throw new Error('addTreeChild: offset out of bounds: ' + offset +
+                ' (Max offset is ' + maxOrder + ' for parent ' + parentElementID  + '.');
+        }
+        enforceStrictChildOrderAndShift(this, networkShortName, parentElementID, offset);
         if(parentElementID === undefined || parentElementID === null) {
             // add a root element
             var network = this.getNetwork(networkShortName);
@@ -672,37 +934,51 @@ angular
         }
     };
 
-    Report.prototype.setTreeElementOrder = function(networkShortName, elementID, order) {
-        ensureNetworkShortName(networkShortName, 'networkShortName', 'setTreeElementOrder');
-        ensureParameter(elementID, 'elementID', 'string', 'setTreeElementOrder');
-        var _order = 1;
-        if(order !== undefined) {
-            ensureParameter(order, 'order', 'number', 'setTreeElementOrder');
-            _order = order;
-        }
-        var element = this.getElementFromTree(networkShortName, elementID);
-        ensureExists(element, 'object', 'setTreeElementOrder', 'Cannot set order. Element with id "' + elementID + '" doesn\'t exist.');
-        element.Order = _order;
-    };
-
-    Report.prototype.moveTreeBranch = function(networkShortName, subtreeRootElementID, newParentElementID) {
+    Report.prototype.moveTreeBranch = function(networkShortName, subtreeRootElementID, newParentElementID, newOffset) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'moveTreeBranch');
         ensureParameter(subtreeRootElementID, 'subtreeRootElementID', 'string', 'moveTreeBranch');
-        ensureParameter(newParentElementID, 'newParentElementID', 'string', 'moveTreeBranch');
 
-        var newParent = this.getElementFromTree(networkShortName, newParentElementID);
-        ensureExists(newParent, 'object', 'moveTreeBranch', 'Cannot move element with id "' + subtreeRootElementID + '" to new parent element with id "' + newParentElementID + '": Parent element doesn\'t exist.');
-        var parentConcept = this.getConcept(newParent.Name);
-        if(!parentConcept.IsAbstract) {
-            throw new Error('moveTreeBranch: cannot move element to target parent "' + newParentElementID +
-                '". Reason: Parent concept "' + newParent.Name  + '" is not abstract.');
+        var newOrder = 1;
+        var maxOrder = getMaxOrder(this, networkShortName, newParentElementID);
+        if(newOffset !== undefined && newOffset !== null){
+            ensureParameter(newOffset, 'newOffset', 'number', 'moveTreeBranch');
+            newOrder = newOffset + 1;
+        } else {
+            newOffset = 0; // default
         }
+        if(newOffset > (maxOrder)){
+            throw new Error('moveTreeBranch: offset out of bounds: ' + newOffset +
+                ' (Max offset is ' + maxOrder + ' for parent ' + newParentElementID  + '.');
+        }
+        if(newParentElementID !== undefined && newParentElementID !== null){
+            ensureParameter(newParentElementID, 'newParentElementID', 'string', 'moveTreeBranch');
 
-        var element = this.removeTreeBranch(networkShortName, subtreeRootElementID);
-        if(newParent.To === undefined || newParent.To === null) {
-            newParent.To = {};
+            var newParent = this.getElementFromTree(networkShortName, newParentElementID);
+            ensureExists(newParent, 'object', 'moveTreeBranch', 'Cannot move element with id "' + subtreeRootElementID + '" to new parent element with id "' + newParentElementID + '": Parent element doesn\'t exist.');
+            var parentConcept = this.getConcept(newParent.Name);
+            if(!parentConcept.IsAbstract) {
+                throw new Error('moveTreeBranch: cannot move element to target parent "' + newParentElementID +
+                    '". Reason: Parent concept "' + newParent.Name  + '" is not abstract.');
+            }
+
+            var element = this.removeTreeBranch(networkShortName, subtreeRootElementID);
+            enforceStrictChildOrderAndShift(this, networkShortName, newParentElementID, newOffset);
+            element.Order = newOrder;
+            if(newParent.To === undefined || newParent.To === null) {
+                newParent.To = {};
+            }
+            newParent.To[element.Name] = element;
+        } else {
+            // no new parent given -> make it a root element
+            var network = this.getNetwork(networkShortName);
+            var element2 = this.removeTreeBranch(networkShortName, subtreeRootElementID);
+            enforceStrictChildOrderAndShift(this, networkShortName, newParentElementID, newOffset);
+            element2.Order = newOrder;
+            if(network.Trees === undefined || network.Trees === null) {
+                network.Trees = [];
+            }
+            network.Trees[element2.Name] = element2;
         }
-        newParent.To[element.Name] = element;
     };
 
     Report.prototype.removeTreeBranch = function(networkShortName,subtreeRootElementID) {

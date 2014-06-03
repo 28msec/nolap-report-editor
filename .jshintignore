@@ -1,3 +1,4 @@
+src/tpl.js
 src/swagger/ReportAPI.js
 src/pegjs/formulaParser.js
 src/pegjs/excelParser.js

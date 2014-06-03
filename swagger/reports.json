@@ -18,8 +18,8 @@
                     "nickname": "listReports",
                     "parameters": [
                         {
-                            "name": "name",
-                            "description": "A report name (e.g. FundamentalAccountingConcepts)",
+                            "name": "_id",
+                            "description": "A report id (e.g. FundamentalAccountingConcepts)",
                             "required": false,
                             "type": "string",
                             "paramType": "query"
@@ -45,7 +45,7 @@
                         },
                         {
                             "code": 404,
-                            "message": "Not found: a report name was given as parameter, but a report with the specified name could not be found",
+                            "message": "Not found: a report id was given as parameter '_id', but a report with the specified id could not be found",
                             "responseModel": "Error"
                         },
                         {
@@ -63,8 +63,8 @@
                     "examples": [
                         {
                             "title": "Retrieve a specific report",
-                            "description": "Retrieve the schema for a specific report identified by its name. Return the result as JSON.",
-                            "request": "[API_URL]/_queries/public/reports/reports.jq?name=FundamentalAccountingConcepts&token=00000-00-000-00000",
+                            "description": "Retrieve the schema for a specific report identified by its id. Return the result as JSON.",
+                            "request": "[API_URL]/_queries/public/reports/reports.jq?_id=FundamentalAccountingConcepts&token=00000-00-000-00000",
                             "response": ""
                         },
                         {
@@ -91,7 +91,7 @@
                             "description": "A JSON object containing the report",
                             "required": true,
                             "type": "object",
-                            "paramType": "query"
+                            "paramType": "body"
                         },
                         {
                             "name": "validation-only",
@@ -174,8 +174,8 @@
                     "nickname": "removeReport",
                     "parameters": [
                         {
-                            "name": "name",
-                            "description": "A report name (e.g. FundamentalAccountingConcepts)",
+                            "name": "_id",
+                            "description": "A report id (e.g. FundamentalAccountingConcepts)",
                             "required": true,
                             "type": "string",
                             "paramType": "query"
@@ -206,7 +206,7 @@
                         },
                         {
                             "code": 404,
-                            "message": "Not found: a report name was given as parameter, but a report with the specified name could not be found",
+                            "message": "Not found: a report id was given as parameter '_id', but a report with the specified id could not be found",
                             "responseModel": "Error"
                         },
                         {
@@ -224,8 +224,8 @@
                     "examples": [
                         {
                             "title": "Delete a report",
-                            "description": "Remove report with name FundamentalAccountingConcepts.",
-                            "request": "[API_URL]/_queries/public/reports/delete-report.jq?name=FundamentalAccountingConcepts&token=00000-00-000-00000",
+                            "description": "Remove report with id FundamentalAccountingConcepts.",
+                            "request": "[API_URL]/_queries/public/reports/delete-report.jq?_id=FundamentalAccountingConcepts&token=00000-00-000-00000",
                             "response": ""
                         }
                     ]
