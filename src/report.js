@@ -180,7 +180,7 @@ angular
     Report.prototype.updateConcept = function(name, label, abstract) {
         ensureConceptName(name, 'name', 'updateConcept');
         ensureParameter(label, 'label', 'string', 'updateConcept');
-        ensureParameter(abstract, 'abstract', 'boolean', 'updateConcept');
+        abstract = abstract === true;
 
         if(!this.existsConcept(name)) {
             throw new Error('updateConcept: cannot update concept with name "' + name + '" because it doesn\'t exist.');
