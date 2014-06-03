@@ -103,11 +103,20 @@ angular
         link: function($scope, element, attrs, reportCtrl) {
             $scope.presentationTree = reportCtrl.getPresentationTree();
             $scope.sortableOptions = {
-                //placeholder: "sortable",
-                //connectWith: ".sortable-container",
+                placeholder: "sortable",
+                connectWith: ".sortable-container",
                 receive: function(e, ui){
-                    var conceptName = angular.element(ui.item).attr('id');
-                    //reportCtrl.getReport().addTreeChild();
+                    var concept = ui.item.sortable.moved;
+                    var dropIdx = ui.item.sortable.dropindex;
+                    var parentIdx = dropIdx - 1;
+                    var parentLevel = $scope.rows[dropIdx].level - 1;
+                    var parent = $scope.rows[parentIdx];
+                    while(parent.level !== parentLevel) {
+                        parentIdx--;
+                        parent = $scope.rows[parentIdx];
+                    }
+                    //networkShortName, parentElementID, conceptName, offset
+                    reportCtrl.getReport().addTreeChild('Presentation', parent.branch.Id, concept.Name, dropIdx - 1 - parentIdx);
                 },
                 stop: function(e, ui){
                     var item = angular.element(ui.item);

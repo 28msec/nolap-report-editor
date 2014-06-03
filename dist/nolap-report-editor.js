@@ -103,11 +103,20 @@ angular
         link: function($scope, element, attrs, reportCtrl) {
             $scope.presentationTree = reportCtrl.getPresentationTree();
             $scope.sortableOptions = {
-                //placeholder: "sortable",
-                //connectWith: ".sortable-container",
+                placeholder: "sortable",
+                connectWith: ".sortable-container",
                 receive: function(e, ui){
-                    var conceptName = angular.element(ui.item).attr('id');
-                    //reportCtrl.getReport().addTreeChild();
+                    var concept = ui.item.sortable.moved;
+                    var dropIdx = ui.item.sortable.dropindex;
+                    var parentIdx = dropIdx - 1;
+                    var parentLevel = $scope.rows[dropIdx].level - 1;
+                    var parent = $scope.rows[parentIdx];
+                    while(parent.level !== parentLevel) {
+                        parentIdx--;
+                        parent = $scope.rows[parentIdx];
+                    }
+                    //networkShortName, parentElementID, conceptName, offset
+                    reportCtrl.getReport().addTreeChild('Presentation', parent.branch.Id, concept.Name, dropIdx - 1 - parentIdx);
                 },
                 stop: function(e, ui){
                     var item = angular.element(ui.item);
@@ -379,7 +388,7 @@ data: body,
     };
 });angular.module("nolapReportEditor")
 
-.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree sortable-container\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row sortable\" id=\"{{row.branch.Id}}\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\" ng-bind=\"row.branch.Label\"></span>\n            <span class=\"remove-concept indented fa fa-times\" ng-click=\"remove(row.branch.Id)\"></span>\n        </a>\n    </li>\n</ul>")
+.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree sortable-container\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row sortable\" id=\"{{row.branch.Id}}\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\">{{row.branch.Label}} ({{row.branch.Name}})</span>\n            <span class=\"remove-concept indented fa fa-times\" ng-click=\"remove(row.branch.Id)\"></span>\n        </a>\n    </li>\n</ul>")
 
 ;'use strict';
 
@@ -563,7 +572,7 @@ angular
     Report.prototype.updateConcept = function(name, label, abstract) {
         ensureConceptName(name, 'name', 'updateConcept');
         ensureParameter(label, 'label', 'string', 'updateConcept');
-        ensureParameter(abstract, 'abstract', 'boolean', 'updateConcept');
+        abstract = abstract === true;
 
         if(!this.existsConcept(name)) {
             throw new Error('updateConcept: cannot update concept with name "' + name + '" because it doesn\'t exist.');
