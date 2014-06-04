@@ -2,7 +2,7 @@
     <li ng-repeat="row in rows"  ng-class="'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')" class="abn-tree-row sortable" id="{{row.branch.Id}}">
         <a ng-click="select(row)">
             <i ng-class="{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }" class="indented tree-icon fa"></i>
-            <span class="indented tree-label" ng-bind="row.branch.Label"></span>
+            <span class="indented tree-label">{{row.branch.Label}} ({{row.branch.Name}})</span>
             <span class="remove-concept indented fa fa-times" ng-click="remove(row.branch.Id)"></span>
         </a>
     </li>

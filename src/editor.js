@@ -42,6 +42,10 @@ angular
                 return $scope.report;
             };
             
+            this.getConcepts = function(){
+                return $scope.concepts;
+            };
+            
             this.getPresentationTree = function(){
                 return this.getReport().getNetwork('Presentation').Trees;
             };
@@ -51,17 +55,21 @@ angular
                 var report = this.getReport();
                 this.getReport().listRules();
                 if(ruleType !== undefined && ruleType !== null){
-                    if(rulesType === 'xbrl28:formula'){
+                    if(ruleType === 'xbrl28:formula'){
                         rules = report.listFormulaRules(concept);
-                    } else if(rulesType === 'xbrl28:validation'){
+                    } else if(ruleType === 'xbrl28:validation'){
                         rules = report.listValidationRules(concept);
-                    } else if(rulesType === 'xbrl28:excel'){
+                    } else if(ruleType === 'xbrl28:excel'){
                         rules = report.listExcelRules(concept);
                     }
                 } else {
                     rules = report.listRules(concept);
                 }
                 return rules;
+            };
+
+            this.getConceptMap = function(){
+                return this.getReport().getNetwork('ConceptMap').Trees;
             };
         },
         link: function($scope, element, attrs, ctrl, $transclude){
@@ -113,20 +121,41 @@ angular
         }
     };
 })
-.directive('presentationTree', function($rootScope, PresentationTreeTpl){
+.directive('presentationTree', function($rootScope, PresentationTreeTpl) {
+
+    var safeApply = function(scope, fn){
+        scope.$apply(function(){
+            try {
+                fn();
+            } catch (e) {
+                $rootScope.$emit('error', 500, e.message);
+            }
+        });
+    };
+
     return {
         restrict: 'E',
         template: PresentationTreeTpl,
         require: '^report',
         link: function($scope, element, attrs, reportCtrl) {
-            $scope.presentationTree = reportCtrl.getPresentationTree();
             $scope.sortableOptions = {
-                //placeholder: "sortable",
-                //connectWith: ".sortable-container",
+                placeholder: 'sortable',
+                connectWith: '.sortable-container',
                 receive: function(e, ui){
-                    //var conceptName = angular.element(ui.item).attr('id');
-                    angular.element(ui.item).attr('id');
-                    //reportCtrl.getReport().addTreeChild();
+                    var concept = ui.item.sortable.moved;
+                    var dropIdx = ui.item.sortable.dropindex;
+                    var parentIdx = dropIdx - 1;
+                    var parentLevel = $scope.rows[dropIdx].level - 1;
+                    var parent = $scope.rows[parentIdx];
+                    while(parent.level !== parentLevel) {
+                        parentIdx--;
+                        parent = $scope.rows[parentIdx];
+                    }
+                    //networkShortName, parentElementID, conceptName, offset
+                    //safeApply($scope, function(){
+                        reportCtrl.getReport().addTreeChild('Presentation', parent.branch.Id, concept.Name, dropIdx - 1 - parentIdx);
+                        ui.item.sortable.cancel();
+                    //});
                 },
                 stop: function(e, ui){
                     var item = angular.element(ui.item);
@@ -134,7 +163,7 @@ angular
                     $scope.rows.forEach(function(row, index){
                         if(row.branch.Id === subtreeRootElementID) {
                             if(index === 0){
-                                $scope.$apply(function(){
+                                safeApply($scope, function(){
                                     reportCtrl.getReport().moveTreeBranch('Presentation', subtreeRootElementID);
                                 });
                             } else {
@@ -147,9 +176,7 @@ angular
                                     parentIdx--;
                                     parent = $scope.rows[parentIdx];
                                 }
-                                $scope.$apply(function(){
-                                    console.log(parent.branch.id);
-                                    console.log('Offset: ' + (siblingIdx - parentIdx));
+                                safeApply($scope, function(){
                                     reportCtrl.getReport().moveTreeBranch('Presentation', subtreeRootElementID, parent.branch.Id, siblingIdx - parentIdx);
                                 });
                             }
@@ -215,7 +242,9 @@ angular
                 $scope.rows = setRows(tree, 1, true, []);
             };
 
-            $scope.$watch('presentationTree', onChange, true);
+            $scope.$watch(function(){
+                return reportCtrl.getPresentationTree();
+            }, onChange, true);
         }   
     };
 })
@@ -268,11 +297,50 @@ angular
             };
 
             //$scope.rows = [];
-            var onChange = function(tree){
+            var onChange = function(){
                 updateRules(undefined, $scope.selectedConcept);
             };
 
             $scope.$watch('presentationTree', onChange, true);
+        }
+    };
+})
+.directive('conceptMap', function(ConceptMapTpl) {
+    return {
+        restrict: 'E',
+        template: ConceptMapTpl,
+        require: '^report',
+        link: function($scope, element, attrs, reportCtrl) {
+            $scope.map = reportCtrl.getConceptMap();
+
+            $scope.$watch(function(){
+                return reportCtrl.getConcepts();
+            }, function(concepts){
+                $scope.concepts = [];
+                concepts.forEach(function(concept){
+                    $scope.concepts.push(concept.Name);
+                });
+            });
+
+            $scope.addConceptMap = function(){
+                reportCtrl.getReport().addConceptMap($scope.newConceptName, []);
+            };
+
+            $scope.addValueToConceptMap = function(concept, values, value){
+                values = Object.keys(values);
+                values.push(value);
+                reportCtrl.getReport().updateConceptMap(concept, values);
+            };
+
+            $scope.removeKey = function(concept){
+                reportCtrl.getReport().removeConceptMap(concept);
+            };
+
+            $scope.removeValue = function(key, value, keyToRemove){
+                var values = Object.keys(value.To);
+                values.splice(values.indexOf(keyToRemove), 1);
+                reportCtrl.getReport().updateConceptMap(key, values);
+            };
         }
     };
 })

@@ -42,8 +42,34 @@ angular
                 return $scope.report;
             };
             
+            this.getConcepts = function(){
+                return $scope.concepts;
+            };
+            
             this.getPresentationTree = function(){
                 return this.getReport().getNetwork('Presentation').Trees;
+            };
+
+            this.getRules = function(ruleType, concept){
+                var rules = [];
+                var report = this.getReport();
+                this.getReport().listRules();
+                if(ruleType !== undefined && ruleType !== null){
+                    if(ruleType === 'xbrl28:formula'){
+                        rules = report.listFormulaRules(concept);
+                    } else if(ruleType === 'xbrl28:validation'){
+                        rules = report.listValidationRules(concept);
+                    } else if(ruleType === 'xbrl28:excel'){
+                        rules = report.listExcelRules(concept);
+                    }
+                } else {
+                    rules = report.listRules(concept);
+                }
+                return rules;
+            };
+
+            this.getConceptMap = function(){
+                return this.getReport().getNetwork('ConceptMap').Trees;
             };
         },
         link: function($scope, element, attrs, ctrl, $transclude){
@@ -95,20 +121,41 @@ angular
         }
     };
 })
-.directive('presentationTree', function($rootScope, PresentationTreeTpl){
+.directive('presentationTree', function($rootScope, PresentationTreeTpl) {
+
+    var safeApply = function(scope, fn){
+        scope.$apply(function(){
+            try {
+                fn();
+            } catch (e) {
+                $rootScope.$emit('error', 500, e.message);
+            }
+        });
+    };
+
     return {
         restrict: 'E',
         template: PresentationTreeTpl,
         require: '^report',
         link: function($scope, element, attrs, reportCtrl) {
-            $scope.presentationTree = reportCtrl.getPresentationTree();
             $scope.sortableOptions = {
-                //placeholder: "sortable",
-                //connectWith: ".sortable-container",
+                placeholder: 'sortable',
+                connectWith: '.sortable-container',
                 receive: function(e, ui){
-                    //var conceptName = angular.element(ui.item).attr('id');
-                    angular.element(ui.item).attr('id');
-                    //reportCtrl.getReport().addTreeChild();
+                    var concept = ui.item.sortable.moved;
+                    var dropIdx = ui.item.sortable.dropindex;
+                    var parentIdx = dropIdx - 1;
+                    var parentLevel = $scope.rows[dropIdx].level - 1;
+                    var parent = $scope.rows[parentIdx];
+                    while(parent.level !== parentLevel) {
+                        parentIdx--;
+                        parent = $scope.rows[parentIdx];
+                    }
+                    //networkShortName, parentElementID, conceptName, offset
+                    //safeApply($scope, function(){
+                        reportCtrl.getReport().addTreeChild('Presentation', parent.branch.Id, concept.Name, dropIdx - 1 - parentIdx);
+                        ui.item.sortable.cancel();
+                    //});
                 },
                 stop: function(e, ui){
                     var item = angular.element(ui.item);
@@ -116,7 +163,7 @@ angular
                     $scope.rows.forEach(function(row, index){
                         if(row.branch.Id === subtreeRootElementID) {
                             if(index === 0){
-                                $scope.$apply(function(){
+                                safeApply($scope, function(){
                                     reportCtrl.getReport().moveTreeBranch('Presentation', subtreeRootElementID);
                                 });
                             } else {
@@ -129,9 +176,7 @@ angular
                                     parentIdx--;
                                     parent = $scope.rows[parentIdx];
                                 }
-                                $scope.$apply(function(){
-                                    console.log(parent.branch.id);
-                                    console.log('Offset: ' + (siblingIdx - parentIdx));
+                                safeApply($scope, function(){
                                     reportCtrl.getReport().moveTreeBranch('Presentation', subtreeRootElementID, parent.branch.Id, siblingIdx - parentIdx);
                                 });
                             }
@@ -197,8 +242,106 @@ angular
                 $scope.rows = setRows(tree, 1, true, []);
             };
 
-            $scope.$watch('presentationTree', onChange, true);
+            $scope.$watch(function(){
+                return reportCtrl.getPresentationTree();
+            }, onChange, true);
         }   
+    };
+})
+.directive('businessRules', function($rootScope, BusinessRulesTpl){
+    return {
+        restrict: 'E',
+        template: BusinessRulesTpl,
+        require: '^report',
+        link: function($scope, element, attrs, reportCtrl) {
+
+            var updateRules = function(rulesType, concept){
+                if(rulesType === undefined || rulesType === null) {
+                    updateRules('xbrl28:formula', concept);
+                    updateRules('xbrl28:validation', concept);
+                    updateRules('xbrl28:excel', concept);
+                } else {
+                    var rules = reportCtrl.getRules(rulesType, concept);
+                    for(var i in rules){
+                        var rule = rules[i];
+                        if(rule.expanded === undefined || rule.expanded === null) {
+                            rule.expanded = false;
+                        }
+                    }
+                    if (rulesType === 'xbrl28:formula'){
+                        $scope.formulaRules = rules;
+                    } else if('xbrl28:validation') {
+                        $scope.validationRules = rules;
+                    }else if ('xbrl28:excel'){
+                        $scope.excelRules = rules;
+                    }
+                }
+            };
+            updateRules();
+
+            $scope.selectedConcept = null;
+            $scope.selectConcept = function(concept) {
+                $scope.selectedConcept = concept;
+                updateRules(undefined, concept);
+            };
+
+            $scope.selectRule = function(row) {
+                if(row.rule) {
+                    row.rule.expanded = !row.rule.expanded;
+                    updateRules(row.rule.Type);
+                }
+            };
+
+            $scope.remove = function(id){
+                $rootScope.$emit('removeRule', id);
+            };
+
+            //$scope.rows = [];
+            var onChange = function(){
+                updateRules(undefined, $scope.selectedConcept);
+            };
+
+            $scope.$watch('presentationTree', onChange, true);
+        }
+    };
+})
+.directive('conceptMap', function(ConceptMapTpl) {
+    return {
+        restrict: 'E',
+        template: ConceptMapTpl,
+        require: '^report',
+        link: function($scope, element, attrs, reportCtrl) {
+            $scope.map = reportCtrl.getConceptMap();
+
+            $scope.$watch(function(){
+                return reportCtrl.getConcepts();
+            }, function(concepts){
+                $scope.concepts = [];
+                concepts.forEach(function(concept){
+                    $scope.concepts.push(concept.Name);
+                });
+            });
+
+            $scope.addConceptMap = function(){
+                reportCtrl.getReport().addConceptMap($scope.newConceptName, []);
+            };
+
+            $scope.addValueToConceptMap = function(concept, values, value){
+                values = Object.keys(values);
+                values.push(value);
+                reportCtrl.getReport().updateConceptMap(concept, values);
+            };
+
+            $scope.removeKey = function(concept){
+                reportCtrl.getReport().removeConceptMap(concept);
+            };
+
+            $scope.removeValue = function(key, value, keyToRemove){
+                var values = Object.keys(value.To);
+                values.splice(values.indexOf(keyToRemove), 1);
+                reportCtrl.getReport().updateConceptMap(key, values);
+            };
+        }
     };
 })
 ;
@@ -381,7 +524,9 @@ data: body,
     };
 });angular.module("nolapReportEditor")
 
-.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree sortable-container\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row sortable\" id=\"{{row.branch.Id}}\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\" ng-bind=\"row.branch.Label\"></span>\n            <span class=\"remove-concept indented fa fa-times\" ng-click=\"remove(row.branch.Id)\"></span>\n        </a>\n    </li>\n</ul>")
+.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree sortable-container\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\r\n    <li ng-repeat=\"row in rows\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row sortable\" id=\"{{row.branch.Id}}\">\r\n        <a ng-click=\"select(row)\">\r\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\r\n            <span class=\"indented tree-label\">{{row.branch.Label}} ({{row.branch.Name}})</span>\r\n            <span class=\"remove-concept indented fa fa-times\" ng-click=\"remove(row.branch.Id)\"></span>\r\n        </a>\r\n    </li>\r\n</ul>")
+
+.constant("ConceptMapTpl", "<form class=\"form-inline\" role=\"form\" ng-submit=\"addConceptMap()\">\r\n  <div class=\"form-group\">\r\n    <input type=\"text\" class=\"form-control\" id=\"conceptName\" placeholder=\"Concept Name\" ng-model=\"newConceptName\" typeahead=\"concept for concept in concepts | filter:$viewValue | limitTo:8\">\r\n  </div>\r\n  <button type=\"submit\" class=\"btn btn-primary\">Add</button>\r\n</form>\r\n<ul class=\"list-group\">\r\n  <li class=\"list-group-item\" ng-repeat=\"(key, value) in map\">\r\n    <a class=\"pull-right\"><i class=\"fa fa-times\" ng-click=\"removeKey(key)\"></i></a>\r\n    <h3 ng-bind=\"value.Name\"></h3>\r\n    <p ng-bind=\"value.Label\"></p>\r\n    <ul class=\"list-group\">\r\n        <li class=\"list-group-item\" ng-repeat=\"(subkey, subvalue) in value.To\">\r\n            <span ng-bind=\"subkey\"></span>\r\n            <a class=\"pull-right\" ng-click=\"removeValue(key, value, subkey)\"><i class=\"fa fa-times\"></i></a>\r\n        </li>\r\n    </ul>\r\n    <form class=\"form-inline\" role=\"form\" ng-submit=\"addValueToConceptMap(key, value.To, newConceptValue)\" ui-keypress=\"{ 13:'addValueToConceptMap(key, value.To, newConceptValue)' }\">\r\n        <div class=\"form-group\">\r\n            <input type=\"text\" class=\"form-control\" id=\"conceptValue\" placeholder=\"Concept Name\" ng-model=\"newConceptValue\" typeahead=\"concept for concept in concepts | filter:$viewValue | limitTo:8\">\r\n        </div>\r\n        <button type=\"submit\" class=\"btn btn-primary\">Add</button>\r\n    </form>\r\n  </li>\r\n</ul>")
 
 ;'use strict';
 
@@ -565,7 +710,7 @@ angular
     Report.prototype.updateConcept = function(name, label, abstract) {
         ensureConceptName(name, 'name', 'updateConcept');
         ensureParameter(label, 'label', 'string', 'updateConcept');
-        ensureParameter(abstract, 'abstract', 'boolean', 'updateConcept');
+        abstract = abstract === true;
 
         if(!this.existsConcept(name)) {
             throw new Error('updateConcept: cannot update concept with name "' + name + '" because it doesn\'t exist.');
@@ -1324,19 +1469,25 @@ angular
         model.Rules.push(rule);
     };
 
-    Report.prototype.listRules = function(){
+    Report.prototype.listRules = function(concept){
 
         var result = [];
         var model = this.getModel();
         if(model === null || model === undefined || model.Rules === null || model.Rules === undefined) {
             return result;
         }
-        return model.Rules;
+        if(concept !== undefined && concept !== null){
+            ensureParameter(concept, 'concept', 'string', 'listRules');
+            result = this.computableByRules(concept);
+        } else {
+            result = model.Rules;
+        }
+        return result;
     };
 
-    Report.prototype.listFormulaRules = function(){
+    Report.prototype.listFormulaRules = function(concept){
         var result = [];
-        var rules = this.listRules();
+        var rules = this.listRules(concept);
         for(var i in rules) {
             var rule = rules[i];
             if(rule.Type === 'xbrl28:formula'){
@@ -1346,12 +1497,24 @@ angular
         return result;
     };
 
-    Report.prototype.listValidationRules = function(){
+    Report.prototype.listValidationRules = function(concept){
         var result = [];
-        var rules = this.listRules();
+        var rules = this.listRules(concept);
         for(var i in rules) {
             var rule = rules[i];
             if(rule.Type === 'xbrl28:validation'){
+                result.push(rule);
+            }
+        }
+        return result;
+    };
+
+    Report.prototype.listExcelRules = function(concept){
+        var result = [];
+        var rules = this.listRules(concept);
+        for(var i in rules) {
+            var rule = rules[i];
+            if(rule.Type === 'xbrl28:excel'){
                 result.push(rule);
             }
         }
