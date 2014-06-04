@@ -9,13 +9,20 @@
     </div>
 </div>
 <div ng-if="map !== undefined">
-    <a class="pull-right"><i class="fa fa-times" ng-click="removeConceptMap()"></i></a>
+    <button class="pull-right btn btn-default"><i class="fa fa-times" ng-click="removeConceptMap()"></i></button>
     <h3 ng-bind="concept.Name"></h3>
     <p ng-bind="concept.Label"></p>
     <ul class="list-group">
-        <li class="list-group-item" ng-repeat="key in map">
+        <li class="list-group-item clearfix" ng-repeat="key in map">
             <span ng-bind="key"></span>
-            <a class="pull-right" ng-click="removeValue(key)"><i class="fa fa-times"></i></a>
+            <div class="btn-group pull-right">
+                <button class="btn btn-default" type="button" ng-click="moveTo(key, $index - 1)" ng-if="$last === false"><i class="fa fa-long-arrow-down"></i></button>
+                <button class="btn btn-default" type="button" ng-click="moveTo(key, $index + 1)" ng-if="$first === false"><i class="fa fa-long-arrow-up"></i></button>
+                <button class="btn btn-default" type="button" ng-click="removeValue(key)"><i class="fa fa-times"></i></button>
+            </div>
+            <!--a class="pull-right" ng-click="removeValue(key, $index - 1)" ng-if="$last === false"><i class="fa fa-long-arrow-down"></i></a>
+            <a class="pull-right" ng-click="moveValueUp(key, $index + 1)" ng-if="$first === false"><i class="fa fa-long-arrow-up"></i></a>
+            <a class="pull-right" ng-click="removeValue(key)"><i class="fa fa-times"></i></a-->
         </li>
     </ul>
     <form class="form-inline" role="form" ng-submit="addValue(newConceptValue)" ui-keypress="{ 13:'addValue(newConceptValue)' }">
