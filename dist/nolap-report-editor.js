@@ -45,6 +45,24 @@ angular
             this.getPresentationTree = function(){
                 return this.getReport().getNetwork('Presentation').Trees;
             };
+
+            this.getRules = function(ruleType, concept){
+                var rules = [];
+                var report = this.getReport();
+                this.getReport().listRules();
+                if(ruleType !== undefined && ruleType !== null){
+                    if(ruleType === 'xbrl28:formula'){
+                        rules = report.listFormulaRules(concept);
+                    } else if(ruleType === 'xbrl28:validation'){
+                        rules = report.listValidationRules(concept);
+                    } else if(ruleType === 'xbrl28:excel'){
+                        rules = report.listExcelRules(concept);
+                    }
+                } else {
+                    rules = report.listRules(concept);
+                }
+                return rules;
+            };
         },
         link: function($scope, element, attrs, ctrl, $transclude){
             var api = new ReportAPI(attrs.reportApi);
@@ -199,6 +217,63 @@ angular
 
             $scope.$watch('presentationTree', onChange, true);
         }   
+    };
+})
+.directive('businessRules', function($rootScope, BusinessRulesTpl){
+    return {
+        restrict: 'E',
+        template: BusinessRulesTpl,
+        require: '^report',
+        link: function($scope, element, attrs, reportCtrl) {
+
+            var updateRules = function(rulesType, concept){
+                if(rulesType === undefined || rulesType === null) {
+                    updateRules('xbrl28:formula', concept);
+                    updateRules('xbrl28:validation', concept);
+                    updateRules('xbrl28:excel', concept);
+                } else {
+                    var rules = reportCtrl.getRules(rulesType, concept);
+                    for(var i in rules){
+                        var rule = rules[i];
+                        if(rule.expanded === undefined || rule.expanded === null) {
+                            rule.expanded = false;
+                        }
+                    }
+                    if (rulesType === 'xbrl28:formula'){
+                        $scope.formulaRules = rules;
+                    } else if('xbrl28:validation') {
+                        $scope.validationRules = rules;
+                    }else if ('xbrl28:excel'){
+                        $scope.excelRules = rules;
+                    }
+                }
+            };
+            updateRules();
+
+            $scope.selectedConcept = null;
+            $scope.selectConcept = function(concept) {
+                $scope.selectedConcept = concept;
+                updateRules(undefined, concept);
+            };
+
+            $scope.selectRule = function(row) {
+                if(row.rule) {
+                    row.rule.expanded = !row.rule.expanded;
+                    updateRules(row.rule.Type);
+                }
+            };
+
+            $scope.remove = function(id){
+                $rootScope.$emit('removeRule', id);
+            };
+
+            //$scope.rows = [];
+            var onChange = function(){
+                updateRules(undefined, $scope.selectedConcept);
+            };
+
+            $scope.$watch('presentationTree', onChange, true);
+        }
     };
 })
 ;
@@ -1324,19 +1399,25 @@ angular
         model.Rules.push(rule);
     };
 
-    Report.prototype.listRules = function(){
+    Report.prototype.listRules = function(concept){
 
         var result = [];
         var model = this.getModel();
         if(model === null || model === undefined || model.Rules === null || model.Rules === undefined) {
             return result;
         }
-        return model.Rules;
+        if(concept !== undefined && concept !== null){
+            ensureParameter(concept, 'concept', 'string', 'listRules');
+            result = this.computableByRules(concept);
+        } else {
+            result = model.Rules;
+        }
+        return result;
     };
 
-    Report.prototype.listFormulaRules = function(){
+    Report.prototype.listFormulaRules = function(concept){
         var result = [];
-        var rules = this.listRules();
+        var rules = this.listRules(concept);
         for(var i in rules) {
             var rule = rules[i];
             if(rule.Type === 'xbrl28:formula'){
@@ -1346,12 +1427,24 @@ angular
         return result;
     };
 
-    Report.prototype.listValidationRules = function(){
+    Report.prototype.listValidationRules = function(concept){
         var result = [];
-        var rules = this.listRules();
+        var rules = this.listRules(concept);
         for(var i in rules) {
             var rule = rules[i];
             if(rule.Type === 'xbrl28:validation'){
+                result.push(rule);
+            }
+        }
+        return result;
+    };
+
+    Report.prototype.listExcelRules = function(concept){
+        var result = [];
+        var rules = this.listRules(concept);
+        for(var i in rules) {
+            var rule = rules[i];
+            if(rule.Type === 'xbrl28:excel'){
                 result.push(rule);
             }
         }

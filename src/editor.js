@@ -51,11 +51,11 @@ angular
                 var report = this.getReport();
                 this.getReport().listRules();
                 if(ruleType !== undefined && ruleType !== null){
-                    if(rulesType === 'xbrl28:formula'){
+                    if(ruleType === 'xbrl28:formula'){
                         rules = report.listFormulaRules(concept);
-                    } else if(rulesType === 'xbrl28:validation'){
+                    } else if(ruleType === 'xbrl28:validation'){
                         rules = report.listValidationRules(concept);
-                    } else if(rulesType === 'xbrl28:excel'){
+                    } else if(ruleType === 'xbrl28:excel'){
                         rules = report.listExcelRules(concept);
                     }
                 } else {
@@ -268,7 +268,7 @@ angular
             };
 
             //$scope.rows = [];
-            var onChange = function(tree){
+            var onChange = function(){
                 updateRules(undefined, $scope.selectedConcept);
             };
 
