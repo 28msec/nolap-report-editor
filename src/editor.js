@@ -248,10 +248,49 @@ angular
         }   
     };
 })
-.directive('businessRules', function($rootScope, BusinessRulesTpl){
+.directive('conceptMap', function(ConceptMapTpl) {
     return {
         restrict: 'E',
-        template: BusinessRulesTpl,
+        template: ConceptMapTpl,
+        require: '^report',
+        link: function($scope, element, attrs, reportCtrl) {
+            $scope.map = reportCtrl.getConceptMap();
+
+            $scope.$watch(function(){
+                return reportCtrl.getConcepts();
+            }, function(concepts){
+                $scope.concepts = [];
+                concepts.forEach(function(concept){
+                    $scope.concepts.push(concept.Name);
+                });
+            });
+
+            $scope.addConceptMap = function(){
+                reportCtrl.getReport().addConceptMap($scope.newConceptName, []);
+            };
+
+            $scope.addValueToConceptMap = function(concept, values, value){
+                values = Object.keys(values);
+                values.push(value);
+                reportCtrl.getReport().updateConceptMap(concept, values);
+            };
+
+            $scope.removeKey = function(concept){
+                reportCtrl.getReport().removeConceptMap(concept);
+            };
+
+            $scope.removeValue = function(key, value, keyToRemove){
+                var values = Object.keys(value.To);
+                values.splice(values.indexOf(keyToRemove), 1);
+                reportCtrl.getReport().updateConceptMap(key, values);
+            };
+        }
+    };
+})
+.directive('businessRules', function($rootScope, BusinessRuleTpl){
+    return {
+        restrict: 'E',
+        template: BusinessRuleTpl,
         require: '^report',
         link: function($scope, element, attrs, reportCtrl) {
 
@@ -302,45 +341,6 @@ angular
             };
 
             $scope.$watch('presentationTree', onChange, true);
-        }
-    };
-})
-.directive('conceptMap', function(ConceptMapTpl) {
-    return {
-        restrict: 'E',
-        template: ConceptMapTpl,
-        require: '^report',
-        link: function($scope, element, attrs, reportCtrl) {
-            $scope.map = reportCtrl.getConceptMap();
-
-            $scope.$watch(function(){
-                return reportCtrl.getConcepts();
-            }, function(concepts){
-                $scope.concepts = [];
-                concepts.forEach(function(concept){
-                    $scope.concepts.push(concept.Name);
-                });
-            });
-
-            $scope.addConceptMap = function(){
-                reportCtrl.getReport().addConceptMap($scope.newConceptName, []);
-            };
-
-            $scope.addValueToConceptMap = function(concept, values, value){
-                values = Object.keys(values);
-                values.push(value);
-                reportCtrl.getReport().updateConceptMap(concept, values);
-            };
-
-            $scope.removeKey = function(concept){
-                reportCtrl.getReport().removeConceptMap(concept);
-            };
-
-            $scope.removeValue = function(key, value, keyToRemove){
-                var values = Object.keys(value.To);
-                values.splice(values.indexOf(keyToRemove), 1);
-                reportCtrl.getReport().updateConceptMap(key, values);
-            };
         }
     };
 })

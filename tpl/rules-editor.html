@@ -1,0 +1,91 @@
+<div class="container">
+    <h1>Rule Editor</h1>
+    <h2>Arithmetic computation of new Facts</h2>
+    <form class="form-horizontal" role="form">
+        <div class="form-group">
+            <label for="ruleID" class="col-sm-{{colspan1}} control-label">ID</label>
+            <div class="col-sm-{{12 - colspan1}}">
+                <input type="text" id="ruleID" class="form-control" ng-model="formula.model.Id" ng-pattern="/^.+$/">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="ruleLabel" class="col-sm-{{colspan1}} control-label">Label</label>
+            <div class="col-sm-{{12 - colspan1}}">
+                <input type="text" id="ruleLabel" class="form-control" ng-model="formula.model.Label">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="ruleDescription" class="col-sm-{{colspan1}} control-label">Description</label>
+            <div class="col-sm-{{12 - colspan1}}">
+                <textarea class="form-control" id="ruleDescription" rows="3" placeholder="" ng-model="formula.model.Description"></textarea>
+            </div>
+        </div>
+        <div class="form-group" ng-repeat="concept in formula.model.ComputableConcepts track by $index">
+            <label for="compFact{{$index}}" class="col-sm-{{colspan1}} control-label">Computable Fact {{ $index +1 }}</label>
+            <div class="col-sm-{{12 - colspan1}}">
+                <input type="text" id="compFact{{$index}}" class="form-control" ng-model="formula.model.ComputableConcepts[$index]">
+            </div>
+        </div>
+        <div class="form-group" ng-repeat="concept in formula.model.DependsOn track by $index">
+            <label for="dep{{$index}}" class="col-sm-{{colspan1}} control-label">Dependency {{ $index +1 }}</label>
+            <div class="col-sm-{{12 - colspan1}}">
+                <input type="text" id="dep{{$index}}" readonly="readonly" class="form-control" ng-model="concept">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="coverAspects" class="col-sm-{{colspan1}} control-label">Cover Aspects</label>
+            <div class="col-sm-{{12 - colspan1}}">
+                <input type="checkbox" id="coverAspects" ng-model="formula.model.AllowCrossPeriodType">  Allow facts to be computable across different period type (e.g. allow to add an instant fact to a duration fact)
+            </div>
+            <div class="col-sm-{{12 - colspan1}}">
+                <input type="checkbox" ng-model="formula.model.AllowCrossBalance">  Allow facts to be computable across different balance types (e.g. allow to compare credit facts with debit facts)
+            </div>
+        </div>
+
+        <tabset ng-if="formula.model.Type === 'xbrl28:arithmetic' || formula.model.Type === 'xbrl28:excel'">
+            <tab ng-repeat="alt in formula.model.Formulae track by $index" heading="Alternative {{$index +1}}" >
+                <div style="border-width: 0 1px 1px 1px;border-color: #ddd;border-radius: 4px 4px 0 0;padding-top: 15px;">
+                    <div class="form-group">
+                        <label for="sourceFact{{$index}}" class="col-sm-{{colspan1}} control-label">Mandatory Source Fact</label>
+                        <div class="col-sm-{{12 - colspan1}}">
+                            <input type="text" id="sourceFact{{$index}}" class="form-control" ng-model="alt.SourceFact[0]" ng-pattern="/^.+$/">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="precondition{{$index}}" class="col-sm-{{colspan1}} control-label">Precondition</label>
+                        <div class="col-sm-{{12 - colspan1}}">
+                            <textarea class="form-control" id="precondition{{$index}}" rows="1" placeholder="" ng-change="formula.compilePrereq($index)" ng-model="alt.PrereqSrc"></textarea>
+                        </div>
+                        <div class="container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}" ng-show="alt.PrereqErr" style="margin-top: 20px;">{{alt.PrereqErr}}</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="rule{{$index}}" class="col-sm-{{colspan1}} control-label">Arithmetic Rule</label>
+                        <div  class="col-sm-{{12 - colspan1}}">
+                            <textarea class="form-control" id="rule{{$index}}" rows="6" placeholder="" ng-change="formula.compileBody($index)" ng-model="alt.BodySrc"></textarea>
+                        </div>
+                        <div class="container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}" ng-show="alt.BodyErr" style="margin-top: 20px;">{{alt.BodyErr}}</div>
+                    </div>
+                </div>
+            </tab>
+        </tabset>
+
+        <div ng-if="formula.model.Type === 'xbrl28:formula'">
+            <div class="form-group">
+                <label for="sourceFact" class="col-sm-{{colspan1}} control-label">Mandatory Source Fact</label>
+                <div class="col-sm-{{12 - colspan1}}">
+                    <input type="text" id="sourceFact" class="form-control" ng-model="formula.model.SourceFact[0]" ng-pattern="/^.+$/">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="rule" class="col-sm-{{colspan1}} control-label">Advanced Rule</label>
+                <div  class="col-sm-{{12 - colspan1}}">
+                    <textarea class="form-control" id="rule" rows="20" placeholder="" ng-change="formula.compile()" ng-model="formula.model.Formula"></textarea>
+                </div>
+                <div class="container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}" ng-show="formula.model.FormulaErr" style="margin-top: 20px;">{{formula.model.FormulaErr}}</div>
+            </div>
+        </div>
+
+        <pre class="container" ng-bind="formula.view" ng-if="false" style="margin-top: 20px;"></pre>
+        <button type="submit" id="send" ng-click="formula.updateView();" class="btn btn-default">Submit</button>
+    </form>
+</div>

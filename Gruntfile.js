@@ -39,7 +39,9 @@ module.exports = function (grunt) {
                 dest: 'src/tpl.js',
                 constants: {
                     PresentationTreeTpl: grunt.file.read('tpl/tree.html'),
-                    ConceptMapTpl: grunt.file.read('tpl/concept-map.html')
+                    ConceptMapTpl: grunt.file.read('tpl/concept-map.html'),
+                    BusinessRuleTpl: grunt.file.read('tpl/business-rule.html'),
+                    RulesEditorTpl: grunt.file.read('tpl/rules-editor.html')
                 }
             }
         },
@@ -88,7 +90,7 @@ module.exports = function (grunt) {
                 separator: ''
             },
             dist: {
-                src: ['src/editor.js', 'src/swagger/ReportAPI.js', 'src/tpl.js', 'src/report.js'],
+                src: ['src/editor.js', 'src/swagger/ReportAPI.js', 'src/tpl.js', 'src/formula.js', 'src/report.js', 'src/pegjs/excelParser.js'],
                 dest: 'dist/nolap-report-editor.js'
             }
         },
@@ -282,11 +284,25 @@ module.exports = function (grunt) {
             options: {
                 'coverage_dir': 'coverage'
             }
+        },
+        copy: {
+            main: {
+                files: [
+                    {
+                        expand: true,
+                        nonull:true,
+                        src: 'dist/nolap-report-editor.js',
+                        dest: '../secxbrl.info/app/bower_components/nolap-report-editor/'
+                    }
+                ]
+            }
         }
     });
 
     grunt.registerTask('test', ['karma:1.2.0']);
     grunt.registerTask('release', ['clean:pre', 'concat', 'test', 'jsdoc', 'clean:post']);//uglify
+    grunt.registerTask('debug', ['clean:pre', 'concat', 'clean:post']);//uglify
     grunt.registerTask('build', ['clean:pre', 'ngconstant:tpl', 'peg', 'swagger', 'release']);
+    grunt.registerTask('devbuild', ['clean:pre', 'ngconstant:tpl', 'peg', 'swagger', 'debug', 'copy']);
     grunt.registerTask('default', ['jshint', 'build']);
 };
