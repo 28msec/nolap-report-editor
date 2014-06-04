@@ -41,7 +41,8 @@ module.exports = function (grunt) {
                     PresentationTreeTpl: grunt.file.read('tpl/tree.html'),
                     ConceptMapTpl: grunt.file.read('tpl/concept-map.html'),
                     BusinessRuleTpl: grunt.file.read('tpl/business-rule.html'),
-                    RulesEditorTpl: grunt.file.read('tpl/rules-editor.html')
+                    RulesEditorTpl: grunt.file.read('tpl/rules-editor.html'),
+                    ConceptTpl: grunt.file.read('tpl/concept.html')
                 }
             }
         },
