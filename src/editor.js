@@ -117,6 +117,9 @@ angular
 
     return {
         restrict: 'E',
+        scope: {
+            'conceptName': '@'
+        },
         template: PresentationTreeTpl,
         require: '^report',
         link: function($scope, element, attrs, reportCtrl) {
@@ -135,7 +138,7 @@ angular
                     }
                     //networkShortName, parentElementID, conceptName, offset
                     //safeApply($scope, function(){
-                        reportCtrl.getReport().addTreeChild('Presentation', parent.branch.Id, concept.Name, dropIdx - 1 - parentIdx);
+                        reportCtrl.getReport().addTreeChild('Presentation', parent.branch.Id, ui.item.text(), dropIdx - 1 - parentIdx);
                         ui.item.sortable.cancel();
                     //});
                 },
@@ -168,16 +171,24 @@ angular
                     });
                 }
             };
+            
+            /*
+            $scope.$watch('conceptName', function(conceptName){
+                if(conceptName !== undefined) {
+                    $scope.toDrop = [conceptName];
+                }
+            });
+            */
 
             $scope.select = function(row) {
                 if(row.branch.To) {
                     row.branch.expanded = !row.branch.expanded;
-                    $scope.rows = setRows($scope.presentationTree, 1, true, []);
+                    $scope.rows = setRows(reportCtrl.getPresentationTree(), 1, true, []);
                 } else {
                     $scope.selected = row.branch;
                 }
             };
-            
+
             $scope.remove = function(id){
                 $rootScope.$emit('removeConceptFromPresentationTree', id);  
             };
@@ -185,6 +196,9 @@ angular
             var setRows = function(tree, level, visible, rows){
                 if(visible === false) {
                     return; 
+                }
+                if(tree === undefined) {
+                    console.log(tree);
                 }
                 Object.keys(tree).sort(function(elem1, elem2){
                     elem1 = tree[elem1];
@@ -266,13 +280,23 @@ angular
             };
 
             $scope.addValue = function(value){
-                $scope.map.push(value);
-                reportCtrl.getReport().updateConceptMap($scope.concept.Name, $scope.map);
+                if($scope.concepts.indexOf(value) !== -1) {
+                    $scope.map.push(value);
+                    reportCtrl.getReport().updateConceptMap($scope.concept.Name, $scope.map);
+                }
             };
 
             $scope.removeValue = function(value){
-                $scope.map.splice($scope.map.indexOf(value), 1);
-                reportCtrl.getReport().updateConceptMap($scope.concept.Name, $scope.map);
+                if($scope.map.indexOf(value) !== -1) {
+                    $scope.map.splice($scope.map.indexOf(value), 1);
+                    reportCtrl.getReport().updateConceptMap($scope.concept.Name, $scope.map);
+                }
+            };
+            
+            $scope.moveTo = function(value, index) {
+                //console.log(reportCtrl.getConceptMap()[$scope.conceptName].To[value].Id);
+                //console.log(reportCtrl.getConceptMap()[$scope.conceptName].Id);
+                reportCtrl.getReport().moveTreeBranch('Presentation', reportCtrl.getConceptMap()[$scope.conceptName].To[value].Id, reportCtrl.getConceptMap()[$scope.conceptName].Id, index);
             };
         }
     };
@@ -287,7 +311,7 @@ angular
         require: '^report',
         link: function($scope, element, attrs, reportCtrl) {
             
-            $scope.concept = angular.copy(reportCtrl.getReport().getConcept($scope.conceptName));
+            $scope.concept = reportCtrl.getReport().getConcept($scope.conceptName);
 
             $scope.remove = function(){
                 try {

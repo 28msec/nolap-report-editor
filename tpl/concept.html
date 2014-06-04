@@ -1,5 +1,6 @@
 <form name="newConceptForm" ng-submit="ok" role="form" spellcheck="false" novalidate>
     <div class="modal-header">
+    <button class="pull-right btn btn-default"><i class="fa fa-times" ng-click="remove()"></i></button>
         <h3 class="modal-title" ng-bind="concept.Name"></h3>
     </div>
     <div class="modal-body">
@@ -12,9 +13,5 @@
                 <input type="checkbox" ng-model="concept.IsAbstract"> Abstract
             </label>
         </div>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary pull-left" ng-click="edit()">Edit</button>
-        <button class="btn btn-danger" ng-click="remove()">Remove</button>
     </div>
 </form>
