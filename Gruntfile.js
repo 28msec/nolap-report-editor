@@ -19,7 +19,8 @@ module.exports = function (grunt) {
                 dest: 'src/tpl.js',
                 constants: {
                     PresentationTreeTpl: grunt.file.read('tpl/tree.html'),
-                    ConceptMapTpl: grunt.file.read('tpl/concept-map.html')
+                    ConceptMapTpl: grunt.file.read('tpl/concept-map.html'),
+                    ConceptTpl: grunt.file.read('tpl/concept.html')
                 }
             }
         },

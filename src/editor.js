@@ -230,13 +230,17 @@ angular
         }   
     };
 })
-.directive('conceptMap', function(ConceptMapTpl) {
+.directive('conceptMap', function($rootScope, ConceptMapTpl) {
     return {
         restrict: 'E',
+        scope: {
+            'conceptName': '@'
+        },
         template: ConceptMapTpl,
         require: '^report',
         link: function($scope, element, attrs, reportCtrl) {
-            $scope.map = reportCtrl.getConceptMap();
+            $scope.concept = reportCtrl.getReport().getConcept($scope.conceptName);
+            $scope.map = reportCtrl.getConceptMap()[$scope.conceptName] === undefined ? undefined : Object.keys(reportCtrl.getConceptMap()[$scope.conceptName].To);
 
             $scope.$watch(function(){
                 return reportCtrl.getConcepts();
@@ -247,26 +251,57 @@ angular
                 });
             });
 
+            $scope.removeConceptMap = function(){
+                reportCtrl.getReport().removeConceptMap($scope.conceptName);
+                $scope.map = undefined;
+            };
+
             $scope.addConceptMap = function(){
-                reportCtrl.getReport().addConceptMap($scope.newConceptName, []);
+                try {
+                    reportCtrl.getReport().addConceptMap($scope.conceptName, []);
+                    $scope.map = [];
+                } catch(e) {
+                    $rootScope.$emit('error', 500, e.message);
+                }
             };
 
-            $scope.addValueToConceptMap = function(concept, values, value){
-                values = Object.keys(values);
-                values.push(value);
-                reportCtrl.getReport().updateConceptMap(concept, values);
+            $scope.addValue = function(value){
+                $scope.map.push(value);
+                reportCtrl.getReport().updateConceptMap($scope.concept.Name, $scope.map);
             };
 
-            $scope.removeKey = function(concept){
-                reportCtrl.getReport().removeConceptMap(concept);
-            };
-
-            $scope.removeValue = function(key, value, keyToRemove){
-                var values = Object.keys(value.To);
-                values.splice(values.indexOf(keyToRemove), 1);
-                reportCtrl.getReport().updateConceptMap(key, values);
+            $scope.removeValue = function(value){
+                $scope.map.splice($scope.map.indexOf(value), 1);
+                reportCtrl.getReport().updateConceptMap($scope.concept.Name, $scope.map);
             };
         }
     };
+})
+.directive('concept', function($rootScope, ConceptTpl){
+    return {
+        restrict: 'E',
+        scope: {
+            'conceptName': '@'
+        },
+        template: ConceptTpl,
+        require: '^report',
+        link: function($scope, element, attrs, reportCtrl) {
+            
+            $scope.concept = angular.copy(reportCtrl.getReport().getConcept($scope.conceptName));
+
+            $scope.remove = function(){
+                try {
+                    reportCtrl.getReport().removeConcept($scope.concept.Name);
+                } catch(e) {
+                    console.log(e);
+                    $rootScope.$emit('error', 500, e.message);
+                }
+            };
+
+            $scope.edit = function(){
+                reportCtrl.getReport().updateConcept($scope.concept.Name, $scope.concept.Label, $scope.concept.IsAbstract);
+            };
+        }
+    };    
 })
 ;

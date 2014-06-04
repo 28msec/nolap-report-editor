@@ -1,10 +1,39 @@
-<form class="form-inline" role="form" ng-submit="addConceptMap()">
-  <div class="form-group">
-    <input type="text" class="form-control" id="conceptName" placeholder="Concept Name" ng-model="newConceptName" typeahead="concept for concept in concepts | filter:$viewValue | limitTo:8">
-  </div>
-  <button type="submit" class="btn btn-primary">Add</button>
-</form>
-<ul class="list-group">
+<div ng-if="map === undefined">
+    <h3 ng-bind="concept.Name"></h3>
+    <div ng-if="concept.IsAbstract !== true">
+        <p>There is no concept map associated to <i ng-bind="conceptName"></i>.</p>
+        <button ng-click="addConceptMap()" class="btn btn-primary">Add concept Map</button>
+    </div>
+    <div ng-if="concept.IsAbstract === true">
+        <p>This concept is abstract.</p>
+    </div>
+</div>
+<div ng-if="map !== undefined">
+    <a class="pull-right"><i class="fa fa-times" ng-click="removeConceptMap()"></i></a>
+    <h3 ng-bind="concept.Name"></h3>
+    <p ng-bind="concept.Label"></p>
+    <ul class="list-group">
+        <li class="list-group-item" ng-repeat="key in map">
+            <span ng-bind="key"></span>
+            <a class="pull-right" ng-click="removeValue(key)"><i class="fa fa-times"></i></a>
+        </li>
+    </ul>
+    <form class="form-inline" role="form" ng-submit="addValue(newConceptValue)" ui-keypress="{ 13:'addValue(newConceptValue)' }">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="conceptValue" placeholder="Concept Name" ng-model="newConceptValue" typeahead="concept for concept in concepts | filter:$viewValue | limitTo:8">
+                        <span class="input-group-btn">
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<!--ul class="list-group">
   <li class="list-group-item" ng-repeat="(key, value) in map">
     <a class="pull-right"><i class="fa fa-times" ng-click="removeKey(key)"></i></a>
     <h3 ng-bind="value.Name"></h3>
@@ -22,4 +51,4 @@
         <button type="submit" class="btn btn-primary">Add</button>
     </form>
   </li>
-</ul>
+</ul-->
