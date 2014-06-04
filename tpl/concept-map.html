@@ -1,0 +1,25 @@
+<form class="form-inline" role="form" ng-submit="addConceptMap()">
+  <div class="form-group">
+    <input type="text" class="form-control" id="conceptName" placeholder="Concept Name" ng-model="newConceptName" typeahead="concept for concept in concepts | filter:$viewValue | limitTo:8">
+  </div>
+  <button type="submit" class="btn btn-primary">Add</button>
+</form>
+<ul class="list-group">
+  <li class="list-group-item" ng-repeat="(key, value) in map">
+    <a class="pull-right"><i class="fa fa-times" ng-click="removeKey(key)"></i></a>
+    <h3 ng-bind="value.Name"></h3>
+    <p ng-bind="value.Label"></p>
+    <ul class="list-group">
+        <li class="list-group-item" ng-repeat="(subkey, subvalue) in value.To">
+            <span ng-bind="subkey"></span>
+            <a class="pull-right" ng-click="removeValue(key, value, subkey)"><i class="fa fa-times"></i></a>
+        </li>
+    </ul>
+    <form class="form-inline" role="form" ng-submit="addValueToConceptMap(key, value.To, newConceptValue)" ui-keypress="{ 13:'addValueToConceptMap(key, value.To, newConceptValue)' }">
+        <div class="form-group">
+            <input type="text" class="form-control" id="conceptValue" placeholder="Concept Name" ng-model="newConceptValue" typeahead="concept for concept in concepts | filter:$viewValue | limitTo:8">
+        </div>
+        <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+  </li>
+</ul>

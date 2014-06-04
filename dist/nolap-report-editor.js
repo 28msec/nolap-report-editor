@@ -42,8 +42,16 @@ angular
                 return $scope.report;
             };
             
+            this.getConcepts = function(){
+                return $scope.concepts;
+            };
+            
             this.getPresentationTree = function(){
                 return this.getReport().getNetwork('Presentation').Trees;
+            };
+            
+            this.getConceptMap = function(){
+                return this.getReport().getNetwork('ConceptMap').Trees;
             };
         },
         link: function($scope, element, attrs, ctrl, $transclude){
@@ -220,6 +228,45 @@ angular
                 return reportCtrl.getPresentationTree();
             }, onChange, true);
         }   
+    };
+})
+.directive('conceptMap', function(ConceptMapTpl) {
+    return {
+        restrict: 'E',
+        template: ConceptMapTpl,
+        require: '^report',
+        link: function($scope, element, attrs, reportCtrl) {
+            $scope.map = reportCtrl.getConceptMap();
+
+            $scope.$watch(function(){
+                return reportCtrl.getConcepts();
+            }, function(concepts){
+                $scope.concepts = [];
+                concepts.forEach(function(concept){
+                    $scope.concepts.push(concept.Name);
+                });
+            });
+
+            $scope.addConceptMap = function(){
+                reportCtrl.getReport().addConceptMap($scope.newConceptName, []);
+            };
+
+            $scope.addValueToConceptMap = function(concept, values, value){
+                values = Object.keys(values);
+                values.push(value);
+                reportCtrl.getReport().updateConceptMap(concept, values);
+            };
+
+            $scope.removeKey = function(concept){
+                reportCtrl.getReport().removeConceptMap(concept);
+            };
+
+            $scope.removeValue = function(key, value, keyToRemove){
+                var values = Object.keys(value.To);
+                values.splice(values.indexOf(keyToRemove), 1);
+                reportCtrl.getReport().updateConceptMap(key, values);
+            };
+        }
     };
 })
 ;angular.module('reports.api.28.io', [])
@@ -401,7 +448,9 @@ data: body,
     };
 });angular.module("nolapReportEditor")
 
-.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree sortable-container\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row sortable\" id=\"{{row.branch.Id}}\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\"><span class=\"branch-label\">{{row.branch.Label}}</span> ({{row.branch.Name}})</span>\n            <span class=\"remove-concept indented fa fa-times\" ng-click=\"remove(row.branch.Id)\"></span>\n        </a>\n    </li>\n</ul>")
+.constant("PresentationTreeTpl", "<ul class=\"nav nav-list nav-pills nav-stacked abn-tree sortable-container\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row sortable\" id=\"{{row.branch.Id}}\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\">{{row.branch.Label}} ({{row.branch.Name}})</span>\n            <span class=\"remove-concept indented fa fa-times\" ng-click=\"remove(row.branch.Id)\"></span>\n        </a>\n    </li>\n</ul>")
+
+.constant("ConceptMapTpl", "<form class=\"form-inline\" role=\"form\" ng-submit=\"addConceptMap()\">\n  <div class=\"form-group\">\n    <input type=\"text\" class=\"form-control\" id=\"conceptName\" placeholder=\"Concept Name\" ng-model=\"newConceptName\" typeahead=\"concept for concept in concepts | filter:$viewValue | limitTo:8\">\n  </div>\n  <button type=\"submit\" class=\"btn btn-primary\">Add</button>\n</form>\n<ul class=\"list-group\">\n  <li class=\"list-group-item\" ng-repeat=\"(key, value) in map\">\n    <a class=\"pull-right\"><i class=\"fa fa-times\" ng-click=\"removeKey(key)\"></i></a>\n    <h3 ng-bind=\"value.Name\"></h3>\n    <p ng-bind=\"value.Label\"></p>\n    <ul class=\"list-group\">\n        <li class=\"list-group-item\" ng-repeat=\"(subkey, subvalue) in value.To\">\n            <span ng-bind=\"subkey\"></span>\n            <a class=\"pull-right\" ng-click=\"removeValue(key, value, subkey)\"><i class=\"fa fa-times\"></i></a>\n        </li>\n    </ul>\n    <form class=\"form-inline\" role=\"form\" ng-submit=\"addValueToConceptMap(key, value.To, newConceptValue)\" ui-keypress=\"{ 13:'addValueToConceptMap(key, value.To, newConceptValue)' }\">\n        <div class=\"form-group\">\n            <input type=\"text\" class=\"form-control\" id=\"conceptValue\" placeholder=\"Concept Name\" ng-model=\"newConceptValue\" typeahead=\"concept for concept in concepts | filter:$viewValue | limitTo:8\">\n        </div>\n        <button type=\"submit\" class=\"btn btn-primary\">Add</button>\n    </form>\n  </li>\n</ul>")
 
 ;'use strict';
 

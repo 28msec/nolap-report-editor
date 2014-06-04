@@ -18,7 +18,8 @@ module.exports = function (grunt) {
                 name: 'nolapReportEditor',
                 dest: 'src/tpl.js',
                 constants: {
-                    PresentationTreeTpl: grunt.file.read('tpl/tree.html')
+                    PresentationTreeTpl: grunt.file.read('tpl/tree.html'),
+                    ConceptMapTpl: grunt.file.read('tpl/concept-map.html')
                 }
             }
         },
