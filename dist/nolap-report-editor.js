@@ -55,6 +55,19 @@ angular
             };
         },
         link: function($scope, element, attrs, ctrl, $transclude){
+            $scope.isInPresentation = function(concept){
+                return $scope.report.findInTree('Presentation', concept.Name).length > 0;
+            };
+            
+            $scope.isInConceptMap = function(concept){
+                return $scope.report.findInConceptMap(concept.Name).length > 0;
+                
+            };
+            
+            $scope.isInBusinessRule = function(concept){
+                return $scope.report.findInRules(concept.Name).length > 0;
+            };
+                    
             var api = new ReportAPI(attrs.reportApi);
 
             api.listReports({
@@ -78,9 +91,21 @@ angular
             });
 
             $scope.$watch('dirtyModel', function(dirtyModel, previousVersion){
-                if(previousVersion === undefined) {
+
+                if(previousVersion === undefined || JSON.stringify(dirtyModel) === JSON.stringify(previousVersion)) {
                     return;
                 }
+  /*  
+        var instance = jsondiffpatch.create({
+        objectHash: function(obj) {
+            return obj._id || obj.id || obj.name || JSON.stringify(obj);
+        }
+    });
+    console.log(dirtyModel);
+    console.log(previousVersion);
+var delta = instance.diff(dirtyModel, previousVersion);
+console.log(delta);
+*/
                 $rootScope.$emit('saving');
                 api.addOrReplaceOrValidateReport({
                     report: dirtyModel,
