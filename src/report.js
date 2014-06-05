@@ -571,9 +571,12 @@ angular
             var newParent = this.getElementFromTree(networkShortName, newParentElementID);
             ensureExists(newParent, 'object', 'moveTreeBranch', 'Cannot move element with id "' + subtreeRootElementID + '" to new parent element with id "' + newParentElementID + '": Parent element doesn\'t exist.');
             var parentConcept = this.getConcept(newParent.Name);
-            if(!parentConcept.IsAbstract) {
+            if(networkShortName !== 'ConceptMap' && !parentConcept.IsAbstract) {
                 throw new Error('moveTreeBranch: cannot move element to target parent "' + newParentElementID +
                     '". Reason: Parent concept "' + newParent.Name  + '" is not abstract.');
+            } else if(networkShortName === 'ConceptMap' && parentConcept.IsAbstract) {
+                throw new Error('moveTreeBranch: cannot move element to target parent "' + newParentElementID +
+                    '" in ConceptMap. Reason: Parent concept "' + newParent.Name  + '" is abstract.');
             }
 
             var element = this.removeTreeBranch(networkShortName, subtreeRootElementID);
@@ -670,11 +673,13 @@ angular
             var name = toConceptNamesArray[i];
             ensureConceptName(name, 'toConceptNamesArray', 'addConceptMap');
             toObj[name] = {
+                'Id': uuid(),
                 'Name': name,
                 'Order': parseInt(i, 10) + 1
             };
         }
         var conceptMap = {
+            'Id': uuid(),
             'Name': fromConcept.Name,
             'To': toObj
         };
