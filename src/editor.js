@@ -55,17 +55,17 @@ angular
             };
         },
         link: function($scope, element, attrs, ctrl, $transclude){
+            
             $scope.isInPresentation = function(concept){
-                return $scope.report.findInTree('Presentation', concept.Name).length > 0;
+                return $scope.report.findInTree('Presentation', concept.Name);
             };
             
             $scope.isInConceptMap = function(concept){
-                return $scope.report.findInConceptMap(concept.Name).length > 0;
-                
+                return $scope.report.findInConceptMap(concept.Name);
             };
             
             $scope.isInBusinessRule = function(concept){
-                return $scope.report.findInRules(concept.Name).length > 0;
+                return $scope.report.findInRules(concept.Name);
             };
                     
             var api = new ReportAPI(attrs.reportApi);
