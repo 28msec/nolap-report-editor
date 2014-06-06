@@ -42,10 +42,6 @@ angular
                 return $scope.report;
             };
             
-            this.getConcepts = function(){
-                return $scope.concepts;
-            };
-            
             this.getPresentationTree = function(){
                 return this.getReport().getNetwork('Presentation').Trees;
             };
@@ -79,7 +75,6 @@ angular
                 $scope.model = reports[0];
                 $scope.dirtyModel = angular.copy($scope.model);
                 $scope.report = new Report($scope.dirtyModel);
-                $scope.concepts = $scope.report.listConcepts();
             })
             .catch(function(error){
                 console.error(error);
@@ -116,13 +111,11 @@ console.log(delta);
                     $rootScope.$emit('saved');
                     console.log('new model saved');
                     $scope.model = angular.copy(dirtyModel);
-                    $scope.concepts = $scope.report.listConcepts();
                 })
                 .catch(function(error){
                     $rootScope.$emit('savingError');
                     console.error(error);
                     $scope.dirtyModel = angular.copy($scope.model);
-                    $scope.concepts = $scope.report.listConcepts();
                 });
             }, true);
         }
@@ -281,6 +274,7 @@ console.log(delta);
             $scope.concept = reportCtrl.getReport().getConcept($scope.conceptName);
             $scope.map = reportCtrl.getConceptMap()[$scope.conceptName] === undefined ? undefined : Object.keys(reportCtrl.getConceptMap()[$scope.conceptName].To);
 
+/*
             $scope.$watch(function(){
                 return reportCtrl.getConcepts();
             }, function(concepts){
@@ -289,6 +283,7 @@ console.log(delta);
                     $scope.concepts.push(concept.Name);
                 });
             });
+            */
 
             $scope.removeConceptMap = function(){
                 reportCtrl.getReport().removeConceptMap($scope.conceptName);

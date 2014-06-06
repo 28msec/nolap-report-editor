@@ -42,10 +42,6 @@ angular
                 return $scope.report;
             };
             
-            this.getConcepts = function(){
-                return $scope.concepts;
-            };
-            
             this.getPresentationTree = function(){
                 return this.getReport().getNetwork('Presentation').Trees;
             };
@@ -79,7 +75,6 @@ angular
                 $scope.model = reports[0];
                 $scope.dirtyModel = angular.copy($scope.model);
                 $scope.report = new Report($scope.dirtyModel);
-                $scope.concepts = $scope.report.listConcepts();
             })
             .catch(function(error){
                 console.error(error);
@@ -116,13 +111,11 @@ console.log(delta);
                     $rootScope.$emit('saved');
                     console.log('new model saved');
                     $scope.model = angular.copy(dirtyModel);
-                    $scope.concepts = $scope.report.listConcepts();
                 })
                 .catch(function(error){
                     $rootScope.$emit('savingError');
                     console.error(error);
                     $scope.dirtyModel = angular.copy($scope.model);
-                    $scope.concepts = $scope.report.listConcepts();
                 });
             }, true);
         }
@@ -281,6 +274,7 @@ console.log(delta);
             $scope.concept = reportCtrl.getReport().getConcept($scope.conceptName);
             $scope.map = reportCtrl.getConceptMap()[$scope.conceptName] === undefined ? undefined : Object.keys(reportCtrl.getConceptMap()[$scope.conceptName].To);
 
+/*
             $scope.$watch(function(){
                 return reportCtrl.getConcepts();
             }, function(concepts){
@@ -289,6 +283,7 @@ console.log(delta);
                     $scope.concepts.push(concept.Name);
                 });
             });
+            */
 
             $scope.removeConceptMap = function(){
                 reportCtrl.getReport().removeConceptMap($scope.conceptName);
@@ -534,9 +529,9 @@ data: body,
 
 .constant("PresentationTreeTpl", "<div ng-if=\"!conceptName\">\n    <p>No concept is selected. You can pick one on the left end side or create a new concept.</p>\n    <button ng-click=\"newConcept()\" class=\"btn btn-primary\"><i class=\"fa fa-plus\"></i> Concept</button>\n</div>\n<div ng-if=\"conceptName\">\n    <p>Drag and drop the concept in the presentation tree.</p>\n    <ul class=\"list-group sortable-container\" ui-sortable=\"sortableOptions\" ng-model=\"conceptName\">\n        <li class=\"list-group-item sortable\" ng-bind=\"conceptName\"></li>\n    </ul>\n</div>\n<ul class=\"nav nav-list nav-pills nav-stacked abn-tree sortable-container\" ui-sortable=\"sortableOptions\" ng-model=\"rows\">\n    <li ng-repeat=\"row in rows\"  ng-class=\"'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')\" class=\"abn-tree-row sortable\" id=\"{{row.branch.Id}}\">\n        <a ng-click=\"select(row)\">\n            <i ng-class=\"{ 'fa-caret-right': !row.branch.expanded && row.branch.To, 'fa-caret-down': row.branch.expanded && row.branch.To }\" class=\"indented tree-icon fa\"></i>\n            <span class=\"indented tree-label\">{{row.branch.Label}} ({{row.branch.Name}})</span>\n            <span class=\"remove-concept indented fa fa-times\" ng-click=\"remove(row.branch.Id)\"></span>\n        </a>\n    </li>\n</ul>")
 
-.constant("ConceptMapTpl", "<div ng-if=\"map === undefined\">\n    <h3 ng-bind=\"concept.Name\"></h3>\n    <div ng-if=\"concept.IsAbstract !== true\">\n        <p>There is no concept map associated to <i ng-bind=\"conceptName\"></i>.</p>\n        <button ng-click=\"addConceptMap()\" class=\"btn btn-primary\">Add concept Map</button>\n    </div>\n    <div ng-if=\"concept.IsAbstract === true\">\n        <p>This concept is abstract.</p>\n    </div>\n</div>\n<div ng-if=\"map !== undefined\">\n    <button class=\"pull-right btn btn-default\"><i class=\"fa fa-times\" ng-click=\"removeConceptMap()\"></i></button>\n    <h3 ng-bind=\"concept.Name\"></h3>\n    <p ng-bind=\"concept.Label\"></p>\n    <ul class=\"list-group\">\n        <li class=\"list-group-item clearfix\" ng-repeat=\"key in map\">\n            <span ng-bind=\"key\"></span>\n            <div class=\"btn-group pull-right\">\n                <button class=\"btn btn-default\" type=\"button\" ng-click=\"moveTo(key, $index - 1)\" ng-if=\"$last === false\"><i class=\"fa fa-long-arrow-down\"></i></button>\n                <button class=\"btn btn-default\" type=\"button\" ng-click=\"moveTo(key, $index + 1)\" ng-if=\"$first === false\"><i class=\"fa fa-long-arrow-up\"></i></button>\n                <button class=\"btn btn-default\" type=\"button\" ng-click=\"removeValue(key)\"><i class=\"fa fa-times\"></i></button>\n            </div>\n            <!--a class=\"pull-right\" ng-click=\"removeValue(key, $index - 1)\" ng-if=\"$last === false\"><i class=\"fa fa-long-arrow-down\"></i></a>\n            <a class=\"pull-right\" ng-click=\"moveValueUp(key, $index + 1)\" ng-if=\"$first === false\"><i class=\"fa fa-long-arrow-up\"></i></a>\n            <a class=\"pull-right\" ng-click=\"removeValue(key)\"><i class=\"fa fa-times\"></i></a-->\n        </li>\n    </ul>\n    <form class=\"form-inline\" role=\"form\" ng-submit=\"addValue(newConceptValue)\" ui-keypress=\"{ 13:'addValue(newConceptValue)' }\">\n        <div class=\"form-group\">\n            <div class=\"row\">\n                <div class=\"col-lg-6\">\n                    <div class=\"input-group\">\n                        <input type=\"text\" class=\"form-control\" id=\"conceptValue\" placeholder=\"Concept Name\" ng-model=\"newConceptValue\" typeahead=\"concept for concept in concepts | filter:$viewValue | limitTo:8\">\n                        <span class=\"input-group-btn\">\n                            <button type=\"submit\" class=\"btn btn-primary\">Add</button>\n                        </span>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </form>\n</div>\n<!--ul class=\"list-group\">\n  <li class=\"list-group-item\" ng-repeat=\"(key, value) in map\">\n    <a class=\"pull-right\"><i class=\"fa fa-times\" ng-click=\"removeKey(key)\"></i></a>\n    <h3 ng-bind=\"value.Name\"></h3>\n    <p ng-bind=\"value.Label\"></p>\n    <ul class=\"list-group\">\n        <li class=\"list-group-item\" ng-repeat=\"(subkey, subvalue) in value.To\">\n            <span ng-bind=\"subkey\"></span>\n            <a class=\"pull-right\" ng-click=\"removeValue(key, value, subkey)\"><i class=\"fa fa-times\"></i></a>\n        </li>\n    </ul>\n    <form class=\"form-inline\" role=\"form\" ng-submit=\"addValueToConceptMap(key, value.To, newConceptValue)\" ui-keypress=\"{ 13:'addValueToConceptMap(key, value.To, newConceptValue)' }\">\n        <div class=\"form-group\">\n            <input type=\"text\" class=\"form-control\" id=\"conceptValue\" placeholder=\"Concept Name\" ng-model=\"newConceptValue\" typeahead=\"concept for concept in concepts | filter:$viewValue | limitTo:8\">\n        </div>\n        <button type=\"submit\" class=\"btn btn-primary\">Add</button>\n    </form>\n  </li>\n</ul-->")
+.constant("ConceptMapTpl", "<div ng-if=\"map === undefined\">\n    <h3 ng-bind=\"concept.Name\"></h3>\n    <div ng-if=\"concept.IsAbstract !== true\">\n        <p>There is no concept map associated to <i ng-bind=\"conceptName\"></i>.</p>\n        <button ng-click=\"addConceptMap()\" class=\"btn btn-primary\">Add concept Map</button>\n    </div>\n    <div ng-if=\"concept.IsAbstract === true\">\n        <p>This concept is abstract.</p>\n    </div>\n</div>\n<div ng-if=\"map !== undefined\">\n    <button class=\"pull-right btn btn-default\"><i class=\"fa fa-times\" ng-click=\"removeConceptMap()\"></i></button>\n    <h3 ng-bind=\"concept.Name\"></h3>\n    <p ng-bind=\"concept.Label\"></p>\n    <ul class=\"list-group\">\n        <li class=\"list-group-item clearfix\" ng-repeat=\"key in map\">\n            <span ng-bind=\"key\"></span>\n            <div class=\"btn-group pull-right\">\n                <button class=\"btn btn-default\" type=\"button\" ng-click=\"moveTo(key, $index - 1)\" ng-if=\"$last === false\"><i class=\"fa fa-long-arrow-down\"></i></button>\n                <button class=\"btn btn-default\" type=\"button\" ng-click=\"moveTo(key, $index + 1)\" ng-if=\"$first === false\"><i class=\"fa fa-long-arrow-up\"></i></button>\n                <button class=\"btn btn-default\" type=\"button\" ng-click=\"removeValue(key)\"><i class=\"fa fa-times\"></i></button>\n            </div>\n        </li>\n    </ul>\n    <form class=\"form-inline\" role=\"form\" ng-submit=\"addValue(newConceptValue)\" ui-keypress=\"{ 13:'addValue(newConceptValue)' }\">\n        <div class=\"form-group\">\n            <div class=\"row\">\n                <div class=\"col-lg-6\">\n                    <div class=\"input-group\">\n                        <input type=\"text\" class=\"form-control\" id=\"conceptValue\" placeholder=\"Concept Name\" ng-model=\"newConceptValue\" typeahead=\"concept for concept in concepts | filter:$viewValue | limitTo:8\">\n                        <span class=\"input-group-btn\">\n                            <button type=\"submit\" class=\"btn btn-primary\">Add</button>\n                        </span>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </form>\n</div>")
 
-.constant("ConceptTpl", "<form name=\"newConceptForm\" ng-submit=\"ok\" role=\"form\" spellcheck=\"false\" novalidate>\n    <div class=\"modal-header\">\n    <button class=\"pull-right btn btn-default\"><i class=\"fa fa-times\" ng-click=\"remove()\"></i></button>\n        <h3 class=\"modal-title\" ng-bind=\"concept.Name\"></h3>\n    </div>\n    <div class=\"modal-body\">\n        <div class=\"form-group\">\n            <label for=\"label\">Label</label>\n           <input type=\"text\" class=\"form-control\" id=\"label\" ng-model=\"concept.Label\" placeholder=\"Label\" required>\n        </div>\n        <div class=\"checkbox\">\n            <label>\n                <input type=\"checkbox\" ng-model=\"concept.IsAbstract\"> Abstract\n            </label>\n        </div>\n    </div>\n</form>")
+.constant("ConceptTpl", "<form name=\"editConceptForm\" ng-submit=\"ok\" role=\"form\" spellcheck=\"false\" novalidate>\n    <div class=\"modal-header\">\n    <button class=\"pull-right btn btn-default\"><i class=\"fa fa-times\" ng-click=\"remove()\"></i></button>\n        <h3 class=\"modal-title\" ng-bind=\"concept.Name\"></h3>\n    </div>\n    <div class=\"modal-body\">\n        <div class=\"form-group\">\n            <label for=\"label\">Label</label>\n           <input type=\"text\" class=\"form-control\" id=\"label\" ng-model=\"concept.Label\" placeholder=\"Label\" required>\n        </div>\n        <div class=\"checkbox\">\n            <label>\n                <input type=\"checkbox\" ng-model=\"concept.IsAbstract\"> Abstract\n            </label>\n        </div>\n    </div>\n</form>")
 
 ;'use strict';
 
