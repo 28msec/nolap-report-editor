@@ -57,15 +57,15 @@ angular
         link: function($scope, element, attrs, ctrl, $transclude){
             
             $scope.isInPresentation = function(concept){
-                return $scope.report.findInTree('Presentation', concept.Name);
+                return $scope.report.findInTree('Presentation', concept.Name).length > 0;
             };
             
             $scope.isInConceptMap = function(concept){
-                return $scope.report.findInConceptMap(concept.Name);
+                return $scope.report.findInConceptMap(concept.Name).length > 0;
             };
             
             $scope.isInBusinessRule = function(concept){
-                return $scope.report.findInRules(concept.Name);
+                return $scope.report.findInRules(concept.Name).length > 0;
             };
                     
             var api = new ReportAPI(attrs.reportApi);
@@ -319,9 +319,9 @@ console.log(delta);
             };
             
             $scope.moveTo = function(value, index) {
-                //console.log(reportCtrl.getConceptMap()[$scope.conceptName].To[value].Id);
-                //console.log(reportCtrl.getConceptMap()[$scope.conceptName].Id);
-                reportCtrl.getReport().moveTreeBranch('Presentation', reportCtrl.getConceptMap()[$scope.conceptName].To[value].Id, reportCtrl.getConceptMap()[$scope.conceptName].Id, index);
+                var parent = reportCtrl.getConceptMap()[$scope.conceptName];
+                var child = parent.To[value]; 
+                reportCtrl.getReport().moveTreeBranch('ConceptMap', child.Id, parent.Id, index);
             };
         }
     };

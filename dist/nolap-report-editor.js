@@ -57,15 +57,15 @@ angular
         link: function($scope, element, attrs, ctrl, $transclude){
             
             $scope.isInPresentation = function(concept){
-                return $scope.report.findInTree('Presentation', concept.Name);
+                return $scope.report.findInTree('Presentation', concept.Name).length > 0;
             };
             
             $scope.isInConceptMap = function(concept){
-                return $scope.report.findInConceptMap(concept.Name);
+                return $scope.report.findInConceptMap(concept.Name).length > 0;
             };
             
             $scope.isInBusinessRule = function(concept){
-                return $scope.report.findInRules(concept.Name);
+                return $scope.report.findInRules(concept.Name).length > 0;
             };
                     
             var api = new ReportAPI(attrs.reportApi);
@@ -319,9 +319,9 @@ console.log(delta);
             };
             
             $scope.moveTo = function(value, index) {
-                //console.log(reportCtrl.getConceptMap()[$scope.conceptName].To[value].Id);
-                //console.log(reportCtrl.getConceptMap()[$scope.conceptName].Id);
-                reportCtrl.getReport().moveTreeBranch('Presentation', reportCtrl.getConceptMap()[$scope.conceptName].To[value].Id, reportCtrl.getConceptMap()[$scope.conceptName].Id, index);
+                var parent = reportCtrl.getConceptMap()[$scope.conceptName];
+                var child = parent.To[value]; 
+                reportCtrl.getReport().moveTreeBranch('ConceptMap', child.Id, parent.Id, index);
             };
         }
     };
@@ -1111,9 +1111,12 @@ angular
             var newParent = this.getElementFromTree(networkShortName, newParentElementID);
             ensureExists(newParent, 'object', 'moveTreeBranch', 'Cannot move element with id "' + subtreeRootElementID + '" to new parent element with id "' + newParentElementID + '": Parent element doesn\'t exist.');
             var parentConcept = this.getConcept(newParent.Name);
-            if(!parentConcept.IsAbstract) {
+            if(networkShortName !== 'ConceptMap' && !parentConcept.IsAbstract) {
                 throw new Error('moveTreeBranch: cannot move element to target parent "' + newParentElementID +
                     '". Reason: Parent concept "' + newParent.Name  + '" is not abstract.');
+            } else if(networkShortName === 'ConceptMap' && parentConcept.IsAbstract) {
+                throw new Error('moveTreeBranch: cannot move element to target parent "' + newParentElementID +
+                    '" in ConceptMap. Reason: Parent concept "' + newParent.Name  + '" is abstract.');
             }
 
             var element = this.removeTreeBranch(networkShortName, subtreeRootElementID);
@@ -1210,11 +1213,13 @@ angular
             var name = toConceptNamesArray[i];
             ensureConceptName(name, 'toConceptNamesArray', 'addConceptMap');
             toObj[name] = {
+                'Id': uuid(),
                 'Name': name,
                 'Order': parseInt(i, 10) + 1
             };
         }
         var conceptMap = {
+            'Id': uuid(),
             'Name': fromConcept.Name,
             'To': toObj
         };
