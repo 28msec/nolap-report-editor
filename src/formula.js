@@ -16,20 +16,20 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
     };
 
     //Constructor
-    var Formula = function(model_or_ruleType, computable_concept){
-        if(typeof model_or_ruleType === 'object' && model_or_ruleType !== null){
-            this.setModel(model_or_ruleType);
+    var Formula = function(modelOrRuleType, computableConcept){
+        if(typeof modelOrRuleType === 'object' && modelOrRuleType !== null){
+            this.setModel(modelOrRuleType);
         } else {
-            ensureParameter(model_or_ruleType, 'model_or_ruleType', 'string', 'Formula (Const.)');
-            ensureParameter(computable_concept, 'computable_concept', 'string', 'Formula (Const.)');
+            ensureParameter(modelOrRuleType, 'model_or_ruleType', 'string', 'Formula (Const.)');
+            ensureParameter(computableConcept, 'computable_concept', 'string', 'Formula (Const.)');
             this.parser = null;
-            if(model_or_ruleType === 'xbrl28:arithmetic' || model_or_ruleType === 'xbrl28:excel') {
+            if(modelOrRuleType === 'xbrl28:arithmetic' || modelOrRuleType === 'xbrl28:excel') {
                 this.setModel({
                     'Id': '',
-                    'Type': model_or_ruleType,
+                    'Type': modelOrRuleType,
                     'Label': '',
                     'Description': '',
-                    'ComputableConcepts': [ computable_concept ],
+                    'ComputableConcepts': [ computableConcept ],
                     'DependsOn': [],
                     'AllowCrossPeriod': false,
                     'AllowCrossBalance': false,
@@ -43,24 +43,24 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
                         }
                     ]
                 });
-            } else if (model_or_ruleType === 'xbrl28:validation'){
+            } else if (modelOrRuleType === 'xbrl28:validation'){
                 this.setModel({
                     'Id': '',
-                    'Type': model_or_ruleType,
+                    'Type': modelOrRuleType,
                     'Label': '',
                     'Description': '',
-                    'ComputableConcepts': [ computable_concept + 'Validation' ],
-                    'ValidatedConcepts': [ computable_concept ],
+                    'ComputableConcepts': [ computableConcept + 'Validation' ],
+                    'ValidatedConcepts': [ computableConcept ],
                     'DependsOn': [],
                     'Formula': ''
                 });
-            } else if (model_or_ruleType === 'xbrl28:formula') {
+            } else if (modelOrRuleType === 'xbrl28:formula') {
                 this.setModel({
                     'Id': '',
-                    'Type': model_or_ruleType,
+                    'Type': modelOrRuleType,
                     'Label': '',
                     'Description': '',
-                    'ComputableConcepts': [ computable_concept ],
+                    'ComputableConcepts': [ computableConcept ],
                     'DependsOn': [],
                     'Formula': ''
                 });
@@ -91,8 +91,8 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         var deferred = $q.defer();
 
         $log.log('starting compilation');
-        if((this.model.Type === 'xbrl28:excel' || this.model.Type === 'xbrl28:arithmetic')
-            && this.model.Formulae !== undefined && this.model.Formulae !== null) {
+        if((this.model.Type === 'xbrl28:excel' || this.model.Type === 'xbrl28:arithmetic') &&
+            this.model.Formulae !== undefined && this.model.Formulae !== null) {
             for (var i = 0; i < this.model.Formulae.length; ++i) {
                 this.compilePrereq(i);
                 this.compileBody(i);

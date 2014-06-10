@@ -42,10 +42,6 @@ angular
                 return $scope.report;
             };
             
-            this.getConcepts = function(){
-                return $scope.concepts;
-            };
-            
             this.getPresentationTree = function(){
                 return this.getReport().getNetwork('Presentation').Trees;
             };
@@ -73,6 +69,19 @@ angular
             };
         },
         link: function($scope, element, attrs, ctrl, $transclude){
+            
+            $scope.isInPresentation = function(concept){
+                return $scope.report.findInTree('Presentation', concept.Name).length > 0;
+            };
+            
+            $scope.isInConceptMap = function(concept){
+                return $scope.report.findInConceptMap(concept.Name).length > 0;
+            };
+            
+            $scope.isInBusinessRule = function(concept){
+                return $scope.report.findInRules(concept.Name).length > 0;
+            };
+                    
             var api = new ReportAPI(attrs.reportApi);
 
             api.listReports({
@@ -84,7 +93,6 @@ angular
                 $scope.model = reports[0];
                 $scope.dirtyModel = angular.copy($scope.model);
                 $scope.report = new Report($scope.dirtyModel);
-                $scope.concepts = $scope.report.listConcepts();
             })
             .catch(function(error){
                 console.error(error);
@@ -96,9 +104,21 @@ angular
             });
 
             $scope.$watch('dirtyModel', function(dirtyModel, previousVersion){
-                if(previousVersion === undefined) {
+
+                if(previousVersion === undefined || JSON.stringify(dirtyModel) === JSON.stringify(previousVersion)) {
                     return;
                 }
+  /*  
+        var instance = jsondiffpatch.create({
+        objectHash: function(obj) {
+            return obj._id || obj.id || obj.name || JSON.stringify(obj);
+        }
+    });
+    console.log(dirtyModel);
+    console.log(previousVersion);
+var delta = instance.diff(dirtyModel, previousVersion);
+console.log(delta);
+*/
                 $rootScope.$emit('saving');
                 api.addOrReplaceOrValidateReport({
                     report: dirtyModel,
@@ -109,13 +129,11 @@ angular
                     $rootScope.$emit('saved');
                     console.log('new model saved');
                     $scope.model = angular.copy(dirtyModel);
-                    $scope.concepts = $scope.report.listConcepts();
                 })
                 .catch(function(error){
                     $rootScope.$emit('savingError');
                     console.error(error);
                     $scope.dirtyModel = angular.copy($scope.model);
-                    $scope.concepts = $scope.report.listConcepts();
                 });
             }, true);
         }
@@ -145,7 +163,7 @@ angular
                 placeholder: 'sortable',
                 connectWith: '.sortable-container',
                 receive: function(e, ui){
-                    var concept = ui.item.sortable.moved;
+                    //var concept = ui.item.sortable.moved;
                     var dropIdx = ui.item.sortable.dropindex;
                     var parentIdx = dropIdx - 1;
                     var parentLevel = $scope.rows[dropIdx].level - 1;
@@ -274,6 +292,7 @@ angular
             $scope.concept = reportCtrl.getReport().getConcept($scope.conceptName);
             $scope.map = reportCtrl.getConceptMap()[$scope.conceptName] === undefined ? undefined : Object.keys(reportCtrl.getConceptMap()[$scope.conceptName].To);
 
+/*
             $scope.$watch(function(){
                 return reportCtrl.getConcepts();
             }, function(concepts){
@@ -282,6 +301,7 @@ angular
                     $scope.concepts.push(concept.Name);
                 });
             });
+            */
 
             $scope.removeConceptMap = function(){
                 reportCtrl.getReport().removeConceptMap($scope.conceptName);
@@ -312,9 +332,9 @@ angular
             };
             
             $scope.moveTo = function(value, index) {
-                //console.log(reportCtrl.getConceptMap()[$scope.conceptName].To[value].Id);
-                //console.log(reportCtrl.getConceptMap()[$scope.conceptName].Id);
-                reportCtrl.getReport().moveTreeBranch('Presentation', reportCtrl.getConceptMap()[$scope.conceptName].To[value].Id, reportCtrl.getConceptMap()[$scope.conceptName].Id, index);
+                var parent = reportCtrl.getConceptMap()[$scope.conceptName];
+                var child = parent.To[value]; 
+                reportCtrl.getReport().moveTreeBranch('ConceptMap', child.Id, parent.Id, index);
             };
         }
     };
@@ -424,7 +444,7 @@ angular
             'action': '='
         },
         template: RulesEditorTpl,
-        link: function($scope, element, attrs) {
+        link: function($scope) {
             $scope.colspan1 = 2;
         }
     };
