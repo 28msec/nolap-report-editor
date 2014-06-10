@@ -1,17 +1,16 @@
 <div class="container">
-    <h1>Rule Editor</h1>
-    <h2>Arithmetic computation of new Facts</h2>
-    <form class="form-horizontal" role="form">
+    <form novalidate class="form-horizontal" role="form">
         <div class="form-group">
             <label for="ruleID" class="col-sm-{{colspan1}} control-label">ID</label>
             <div class="col-sm-{{12 - colspan1}}">
-                <input type="text" id="ruleID" class="form-control" ng-model="formula.model.Id" ng-pattern="/^.+$/">
+                <input ng-if="action === 'Create'" type="text" id="ruleID" class="form-control" ng-model="formula.model.Id" ng-pattern="/^.+$/" required>
+                <input ng-if="action === 'Update'" type="text" id="ruleID" readonly="readonly" class="form-control" ng-model="formula.model.Id" ng-pattern="/^.+$/" required>
             </div>
         </div>
         <div class="form-group">
             <label for="ruleLabel" class="col-sm-{{colspan1}} control-label">Label</label>
             <div class="col-sm-{{12 - colspan1}}">
-                <input type="text" id="ruleLabel" class="form-control" ng-model="formula.model.Label">
+                <input type="text" id="ruleLabel" class="form-control" ng-model="formula.model.Label" required>
             </div>
         </div>
         <div class="form-group">
@@ -26,13 +25,17 @@
                 <input type="text" id="compFact{{$index}}" class="form-control" ng-model="formula.model.ComputableConcepts[$index]">
             </div>
         </div>
-        <div class="form-group" ng-repeat="concept in formula.model.DependsOn track by $index">
+
+
+        <!-- if 'xbrl28:arithmetic' || 'xbrl28:excel'-->
+        <div class="form-group" ng-repeat="concept in formula.model.DependsOn track by $index"
+             ng-if="formula.model.Type === 'xbrl28:arithmetic' || formula.model.Type === 'xbrl28:excel'">
             <label for="dep{{$index}}" class="col-sm-{{colspan1}} control-label">Dependency {{ $index +1 }}</label>
             <div class="col-sm-{{12 - colspan1}}">
                 <input type="text" id="dep{{$index}}" readonly="readonly" class="form-control" ng-model="concept">
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" ng-if="formula.model.Type === 'xbrl28:arithmetic' || formula.model.Type === 'xbrl28:excel'">
             <label for="coverAspects" class="col-sm-{{colspan1}} control-label">Cover Aspects</label>
             <div class="col-sm-{{12 - colspan1}}">
                 <input type="checkbox" id="coverAspects" ng-model="formula.model.AllowCrossPeriodType">  Allow facts to be computable across different period type (e.g. allow to add an instant fact to a duration fact)
@@ -41,7 +44,6 @@
                 <input type="checkbox" ng-model="formula.model.AllowCrossBalance">  Allow facts to be computable across different balance types (e.g. allow to compare credit facts with debit facts)
             </div>
         </div>
-
         <tabset ng-if="formula.model.Type === 'xbrl28:arithmetic' || formula.model.Type === 'xbrl28:excel'">
             <tab ng-repeat="alt in formula.model.Formulae track by $index" heading="Alternative {{$index +1}}" >
                 <div style="border-width: 0 1px 1px 1px;border-color: #ddd;border-radius: 4px 4px 0 0;padding-top: 15px;">
@@ -69,6 +71,15 @@
             </tab>
         </tabset>
 
+
+        <!-- if 'xbrl28:formula' || 'xbrl28:validation'-->
+        <div class="form-group" ng-repeat="concept in formula.model.DependsOn track by $index"
+             ng-if="formula.model.Type === 'xbrl28:formula' || formula.model.Type === 'xbrl28:validation'">
+            <label for="dep2{{$index}}" class="col-sm-{{colspan1}} control-label">Dependency {{ $index +1 }}</label>
+            <div class="col-sm-{{12 - colspan1}}">
+                <input type="text" id="dep2{{$index}}" class="form-control" ng-model="concept">
+            </div>
+        </div>
         <div ng-if="formula.model.Type === 'xbrl28:formula'">
             <div class="form-group">
                 <label for="sourceFact" class="col-sm-{{colspan1}} control-label">Mandatory Source Fact</label>
@@ -84,8 +95,20 @@
                 <div class="container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}" ng-show="formula.model.FormulaErr" style="margin-top: 20px;">{{formula.model.FormulaErr}}</div>
             </div>
         </div>
-
-        <pre class="container" ng-bind="formula.view" ng-if="false" style="margin-top: 20px;"></pre>
-        <button type="submit" id="send" ng-click="formula.updateView();" class="btn btn-default">Submit</button>
+        <div ng-if="formula.model.Type === 'xbrl28:validation'">
+            <div class="form-group">
+                <label for="validatedConcept" class="col-sm-{{colspan1}} control-label">Validated Concept</label>
+                <div class="col-sm-{{12 - colspan1}}">
+                    <input type="text" id="validatedConcept" class="form-control" ng-model="formula.model.ValidatedConcepts[0]" ng-pattern="/^.+$/">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="validation" class="col-sm-{{colspan1}} control-label">Advanced Validation Rule</label>
+                <div  class="col-sm-{{12 - colspan1}}">
+                    <textarea class="form-control" id="validation" rows="20" placeholder="" ng-change="formula.compile()" ng-model="formula.model.Formula"></textarea>
+                </div>
+                <div class="container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}" ng-show="formula.model.FormulaErr" style="margin-top: 20px;">{{formula.model.FormulaErr}}</div>
+            </div>
+        </div>
     </form>
 </div>

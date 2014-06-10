@@ -76,10 +76,19 @@ op_comparator_single
     Primaries
 *******************/
 primary
-  = integer / block / variable / function / variable2
+  = integer / block / boolean / variable / function / variable2
 
 block
   = "(" _ block:comparison _ ")" { return createOne("block", block); }
+
+boolean
+  = _ true / false _
+
+true
+  = "TRUE" / "true" { return createAtomic('true'); }
+
+false
+  = "FALSE" / "false" { return createAtomic('false'); }
 
 variable
   = _ name:( [a-zA-Z0-9._]+ & ( _ [^(] ) ) _ { return createVar(name[0].join("")); }

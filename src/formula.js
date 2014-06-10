@@ -16,53 +16,83 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
     };
 
     //Constructor
-    var Formula = function(type){
-        ensureParameter(type, 'type', 'string', 'Formula (Const.)');
-        this.parser = null;
-        this.model = {
-            'Id': '',
-            'Type': type,
-            'Label': '',
-            'Description': '',
-            'ComputableConcepts': [],
-            'DependsOn': [],
-            'AllowCrossPeriod': false,
-            'Formulae': [
-                {
-                    'PrereqSrc': '',
-                    'Prereq': {},
-                    'SourceFact': [],
-                    'BodySrc': '',
-                    'Body': {}
-                }
-            ]
-        };
+    var Formula = function(model_or_ruleType, computable_concept){
+        if(typeof model_or_ruleType === 'object' && model_or_ruleType !== null){
+            this.setModel(model_or_ruleType);
+        } else {
+            ensureParameter(model_or_ruleType, 'model_or_ruleType', 'string', 'Formula (Const.)');
+            ensureParameter(computable_concept, 'computable_concept', 'string', 'Formula (Const.)');
+            this.parser = null;
+            if(model_or_ruleType === 'xbrl28:arithmetic' || model_or_ruleType === 'xbrl28:excel') {
+                this.setModel({
+                    'Id': '',
+                    'Type': model_or_ruleType,
+                    'Label': '',
+                    'Description': '',
+                    'ComputableConcepts': [ computable_concept ],
+                    'DependsOn': [],
+                    'AllowCrossPeriod': false,
+                    'AllowCrossBalance': false,
+                    'Formulae': [
+                        {
+                            'PrereqSrc': 'TRUE',
+                            'Prereq': {},
+                            'SourceFact': [],
+                            'BodySrc': '',
+                            'Body': {}
+                        }
+                    ]
+                });
+            } else if (model_or_ruleType === 'xbrl28:validation'){
+                this.setModel({
+                    'Id': '',
+                    'Type': model_or_ruleType,
+                    'Label': '',
+                    'Description': '',
+                    'ComputableConcepts': [ computable_concept + 'Validation' ],
+                    'ValidatedConcepts': [ computable_concept ],
+                    'DependsOn': [],
+                    'Formula': ''
+                });
+            } else if (model_or_ruleType === 'xbrl28:formula') {
+                this.setModel({
+                    'Id': '',
+                    'Type': model_or_ruleType,
+                    'Label': '',
+                    'Description': '',
+                    'ComputableConcepts': [ computable_concept ],
+                    'DependsOn': [],
+                    'Formula': ''
+                });
+            }
+        }
     };
 
     Formula.prototype.getParser = function() {
         if(this.parser === undefined || this.parser === null ) {
             if(this.model.Type === 'xbrl28:arithmetic') {
-                this.parser = new FormulaParser();
+                this.parser = FormulaParser;
                 this.parserType = 'FormulaParser';
             }
             if(this.model.Type === 'xbrl28:excel') {
-                this.parser = new ExcelParser();
+                this.parser = ExcelParser;
                 this.parserType = 'ExcelParser';
             }
         }
         return this.parser;
     };
 
-    Formula.prototype.updateView = function() {
+    /*Formula.prototype.updateView = function() {
         this.view = JSON.stringify(this.model, null, ' ');
-    };
+    };*/
 
 
     Formula.prototype.compileDeferred = function() {
         var deferred = $q.defer();
 
         $log.log('starting compilation');
-        if(this.model.Formulae !== undefined && this.model.Formulae !== null) {
+        if((this.model.Type === 'xbrl28:excel' || this.model.Type === 'xbrl28:arithmetic')
+            && this.model.Formulae !== undefined && this.model.Formulae !== null) {
             for (var i = 0; i < this.model.Formulae.length; ++i) {
                 this.compilePrereq(i);
                 this.compileBody(i);
@@ -86,13 +116,17 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         var parser = this.getParser();
         var altComp = this.model.Formulae[index];
         var body;
-        try{
-            body = parser.parse(altComp.BodySrc);
-            deferred.resolve(body);
-        }
-        catch(e) {
-            var errMsg = this.parserType + ' ' + e.name + ' Error: (' + e.line + ',' + e.column + ') ' + e.message;
-            deferred.reject(errMsg);
+        if(altComp.BodySrc === undefined || altComp.BodySrc === '' || altComp.BodySrc === null){
+            deferred.reject('Rule code section cannot be empty. Example code: "((NetIncomeLoss/Revenues)*(1+(Assets-Equity)/Equity))/((1/(Revenues/Assets))-((NetIncomeLoss/Revenues)*(1+(Assets-Equity)/Equity)))"');
+        }else {
+            try {
+                body = parser.parse(altComp.BodySrc);
+                deferred.resolve(body);
+            }
+            catch (e) {
+                var errMsg = this.parserType + ' ' + e.name + ' Error: (' + e.line + ',' + e.column + ') ' + e.message;
+                deferred.reject(errMsg);
+            }
         }
         return deferred.promise;
     };
@@ -126,13 +160,17 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         var parser = this.getParser();
         var altComp = this.model.Formulae[index];
         var prereq;
-        try{
-            prereq = parser.parse(altComp.PrereqSrc);
-            deferred.resolve(prereq);
-        }
-        catch(e) {
-            var errMsg = this.parserType + ' ' + e.name + ' Error: (' + e.line + ',' + e.column + ') ' + e.message;
-            deferred.reject(errMsg);
+        if(altComp.PrereqSrc === undefined || altComp.PrereqSrc === '' || altComp.PrereqSrc === null){
+            deferred.reject('Rule precondition section cannot be empty. If you don\'t want to check a precondition just put "TRUE".');
+        }else {
+            try {
+                prereq = parser.parse(altComp.PrereqSrc);
+                deferred.resolve(prereq);
+            }
+            catch (e) {
+                var errMsg = this.parserType + ' ' + e.name + ' Error: (' + e.line + ',' + e.column + ') ' + e.message;
+                deferred.reject(errMsg);
+            }
         }
         return deferred.promise;
     };
@@ -158,6 +196,25 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
                 that.model.Formulae[index] = altComp;
             }
         );
+    };
+
+    Formula.prototype.getRule = function () {
+        if(this.model.Type === 'xbrl28:excel' || this.model.Type === 'xbrl28:arithmetic'){
+            var rule = {
+                'Id': this.model.Id,
+                'Type': this.model.Type,
+                'Label': this.model.Label,
+                'Description': this.model.Description,
+                'ComputableConcepts': this.model.ComputableConcepts,
+                'DependsOn': this.model.DependsOn
+            };
+            rule.Formulae = this.model.Formulae;
+            rule.AllowCrossPeriod = this.model.AllowCrossPeriod;
+            rule.AllowCrossBalance = this.model.AllowCrossBalance;
+            return rule;
+        } else if(this.model.Type === 'xbrl28:formula' || this.model.Type === 'xbrl28:validation'){
+            return this.getModel();
+        }
     };
 
     Formula.prototype.getModel = function () {

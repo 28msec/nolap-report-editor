@@ -91,9 +91,16 @@ angular
             'invalid networkShortName parameter value passed "' + networkShortName + '" (allowed values: Presentation, ConceptMap).');
     };
 
-    var ensureConceptName = function(conceptName, paramName, functionName) {
-        ensureParameter(conceptName, paramName, 'string', functionName, /^\w(\w|\d|[-_])*:(\w|\d|[-_])*$/g,
-            'function called with mandatory "' + paramName + '" parameter which is not a QName: ' + conceptName);
+    var ensureConceptName = function(conceptName, paramName, functionName, errorMsg) {
+        var regex = /^\w(\w|\d|[-_])*:(\w|\d|[-_])*$/g;
+        if(errorMsg === undefined || errorMsg === null) {
+            ensureParameter(conceptName, paramName, 'string', functionName, regex,
+                    'function called with mandatory "' + paramName + '" parameter which is not a QName: ' + conceptName);
+        } else {
+            if(paramValue.match(regex) === null) {
+                throw new Error(errorMsg);
+            }
+        }
     };
     
     var ensureRuleType = function(ruleType, paramName, functionName) {
@@ -905,6 +912,58 @@ angular
             rule.ValidatedConcepts = validatedConceptsArray;
         }
         return rule;
+    };
+
+    Report.prototype.createRule = function(rule){
+        var id = rule.Id;
+        var label = rule.Label;
+        var type = rule.Type;
+        var description = rule.Description;
+        var formula = rule.Formula;
+        var computableConceptsArray = rule.ComputableConcepts;
+        var dependingConceptsArray = rule.DependsOn;
+        var validatedConceptsArray = rule.ValidatedConcepts;
+        ensureExists(id, 'string', 'Rule Creation Error', 'Mandatory Id missing.');
+        var rule = this.getRule(id);
+        if(rule !== undefined){
+            throw new Error('Rule with ID "' + id + '" already exists!');
+        }
+        ensureExists(label, 'string', 'Rule Creation Error', 'Mandatory Label missing.');
+        ensureExists(formula, 'string', 'Rule Creation Error', 'Cannot store rule with empty source code.');
+        ensureExists(computableConceptsArray[0], 'string', 'Rule Creation Error', 'Mandatory computable concept missing.');
+        for(var i in computableConceptsArray) {
+            var cname = computableConceptsArray[i];
+            ensureConceptName(cname, 'computableConceptsArray', 'Rule Creation Error', 'The computable concept name ' + cname + 'is not a valid concept name (correct pattern e.g. fac:Revenues).');
+            var rulesComputableConcepts = report.computableByRules(cname);
+            if(rulesComputableConcepts.lenght > 0 && rulesComputableConcepts[0].Id !== id) {
+                throw new Error('Rule Creation Error: A rule which can compute facts for concept "' + cname + '" exists already: "' + rulesComputableConcepts[0].Id + '. Currently, only one rule must be able to compute a fact for a certain concept.');
+            }
+        }
+        if(dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
+            for(var j in dependingConceptsArray) {
+                var dname = dependingConceptsArray[j];
+                ensureConceptName(dname, 'dependingConceptsArray', 'Rule Creation Error', 'The dependency concept name ' + dname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
+            }
+        }
+        if(validatedConceptsArray !== null && typeof validatedConceptsArray === 'object') {
+            for(var x in validatedConceptsArray) {
+                var vname = validatedConceptsArray[x];
+                ensureConceptName(vname, 'validatedConceptsArray', 'Rule Creation Error', 'The validated concept name ' + vname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
+            }
+        }
+        if(type === 'xbrl28:formula'){
+            this.setFormulaRule(id, label, description, formula, computableConceptsArray, dependingConceptsArray);
+        } else if (type === 'xbrl28:validation') {
+            this.setValidationRule(id, label, description, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray);
+        } else if (type === 'xbrl28:excel' || type === 'xbrl28:arithmetic') {
+            var model = this.getModel();
+            ensureExists(model, 'object', 'createRule', 'Report doesn\'t have a model.');
+
+            if(model.Rules === null || model.Rules === undefined) {
+                model.Rules = [];
+            }
+            model.Rules.push(rule);
+        }
     };
 
     Report.prototype.setFormulaRule = function(id, label, description, formula, computableConceptsArray, dependingConceptsArray){

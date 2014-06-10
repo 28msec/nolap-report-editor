@@ -1,25 +1,84 @@
-<form class="form-inline" role="form" ng-submit="addConceptMap()">
-    <div class="form-group">
-        <input type="text" class="form-control" id="conceptName" placeholder="Concept Name" ng-model="newConceptName" typeahead="concept for concept in concepts | filter:$viewValue | limitTo:8">
-    </div>
-    <button type="submit" class="btn btn-primary">Add</button>
-</form>
-<ul class="list-group">
-    <li class="list-group-item" ng-repeat="(key, value) in map">
-        <a class="pull-right"><i class="fa fa-times" ng-click="removeKey(key)"></i></a>
-        <h3 ng-bind="value.Name"></h3>
-        <p ng-bind="value.Label"></p>
-        <ul class="list-group">
-            <li class="list-group-item" ng-repeat="(subkey, subvalue) in value.To">
-                <span ng-bind="subkey"></span>
-                <a class="pull-right" ng-click="removeValue(key, value, subkey)"><i class="fa fa-times"></i></a>
-            </li>
-        </ul>
-        <form class="form-inline" role="form" ng-submit="addValueToConceptMap(key, value.To, newConceptValue)" ui-keypress="{ 13:'addValueToConceptMap(key, value.To, newConceptValue)' }">
-            <div class="form-group">
-                <input type="text" class="form-control" id="conceptValue" placeholder="Concept Name" ng-model="newConceptValue" typeahead="concept for concept in concepts | filter:$viewValue | limitTo:8">
-            </div>
-            <button type="submit" class="btn btn-primary">Add</button>
-        </form>
-    </li>
-</ul>
+<h2>Simple Rules</h2>
+<table class="table table-hover" ng-if="excelRules.length > 0">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Label</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="(key, rule) in excelRules">
+        <td ng-bind="rule.Id"></td>
+        <td ng-bind="rule.Label"></td>
+        <td>
+            <button type="button" class="btn btn-primary" ng-click="editRule(rule.Id)">Edit Rule</button>
+            <button type="button" class="btn btn-danger" ng-click="removeRule(rule.Id)">Delete Rule</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div>
+    <p ng-if="excelRules === undefined || excelRules.length === 0" class="lead">There are no Simple Rules yet for {{conceptName}}</p>
+    <form class="form-inline" role="form" ng-submit="addRule(conceptName, 'xbrl28:excel')">
+        <button ng-if="(formulaRules === undefined || formulaRules.length === 0) && (excelRules === undefined || excelRules.length === 0)"
+                type="submit" class="btn btn-primary">Add Simple Rule</button>
+        <button ng-if="(formulaRules !== undefined && formulaRules.length > 0) || (excelRules !== undefined && excelRules.length > 0)"
+                type="submit" class="btn btn-primary" disabled="disabled">Add Simple Rule</button>
+    </form>
+</div>
+<h2>Advanced Rules</h2>
+<table class="table table-hover" ng-if="formulaRules.length > 0">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Label</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="(key, rule) in formulaRules">
+            <td ng-bind="rule.Id"></td>
+            <td ng-bind="rule.Label"></td>
+            <td>
+                <button type="button" class="btn btn-primary" ng-click="editRule(rule.Id)">Edit Rule</button>
+                <button type="button" class="btn btn-danger" ng-click="removeRule(rule.Id)">Delete Rule</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<div>
+    <p ng-if="formulaRules === undefined || formulaRules.length === 0" class="lead">There are no Advanced Rules yet for {{conceptName}}</p>
+    <form class="form-inline" role="form" ng-submit="addRule(conceptName, 'xbrl28:formula')">
+        <button ng-if="(formulaRules === undefined || formulaRules.length === 0) && (excelRules === undefined || excelRules.length === 0)"
+                type="submit" class="btn btn-primary">Add Advanced Rule</button>
+        <button ng-if="(formulaRules !== undefined && formulaRules.length > 0) || (excelRules !== undefined && excelRules.length > 0)"
+                type="submit" class="btn btn-primary" disabled="disabled">Add Advanced Rule</button>
+    </form>
+</div>
+<h2>Validation Rules</h2>
+<table class="table table-hover" ng-if="validationRules.length > 0">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Label</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="(key, rule) in validationRules">
+        <td ng-bind="rule.Id"></td>
+        <td ng-bind="rule.Label"></td>
+        <td>
+            <button type="button" class="btn btn-primary" ng-click="editRule(rule.Id)">Edit Rule</button>
+            <button type="button" class="btn btn-danger" ng-click="removeRule(rule.Id)">Delete Rule</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div>
+    <p class="lead" ng-if="validationRules === undefined || validationRules.length === 0">There are no Validation Rules yet for {{conceptName}}</p>
+    <form class="form-inline" role="form" ng-submit="addRule(conceptName, 'xbrl28:validation')">
+        <button type="submit" class="btn btn-primary">Add Validation Rule</button>
+    </form>
+</div>

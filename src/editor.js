@@ -348,12 +348,21 @@ angular
 .directive('businessRules', function($rootScope, BusinessRuleTpl){
     return {
         restrict: 'E',
+        scope: {
+            'conceptName': '@'
+        },
         template: BusinessRuleTpl,
         require: '^report',
         link: function($scope, element, attrs, reportCtrl) {
 
+            //$scope.concept = reportCtrl.getReport().getConcept($scope.conceptName);
+
             var updateRules = function(rulesType, concept){
-                if(rulesType === undefined || rulesType === null) {
+                if(concept === undefined || concept === null){
+                    $scope.formulaRules = undefined;
+                    $scope.validationRules = undefined;
+                    $scope.excelRules = undefined;
+                } else if(rulesType === undefined || rulesType === null) {
                     updateRules('xbrl28:formula', concept);
                     updateRules('xbrl28:validation', concept);
                     updateRules('xbrl28:excel', concept);
@@ -367,38 +376,56 @@ angular
                     }
                     if (rulesType === 'xbrl28:formula'){
                         $scope.formulaRules = rules;
-                    } else if('xbrl28:validation') {
+                    } else if(rulesType === 'xbrl28:validation') {
                         $scope.validationRules = rules;
-                    }else if ('xbrl28:excel'){
+                    }else if (rulesType === 'xbrl28:excel'){
                         $scope.excelRules = rules;
                     }
                 }
             };
-            updateRules();
+            updateRules(undefined, $scope.conceptName);
 
-            $scope.selectedConcept = null;
-            $scope.selectConcept = function(concept) {
-                $scope.selectedConcept = concept;
-                updateRules(undefined, concept);
+            $scope.$watch(function(){
+                return reportCtrl.getConcepts();
+            }, function(concepts){
+                $scope.concepts = [];
+                concepts.forEach(function(concept){
+                    $scope.concepts.push(concept.Name);
+                });
+            });
+            $scope.$watch(function(){
+                return reportCtrl.getRules();
+            }, function(){
+                updateRules(undefined, $scope.conceptName);
+            });
+
+            $scope.removeRule = function(id){
+                reportCtrl.getReport().removeRule(id);
+                updateRules(undefined, $scope.conceptName);
             };
 
-            $scope.selectRule = function(row) {
-                if(row.rule) {
-                    row.rule.expanded = !row.rule.expanded;
-                    updateRules(row.rule.Type);
-                }
+            $scope.addRule = function(concept, ruleType){
+                $rootScope.$emit('createRule', concept, ruleType);
             };
 
-            $scope.remove = function(id){
-                $rootScope.$emit('removeRule', id);
+            $scope.editRule = function(id) {
+                $rootScope.$emit('editRule', id);
             };
 
-            //$scope.rows = [];
-            var onChange = function(){
-                updateRules(undefined, $scope.selectedConcept);
-            };
-
-            $scope.$watch('presentationTree', onChange, true);
+        }
+    };
+})
+.directive('rulesEditor', function($rootScope, RulesEditorTpl){
+    return {
+        restrict: 'E',
+        scope: {
+            'conceptName': '@',
+            'formula': '=',
+            'action': '='
+        },
+        template: RulesEditorTpl,
+        link: function($scope, element, attrs) {
+            $scope.colspan1 = 2;
         }
     };
 })

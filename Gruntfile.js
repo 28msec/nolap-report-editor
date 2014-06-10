@@ -91,7 +91,7 @@ module.exports = function (grunt) {
                 separator: ''
             },
             dist: {
-                src: ['src/editor.js', 'src/swagger/ReportAPI.js', 'src/tpl.js', 'src/formula.js', 'src/report.js', 'src/pegjs/excelParser.js'],
+                src: ['src/pegjs/excelParser.js', 'src/pegjs/formulaParser.js', 'src/formula.js', 'src/editor.js', 'src/swagger/ReportAPI.js', 'src/tpl.js', 'src/report.js'],
                 dest: 'dist/nolap-report-editor.js'
             }
         },
