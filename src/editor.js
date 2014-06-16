@@ -142,10 +142,10 @@ console.log(delta);
         require: '^report',
         link: function($scope, element, attrs, reportCtrl) {
             $scope.sortableOptions = {
-                placeholder: "sortable",
-                connectWith: ".sortable-container",
+                placeholder: 'sortable',
+                connectWith: '.sortable-container',
                 receive: function(e, ui){
-                    var concept = ui.item.sortable.moved;
+                    //var concept = ui.item.sortable.moved;
                     var dropIdx = ui.item.sortable.dropindex;
                     var parentIdx = dropIdx - 1;
                     var parentLevel = $scope.rows[dropIdx].level - 1;

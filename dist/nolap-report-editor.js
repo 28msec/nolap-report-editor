@@ -142,10 +142,10 @@ console.log(delta);
         require: '^report',
         link: function($scope, element, attrs, reportCtrl) {
             $scope.sortableOptions = {
-                placeholder: "sortable",
-                connectWith: ".sortable-container",
+                placeholder: 'sortable',
+                connectWith: '.sortable-container',
                 receive: function(e, ui){
-                    var concept = ui.item.sortable.moved;
+                    //var concept = ui.item.sortable.moved;
                     var dropIdx = ui.item.sortable.dropindex;
                     var parentIdx = dropIdx - 1;
                     var parentLevel = $scope.rows[dropIdx].level - 1;
@@ -348,7 +348,8 @@ console.log(delta);
         }
     };    
 })
-;angular.module('reports.api.28.io', [])
+;
+angular.module('reports.api.28.io', [])
 /**
  * <p>This API can be used to manage reports.</p> <p>This API is only accesible for users having granted priviliges to work with reports.</p> <p>Note, that the POST method can be simulated by using GET and adding the _method=POST parameter to the HTTP request.</p>
  */
