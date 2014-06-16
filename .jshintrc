@@ -1,7 +1,7 @@
 {
-    "node": false,
+    "node": true,
     "browser": true,
-    "es5": true,
+    "es5": false,
     "esnext": true,
     "bitwise": true,
     "camelcase": true,
@@ -16,9 +16,9 @@
     "regexp": true,
     "undef": true,
     "unused": true,
-    "strict": true,
     "trailing": true,
     "smarttabs": true,
+    "strict": true, 
     "predef": [
         "inject",
         "describe",

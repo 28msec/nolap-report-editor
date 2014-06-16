@@ -1,0 +1,17 @@
+<form name="editConceptForm" ng-submit="ok" role="form" spellcheck="false" novalidate>
+    <div class="modal-header">
+    <button class="pull-right btn btn-default"><i class="fa fa-times" ng-click="remove()"></i></button>
+        <h3 class="modal-title" ng-bind="concept.Name"></h3>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            <label for="label">Label</label>
+           <input type="text" class="form-control" id="label" ng-model="concept.Label" placeholder="Label" required>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" ng-model="concept.IsAbstract"> Abstract
+            </label>
+        </div>
+    </div>
+</form>

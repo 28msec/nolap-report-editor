@@ -1,6 +1,4 @@
-var fail = function (msg) {
-    expect('should not reach this!: ' + msg).toEqual('failure');
-};
+'use strict';
 
 var Report;
 beforeEach(module('nolapReportEditor'));

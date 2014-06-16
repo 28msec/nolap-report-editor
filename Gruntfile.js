@@ -4,17 +4,47 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
     require('time-grunt')(grunt);
 
+    grunt.task.loadTasks('tasks');
+    
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-
+        ngconstant: {
+            options: {
+                space: '    ',
+                deps: false
+            },
+            tpl: {
+                name: 'nolapReportEditor',
+                dest: 'src/tpl.js',
+                constants: {
+                    PresentationTreeTpl: grunt.file.read('tpl/tree.html'),
+                    ConceptMapTpl: grunt.file.read('tpl/concept-map.html'),
+                    ConceptTpl: grunt.file.read('tpl/concept.html')
+                }
+            }
+        },
+        swagger: {
+            options: {
+                apis: [
+                    {
+                        swagger: 'swagger/reports.json',
+                        module: 'reports.api.28.io',
+                        newModule: true,
+                        service: 'ReportAPI'
+                    }
+                ],
+                dest: 'src/swagger'
+            },
+            all: {}
+        },
         jsdoc: {
-           docs: {
-             src: ['src/editor.js', 'src/report.js'],
-             options: {
-               destination: 'out'
-             }
-           }
+            docs: {
+                src: ['src/editor.js', 'src/report.js'],
+                options: {
+                    destination: 'out'
+                }
+            }
         },
         'gh-pages': {
             docs: {
@@ -29,15 +59,17 @@ module.exports = function (grunt) {
             post: []
         },
         jshint: {
-            all: ['Gruntfile.js', 'src/**/*.js', 'test/*.js'],
-            jshintrc: '.jshintrc'
+            options: {
+                jshintrc: '.jshintrc'
+            },
+            src: ['Gruntfile.js', 'src/**/*.js', 'test/*.js', 'tasks/*.js'],
         },
         concat: {
             options: {
                 separator: ''
             },
             dist: {
-                src: ['src/editor.js', 'src/report.js'],
+                src: ['src/editor.js', 'src/swagger/ReportAPI.js', 'src/tpl.js', 'src/report.js'],
                 dest: 'dist/nolap-report-editor.js'
             }
         },
@@ -229,13 +261,13 @@ module.exports = function (grunt) {
         },
         coveralls: {
             options: {
-                coverage_dir: 'coverage'
+                'coverage_dir': 'coverage'
             }
         }
     });
 
     grunt.registerTask('test', ['karma:1.2.0']);
     grunt.registerTask('release', ['clean:pre', 'concat', 'test', 'jsdoc', 'clean:post']);//uglify
-    grunt.registerTask('build', ['clean:pre', 'release']);
-    grunt.registerTask('default', ['build']);
+    grunt.registerTask('build', ['clean:pre', 'ngconstant:tpl', 'swagger', 'release']);
+    grunt.registerTask('default', ['jshint', 'build']);
 };

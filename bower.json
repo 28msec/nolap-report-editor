@@ -8,7 +8,7 @@
     "type": "git",
     "url": "https://github.com/28msec/nolap-report-editor"
   },
-  "main": "./dist/nolap-report-editor.min.js",
+  "main": "./dist/nolap-report-editor.js",
   "ignore": [
     ".bowerrc",
     "coverage/",
