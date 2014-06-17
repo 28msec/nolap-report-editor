@@ -1,14 +1,57 @@
 module.exports = function (grunt) {
     'use strict';
+    
+    var config = {
+        app: 'test-app'
+    };
 
     require('load-grunt-tasks')(grunt);
     require('time-grunt')(grunt);
-
     grunt.task.loadTasks('tasks');
     
+    var LIVERELOAD_PORT = 35729;
+    var lrSnippet = require('connect-livereload')({
+        port: LIVERELOAD_PORT
+    });
+    var mountFolder = function (connect, dir) {
+        return connect.static(require('path').resolve(dir));
+    };
+    var modRewrite = require('connect-modrewrite');
+
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        //Connect
+        connect: {
+            options: {
+                port: 9000,
+                hostname: '0.0.0.0'
+            },
+            livereload: {
+                options: {
+                    middleware: function (connect) {
+                        return [
+                            lrSnippet,
+                            modRewrite([
+                                '!\\.html|\\.xml|\\images|\\.js|\\.css|\\.png|\\.jpg|\\.woff|\\.ttf|\\.svg|\\.ico /index.html [L]'
+                            ]),
+                            mountFolder(connect, '.tmp'),
+                            mountFolder(connect, config.app)
+                        ];
+                    }
+                }
+            },
+            test: {
+                options: {
+                    middleware: function (connect) {
+                        return [
+                            mountFolder(connect, '.tmp'),
+                            mountFolder(connect, 'test')
+                        ];
+                    }
+                }
+            }
+        },
         ngconstant: {
             options: {
                 space: '    ',
