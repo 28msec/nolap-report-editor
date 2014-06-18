@@ -1,0 +1,26 @@
+<!doctype html>
+<html ng-app="main">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="viewport" content="width=device-width">
+    </head>
+
+    <body class="ng-cloak">
+        <div ui-view></div>
+
+        <!-- build:js({.tmp,app}) scripts/scripts.js -->
+        <script src="/bower_components/angular/angular.js"></script>
+        <script src="/bower_components/ngprogress-lite/ngprogress-lite.js"></script>
+        <script src="/bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+        <script src="/bower_components/angular-sanitize/angular-sanitize.js"></script>
+        <script src="/bower_components/angular-ui-bootstrap-bower/ui-bootstrap.js"></script>
+        <script src="/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js"></script>
+        <script src="/bower_components/angular-cache/dist/angular-cache.js"></script>
+    
+        <script src="/scripts/app.js"></script>
+        <!-- endbuild -->
+    </body>
+</html>

@@ -2,7 +2,7 @@ module.exports = function (grunt) {
     'use strict';
     
     var config = {
-        app: 'test-app'
+        app: 'demo'
     };
 
     require('load-grunt-tasks')(grunt);
