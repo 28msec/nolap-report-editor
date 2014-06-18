@@ -7,18 +7,18 @@
     return {Type: type, Children: [one]};
   }
 
-  function createAtomic(val) {
-    return {Type: "atomic", Value: val};
+  function createAtomic(type, val) {
+    return {Type: type, Value: val};
   }
 
 
   function createVar(name) {
-    return {Type: "variable", ConceptName: name};
+    return {Type: "variable", Name: name};
   }
 
   
   function createFun(name, params) {
-    return {Type: "function", Name: name, Params: [params]};
+    return {Type: "function", Name: name.toLowerCase(), Children: [params]};
   }
 
 }
@@ -69,7 +69,12 @@ op_comparator_not_equal
   = "<>" { return "ne"; }
 
 op_comparator_single
-  = single:[<=>] { return single; } 
+  = single:[<=>] { switch(single){
+                     case "=": return "eq";
+                     case "<": return "lt";
+                     case ">": return "gt";
+                   };
+                 } 
 
 
 /*******************
@@ -82,13 +87,13 @@ block
   = "(" _ block:comparison _ ")" { return createOne("block", block); }
 
 boolean
-  = _ true / false _
+  = true / false
 
 true
-  = "TRUE" / "true" { return createAtomic('true'); }
+  = _ ([Tt][Rr][Uu][Ee]) _ { return createAtomic('boolean', 'true'); }
 
 false
-  = "FALSE" / "false" { return createAtomic('false'); }
+  = _ ([Ff][Aa][Ll][Ss][Ee]) _ { return createAtomic('boolean', 'false'); }
 
 variable
   = _ name:( [a-zA-Z0-9._]+ & ( _ [^(] ) ) _ { return createVar(name[0].join("")); }
@@ -97,24 +102,24 @@ variable2
   = _ name:( [a-zA-Z0-9._]+ ) _ { return createVar(name.join("")); }
 
 integer "integer"
-  = digits:[0-9.]+ { return createAtomic(parseFloat(digits.join(""), 10)); }
+  = digits:[0-9.]+ { return createAtomic('numeric', parseFloat(digits.join(""), 10)); }
 
 function
-  = _ ( fun_and / fun_or /fun_not
-    / fun_isblank ) _
+  = fun_and / fun_or /fun_not
+    / fun_isblank
 
 fun_and
-  = name:([aA][nN][dD]) _ "(" _ params:parameter+ _ ")" 
+  = _ name:([aA][nN][dD]) _ "(" _ params:parameter+ _ ")" _
     { return createFun(name.join("").toLowerCase(), params); }
 
 fun_or
-  = name:([oO][rR]) _ "(" _ params:parameter+ _ ")" { return createFun(name.join("").toLowerCase(), params); }
+  = _ name:([oO][rR]) _ "(" _ params:parameter+ _ ")" _ { return createFun(name.join(""), params); }
 
 fun_not
-  = name:"not" _ "(" _ param:parameter _ ")" { return createFun(name, param); }
+  = _ name:"not" _ "(" _ param:parameter _ ")" _ { return createFun(name, param); }
 
 fun_isblank
-  = name:"isblank" _ "(" _ param:parameter _ ")" { return createFun(name, param); }
+  = _ name:"isblank" _ "(" _ param:parameter _ ")" _ { return createFun(name, param); }
 
 parameter 
   = comma? param:comparison { return param; }
@@ -128,4 +133,3 @@ _
 comma 
   = _ "," _
   
-

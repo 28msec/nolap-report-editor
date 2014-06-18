@@ -54,56 +54,70 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
         peg$c15 = function() { return "ne"; },
         peg$c16 = /^[<=>]/,
         peg$c17 = { type: "class", value: "[<=>]", description: "[<=>]" },
-        peg$c18 = function(single) { return single; },
+        peg$c18 = function(single) { switch(single){
+                             case "=": return "eq";
+                             case "<": return "lt";
+                             case ">": return "gt";
+                           };
+                         },
         peg$c19 = "(",
         peg$c20 = { type: "literal", value: "(", description: "\"(\"" },
         peg$c21 = ")",
         peg$c22 = { type: "literal", value: ")", description: "\")\"" },
         peg$c23 = function(block) { return createOne("block", block); },
-        peg$c24 = "TRUE",
-        peg$c25 = { type: "literal", value: "TRUE", description: "\"TRUE\"" },
-        peg$c26 = "true",
-        peg$c27 = { type: "literal", value: "true", description: "\"true\"" },
-        peg$c28 = function() { return createAtomic('true'); },
-        peg$c29 = "FALSE",
-        peg$c30 = { type: "literal", value: "FALSE", description: "\"FALSE\"" },
-        peg$c31 = "false",
-        peg$c32 = { type: "literal", value: "false", description: "\"false\"" },
-        peg$c33 = function() { return createAtomic('false'); },
-        peg$c34 = [],
-        peg$c35 = /^[a-zA-Z0-9._]/,
-        peg$c36 = { type: "class", value: "[a-zA-Z0-9._]", description: "[a-zA-Z0-9._]" },
-        peg$c37 = void 0,
-        peg$c38 = /^[^(]/,
-        peg$c39 = { type: "class", value: "[^(]", description: "[^(]" },
-        peg$c40 = function(name) { return createVar(name[0].join("")); },
-        peg$c41 = function(name) { return createVar(name.join("")); },
-        peg$c42 = { type: "other", description: "integer" },
-        peg$c43 = /^[0-9.]/,
-        peg$c44 = { type: "class", value: "[0-9.]", description: "[0-9.]" },
-        peg$c45 = function(digits) { return createAtomic(parseFloat(digits.join(""), 10)); },
-        peg$c46 = /^[aA]/,
-        peg$c47 = { type: "class", value: "[aA]", description: "[aA]" },
-        peg$c48 = /^[nN]/,
-        peg$c49 = { type: "class", value: "[nN]", description: "[nN]" },
-        peg$c50 = /^[dD]/,
-        peg$c51 = { type: "class", value: "[dD]", description: "[dD]" },
-        peg$c52 = function(name, params) { return createFun(name.join("").toLowerCase(), params); },
-        peg$c53 = /^[oO]/,
-        peg$c54 = { type: "class", value: "[oO]", description: "[oO]" },
-        peg$c55 = /^[rR]/,
-        peg$c56 = { type: "class", value: "[rR]", description: "[rR]" },
-        peg$c57 = "not",
-        peg$c58 = { type: "literal", value: "not", description: "\"not\"" },
-        peg$c59 = function(name, param) { return createFun(name, param); },
-        peg$c60 = "isblank",
-        peg$c61 = { type: "literal", value: "isblank", description: "\"isblank\"" },
-        peg$c62 = null,
-        peg$c63 = function(param) { return param; },
-        peg$c64 = /^[ \t\r\n]/,
-        peg$c65 = { type: "class", value: "[ \\t\\r\\n]", description: "[ \\t\\r\\n]" },
-        peg$c66 = ",",
-        peg$c67 = { type: "literal", value: ",", description: "\",\"" },
+        peg$c24 = /^[Tt]/,
+        peg$c25 = { type: "class", value: "[Tt]", description: "[Tt]" },
+        peg$c26 = /^[Rr]/,
+        peg$c27 = { type: "class", value: "[Rr]", description: "[Rr]" },
+        peg$c28 = /^[Uu]/,
+        peg$c29 = { type: "class", value: "[Uu]", description: "[Uu]" },
+        peg$c30 = /^[Ee]/,
+        peg$c31 = { type: "class", value: "[Ee]", description: "[Ee]" },
+        peg$c32 = function() { return createAtomic('boolean', 'true'); },
+        peg$c33 = /^[Ff]/,
+        peg$c34 = { type: "class", value: "[Ff]", description: "[Ff]" },
+        peg$c35 = /^[Aa]/,
+        peg$c36 = { type: "class", value: "[Aa]", description: "[Aa]" },
+        peg$c37 = /^[Ll]/,
+        peg$c38 = { type: "class", value: "[Ll]", description: "[Ll]" },
+        peg$c39 = /^[Ss]/,
+        peg$c40 = { type: "class", value: "[Ss]", description: "[Ss]" },
+        peg$c41 = function() { return createAtomic('boolean', 'false'); },
+        peg$c42 = [],
+        peg$c43 = /^[a-zA-Z0-9._]/,
+        peg$c44 = { type: "class", value: "[a-zA-Z0-9._]", description: "[a-zA-Z0-9._]" },
+        peg$c45 = void 0,
+        peg$c46 = /^[^(]/,
+        peg$c47 = { type: "class", value: "[^(]", description: "[^(]" },
+        peg$c48 = function(name) { return createVar(name[0].join("")); },
+        peg$c49 = function(name) { return createVar(name.join("")); },
+        peg$c50 = { type: "other", description: "integer" },
+        peg$c51 = /^[0-9.]/,
+        peg$c52 = { type: "class", value: "[0-9.]", description: "[0-9.]" },
+        peg$c53 = function(digits) { return createAtomic('numeric', parseFloat(digits.join(""), 10)); },
+        peg$c54 = /^[aA]/,
+        peg$c55 = { type: "class", value: "[aA]", description: "[aA]" },
+        peg$c56 = /^[nN]/,
+        peg$c57 = { type: "class", value: "[nN]", description: "[nN]" },
+        peg$c58 = /^[dD]/,
+        peg$c59 = { type: "class", value: "[dD]", description: "[dD]" },
+        peg$c60 = function(name, params) { return createFun(name.join("").toLowerCase(), params); },
+        peg$c61 = /^[oO]/,
+        peg$c62 = { type: "class", value: "[oO]", description: "[oO]" },
+        peg$c63 = /^[rR]/,
+        peg$c64 = { type: "class", value: "[rR]", description: "[rR]" },
+        peg$c65 = function(name, params) { return createFun(name.join(""), params); },
+        peg$c66 = "not",
+        peg$c67 = { type: "literal", value: "not", description: "\"not\"" },
+        peg$c68 = function(name, param) { return createFun(name, param); },
+        peg$c69 = "isblank",
+        peg$c70 = { type: "literal", value: "isblank", description: "\"isblank\"" },
+        peg$c71 = null,
+        peg$c72 = function(param) { return param; },
+        peg$c73 = /^[ \t\r\n]/,
+        peg$c74 = { type: "class", value: "[ \\t\\r\\n]", description: "[ \\t\\r\\n]" },
+        peg$c75 = ",",
+        peg$c76 = { type: "literal", value: ",", description: "\",\"" },
 
         peg$currPos          = 0,
         peg$reportedPos      = 0,
@@ -658,30 +672,78 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
     }
 
     function peg$parseboolean() {
-      var s0, s1, s2;
+      var s0;
+
+      s0 = peg$parsetrue();
+      if (s0 === peg$FAILED) {
+        s0 = peg$parsefalse();
+      }
+
+      return s0;
+    }
+
+    function peg$parsetrue() {
+      var s0, s1, s2, s3, s4, s5, s6;
 
       s0 = peg$currPos;
       s1 = peg$parse_();
       if (s1 !== peg$FAILED) {
-        s2 = peg$parsetrue();
-        if (s2 !== peg$FAILED) {
-          s1 = [s1, s2];
-          s0 = s1;
+        s2 = peg$currPos;
+        if (peg$c24.test(input.charAt(peg$currPos))) {
+          s3 = input.charAt(peg$currPos);
+          peg$currPos++;
         } else {
-          peg$currPos = s0;
-          s0 = peg$c0;
+          s3 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c25); }
         }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$c0;
-      }
-      if (s0 === peg$FAILED) {
-        s0 = peg$currPos;
-        s1 = peg$parsefalse();
-        if (s1 !== peg$FAILED) {
-          s2 = peg$parse_();
-          if (s2 !== peg$FAILED) {
-            s1 = [s1, s2];
+        if (s3 !== peg$FAILED) {
+          if (peg$c26.test(input.charAt(peg$currPos))) {
+            s4 = input.charAt(peg$currPos);
+            peg$currPos++;
+          } else {
+            s4 = peg$FAILED;
+            if (peg$silentFails === 0) { peg$fail(peg$c27); }
+          }
+          if (s4 !== peg$FAILED) {
+            if (peg$c28.test(input.charAt(peg$currPos))) {
+              s5 = input.charAt(peg$currPos);
+              peg$currPos++;
+            } else {
+              s5 = peg$FAILED;
+              if (peg$silentFails === 0) { peg$fail(peg$c29); }
+            }
+            if (s5 !== peg$FAILED) {
+              if (peg$c30.test(input.charAt(peg$currPos))) {
+                s6 = input.charAt(peg$currPos);
+                peg$currPos++;
+              } else {
+                s6 = peg$FAILED;
+                if (peg$silentFails === 0) { peg$fail(peg$c31); }
+              }
+              if (s6 !== peg$FAILED) {
+                s3 = [s3, s4, s5, s6];
+                s2 = s3;
+              } else {
+                peg$currPos = s2;
+                s2 = peg$c0;
+              }
+            } else {
+              peg$currPos = s2;
+              s2 = peg$c0;
+            }
+          } else {
+            peg$currPos = s2;
+            s2 = peg$c0;
+          }
+        } else {
+          peg$currPos = s2;
+          s2 = peg$c0;
+        }
+        if (s2 !== peg$FAILED) {
+          s3 = peg$parse_();
+          if (s3 !== peg$FAILED) {
+            peg$reportedPos = s0;
+            s1 = peg$c32();
             s0 = s1;
           } else {
             peg$currPos = s0;
@@ -691,64 +753,100 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
           peg$currPos = s0;
           s0 = peg$c0;
         }
-      }
-
-      return s0;
-    }
-
-    function peg$parsetrue() {
-      var s0, s1;
-
-      if (input.substr(peg$currPos, 4) === peg$c24) {
-        s0 = peg$c24;
-        peg$currPos += 4;
       } else {
-        s0 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c25); }
-      }
-      if (s0 === peg$FAILED) {
-        s0 = peg$currPos;
-        if (input.substr(peg$currPos, 4) === peg$c26) {
-          s1 = peg$c26;
-          peg$currPos += 4;
-        } else {
-          s1 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c27); }
-        }
-        if (s1 !== peg$FAILED) {
-          peg$reportedPos = s0;
-          s1 = peg$c28();
-        }
-        s0 = s1;
+        peg$currPos = s0;
+        s0 = peg$c0;
       }
 
       return s0;
     }
 
     function peg$parsefalse() {
-      var s0, s1;
+      var s0, s1, s2, s3, s4, s5, s6, s7;
 
-      if (input.substr(peg$currPos, 5) === peg$c29) {
-        s0 = peg$c29;
-        peg$currPos += 5;
-      } else {
-        s0 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c30); }
-      }
-      if (s0 === peg$FAILED) {
-        s0 = peg$currPos;
-        if (input.substr(peg$currPos, 5) === peg$c31) {
-          s1 = peg$c31;
-          peg$currPos += 5;
+      s0 = peg$currPos;
+      s1 = peg$parse_();
+      if (s1 !== peg$FAILED) {
+        s2 = peg$currPos;
+        if (peg$c33.test(input.charAt(peg$currPos))) {
+          s3 = input.charAt(peg$currPos);
+          peg$currPos++;
         } else {
-          s1 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c32); }
+          s3 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c34); }
         }
-        if (s1 !== peg$FAILED) {
-          peg$reportedPos = s0;
-          s1 = peg$c33();
+        if (s3 !== peg$FAILED) {
+          if (peg$c35.test(input.charAt(peg$currPos))) {
+            s4 = input.charAt(peg$currPos);
+            peg$currPos++;
+          } else {
+            s4 = peg$FAILED;
+            if (peg$silentFails === 0) { peg$fail(peg$c36); }
+          }
+          if (s4 !== peg$FAILED) {
+            if (peg$c37.test(input.charAt(peg$currPos))) {
+              s5 = input.charAt(peg$currPos);
+              peg$currPos++;
+            } else {
+              s5 = peg$FAILED;
+              if (peg$silentFails === 0) { peg$fail(peg$c38); }
+            }
+            if (s5 !== peg$FAILED) {
+              if (peg$c39.test(input.charAt(peg$currPos))) {
+                s6 = input.charAt(peg$currPos);
+                peg$currPos++;
+              } else {
+                s6 = peg$FAILED;
+                if (peg$silentFails === 0) { peg$fail(peg$c40); }
+              }
+              if (s6 !== peg$FAILED) {
+                if (peg$c30.test(input.charAt(peg$currPos))) {
+                  s7 = input.charAt(peg$currPos);
+                  peg$currPos++;
+                } else {
+                  s7 = peg$FAILED;
+                  if (peg$silentFails === 0) { peg$fail(peg$c31); }
+                }
+                if (s7 !== peg$FAILED) {
+                  s3 = [s3, s4, s5, s6, s7];
+                  s2 = s3;
+                } else {
+                  peg$currPos = s2;
+                  s2 = peg$c0;
+                }
+              } else {
+                peg$currPos = s2;
+                s2 = peg$c0;
+              }
+            } else {
+              peg$currPos = s2;
+              s2 = peg$c0;
+            }
+          } else {
+            peg$currPos = s2;
+            s2 = peg$c0;
+          }
+        } else {
+          peg$currPos = s2;
+          s2 = peg$c0;
         }
-        s0 = s1;
+        if (s2 !== peg$FAILED) {
+          s3 = peg$parse_();
+          if (s3 !== peg$FAILED) {
+            peg$reportedPos = s0;
+            s1 = peg$c41();
+            s0 = s1;
+          } else {
+            peg$currPos = s0;
+            s0 = peg$c0;
+          }
+        } else {
+          peg$currPos = s0;
+          s0 = peg$c0;
+        }
+      } else {
+        peg$currPos = s0;
+        s0 = peg$c0;
       }
 
       return s0;
@@ -762,22 +860,22 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
       if (s1 !== peg$FAILED) {
         s2 = peg$currPos;
         s3 = [];
-        if (peg$c35.test(input.charAt(peg$currPos))) {
+        if (peg$c43.test(input.charAt(peg$currPos))) {
           s4 = input.charAt(peg$currPos);
           peg$currPos++;
         } else {
           s4 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c36); }
+          if (peg$silentFails === 0) { peg$fail(peg$c44); }
         }
         if (s4 !== peg$FAILED) {
           while (s4 !== peg$FAILED) {
             s3.push(s4);
-            if (peg$c35.test(input.charAt(peg$currPos))) {
+            if (peg$c43.test(input.charAt(peg$currPos))) {
               s4 = input.charAt(peg$currPos);
               peg$currPos++;
             } else {
               s4 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c36); }
+              if (peg$silentFails === 0) { peg$fail(peg$c44); }
             }
           }
         } else {
@@ -789,12 +887,12 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
           s5 = peg$currPos;
           s6 = peg$parse_();
           if (s6 !== peg$FAILED) {
-            if (peg$c38.test(input.charAt(peg$currPos))) {
+            if (peg$c46.test(input.charAt(peg$currPos))) {
               s7 = input.charAt(peg$currPos);
               peg$currPos++;
             } else {
               s7 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c39); }
+              if (peg$silentFails === 0) { peg$fail(peg$c47); }
             }
             if (s7 !== peg$FAILED) {
               s6 = [s6, s7];
@@ -810,7 +908,7 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
           peg$silentFails--;
           if (s5 !== peg$FAILED) {
             peg$currPos = s4;
-            s4 = peg$c37;
+            s4 = peg$c45;
           } else {
             s4 = peg$c0;
           }
@@ -829,7 +927,7 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
           s3 = peg$parse_();
           if (s3 !== peg$FAILED) {
             peg$reportedPos = s0;
-            s1 = peg$c40(s2);
+            s1 = peg$c48(s2);
             s0 = s1;
           } else {
             peg$currPos = s0;
@@ -854,22 +952,22 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
       s1 = peg$parse_();
       if (s1 !== peg$FAILED) {
         s2 = [];
-        if (peg$c35.test(input.charAt(peg$currPos))) {
+        if (peg$c43.test(input.charAt(peg$currPos))) {
           s3 = input.charAt(peg$currPos);
           peg$currPos++;
         } else {
           s3 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c36); }
+          if (peg$silentFails === 0) { peg$fail(peg$c44); }
         }
         if (s3 !== peg$FAILED) {
           while (s3 !== peg$FAILED) {
             s2.push(s3);
-            if (peg$c35.test(input.charAt(peg$currPos))) {
+            if (peg$c43.test(input.charAt(peg$currPos))) {
               s3 = input.charAt(peg$currPos);
               peg$currPos++;
             } else {
               s3 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c36); }
+              if (peg$silentFails === 0) { peg$fail(peg$c44); }
             }
           }
         } else {
@@ -879,7 +977,7 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
           s3 = peg$parse_();
           if (s3 !== peg$FAILED) {
             peg$reportedPos = s0;
-            s1 = peg$c41(s2);
+            s1 = peg$c49(s2);
             s0 = s1;
           } else {
             peg$currPos = s0;
@@ -903,22 +1001,22 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
       peg$silentFails++;
       s0 = peg$currPos;
       s1 = [];
-      if (peg$c43.test(input.charAt(peg$currPos))) {
+      if (peg$c51.test(input.charAt(peg$currPos))) {
         s2 = input.charAt(peg$currPos);
         peg$currPos++;
       } else {
         s2 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c44); }
+        if (peg$silentFails === 0) { peg$fail(peg$c52); }
       }
       if (s2 !== peg$FAILED) {
         while (s2 !== peg$FAILED) {
           s1.push(s2);
-          if (peg$c43.test(input.charAt(peg$currPos))) {
+          if (peg$c51.test(input.charAt(peg$currPos))) {
             s2 = input.charAt(peg$currPos);
             peg$currPos++;
           } else {
             s2 = peg$FAILED;
-            if (peg$silentFails === 0) { peg$fail(peg$c44); }
+            if (peg$silentFails === 0) { peg$fail(peg$c52); }
           }
         }
       } else {
@@ -926,135 +1024,127 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
       }
       if (s1 !== peg$FAILED) {
         peg$reportedPos = s0;
-        s1 = peg$c45(s1);
+        s1 = peg$c53(s1);
       }
       s0 = s1;
       peg$silentFails--;
       if (s0 === peg$FAILED) {
         s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c42); }
+        if (peg$silentFails === 0) { peg$fail(peg$c50); }
       }
 
       return s0;
     }
 
     function peg$parsefunction() {
-      var s0, s1, s2, s3;
+      var s0;
 
-      s0 = peg$currPos;
-      s1 = peg$parse_();
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parsefun_and();
-        if (s2 === peg$FAILED) {
-          s2 = peg$parsefun_or();
-          if (s2 === peg$FAILED) {
-            s2 = peg$parsefun_not();
-            if (s2 === peg$FAILED) {
-              s2 = peg$parsefun_isblank();
-            }
+      s0 = peg$parsefun_and();
+      if (s0 === peg$FAILED) {
+        s0 = peg$parsefun_or();
+        if (s0 === peg$FAILED) {
+          s0 = peg$parsefun_not();
+          if (s0 === peg$FAILED) {
+            s0 = peg$parsefun_isblank();
           }
         }
-        if (s2 !== peg$FAILED) {
-          s3 = peg$parse_();
-          if (s3 !== peg$FAILED) {
-            s1 = [s1, s2, s3];
-            s0 = s1;
-          } else {
-            peg$currPos = s0;
-            s0 = peg$c0;
-          }
-        } else {
-          peg$currPos = s0;
-          s0 = peg$c0;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$c0;
       }
 
       return s0;
     }
 
     function peg$parsefun_and() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
+      var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
 
       s0 = peg$currPos;
-      s1 = peg$currPos;
-      if (peg$c46.test(input.charAt(peg$currPos))) {
-        s2 = input.charAt(peg$currPos);
-        peg$currPos++;
-      } else {
-        s2 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c47); }
-      }
-      if (s2 !== peg$FAILED) {
-        if (peg$c48.test(input.charAt(peg$currPos))) {
+      s1 = peg$parse_();
+      if (s1 !== peg$FAILED) {
+        s2 = peg$currPos;
+        if (peg$c54.test(input.charAt(peg$currPos))) {
           s3 = input.charAt(peg$currPos);
           peg$currPos++;
         } else {
           s3 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c49); }
+          if (peg$silentFails === 0) { peg$fail(peg$c55); }
         }
         if (s3 !== peg$FAILED) {
-          if (peg$c50.test(input.charAt(peg$currPos))) {
+          if (peg$c56.test(input.charAt(peg$currPos))) {
             s4 = input.charAt(peg$currPos);
             peg$currPos++;
           } else {
             s4 = peg$FAILED;
-            if (peg$silentFails === 0) { peg$fail(peg$c51); }
+            if (peg$silentFails === 0) { peg$fail(peg$c57); }
           }
           if (s4 !== peg$FAILED) {
-            s2 = [s2, s3, s4];
-            s1 = s2;
+            if (peg$c58.test(input.charAt(peg$currPos))) {
+              s5 = input.charAt(peg$currPos);
+              peg$currPos++;
+            } else {
+              s5 = peg$FAILED;
+              if (peg$silentFails === 0) { peg$fail(peg$c59); }
+            }
+            if (s5 !== peg$FAILED) {
+              s3 = [s3, s4, s5];
+              s2 = s3;
+            } else {
+              peg$currPos = s2;
+              s2 = peg$c0;
+            }
           } else {
-            peg$currPos = s1;
-            s1 = peg$c0;
+            peg$currPos = s2;
+            s2 = peg$c0;
           }
         } else {
-          peg$currPos = s1;
-          s1 = peg$c0;
+          peg$currPos = s2;
+          s2 = peg$c0;
         }
-      } else {
-        peg$currPos = s1;
-        s1 = peg$c0;
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
         if (s2 !== peg$FAILED) {
-          if (input.charCodeAt(peg$currPos) === 40) {
-            s3 = peg$c19;
-            peg$currPos++;
-          } else {
-            s3 = peg$FAILED;
-            if (peg$silentFails === 0) { peg$fail(peg$c20); }
-          }
+          s3 = peg$parse_();
           if (s3 !== peg$FAILED) {
-            s4 = peg$parse_();
+            if (input.charCodeAt(peg$currPos) === 40) {
+              s4 = peg$c19;
+              peg$currPos++;
+            } else {
+              s4 = peg$FAILED;
+              if (peg$silentFails === 0) { peg$fail(peg$c20); }
+            }
             if (s4 !== peg$FAILED) {
-              s5 = [];
-              s6 = peg$parseparameter();
-              if (s6 !== peg$FAILED) {
-                while (s6 !== peg$FAILED) {
-                  s5.push(s6);
-                  s6 = peg$parseparameter();
-                }
-              } else {
-                s5 = peg$c0;
-              }
+              s5 = peg$parse_();
               if (s5 !== peg$FAILED) {
-                s6 = peg$parse_();
-                if (s6 !== peg$FAILED) {
-                  if (input.charCodeAt(peg$currPos) === 41) {
-                    s7 = peg$c21;
-                    peg$currPos++;
-                  } else {
-                    s7 = peg$FAILED;
-                    if (peg$silentFails === 0) { peg$fail(peg$c22); }
+                s6 = [];
+                s7 = peg$parseparameter();
+                if (s7 !== peg$FAILED) {
+                  while (s7 !== peg$FAILED) {
+                    s6.push(s7);
+                    s7 = peg$parseparameter();
                   }
+                } else {
+                  s6 = peg$c0;
+                }
+                if (s6 !== peg$FAILED) {
+                  s7 = peg$parse_();
                   if (s7 !== peg$FAILED) {
-                    peg$reportedPos = s0;
-                    s1 = peg$c52(s1, s5);
-                    s0 = s1;
+                    if (input.charCodeAt(peg$currPos) === 41) {
+                      s8 = peg$c21;
+                      peg$currPos++;
+                    } else {
+                      s8 = peg$FAILED;
+                      if (peg$silentFails === 0) { peg$fail(peg$c22); }
+                    }
+                    if (s8 !== peg$FAILED) {
+                      s9 = peg$parse_();
+                      if (s9 !== peg$FAILED) {
+                        peg$reportedPos = s0;
+                        s1 = peg$c60(s2, s6);
+                        s0 = s1;
+                      } else {
+                        peg$currPos = s0;
+                        s0 = peg$c0;
+                      }
+                    } else {
+                      peg$currPos = s0;
+                      s0 = peg$c0;
+                    }
                   } else {
                     peg$currPos = s0;
                     s0 = peg$c0;
@@ -1088,73 +1178,85 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
     }
 
     function peg$parsefun_or() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
+      var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
 
       s0 = peg$currPos;
-      s1 = peg$currPos;
-      if (peg$c53.test(input.charAt(peg$currPos))) {
-        s2 = input.charAt(peg$currPos);
-        peg$currPos++;
-      } else {
-        s2 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c54); }
-      }
-      if (s2 !== peg$FAILED) {
-        if (peg$c55.test(input.charAt(peg$currPos))) {
+      s1 = peg$parse_();
+      if (s1 !== peg$FAILED) {
+        s2 = peg$currPos;
+        if (peg$c61.test(input.charAt(peg$currPos))) {
           s3 = input.charAt(peg$currPos);
           peg$currPos++;
         } else {
           s3 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c56); }
+          if (peg$silentFails === 0) { peg$fail(peg$c62); }
         }
         if (s3 !== peg$FAILED) {
-          s2 = [s2, s3];
-          s1 = s2;
-        } else {
-          peg$currPos = s1;
-          s1 = peg$c0;
-        }
-      } else {
-        peg$currPos = s1;
-        s1 = peg$c0;
-      }
-      if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
-        if (s2 !== peg$FAILED) {
-          if (input.charCodeAt(peg$currPos) === 40) {
-            s3 = peg$c19;
+          if (peg$c63.test(input.charAt(peg$currPos))) {
+            s4 = input.charAt(peg$currPos);
             peg$currPos++;
           } else {
-            s3 = peg$FAILED;
-            if (peg$silentFails === 0) { peg$fail(peg$c20); }
+            s4 = peg$FAILED;
+            if (peg$silentFails === 0) { peg$fail(peg$c64); }
           }
+          if (s4 !== peg$FAILED) {
+            s3 = [s3, s4];
+            s2 = s3;
+          } else {
+            peg$currPos = s2;
+            s2 = peg$c0;
+          }
+        } else {
+          peg$currPos = s2;
+          s2 = peg$c0;
+        }
+        if (s2 !== peg$FAILED) {
+          s3 = peg$parse_();
           if (s3 !== peg$FAILED) {
-            s4 = peg$parse_();
+            if (input.charCodeAt(peg$currPos) === 40) {
+              s4 = peg$c19;
+              peg$currPos++;
+            } else {
+              s4 = peg$FAILED;
+              if (peg$silentFails === 0) { peg$fail(peg$c20); }
+            }
             if (s4 !== peg$FAILED) {
-              s5 = [];
-              s6 = peg$parseparameter();
-              if (s6 !== peg$FAILED) {
-                while (s6 !== peg$FAILED) {
-                  s5.push(s6);
-                  s6 = peg$parseparameter();
-                }
-              } else {
-                s5 = peg$c0;
-              }
+              s5 = peg$parse_();
               if (s5 !== peg$FAILED) {
-                s6 = peg$parse_();
-                if (s6 !== peg$FAILED) {
-                  if (input.charCodeAt(peg$currPos) === 41) {
-                    s7 = peg$c21;
-                    peg$currPos++;
-                  } else {
-                    s7 = peg$FAILED;
-                    if (peg$silentFails === 0) { peg$fail(peg$c22); }
+                s6 = [];
+                s7 = peg$parseparameter();
+                if (s7 !== peg$FAILED) {
+                  while (s7 !== peg$FAILED) {
+                    s6.push(s7);
+                    s7 = peg$parseparameter();
                   }
+                } else {
+                  s6 = peg$c0;
+                }
+                if (s6 !== peg$FAILED) {
+                  s7 = peg$parse_();
                   if (s7 !== peg$FAILED) {
-                    peg$reportedPos = s0;
-                    s1 = peg$c52(s1, s5);
-                    s0 = s1;
+                    if (input.charCodeAt(peg$currPos) === 41) {
+                      s8 = peg$c21;
+                      peg$currPos++;
+                    } else {
+                      s8 = peg$FAILED;
+                      if (peg$silentFails === 0) { peg$fail(peg$c22); }
+                    }
+                    if (s8 !== peg$FAILED) {
+                      s9 = peg$parse_();
+                      if (s9 !== peg$FAILED) {
+                        peg$reportedPos = s0;
+                        s1 = peg$c65(s2, s6);
+                        s0 = s1;
+                      } else {
+                        peg$currPos = s0;
+                        s0 = peg$c0;
+                      }
+                    } else {
+                      peg$currPos = s0;
+                      s0 = peg$c0;
+                    }
                   } else {
                     peg$currPos = s0;
                     s0 = peg$c0;
@@ -1188,44 +1290,56 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
     }
 
     function peg$parsefun_not() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
+      var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
 
       s0 = peg$currPos;
-      if (input.substr(peg$currPos, 3) === peg$c57) {
-        s1 = peg$c57;
-        peg$currPos += 3;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c58); }
-      }
+      s1 = peg$parse_();
       if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
+        if (input.substr(peg$currPos, 3) === peg$c66) {
+          s2 = peg$c66;
+          peg$currPos += 3;
+        } else {
+          s2 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c67); }
+        }
         if (s2 !== peg$FAILED) {
-          if (input.charCodeAt(peg$currPos) === 40) {
-            s3 = peg$c19;
-            peg$currPos++;
-          } else {
-            s3 = peg$FAILED;
-            if (peg$silentFails === 0) { peg$fail(peg$c20); }
-          }
+          s3 = peg$parse_();
           if (s3 !== peg$FAILED) {
-            s4 = peg$parse_();
+            if (input.charCodeAt(peg$currPos) === 40) {
+              s4 = peg$c19;
+              peg$currPos++;
+            } else {
+              s4 = peg$FAILED;
+              if (peg$silentFails === 0) { peg$fail(peg$c20); }
+            }
             if (s4 !== peg$FAILED) {
-              s5 = peg$parseparameter();
+              s5 = peg$parse_();
               if (s5 !== peg$FAILED) {
-                s6 = peg$parse_();
+                s6 = peg$parseparameter();
                 if (s6 !== peg$FAILED) {
-                  if (input.charCodeAt(peg$currPos) === 41) {
-                    s7 = peg$c21;
-                    peg$currPos++;
-                  } else {
-                    s7 = peg$FAILED;
-                    if (peg$silentFails === 0) { peg$fail(peg$c22); }
-                  }
+                  s7 = peg$parse_();
                   if (s7 !== peg$FAILED) {
-                    peg$reportedPos = s0;
-                    s1 = peg$c59(s1, s5);
-                    s0 = s1;
+                    if (input.charCodeAt(peg$currPos) === 41) {
+                      s8 = peg$c21;
+                      peg$currPos++;
+                    } else {
+                      s8 = peg$FAILED;
+                      if (peg$silentFails === 0) { peg$fail(peg$c22); }
+                    }
+                    if (s8 !== peg$FAILED) {
+                      s9 = peg$parse_();
+                      if (s9 !== peg$FAILED) {
+                        peg$reportedPos = s0;
+                        s1 = peg$c68(s2, s6);
+                        s0 = s1;
+                      } else {
+                        peg$currPos = s0;
+                        s0 = peg$c0;
+                      }
+                    } else {
+                      peg$currPos = s0;
+                      s0 = peg$c0;
+                    }
                   } else {
                     peg$currPos = s0;
                     s0 = peg$c0;
@@ -1259,44 +1373,56 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
     }
 
     function peg$parsefun_isblank() {
-      var s0, s1, s2, s3, s4, s5, s6, s7;
+      var s0, s1, s2, s3, s4, s5, s6, s7, s8, s9;
 
       s0 = peg$currPos;
-      if (input.substr(peg$currPos, 7) === peg$c60) {
-        s1 = peg$c60;
-        peg$currPos += 7;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c61); }
-      }
+      s1 = peg$parse_();
       if (s1 !== peg$FAILED) {
-        s2 = peg$parse_();
+        if (input.substr(peg$currPos, 7) === peg$c69) {
+          s2 = peg$c69;
+          peg$currPos += 7;
+        } else {
+          s2 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c70); }
+        }
         if (s2 !== peg$FAILED) {
-          if (input.charCodeAt(peg$currPos) === 40) {
-            s3 = peg$c19;
-            peg$currPos++;
-          } else {
-            s3 = peg$FAILED;
-            if (peg$silentFails === 0) { peg$fail(peg$c20); }
-          }
+          s3 = peg$parse_();
           if (s3 !== peg$FAILED) {
-            s4 = peg$parse_();
+            if (input.charCodeAt(peg$currPos) === 40) {
+              s4 = peg$c19;
+              peg$currPos++;
+            } else {
+              s4 = peg$FAILED;
+              if (peg$silentFails === 0) { peg$fail(peg$c20); }
+            }
             if (s4 !== peg$FAILED) {
-              s5 = peg$parseparameter();
+              s5 = peg$parse_();
               if (s5 !== peg$FAILED) {
-                s6 = peg$parse_();
+                s6 = peg$parseparameter();
                 if (s6 !== peg$FAILED) {
-                  if (input.charCodeAt(peg$currPos) === 41) {
-                    s7 = peg$c21;
-                    peg$currPos++;
-                  } else {
-                    s7 = peg$FAILED;
-                    if (peg$silentFails === 0) { peg$fail(peg$c22); }
-                  }
+                  s7 = peg$parse_();
                   if (s7 !== peg$FAILED) {
-                    peg$reportedPos = s0;
-                    s1 = peg$c59(s1, s5);
-                    s0 = s1;
+                    if (input.charCodeAt(peg$currPos) === 41) {
+                      s8 = peg$c21;
+                      peg$currPos++;
+                    } else {
+                      s8 = peg$FAILED;
+                      if (peg$silentFails === 0) { peg$fail(peg$c22); }
+                    }
+                    if (s8 !== peg$FAILED) {
+                      s9 = peg$parse_();
+                      if (s9 !== peg$FAILED) {
+                        peg$reportedPos = s0;
+                        s1 = peg$c68(s2, s6);
+                        s0 = s1;
+                      } else {
+                        peg$currPos = s0;
+                        s0 = peg$c0;
+                      }
+                    } else {
+                      peg$currPos = s0;
+                      s0 = peg$c0;
+                    }
                   } else {
                     peg$currPos = s0;
                     s0 = peg$c0;
@@ -1335,13 +1461,13 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
       s0 = peg$currPos;
       s1 = peg$parsecomma();
       if (s1 === peg$FAILED) {
-        s1 = peg$c62;
+        s1 = peg$c71;
       }
       if (s1 !== peg$FAILED) {
         s2 = peg$parsecomparison();
         if (s2 !== peg$FAILED) {
           peg$reportedPos = s0;
-          s1 = peg$c63(s2);
+          s1 = peg$c72(s2);
           s0 = s1;
         } else {
           peg$currPos = s0;
@@ -1358,12 +1484,12 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
     function peg$parsews() {
       var s0;
 
-      if (peg$c64.test(input.charAt(peg$currPos))) {
+      if (peg$c73.test(input.charAt(peg$currPos))) {
         s0 = input.charAt(peg$currPos);
         peg$currPos++;
       } else {
         s0 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c65); }
+        if (peg$silentFails === 0) { peg$fail(peg$c74); }
       }
 
       return s0;
@@ -1389,11 +1515,11 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
       s1 = peg$parse_();
       if (s1 !== peg$FAILED) {
         if (input.charCodeAt(peg$currPos) === 44) {
-          s2 = peg$c66;
+          s2 = peg$c75;
           peg$currPos++;
         } else {
           s2 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c67); }
+          if (peg$silentFails === 0) { peg$fail(peg$c76); }
         }
         if (s2 !== peg$FAILED) {
           s3 = peg$parse_();
@@ -1425,18 +1551,18 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
         return {Type: type, Children: [one]};
       }
 
-      function createAtomic(val) {
-        return {Type: "atomic", Value: val};
+      function createAtomic(type, val) {
+        return {Type: type, Value: val};
       }
 
 
       function createVar(name) {
-        return {Type: "variable", ConceptName: name};
+        return {Type: "variable", Name: name};
       }
 
       
       function createFun(name, params) {
-        return {Type: "function", Name: name, Params: [params]};
+        return {Type: "function", Name: name.toLowerCase(), Children: [params]};
       }
 
 
@@ -2472,36 +2598,20 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
     };
 
     //Constructor
-    var Formula = function(modelOrRuleType, computableConcept){
+    var Formula = function(modelOrRuleType, report, computableConcept, language){
         if(typeof modelOrRuleType === 'object' && modelOrRuleType !== null){
+            this.report = report;
             this.setModel(modelOrRuleType);
         } else {
-            ensureParameter(modelOrRuleType, 'model_or_ruleType', 'string', 'Formula (Const.)');
-            ensureParameter(computableConcept, 'computable_concept', 'string', 'Formula (Const.)');
+            ensureParameter(modelOrRuleType, 'modelOrRuleType', 'string', 'Formula (Const.)',/^(xbrl28:formula)|(xbrl28:validation)$/g,'unknown rule type: ' + modelOrRuleType);
+            ensureParameter(computableConcept, 'computableConcept', 'string', 'Formula (Const.)');
+            ensureParameter(language, 'language', 'string', 'Formula (Const.)');
+            ensureParameter(report, 'report', 'object', 'Formula (Const.)');
+            this.report = report;
             this.parser = null;
-            if(modelOrRuleType === 'xbrl28:arithmetic' || modelOrRuleType === 'xbrl28:excel') {
+            if (modelOrRuleType === 'xbrl28:validation'){
                 this.setModel({
-                    'Id': '',
-                    'Type': modelOrRuleType,
-                    'Label': '',
-                    'Description': '',
-                    'ComputableConcepts': [ computableConcept ],
-                    'DependsOn': [],
-                    'AllowCrossPeriod': false,
-                    'AllowCrossBalance': false,
-                    'Formulae': [
-                        {
-                            'PrereqSrc': 'TRUE',
-                            'Prereq': {},
-                            'SourceFact': [],
-                            'BodySrc': '',
-                            'Body': {}
-                        }
-                    ]
-                });
-            } else if (modelOrRuleType === 'xbrl28:validation'){
-                this.setModel({
-                    'Id': '',
+                    'Id': report.uuid(),
                     'Type': modelOrRuleType,
                     'Label': '',
                     'Description': '',
@@ -2511,26 +2621,100 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
                     'Formula': ''
                 });
             } else if (modelOrRuleType === 'xbrl28:formula') {
-                this.setModel({
-                    'Id': '',
-                    'Type': modelOrRuleType,
-                    'Label': '',
-                    'Description': '',
-                    'ComputableConcepts': [ computableConcept ],
-                    'DependsOn': [],
-                    'Formula': ''
-                });
+                if(language === 'SpreadsheetFormula') {
+                    this.setModel({
+                        'Id': report.uuid(),
+                        'Type': modelOrRuleType,
+                        'OriginalLanguage': language,
+                        'Label': '',
+                        'Description': '',
+                        'ComputableConcepts': [ computableConcept ],
+                        'DependsOn': [],
+                        'AllowCrossPeriod': true,
+                        'AllowCrossBalance': true,
+                        'Formulae': [
+                            {
+                                'PrereqSrc': 'TRUE',
+                                'Prereq': {},
+                                'SourceFact': [],
+                                'BodySrc': '',
+                                'Body': {},
+                                'active': true
+                            }
+                        ]
+                    });
+                } else {
+                    this.setModel({
+                        'Id': report.uuid(),
+                        'Type': modelOrRuleType,
+                        'Label': '',
+                        'Description': '',
+                        'ComputableConcepts': [ computableConcept ],
+                        'DependsOn': [],
+                        'Formula': ''
+                    });
+                }
             }
         }
     };
 
+    Formula.prototype.addAlternative = function(){
+        if(this.model.Formulae === undefined || this.model.Formulae === null){
+            this.model.Formulae = [];
+        }
+        var language = this.model.OriginalLanguage;
+        if(language === 'SpreadsheetFormula') {
+            this.model.Formulae.push(
+                {
+                    'PrereqSrc': 'TRUE',
+                    'Prereq': {},
+                    'SourceFact': [],
+                    'BodySrc': '',
+                    'Body': {},
+                    'active': true
+                });
+        }
+    };
+
+    Formula.prototype.copyAlternative = function(index){
+        var formulae = this.model.Formulae;
+        if(formulae === undefined || formulae === null || index >= formulae.length){
+            throw new Error('Index out of bounds: ' + index + '. Array: ' + JSON.stringify(formulae));
+        }
+        var alternative = angular.copy(formulae[index]);
+        var language = this.model.OriginalLanguage;
+        if(language === 'SpreadsheetFormula') {
+            formulae.push( alternative);
+            alternative.active = true;
+        }
+    };
+
+    Formula.prototype.removeAlternative = function(index){
+        var formulae = this.model.Formulae;
+        if(formulae === undefined || formulae === null || index >= formulae.length){
+            throw new Error('Index out of bounds: ' + index + '. Array: ' + JSON.stringify(formulae));
+        }
+        formulae.splice(index, 1);
+    };
+
+    Formula.prototype.getPrefix = function(){
+        var prefix;
+        if(this.report !== undefined && this.report !== null && typeof this.report === 'object'){
+            prefix = this.report.getPrefix();
+        }
+        if(this.report === undefined || prefix === undefined || prefix === null || prefix === ''){
+            return 'ext';
+        }
+        return prefix;
+    };
+
     Formula.prototype.getParser = function() {
         if(this.parser === undefined || this.parser === null ) {
-            if(this.model.Type === 'xbrl28:arithmetic') {
+            if(this.model.OriginalLanguage === 'ArithmeticFormula') {
                 this.parser = FormulaParser;
                 this.parserType = 'FormulaParser';
             }
-            if(this.model.Type === 'xbrl28:excel') {
+            if(this.model.OriginalLanguage === 'SpreadsheetFormula') {
                 this.parser = ExcelParser;
                 this.parserType = 'ExcelParser';
             }
@@ -2542,29 +2726,388 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         this.view = JSON.stringify(this.model, null, ' ');
     };*/
 
-
-    Formula.prototype.compileDeferred = function() {
-        var deferred = $q.defer();
-
-        $log.log('starting compilation');
-        if((this.model.Type === 'xbrl28:excel' || this.model.Type === 'xbrl28:arithmetic') &&
-            this.model.Formulae !== undefined && this.model.Formulae !== null) {
-            for (var i = 0; i < this.model.Formulae.length; ++i) {
-                this.compilePrereq(i);
-                this.compileBody(i);
+    var alignConceptPrefix = function(prefix, concept){
+        var result;
+        if(concept !== undefined && concept !== null && typeof concept === 'string') {
+            if (concept.indexOf(':') === -1) {
+                result = prefix + ':' + concept;
+            } else {
+                result = concept;
             }
         }
+        return result;
+    };
 
-        return deferred.promise;
+    var alignConceptPrefixes = function(prefix, conceptsArray){
+        var result = [];
+        if(conceptsArray !== undefined && conceptsArray !== null && typeof conceptsArray === 'object') {
+            for (var i in conceptsArray) {
+                var concept = conceptsArray[i];
+                result.push(alignConceptPrefix(prefix, concept));
+            }
+        }
+        return result;
+    };
+
+    var makeUnique = function(array){
+        ensureParameter(array, 'array', 'object', 'makeUnique');
+        var unique = {}, result = [];
+        for(var j in array){
+            var item = array[j];
+            if(unique.hasOwnProperty(item)) {
+                continue;
+            }
+            result.push(item);
+            unique[item] = 1;
+        }
+        return result;
+    };
+
+    var inferDependenciesImpl = function(formula, obj){
+        ensureParameter(formula, 'formula', 'object', 'inferDependenciesImpl');
+        ensureParameter(obj, 'obj', 'object', 'inferDependenciesImpl');
+        var prefix = formula.getPrefix();
+        var result = [];
+        var formulae = obj.Formulae;
+        if(formulae !== undefined && formulae !== null && typeof formulae === 'object'){
+            for(var i in formulae){
+                var alternative = formulae[i];
+                result = result.concat(inferDependenciesImpl(formula, alternative));
+            }
+            result = alignConceptPrefixes(prefix, result);
+            result = makeUnique(result);
+            obj.DependsOn = result;
+        } else {
+            var prereq = obj.Prereq;
+            var body = obj.Body;
+            var sourceFacts = obj.SourceFact;
+            if (prereq !== undefined || body !== undefined || sourceFacts !== undefined) {
+                if (prereq !== undefined && prereq !== null && typeof prereq === 'object') {
+                    result = result.concat(inferDependenciesImpl(formula, prereq));
+                }
+                if (body !== undefined && body !== null && typeof body === 'object') {
+                    result = result.concat(inferDependenciesImpl(formula, body));
+                }
+                if (sourceFacts !== undefined && sourceFacts !== null && typeof sourceFacts === 'object') {
+                    result = result.concat(sourceFacts);
+                }
+            } else {
+                var type = obj.Type;
+                var children = obj.Children;
+                if(type === 'variable'){
+                    var name = obj.Name;
+                    result.push(name);
+                } else if(children !== undefined && children !== null && typeof children === 'object'){
+                    for(var j in children){
+                        var child = children[j];
+                        result = result.concat(inferDependenciesImpl(formula, child));
+                    }
+                }
+            }
+        }
+        return result;
+    };
+
+    var inferDependencies = function(formula, obj, async) {
+        ensureParameter(formula, 'formula', 'object', 'inferDependencies');
+        ensureParameter(obj, 'obj', 'object', 'inferDependencies');
+        if(async === undefined || async === null || async) {
+            var deferred = $q.defer();
+            var result = inferDependenciesImpl(formula, obj);
+            deferred.resolve(result);
+            return deferred.promise;
+        } else {
+            return inferDependenciesImpl(formula, obj);
+        }
+    };
+
+    // computation is the jsoniq code part that computes the value of the new
+    // fact
+    var toComputation = function(ast){
+        if(ast !== undefined && ast !== null && typeof ast === 'object'){
+            var type = ast.Type;
+            var children = ast.Children;
+            var value = ast.Value;
+            var name = ast.Name;
+            switch(type){
+                // comparisons
+                case 'eq':
+                case 'ne':
+                case 'gt':
+                case 'ge':
+                case 'lt':
+                case 'le': return toComputation(children[0]) + ' ' + type + ' ' + toComputation(children[1]);
+
+                // arithmetics
+                case 'add': return toComputation(children[0]) + ' + ' + toComputation(children[1]);
+                case 'mul': return toComputation(children[0]) + ' * ' + toComputation(children[1]);
+                case 'div': return toComputation(children[0]) + ' div ' + toComputation(children[1]);
+                case 'sub': return toComputation(children[0]) + ' - ' + toComputation(children[1]);
+
+                // primaries
+                case 'block':
+                    var inner = [];
+                    for(var i in children) {
+                        var child = children[i];
+                        inner.push(toComputation(child));
+                    }
+                    return '(' + inner.join(',') + ')';
+                case 'variable': return 'rules:decimal-value($' + name + ')';
+
+                // atomics
+                case 'numeric': return value;
+                case 'boolean': return value;
+                case 'string': return '\"' + value + '\"';
+
+                // functions
+                case 'function':
+                    var innerparams = [];
+                    for(var j in children) {
+                        var param = children[j];
+                        innerparams.push(toComputation(param));
+                    }
+                    switch(name){
+                        case 'isblank':
+                            var innerparams2 = [];
+                            for(var h in children) {
+                                if(children.hasOwnProperty(h)) {
+                                    var p = children[j];
+                                    if(p.Type === 'variable'){
+                                        innerparams2.push('$' + p.Name);
+                                    } else {
+                                        innerparams2.push(toComputation(p));
+                                    }
+                                }
+                            }
+                            return 'not(exists(' + innerparams2.join(', ') + '))';
+                        case 'not': return 'not((' + innerparams.join(', ') + '))';
+                        case 'and': return '(' + innerparams.join(' and ') + ')';
+                        case 'or': return '(' + innerparams.join(' or ') + ')';
+                    }
+            }
+        }
+    };
+
+    // computation is the jsoniq code part that creates the audit trail of the new
+    // fact
+    var toAuditTrail = function(ast){
+        if(ast !== undefined && ast !== null && typeof ast === 'object'){
+            var type = ast.Type;
+            var children = ast.Children;
+            var value = ast.Value;
+            var name = ast.Name;
+            var result = [];
+            switch(type){
+                // comparisons
+                case 'eq':
+                case 'ne':
+                case 'gt':
+                case 'ge':
+                case 'lt':
+                case 'le': result.push(toAuditTrail(children[0]) + ' || " ' + type + ' " || ' + toAuditTrail(children[1])); break;
+
+                // arithmetics
+                case 'add': result.push(toAuditTrail(children[0]) + ' || " + " || ' + toAuditTrail(children[1])); break;
+                case 'mul': result.push(toAuditTrail(children[0]) + ' || " * " || ' + toAuditTrail(children[1])); break;
+                case 'div': result.push(toAuditTrail(children[0]) + ' || " div " || ' + toAuditTrail(children[1])); break;
+                case 'sub': result.push(toAuditTrail(children[0]) + ' || " - " || ' + toAuditTrail(children[1])); break;
+
+                // primaries
+                case 'block':
+                    var inner = [];
+                    for(var i in children) {
+                        var child = children[i];
+                        inner.push(toAuditTrail(child));
+                    }
+                    result.push('" ( " || ' + inner.join(' || ", "') + ' || " )"');
+                    break;
+                case 'variable': result.push('rules:fact-trail($' + name + ', "' + name + '")'); break;
+
+                // atomics
+                case 'numeric':
+                case 'boolean':
+                case 'string': result.push('"' + value + '"');  break;
+
+                // functions
+                case 'function':
+                    var innerparams = [];
+                    for(var j in children) {
+                        var param = children[j];
+                        innerparams.push(toAuditTrail(param));
+                    }
+                    switch(name){
+                        case 'isblank': result.push('"not(exists( " || ' + innerparams.join(' || ", "') + ' || "))"'); break;
+                        case 'not': result.push('not((' + innerparams.join(' || ", "') + ' || "))"'); break;
+                        case 'and': result.push('(' + innerparams.join(' || " and "') + ' || ")"'); break;
+                        case 'or': result.push('(' + innerparams.join(' || " or "') + ' || ")"'); break;
+                    }
+                    break;
+            }
+            return result.join(' || ');
+        }
+    };
+
+    var getUniqueFacts = function(report, prefix){
+        var facts = [];
+        facts = facts.concat(report.model.ComputableConcepts);
+        facts = facts.concat(report.model.DependsOn);
+        if((report.model.OriginalLanguage === 'SpreadsheetFormula') &&
+            report.model.Formulae !== undefined && report.model.Formulae !== null) {
+            for (var i in report.model.Formulae) {
+                facts = facts.concat(report.model.Formulae[i].SourceFact);
+            }
+        }
+        return makeUnique(alignConceptPrefixes(prefix, facts));
+    };
+
+    Formula.prototype.toJsoniq = function() {
+        var result = [];
+        var prefix = this.getPrefix();
+        var computedConcept = alignConceptPrefix(prefix, this.model.ComputableConcepts[0]);
+        if(this.model !== undefined && this.model !== null && typeof this.model ==='object') {
+            if ((this.model.OriginalLanguage === 'SpreadsheetFormula') &&
+                this.model.Formulae !== undefined && this.model.Formulae !== null) {
+
+                var facts = getUniqueFacts(this, prefix);
+                var computedFactVariable;
+                if(computedConcept.indexOf( prefix + ':') === 0){
+                    computedFactVariable = computedConcept.substring(prefix.length + 1);
+                }else{
+                    computedFactVariable = computedConcept.replace(/:/g, '_');
+                }
+                var allowCrossPeriod = this.model.AllowCrossPeriod;
+                var allowCrossBalance = this.model.AllowCrossBalance;
+                var factsFilter = '';
+                for(var i in facts){
+                    var fact = facts[i];
+                    if(factsFilter === ''){
+                        factsFilter = '"';
+                    }else{
+                        factsFilter += ', "';
+                    }
+                    factsFilter += fact + '"';
+                }
+                var variables = [];
+                for(var j in facts){
+                    var concept = facts[j];
+                    var variable = {};
+                    if(concept.indexOf( prefix + ':') === 0){
+                        variable.Name = concept.substring(prefix.length + 1);
+                    }else{
+                        variable.Name = concept.replace(/:/g, '_');
+                    }
+                    variable.Concept = alignConceptPrefix(prefix, concept);
+                    variables.push(variable);
+                }
+                var auditTrailSourceFacts = '';
+                for(var y in variables){
+                    if(variables.hasOwnProperty(y)) {
+                        var va = variables[y];
+                        if(auditTrailSourceFacts===''){
+                            auditTrailSourceFacts += '$';
+                        } else {
+                            auditTrailSourceFacts += ', $';
+                        }
+                        auditTrailSourceFacts += va.Name;
+                    }
+                }
+
+                result.push('');
+                result.push('for $facts in facts:facts-for-internal((');
+                result.push('      ' + factsFilter);
+                result.push('    ), $hypercube, $aligned-filter, $concept-maps, $rules, $cache, $options)');
+                if (allowCrossPeriod) {
+                    result.push('let $aligned-period := ( facts:duration-for-fact($facts).End, facts:instant-for-fact($facts), "forever")[1]');
+                }
+                result.push('group by $canonical-filter-string := ');
+                if (allowCrossBalance) {
+                    result.push('  facts:canonically-serialize-object($facts, ($facts:CONCEPT, "_id", "IsInDefaultHypercube", "Type", "Value", "Decimals", "AuditTrails", "xbrl28:Type", "Balance"))');
+                } else {
+                    result.push('  facts:canonically-serialize-object($facts, ($facts:CONCEPT, "_id", "IsInDefaultHypercube", "Type", "Value", "Decimals", "AuditTrails", "xbrl28:Type"))');
+                }
+                if (allowCrossPeriod) {
+                    result.push('  , $aligned-period');
+                }
+                for(var x in variables){
+                    if(variables.hasOwnProperty(x)) {
+                        var v = variables[x];
+                        result.push('let $' + v.Name + ' as object? := $facts[$$.$facts:ASPECTS.$facts:CONCEPT eq "' + v.Concept + '"]');
+                    }
+                }
+                result.push('let $_unit := ($facts.$facts:ASPECTS.$facts:UNIT)[1]');
+                result.push('return');
+                result.push('  switch (true)');
+                result.push('  case exists($' + computedFactVariable + ') return $' + computedFactVariable);
+
+                for (var k in this.model.Formulae) {
+                    if(this.model.Formulae.hasOwnProperty(k)) {
+                        var alternative = this.model.Formulae[k];
+                        var body = alternative.Body;
+                        var prereq = alternative.Prereq;
+                        var sourceFacts = alignConceptPrefixes(prefix, alternative.SourceFact);
+                        var sourceFactVariable;
+                        if(sourceFacts[0] !== undefined && sourceFacts[0].indexOf( prefix + ':') === 0){
+                            sourceFactVariable = sourceFacts[0].substring(prefix.length + 1);
+                        } else if(sourceFacts[0] !== undefined) {
+                            sourceFactVariable = sourceFacts[0].replace(/:/g, '_');
+                        }
+                        var sourceFactExistenceCheck = '';
+                        for(var s in sourceFacts){
+                            if(sourceFacts.hasOwnProperty(s)){
+                                var sFact = sourceFacts[s];
+                                if(sFact.indexOf( prefix + ':') === 0){
+                                    sFact = sFact.substring(prefix.length + 1);
+                                }else{
+                                    sFact = sFact.replace(/:/g, '_');
+                                }
+                                if(sourceFactExistenceCheck !== ''){
+                                    sourceFactExistenceCheck += ' and ';
+                                }
+                                sourceFactExistenceCheck += 'exists($' + sFact + ')';
+                            }
+                        }
+
+                        result.push('  case (' + sourceFactExistenceCheck + ' and ' + toComputation(prereq) + ')');
+                        result.push('  return');
+                        result.push('    let $computed-value := ' + toComputation(body));
+                        result.push('    let $audit-trail-message := ');
+                        result.push('	     rules:fact-trail({"Aspects": { "xbrl:Unit" : $_unit, "xbrl:Concept" : "' + computedConcept + '" }, Value: $computed-value }) || " = "');
+                        result.push('	        || ' + toAuditTrail(body));
+                        result.push('	 let $source-facts := (' + auditTrailSourceFacts + ')');
+                        result.push('    return');
+                        result.push('      rules:create-computed-fact(');
+                        result.push('          $' + sourceFactVariable + ',');
+                        result.push('          "' + computedConcept + '",');
+                        result.push('          $computed-value,');
+                        result.push('          $rule,');
+                        result.push('          $audit-trail-message,');
+                        result.push('          $source-facts,');
+                        result.push('          $options)');
+
+                    }
+                }
+                result.push('  default return ()');
+
+            }
+        }
+        return result.join('\n');
     };
 
     Formula.prototype.compile = function() {
-        this.compileDeferred().then(
-            function(){
-                $log.log('compilation finished');
+        if((this.model.OriginalLanguage === 'SpreadsheetFormula') &&
+            this.model.Formulae !== undefined && this.model.Formulae !== null) {
+            $log.log('starting compilation');
+            for (var i = 0; i < this.model.Formulae.length; ++i) {
+                this.compilePrereq(i, false /* not deferred */);
+                this.compileBody(i, false /* not deferred */);
             }
-        );
+            inferDependencies(this, this.model, false /* not deferred */);
+            this.model.Formula = this.toJsoniq();
+            $log.log('compilation finished');
+        }
     };
+
+    var bodyEmptyErrorMessage = 'Rule code section cannot be empty. Example code: "((NetIncomeLoss/Revenues)*(1+(Assets-Equity)/Equity))/((1/(Revenues/Assets))-((NetIncomeLoss/Revenues)*(1+(Assets-Equity)/Equity)))"';
 
     Formula.prototype.compileBodyDeferred = function(index) {
         ensureParameter(index, 'index', 'number', 'compileBodyDeferred');
@@ -2573,7 +3116,7 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         var altComp = this.model.Formulae[index];
         var body;
         if(altComp.BodySrc === undefined || altComp.BodySrc === '' || altComp.BodySrc === null){
-            deferred.reject('Rule code section cannot be empty. Example code: "((NetIncomeLoss/Revenues)*(1+(Assets-Equity)/Equity))/((1/(Revenues/Assets))-((NetIncomeLoss/Revenues)*(1+(Assets-Equity)/Equity)))"');
+            deferred.reject(bodyEmptyErrorMessage);
         }else {
             try {
                 body = parser.parse(altComp.BodySrc);
@@ -2587,28 +3130,54 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         return deferred.promise;
     };
 
-    Formula.prototype.compileBody = function(index) {
+    Formula.prototype.compileBody = function(index, async, action) {
         ensureParameter(index, 'index', 'number', 'compileBody');
         var that = this;
-        this.compileBodyDeferred(index).then(
-            function(body){
-                var altComp = that.model.Formulae[index];
-                altComp.Body = body;
-                if(altComp.BodyErr !== undefined){
-                    delete altComp.BodyErr;
-                }
-                $log.log(that.parserType + ' Body ok');
-                that.model.Formulae[index] = altComp;
-            },
-            function(errMsg){
-                var altComp = that.model.Formulae[index];
-                altComp.BodyErr = errMsg;
-                altComp.Body = {};
-                $log.log(errMsg);
-                that.model.Formulae[index] = altComp;
+        var altComp = that.model.Formulae[index];
+        var successFunc = function (body) {
+            altComp.Body = body;
+            if (altComp.BodyErr !== undefined) {
+                delete altComp.BodyErr;
             }
-        );
+            //$log.log(that.parserType + ' Body ok');
+            that.model.Formulae[index] = altComp;
+            if(async !== false){
+                inferDependencies(that, that.model, async).then(
+                    function() {
+                        that.validate(action);
+                    });
+            } else {
+                that.validate(action);
+            }
+        };
+        var errorFunc = function (errMsg) {
+            altComp.BodyErr = errMsg;
+            altComp.Body = {};
+            $log.log(errMsg);
+            that.model.Formulae[index] = altComp;
+            that.validate(action);
+        };
+        if(async === undefined || async === null || async === true) {
+            this.compileBodyDeferred(index).then(successFunc, errorFunc);
+        } else {
+            var parser = this.getParser();
+            var body;
+            if(altComp.BodySrc === undefined || altComp.BodySrc === '' || altComp.BodySrc === null){
+                errorFunc(bodyEmptyErrorMessage);
+            }else {
+                try {
+                    body = parser.parse(altComp.BodySrc);
+                    successFunc(body);
+                }
+                catch (e) {
+                    var errMsg = this.parserType + ' ' + e.name + ' Error: (' + e.line + ',' + e.column + ') ' + e.message;
+                    errorFunc(errMsg);
+                }
+            }
+        }
     };
+
+    var prereqEmptyErrorMessage = 'Rule precondition section cannot be empty. If you don\'t want to check a precondition just put "TRUE".';
 
     Formula.prototype.compilePrereqDeferred = function(index) {
         ensureParameter(index, 'index', 'number', 'compilePrereqDeferred');
@@ -2617,7 +3186,7 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         var altComp = this.model.Formulae[index];
         var prereq;
         if(altComp.PrereqSrc === undefined || altComp.PrereqSrc === '' || altComp.PrereqSrc === null){
-            deferred.reject('Rule precondition section cannot be empty. If you don\'t want to check a precondition just put "TRUE".');
+            deferred.reject(prereqEmptyErrorMessage);
         }else {
             try {
                 prereq = parser.parse(altComp.PrereqSrc);
@@ -2631,46 +3200,275 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         return deferred.promise;
     };
 
-    Formula.prototype.compilePrereq = function(index) {
+    Formula.prototype.compilePrereq = function(index, async, action) {
         ensureParameter(index, 'index', 'number', 'compilePrereq');
         var that = this;
-        this.compilePrereqDeferred(index).then(
-            function(prereq){
-                var altComp = that.model.Formulae[index];
-                altComp.Prereq = prereq;
-                if(altComp.PrereqErr !== undefined){
-                    delete altComp.PrereqErr;
-                }
-                $log.log(that.parserType + ' Prereq ok');
-                that.model.Formulae[index] = altComp;
-            },
-            function(errMsg){
-                var altComp = that.model.Formulae[index];
-                altComp.PrereqErr = errMsg;
-                altComp.Prereq = {};
-                $log.log(errMsg);
-                that.model.Formulae[index] = altComp;
+        var altComp = that.model.Formulae[index];
+        var successFunc = function(prereq){
+            altComp.Prereq = prereq;
+            if(altComp.PrereqErr !== undefined){
+                delete altComp.PrereqErr;
             }
-        );
+            //$log.log(that.parserType + ' Prereq ok');
+            that.model.Formulae[index] = altComp;
+            if(async !== false){
+                inferDependencies(that, that.model, async).then(
+                    function() {
+                        that.validate(action);
+                    });
+            } else {
+                that.validate(action);
+            }
+        };
+        var errorFunc = function(errMsg){
+            var altComp = that.model.Formulae[index];
+            altComp.PrereqErr = errMsg;
+            altComp.Prereq = {};
+            $log.log(errMsg);
+            that.model.Formulae[index] = altComp;
+            that.validate(action);
+        };
+        if(async === undefined || async === null || async === true) {
+            this.compilePrereqDeferred(index).then(successFunc, errorFunc);
+        } else {
+            var parser = this.getParser();
+            var prereq;
+            if(altComp.PrereqSrc === undefined || altComp.PrereqSrc === '' || altComp.PrereqSrc === null){
+                errorFunc(prereqEmptyErrorMessage);
+            }else {
+                try {
+                    prereq = parser.parse(altComp.PrereqSrc);
+                    successFunc(prereq);
+                }
+                catch (e) {
+                    var errMsg = this.parserType + ' ' + e.name + ' Error: (' + e.line + ',' + e.column + ') ' + e.message;
+                    errorFunc(errMsg);
+                }
+            }
+        }
+    };
+
+    var validateId = function(rule, report, action){
+        var existingRule;
+        var id = rule.Id;
+        if(id === undefined || id === null || id === ''){
+            rule.IdErr = 'Rule Id is mandatory.';
+            rule.valid = false;
+        } else if(action === 'Create' && (existingRule = report.getRule(id)) !== undefined && existingRule !== null) {
+            rule.IdErr = 'A rule with id "' + id + '" does already exist.';
+            rule.valid = false;
+        } else {
+            delete rule.IdErr;
+        }
+    };
+
+    var validateLabel = function(rule){
+        var label = rule.Label;
+        if(label === undefined || label === null || label === ''){
+            rule.LabelErr = 'Rule Label is mandatory.';
+            rule.valid = false;
+        } else {
+            delete rule.LabelErr;
+        }
+    };
+
+    var validateComputableConcepts = function(rule, report, prefix){
+        var computableConcepts = rule.ComputableConcepts;
+        if(computableConcepts[0] === '' || computableConcepts.length === 0){
+            rule.ComputableConceptsErr = 'Computable Concept is mandatory.';
+            rule.valid = false;
+        } else {
+            var notExistingConcepts = [];
+            for (var i in computableConcepts){
+                if(computableConcepts.hasOwnProperty(i)) {
+                    var concept = report.getConcept(alignConceptPrefix(prefix, computableConcepts[i]));
+                    if (concept === undefined || concept === null) {
+                        notExistingConcepts.push(computableConcepts[i]);
+                    }
+                }
+            }
+            if(notExistingConcepts.length === 1) {
+                rule.ComputableConceptsErr = 'The computed concept "' + notExistingConcepts[0] + '" does not exist.';
+                rule.valid = false;
+            } else if(notExistingConcepts.length > 1) {
+                rule.ComputableConceptsErr = 'The following concepts do not exist: "' + notExistingConcepts.join('", "') + '".';
+                rule.valid = false;
+            }else {
+                delete rule.ComputableConceptsErr;
+            }
+        }
+    };
+
+    var validateDependsOnConcepts = function(rule, report, prefix){
+        var dependsOnConcepts = rule.DependsOn;
+        var notExistingConcepts = [];
+        for (var i in dependsOnConcepts){
+            if(dependsOnConcepts.hasOwnProperty(i)) {
+                var concept = report.getConcept(alignConceptPrefix(prefix, dependsOnConcepts[i]));
+                if (concept === undefined || concept === null) {
+                    notExistingConcepts.push(dependsOnConcepts[i]);
+                }
+            }
+        }
+        if(notExistingConcepts.length === 1) {
+            rule.DependsOnErr = 'The depending concept "' + notExistingConcepts[0] + '" does not exist.';
+            rule.valid = false;
+        } else if(notExistingConcepts.length > 1) {
+            rule.DependsOnErr = 'The following depending concepts do not exist: "' + notExistingConcepts.join('", "') + '".';
+            rule.valid = false;
+        }else {
+            delete rule.DependsOnErr;
+        }
+    };
+
+    var validateValidatedConcepts = function(rule, report, prefix){
+        var validatedConcepts = rule.ValidatedConcepts;
+        if(validatedConcepts[0] === '' || validatedConcepts.length === 0){
+            rule.ValidatedConceptsErr = 'Validated Concept is mandatory.';
+            rule.valid = false;
+        } else {
+            var notExistingConcepts = [];
+            for (var i in validatedConcepts){
+                if(validatedConcepts.hasOwnProperty(i)) {
+                    var concept = report.getConcept(alignConceptPrefix(prefix, validatedConcepts[i]));
+                    if (concept === undefined || concept === null) {
+                        notExistingConcepts.push(validatedConcepts[i]);
+                    }
+                }
+            }
+            if(notExistingConcepts.length === 1) {
+                rule.ValidatedConceptsErr = 'The validated concept "' + notExistingConcepts[0] + '" does not exist.';
+                rule.valid = false;
+            } else if(notExistingConcepts.length > 1) {
+                rule.ValidatedConceptsErr = 'The following validated concepts do not exist: "' + notExistingConcepts.join('", "') + '".';
+                rule.valid = false;
+            }else {
+                delete rule.ValidatedConceptsErr;
+            }
+        }
+    };
+
+    var validateFormula = function(rule){
+        var formula = rule.Formula;
+        if(formula === undefined || formula === null || formula === ''){
+            rule.FormulaErr = 'Rule Code Section is mandatory.';
+            rule.valid = false;
+        } else {
+            delete rule.FormulaErr;
+        }
+    };
+
+    var validateAlternative = function(rule, alternative, report, prefix){
+        var sourceFact = alternative.SourceFact;
+        if(sourceFact === undefined || sourceFact === null || sourceFact[0] === '' || sourceFact.length === 0){
+            alternative.SourceFactErr = 'Source Fact is mandatory (general characteristics - e.g. credit or debit - will be copied from this fact).';
+            alternative.valid = false;
+        } else {
+            var notExistingConcepts = [];
+            // multiple source facts are not supported, this is for future compatibility
+            for (var i in sourceFact){
+                if(sourceFact.hasOwnProperty(i)) {
+                    var concept = report.getConcept(alignConceptPrefix(prefix, sourceFact[i]));
+                    if (concept === undefined || concept === null) {
+                        notExistingConcepts.push(sourceFact[i]);
+                    }
+                }
+            }
+            if(notExistingConcepts.length === 1) {
+                alternative.SourceFactErr = 'The source concept "' + notExistingConcepts[0] + '" does not exist.';
+                alternative.valid = false;
+            } else if(notExistingConcepts.length > 1) {
+                alternative.SourceFactErr = 'The following source concepts do not exist: "' + notExistingConcepts.join('", "') + '".';
+                alternative.valid = false;
+            }else {
+                delete alternative.SourceFactErr;
+            }
+            if(alternative.SourceFactErr === undefined && alternative.BodyErr === undefined && alternative.PrereqErr === undefined){
+                alternative.valid = true;
+            } else {
+                alternative.valid = false;
+            }
+        }
+    };
+
+    var validateAlternatives = function(rule, report, prefix){
+        var formulae = rule.Formulae;
+        if(formulae === undefined || formulae === null || formulae[0] === '' || formulae.length === 0){
+            rule.FormulaeErr = 'At least one alternative code section is mandatory.';
+            rule.valid = false;
+        } else {
+            for (var i in formulae){
+                if(formulae.hasOwnProperty(i)) {
+                    var alternative = formulae[i];
+                    validateAlternative(rule, alternative, report, prefix);
+                    if (!alternative.valid) {
+                        rule.valid = false;
+                    }
+                }
+            }
+        }
+    };
+
+    Formula.prototype.validate = function (action) {
+        var report = this.report;
+        var rule = this.getModel();
+
+        if(rule !== undefined && rule !== null && typeof rule === 'object') {
+            var prefix = this.getPrefix();
+            var type = rule.Type;
+            rule.valid = true;
+            validateId(rule, report, action);
+            validateLabel(rule);
+            validateComputableConcepts(rule, report, prefix);
+            validateDependsOnConcepts(rule, report, prefix);
+            if(type === 'xbrl28:validation' ){
+                validateValidatedConcepts(rule, report, prefix);
+            }
+            validateFormula(rule);
+            if(rule.OriginalLanguage === 'SpreadsheetFormula' ){
+                validateAlternatives(rule, report, prefix);
+            }
+            return rule.valid;
+        }
+    };
+
+    Formula.prototype.isValid = function(){
+        if(this.model === undefined || this.model === null || typeof this.model !== 'object'){
+            return false;
+        }
+        if(this.model.valid === undefined){
+            return false;
+        }else {
+            return this.model.valid;
+        }
     };
 
     Formula.prototype.getRule = function () {
-        if(this.model.Type === 'xbrl28:excel' || this.model.Type === 'xbrl28:arithmetic'){
-            var rule = {
-                'Id': this.model.Id,
-                'Type': this.model.Type,
-                'Label': this.model.Label,
-                'Description': this.model.Description,
-                'ComputableConcepts': this.model.ComputableConcepts,
-                'DependsOn': this.model.DependsOn
-            };
-            rule.Formulae = this.model.Formulae;
-            rule.AllowCrossPeriod = this.model.AllowCrossPeriod;
-            rule.AllowCrossBalance = this.model.AllowCrossBalance;
-            return rule;
-        } else if(this.model.Type === 'xbrl28:formula' || this.model.Type === 'xbrl28:validation'){
-            return this.getModel();
+        var model = this.getModel();
+        if(model.OriginalLanguage === 'SpreadsheetFormula') {
+            this.compile();
         }
+        var computableConcepts = alignConceptPrefixes(this.getPrefix(), model.ComputableConcepts);
+        var rule = {
+            'Id': model.Id,
+            'OriginalLanguage': model.OriginalLanguage,
+            'Type': model.Type,
+            'Label': model.Label,
+            'Description': model.Description,
+            'ComputableConcepts': computableConcepts,
+            'DependsOn': model.DependsOn,
+            'Formula': model.Formula
+        };
+        if(model.ValidatedConcepts !== undefined){
+            rule.ValidatedConcepts = alignConceptPrefixes(this.getPrefix(), model.ValidatedConcepts);
+        }
+        if(model.Formulae !== undefined && model.Formulae !== null && typeof model.Formulae === 'object') {
+            rule.Formulae = model.Formulae;
+        }
+        rule.AllowCrossPeriod = model.AllowCrossPeriod;
+        rule.AllowCrossBalance = model.AllowCrossBalance;
+        //$log.log('getRule done');
+        return rule;
     };
 
     Formula.prototype.getModel = function () {
@@ -2679,7 +3477,17 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
 
     Formula.prototype.setModel = function (model) {
         ensureParameter(model, 'model', 'object', 'setModel');
-        this.model = model;
+        var prefix = this.getPrefix();
+        this.model = angular.copy(model);
+        if(this.model.ComputableConcepts !== undefined && this.model.ComputableConcepts !== null && typeof this.model.ComputableConcepts === 'object'){
+            for (var i in this.model.ComputableConcepts){
+                var computableConcept = this.model.ComputableConcepts[i];
+                if(computableConcept.indexOf(prefix + ':') === 0){
+                    this.model.ComputableConcepts[i] = computableConcept.substring(computableConcept.indexOf(':')+1);
+                }
+            }
+        }
+
         this.parser = null;
         this.compile();
     };
@@ -2737,24 +3545,6 @@ angular
             
             this.getPresentationTree = function(){
                 return this.getReport().getNetwork('Presentation').Trees;
-            };
-
-            this.getRules = function(ruleType, concept){
-                var rules = [];
-                var report = this.getReport();
-                this.getReport().listRules();
-                if(ruleType !== undefined && ruleType !== null){
-                    if(ruleType === 'xbrl28:formula'){
-                        rules = report.listFormulaRules(concept);
-                    } else if(ruleType === 'xbrl28:validation'){
-                        rules = report.listValidationRules(concept);
-                    } else if(ruleType === 'xbrl28:excel'){
-                        rules = report.listExcelRules(concept);
-                    }
-                } else {
-                    rules = report.listRules(concept);
-                }
-                return rules;
             };
 
             this.getConceptMap = function(){
@@ -2901,14 +3691,6 @@ console.log(delta);
                 }
             };
             
-            /*
-            $scope.$watch('conceptName', function(conceptName){
-                if(conceptName !== undefined) {
-                    $scope.toDrop = [conceptName];
-                }
-            });
-            */
-
             $scope.select = function(row) {
                 if(row.branch.To) {
                     row.branch.expanded = !row.branch.expanded;
@@ -3062,63 +3844,52 @@ console.log(delta);
     return {
         restrict: 'E',
         scope: {
-            'conceptName': '@'
+            'conceptName': '@',
+            'report': '='
         },
         template: BusinessRuleTpl,
-        require: '^report',
-        link: function($scope, element, attrs, reportCtrl) {
+        link: function($scope) {
 
-            //$scope.concept = reportCtrl.getReport().getConcept($scope.conceptName);
+            $scope.hasComputingRule = false;
+            $scope.hasValidatingRules = false;
 
-            var updateRules = function(rulesType, concept){
+            var updateRules = function(concept){
                 if(concept === undefined || concept === null){
-                    $scope.formulaRules = undefined;
-                    $scope.validationRules = undefined;
-                    $scope.excelRules = undefined;
-                } else if(rulesType === undefined || rulesType === null) {
-                    updateRules('xbrl28:formula', concept);
-                    updateRules('xbrl28:validation', concept);
-                    updateRules('xbrl28:excel', concept);
+                    $scope.allRules = undefined;
+                    $scope.hasComputingRule = false;
+
+                    $scope.validatingRules = undefined;
+                    $scope.hasValidatingRules = false;
                 } else {
-                    var rules = reportCtrl.getRules(rulesType, concept);
-                    for(var i in rules){
-                        var rule = rules[i];
-                        if(rule.expanded === undefined || rule.expanded === null) {
-                            rule.expanded = false;
-                        }
+                    $scope.allRules = $scope.report.listRules(concept);
+                    if($scope.allRules.length > 0){
+                        $scope.hasComputingRule = true;
+                    } else {
+                        $scope.hasComputingRule = false;
                     }
-                    if (rulesType === 'xbrl28:formula'){
-                        $scope.formulaRules = rules;
-                    } else if(rulesType === 'xbrl28:validation') {
-                        $scope.validationRules = rules;
-                    }else if (rulesType === 'xbrl28:excel'){
-                        $scope.excelRules = rules;
+
+                    $scope.validatingRules = $scope.report.listValidatingRules(concept);
+                    if($scope.validatingRules.length > 0){
+                        $scope.hasValidatingRules = true;
+                    } else {
+                        $scope.hasValidatingRules = false;
                     }
                 }
             };
-            updateRules(undefined, $scope.conceptName);
+            updateRules($scope.conceptName);
 
             $scope.$watch(function(){
-                return reportCtrl.getConcepts();
-            }, function(concepts){
-                $scope.concepts = [];
-                concepts.forEach(function(concept){
-                    $scope.concepts.push(concept.Name);
-                });
-            });
-            $scope.$watch(function(){
-                return reportCtrl.getRules();
+                return $scope.report.listRules();
             }, function(){
-                updateRules(undefined, $scope.conceptName);
-            });
+                updateRules($scope.conceptName);
+            }, true);
 
             $scope.removeRule = function(id){
-                reportCtrl.getReport().removeRule(id);
-                updateRules(undefined, $scope.conceptName);
+                $rootScope.$emit('removeRule', id);
             };
 
-            $scope.addRule = function(concept, ruleType){
-                $rootScope.$emit('createRule', concept, ruleType);
+            $scope.addRule = function(concept, ruleType, language){
+                $rootScope.$emit('createRule', concept, ruleType, language);
             };
 
             $scope.editRule = function(id) {
@@ -3139,6 +3910,7 @@ console.log(delta);
         template: RulesEditorTpl,
         link: function($scope) {
             $scope.colspan1 = 2;
+            $scope.tooltipPlacement = 'top';
         }
     };
 })
@@ -3326,9 +4098,9 @@ data: body,
 
 .constant("ConceptMapTpl", "<div ng-if=\"map === undefined\">\r\n    <h3 ng-bind=\"concept.Name\"></h3>\r\n    <div ng-if=\"concept.IsAbstract !== true\">\r\n        <p>There is no concept map associated to <i ng-bind=\"conceptName\"></i>.</p>\r\n        <button ng-click=\"addConceptMap()\" class=\"btn btn-primary\">Add concept Map</button>\r\n    </div>\r\n    <div ng-if=\"concept.IsAbstract === true\">\r\n        <p>This concept is abstract.</p>\r\n    </div>\r\n</div>\r\n<div ng-if=\"map !== undefined\">\r\n    <button class=\"pull-right btn btn-default\"><i class=\"fa fa-times\" ng-click=\"removeConceptMap()\"></i></button>\r\n    <h3 ng-bind=\"concept.Name\"></h3>\r\n    <p ng-bind=\"concept.Label\"></p>\r\n    <ul class=\"list-group\">\r\n        <li class=\"list-group-item clearfix\" ng-repeat=\"key in map\">\r\n            <span ng-bind=\"key\"></span>\r\n            <div class=\"btn-group pull-right\">\r\n                <button class=\"btn btn-default\" type=\"button\" ng-click=\"moveTo(key, $index - 1)\" ng-if=\"$last === false\"><i class=\"fa fa-long-arrow-down\"></i></button>\r\n                <button class=\"btn btn-default\" type=\"button\" ng-click=\"moveTo(key, $index + 1)\" ng-if=\"$first === false\"><i class=\"fa fa-long-arrow-up\"></i></button>\r\n                <button class=\"btn btn-default\" type=\"button\" ng-click=\"removeValue(key)\"><i class=\"fa fa-times\"></i></button>\r\n            </div>\r\n        </li>\r\n    </ul>\r\n    <form class=\"form-inline\" role=\"form\" ng-submit=\"addValue(newConceptValue)\" ui-keypress=\"{ 13:'addValue(newConceptValue)' }\">\r\n        <div class=\"form-group\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-6\">\r\n                    <div class=\"input-group\">\r\n                        <input type=\"text\" class=\"form-control\" id=\"conceptValue\" placeholder=\"Concept Name\" ng-model=\"newConceptValue\" typeahead=\"concept for concept in concepts | filter:$viewValue | limitTo:8\">\r\n                        <span class=\"input-group-btn\">\r\n                            <button type=\"submit\" class=\"btn btn-primary\">Add</button>\r\n                        </span>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </form>\r\n</div>")
 
-.constant("BusinessRuleTpl", "<h2>Simple Rules</h2>\r\n<table class=\"table table-hover\" ng-if=\"excelRules.length > 0\">\r\n    <thead>\r\n    <tr>\r\n        <th>Id</th>\r\n        <th>Label</th>\r\n        <th>Action</th>\r\n    </tr>\r\n    </thead>\r\n    <tbody>\r\n    <tr ng-repeat=\"(key, rule) in excelRules\">\r\n        <td ng-bind=\"rule.Id\"></td>\r\n        <td ng-bind=\"rule.Label\"></td>\r\n        <td>\r\n            <button type=\"button\" class=\"btn btn-primary\" ng-click=\"editRule(rule.Id)\">Edit Rule</button>\r\n            <button type=\"button\" class=\"btn btn-danger\" ng-click=\"removeRule(rule.Id)\">Delete Rule</button>\r\n        </td>\r\n    </tr>\r\n    </tbody>\r\n</table>\r\n<div>\r\n    <p ng-if=\"excelRules === undefined || excelRules.length === 0\" class=\"lead\">There are no Simple Rules yet for {{conceptName}}</p>\r\n    <form class=\"form-inline\" role=\"form\" ng-submit=\"addRule(conceptName, 'xbrl28:excel')\">\r\n        <button ng-if=\"(formulaRules === undefined || formulaRules.length === 0) && (excelRules === undefined || excelRules.length === 0)\"\r\n                type=\"submit\" class=\"btn btn-primary\">Add Simple Rule</button>\r\n        <button ng-if=\"(formulaRules !== undefined && formulaRules.length > 0) || (excelRules !== undefined && excelRules.length > 0)\"\r\n                type=\"submit\" class=\"btn btn-primary\" disabled=\"disabled\">Add Simple Rule</button>\r\n    </form>\r\n</div>\r\n<h2>Advanced Rules</h2>\r\n<table class=\"table table-hover\" ng-if=\"formulaRules.length > 0\">\r\n    <thead>\r\n        <tr>\r\n            <th>Id</th>\r\n            <th>Label</th>\r\n            <th>Action</th>\r\n        </tr>\r\n    </thead>\r\n    <tbody>\r\n        <tr ng-repeat=\"(key, rule) in formulaRules\">\r\n            <td ng-bind=\"rule.Id\"></td>\r\n            <td ng-bind=\"rule.Label\"></td>\r\n            <td>\r\n                <button type=\"button\" class=\"btn btn-primary\" ng-click=\"editRule(rule.Id)\">Edit Rule</button>\r\n                <button type=\"button\" class=\"btn btn-danger\" ng-click=\"removeRule(rule.Id)\">Delete Rule</button>\r\n            </td>\r\n        </tr>\r\n    </tbody>\r\n</table>\r\n<div>\r\n    <p ng-if=\"formulaRules === undefined || formulaRules.length === 0\" class=\"lead\">There are no Advanced Rules yet for {{conceptName}}</p>\r\n    <form class=\"form-inline\" role=\"form\" ng-submit=\"addRule(conceptName, 'xbrl28:formula')\">\r\n        <button ng-if=\"(formulaRules === undefined || formulaRules.length === 0) && (excelRules === undefined || excelRules.length === 0)\"\r\n                type=\"submit\" class=\"btn btn-primary\">Add Advanced Rule</button>\r\n        <button ng-if=\"(formulaRules !== undefined && formulaRules.length > 0) || (excelRules !== undefined && excelRules.length > 0)\"\r\n                type=\"submit\" class=\"btn btn-primary\" disabled=\"disabled\">Add Advanced Rule</button>\r\n    </form>\r\n</div>\r\n<h2>Validation Rules</h2>\r\n<table class=\"table table-hover\" ng-if=\"validationRules.length > 0\">\r\n    <thead>\r\n    <tr>\r\n        <th>Id</th>\r\n        <th>Label</th>\r\n        <th>Action</th>\r\n    </tr>\r\n    </thead>\r\n    <tbody>\r\n    <tr ng-repeat=\"(key, rule) in validationRules\">\r\n        <td ng-bind=\"rule.Id\"></td>\r\n        <td ng-bind=\"rule.Label\"></td>\r\n        <td>\r\n            <button type=\"button\" class=\"btn btn-primary\" ng-click=\"editRule(rule.Id)\">Edit Rule</button>\r\n            <button type=\"button\" class=\"btn btn-danger\" ng-click=\"removeRule(rule.Id)\">Delete Rule</button>\r\n        </td>\r\n    </tr>\r\n    </tbody>\r\n</table>\r\n<div>\r\n    <p class=\"lead\" ng-if=\"validationRules === undefined || validationRules.length === 0\">There are no Validation Rules yet for {{conceptName}}</p>\r\n    <form class=\"form-inline\" role=\"form\" ng-submit=\"addRule(conceptName, 'xbrl28:validation')\">\r\n        <button type=\"submit\" class=\"btn btn-primary\">Add Validation Rule</button>\r\n    </form>\r\n</div>\r\n")
+.constant("BusinessRuleTpl", "<div ng-if=\"hasComputingRule\">\r\n    <h2>Computing Rule</h2>\r\n    <table class=\"table table-hover\">\r\n        <thead>\r\n        <tr>\r\n            <th>Id</th>\r\n            <th>Label</th>\r\n            <th>Rule Type</th>\r\n            <th>Action</th>\r\n        </tr>\r\n        </thead>\r\n        <tbody>\r\n        <tr ng-repeat=\"(key, rule) in allRules\">\r\n            <td ng-bind=\"rule.Id\"></td>\r\n            <td ng-bind=\"rule.Label\"></td>\r\n            <td ng-bind=\"rule.Type\"></td>\r\n            <td>\r\n                <button type=\"button\" class=\"btn btn-primary\" ng-click=\"editRule(rule.Id)\">Edit Rule</button>\r\n                <button type=\"button\" class=\"btn btn-danger\" ng-click=\"removeRule(rule.Id)\">Delete Rule</button>\r\n            </td>\r\n        </tr>\r\n        </tbody>\r\n    </table>\r\n</div>\r\n<div ng-if=\"!hasComputingRule\">\r\n    <h2>Create a Business Rule to Compute a Fact</h2>\r\n    <h3>Excel Rule</h3>\r\n    <div>\r\n        <p class=\"\">Create a simple rule for concept \"{{conceptName}}\" using spreadsheet formula syntax.</p>\r\n        <form class=\"form-inline\" role=\"form\" ng-submit=\"addRule(conceptName, 'xbrl28:formula', 'SpreadsheetFormula')\">\r\n            <button type=\"submit\" class=\"btn btn-primary\">Add Simple Rule</button>\r\n        </form>\r\n    </div>\r\n    <h3>Advanced Rule</h3>\r\n    <div>\r\n        <p class=\"\">Create an advanced rule for concept \"{{conceptName}}\" using Jsoniq syntax (advanced users only).</p>\r\n        <form class=\"form-inline\" role=\"form\" ng-submit=\"addRule(conceptName, 'xbrl28:formula', undefined)\">\r\n            <button type=\"submit\" class=\"btn btn-primary\">Add Advanced Rule</button>\r\n        </form>\r\n    </div>\r\n    <h3>Validation Rule</h3>\r\n    <div>\r\n        <p class=\"\">Create an advanced validation rule for concept \"{{conceptName}}\" using Jsoniq syntax (advanced users only).</p>\r\n        <form class=\"form-inline\" role=\"form\" ng-submit=\"addRule(conceptName, 'xbrl28:validation', undefined)\">\r\n            <button type=\"submit\" class=\"btn btn-primary\">Add Validation Rule</button>\r\n        </form>\r\n    </div>\r\n</div>\r\n<div ng-if=\"hasComputingRule && allRules[0].Type !== 'xbrl28:validation'\">\r\n    <h2>Validating Rules for Concept \"{{conceptName}}\"</h2>\r\n    <table class=\"table table-hover\" ng-if=\"hasValidatingRules\">\r\n        <thead>\r\n        <tr>\r\n            <th>Id</th>\r\n            <th>Label</th>\r\n            <th>Rule Type</th>\r\n            <th>Action</th>\r\n        </tr>\r\n        </thead>\r\n        <tbody>\r\n        <tr ng-repeat=\"(key, rule) in validatingRules\">\r\n            <td ng-bind=\"rule.Id\"></td>\r\n            <td ng-bind=\"rule.Label\"></td>\r\n            <td ng-bind=\"rule.Type\"></td>\r\n            <td>\r\n                <button type=\"button\" class=\"btn btn-primary\" ng-click=\"editRule(rule.Id)\">Edit Rule</button>\r\n                <button type=\"button\" class=\"btn btn-danger\" ng-click=\"removeRule(rule.Id)\">Delete Rule</button>\r\n            </td>\r\n        </tr>\r\n        </tbody>\r\n    </table>\r\n    <div ng-if=\"!hasValidatingRules\">\r\n        <p class=\"alert alert-info\">There are no validation rules validating concept \"{{conceptName}}\", yet.</p>\r\n    </div>\r\n</div>")
 
-.constant("RulesEditorTpl", "<div class=\"container\">\r\n    <form novalidate class=\"form-horizontal\" role=\"form\">\r\n        <div class=\"form-group\">\r\n            <label for=\"ruleID\" class=\"col-sm-{{colspan1}} control-label\">ID</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input ng-if=\"action === 'Create'\" type=\"text\" id=\"ruleID\" class=\"form-control\" ng-model=\"formula.model.Id\" ng-pattern=\"/^.+$/\" required>\r\n                <input ng-if=\"action === 'Update'\" type=\"text\" id=\"ruleID\" readonly=\"readonly\" class=\"form-control\" ng-model=\"formula.model.Id\" ng-pattern=\"/^.+$/\" required>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\">\r\n            <label for=\"ruleLabel\" class=\"col-sm-{{colspan1}} control-label\">Label</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"text\" id=\"ruleLabel\" class=\"form-control\" ng-model=\"formula.model.Label\" required>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\">\r\n            <label for=\"ruleDescription\" class=\"col-sm-{{colspan1}} control-label\">Description</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <textarea class=\"form-control\" id=\"ruleDescription\" rows=\"3\" placeholder=\"\" ng-model=\"formula.model.Description\"></textarea>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\" ng-repeat=\"concept in formula.model.ComputableConcepts track by $index\">\r\n            <label for=\"compFact{{$index}}\" class=\"col-sm-{{colspan1}} control-label\">Computable Fact {{ $index +1 }}</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"text\" id=\"compFact{{$index}}\" class=\"form-control\" ng-model=\"formula.model.ComputableConcepts[$index]\">\r\n            </div>\r\n        </div>\r\n\r\n\r\n        <!-- if 'xbrl28:arithmetic' || 'xbrl28:excel'-->\r\n        <div class=\"form-group\" ng-repeat=\"concept in formula.model.DependsOn track by $index\"\r\n             ng-if=\"formula.model.Type === 'xbrl28:arithmetic' || formula.model.Type === 'xbrl28:excel'\">\r\n            <label for=\"dep{{$index}}\" class=\"col-sm-{{colspan1}} control-label\">Dependency {{ $index +1 }}</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"text\" id=\"dep{{$index}}\" readonly=\"readonly\" class=\"form-control\" ng-model=\"concept\">\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\" ng-if=\"formula.model.Type === 'xbrl28:arithmetic' || formula.model.Type === 'xbrl28:excel'\">\r\n            <label for=\"coverAspects\" class=\"col-sm-{{colspan1}} control-label\">Cover Aspects</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"checkbox\" id=\"coverAspects\" ng-model=\"formula.model.AllowCrossPeriodType\">  Allow facts to be computable across different period type (e.g. allow to add an instant fact to a duration fact)\r\n            </div>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"checkbox\" ng-model=\"formula.model.AllowCrossBalance\">  Allow facts to be computable across different balance types (e.g. allow to compare credit facts with debit facts)\r\n            </div>\r\n        </div>\r\n        <tabset ng-if=\"formula.model.Type === 'xbrl28:arithmetic' || formula.model.Type === 'xbrl28:excel'\">\r\n            <tab ng-repeat=\"alt in formula.model.Formulae track by $index\" heading=\"Alternative {{$index +1}}\" >\r\n                <div style=\"border-width: 0 1px 1px 1px;border-color: #ddd;border-radius: 4px 4px 0 0;padding-top: 15px;\">\r\n                    <div class=\"form-group\">\r\n                        <label for=\"sourceFact{{$index}}\" class=\"col-sm-{{colspan1}} control-label\">Mandatory Source Fact</label>\r\n                        <div class=\"col-sm-{{12 - colspan1}}\">\r\n                            <input type=\"text\" id=\"sourceFact{{$index}}\" class=\"form-control\" ng-model=\"alt.SourceFact[0]\" ng-pattern=\"/^.+$/\">\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"form-group\">\r\n                        <label for=\"precondition{{$index}}\" class=\"col-sm-{{colspan1}} control-label\">Precondition</label>\r\n                        <div class=\"col-sm-{{12 - colspan1}}\">\r\n                            <textarea class=\"form-control\" id=\"precondition{{$index}}\" rows=\"1\" placeholder=\"\" ng-change=\"formula.compilePrereq($index)\" ng-model=\"alt.PrereqSrc\"></textarea>\r\n                        </div>\r\n                        <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"alt.PrereqErr\" style=\"margin-top: 20px;\">{{alt.PrereqErr}}</div>\r\n                    </div>\r\n                    <div class=\"form-group\">\r\n                        <label for=\"rule{{$index}}\" class=\"col-sm-{{colspan1}} control-label\">Arithmetic Rule</label>\r\n                        <div  class=\"col-sm-{{12 - colspan1}}\">\r\n                            <textarea class=\"form-control\" id=\"rule{{$index}}\" rows=\"6\" placeholder=\"\" ng-change=\"formula.compileBody($index)\" ng-model=\"alt.BodySrc\"></textarea>\r\n                        </div>\r\n                        <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"alt.BodyErr\" style=\"margin-top: 20px;\">{{alt.BodyErr}}</div>\r\n                    </div>\r\n                </div>\r\n            </tab>\r\n        </tabset>\r\n\r\n\r\n        <!-- if 'xbrl28:formula' || 'xbrl28:validation'-->\r\n        <div class=\"form-group\" ng-repeat=\"concept in formula.model.DependsOn track by $index\"\r\n             ng-if=\"formula.model.Type === 'xbrl28:formula' || formula.model.Type === 'xbrl28:validation'\">\r\n            <label for=\"dep2{{$index}}\" class=\"col-sm-{{colspan1}} control-label\">Dependency {{ $index +1 }}</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"text\" id=\"dep2{{$index}}\" class=\"form-control\" ng-model=\"concept\">\r\n            </div>\r\n        </div>\r\n        <div ng-if=\"formula.model.Type === 'xbrl28:formula'\">\r\n            <div class=\"form-group\">\r\n                <label for=\"sourceFact\" class=\"col-sm-{{colspan1}} control-label\">Mandatory Source Fact</label>\r\n                <div class=\"col-sm-{{12 - colspan1}}\">\r\n                    <input type=\"text\" id=\"sourceFact\" class=\"form-control\" ng-model=\"formula.model.SourceFact[0]\" ng-pattern=\"/^.+$/\">\r\n                </div>\r\n            </div>\r\n            <div class=\"form-group\">\r\n                <label for=\"rule\" class=\"col-sm-{{colspan1}} control-label\">Advanced Rule</label>\r\n                <div  class=\"col-sm-{{12 - colspan1}}\">\r\n                    <textarea class=\"form-control\" id=\"rule\" rows=\"20\" placeholder=\"\" ng-change=\"formula.compile()\" ng-model=\"formula.model.Formula\"></textarea>\r\n                </div>\r\n                <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"formula.model.FormulaErr\" style=\"margin-top: 20px;\">{{formula.model.FormulaErr}}</div>\r\n            </div>\r\n        </div>\r\n        <div ng-if=\"formula.model.Type === 'xbrl28:validation'\">\r\n            <div class=\"form-group\">\r\n                <label for=\"validatedConcept\" class=\"col-sm-{{colspan1}} control-label\">Validated Concept</label>\r\n                <div class=\"col-sm-{{12 - colspan1}}\">\r\n                    <input type=\"text\" id=\"validatedConcept\" class=\"form-control\" ng-model=\"formula.model.ValidatedConcepts[0]\" ng-pattern=\"/^.+$/\">\r\n                </div>\r\n            </div>\r\n            <div class=\"form-group\">\r\n                <label for=\"validation\" class=\"col-sm-{{colspan1}} control-label\">Advanced Validation Rule</label>\r\n                <div  class=\"col-sm-{{12 - colspan1}}\">\r\n                    <textarea class=\"form-control\" id=\"validation\" rows=\"20\" placeholder=\"\" ng-change=\"formula.compile()\" ng-model=\"formula.model.Formula\"></textarea>\r\n                </div>\r\n                <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"formula.model.FormulaErr\" style=\"margin-top: 20px;\">{{formula.model.FormulaErr}}</div>\r\n            </div>\r\n        </div>\r\n    </form>\r\n</div>")
+.constant("RulesEditorTpl", "<div class=\"container\">\r\n    <form novalidate class=\"form-horizontal\" role=\"form\">\r\n        <div class=\"form-group\" ng-class=\"{'has-error': formula.model.IdErr!==undefined}\">\r\n            <label for=\"ruleID\" class=\"col-sm-{{colspan1}} control-label\">ID</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input ng-if=\"action === 'Create'\" type=\"text\" id=\"ruleID\" class=\"form-control\" ng-model=\"formula.model.Id\" ng-pattern=\"/^.+$/\" required ng-change=\"formula.validate(action)\">\r\n                <input ng-if=\"action === 'Update'\" type=\"text\" id=\"ruleID\" readonly=\"readonly\" class=\"form-control\" ng-model=\"formula.model.Id\" ng-pattern=\"/^.+$/\" required>\r\n            </div>\r\n            <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.IdErr\">\r\n                <p ng-bind=\"formula.model.IdErr\" class=\"text-danger\"></p>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\" ng-class=\"{'has-error': formula.model.LabelErr!==undefined}\">\r\n            <label for=\"ruleLabel\" class=\"col-sm-{{colspan1}} control-label\">Label</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"text\" id=\"ruleLabel\" class=\"form-control\" ng-model=\"formula.model.Label\" required ng-change=\"formula.validate(action)\">\r\n            </div>\r\n            <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.LabelErr\">\r\n                <p ng-bind=\"formula.model.LabelErr\" class=\"text-danger\"></p>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\" ng-class=\"{'has-error': formula.model.DescriptionErr!==undefined}\">\r\n            <label for=\"ruleDescription\" class=\"col-sm-{{colspan1}} control-label\">Description</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <textarea class=\"form-control\" id=\"ruleDescription\" rows=\"3\" placeholder=\"\" ng-model=\"formula.model.Description\" ng-change=\"formula.validate(action)\"></textarea>\r\n            </div>\r\n            <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.DescriptionErr\">\r\n                <p ng-bind=\"formula.model.DescriptionErr\" class=\"text-danger\"></p>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\" ng-class=\"{'has-error': formula.model.ComputableConceptsErr!==undefined}\">\r\n            <label for=\"compFact\" class=\"col-sm-{{colspan1}} control-label\">Computed Fact Name</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"text\" id=\"compFact\" class=\"form-control\" ng-model=\"formula.model.ComputableConcepts\" ng-list ng-change=\"formula.validate(action)\">\r\n            </div>\r\n            <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.ComputableConceptsErr\">\r\n                <p ng-bind=\"formula.model.ComputableConceptsErr\" class=\"text-danger\"></p>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\" ng-class=\"{'has-error': formula.model.DependsOnErr!==undefined}\">\r\n            <label for=\"deps\" class=\"col-sm-{{colspan1}} control-label\">Dependencies</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input ng-if=\"formula.model.OriginalLanguage === 'SpreadsheetFormula'\"\r\n                       class=\"form-control\" ng-model=\"formula.model.DependsOn\" ng-list ng-change=\"formula.validate(action)\" type=\"text\" id=\"deps\" readonly>\r\n                <input ng-if=\"formula.model.OriginalLanguage !== 'SpreadsheetFormula'\"\r\n                       class=\"form-control\" ng-model=\"formula.model.DependsOn\" ng-list ng-change=\"formula.validate(action)\" type=\"text\" id=\"deps\">\r\n            </div>\r\n            <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.DependsOnErr\">\r\n                <p ng-bind=\"formula.model.DependsOnErr\" class=\"text-danger\"></p>\r\n            </div>\r\n        </div>\r\n\r\n\r\n        <!-- if 'SpreadsheetFormula'-->\r\n        <div class=\"form-group\" ng-if=\"formula.model.OriginalLanguage === 'SpreadsheetFormula'\">\r\n            <label for=\"coverAspects\" class=\"col-sm-{{colspan1}} control-label\">Implicit Filtering Options</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"checkbox\" id=\"coverAspects\" ng-model=\"formula.model.AllowCrossPeriod\">\r\n                    <span tooltip=\"Allow facts to be computable across different period types (e.g. divide Revenue [duration] by Assets [instant]).\" tooltip-trigger=\"mouseenter\" tooltip-placement=\"{{tooltipPlacement}}\">\r\n                        Compute facts across different period types (duration/instant)</span>\r\n            </div>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"checkbox\" ng-model=\"formula.model.AllowCrossBalance\">\r\n                    <span tooltip=\"Allow facts to be computable across different balance types (e.g. allow to compare Assets [debit] with Equity [debit]).\" tooltip-trigger=\"mouseenter\" tooltip-placement=\"{{tooltipPlacement}}\">\r\n                        Compute facts across different balance types (debit/credit)</span>\r\n            </div>\r\n        </div>\r\n        <tabset ng-if=\"formula.model.OriginalLanguage === 'SpreadsheetFormula'\">\r\n            <tab ng-repeat=\"alt in formula.model.Formulae track by $index\" active=\"alt.active\">\r\n                <tab-heading>\r\n                    <span ng-class=\"{'text-danger': alt.valid===false}\"><i class=\"glyphicon glyphicon-bell\" style=\"color: #a94442\" ng-show=\"alt.valid===false\"></i> Alternative {{$index +1}}</span>\r\n                    <span class=\"btn-group\" dropdown is-open=\"status.isopen\" style=\"margin-left: 10px; margin-right: 10px;\">\r\n                        <button type=\"button\" class=\"btn btn-default dropdown-toggle btn-xs\" ng-disabled=\"disabled\"><span class=\"caret\"></span></button>\r\n                        <ul class=\"dropdown-menu\" role=\"menu\">\r\n                            <li ng-if=\"formula.model.Formulae.length > 1\"><a href=\"#\" ng-click=\"formula.removeAlternative($index)\" class=\"text-danger\"><i class=\"glyphicon glyphicon-trash\"></i> Delete</a></li>\r\n                            <li><a href=\"#\" ng-click=\"formula.copyAlternative($index)\"><i class=\"glyphicon glyphicon-share\"></i> Duplicate</a></li>\r\n                        </ul>\r\n                    </span>\r\n                </tab-heading>\r\n                <div style=\"border-width: 0 1px 1px 1px;border-color: #ddd;border-radius: 4px 4px 0 0;padding-top: 15px;\">\r\n                    <div class=\"form-group\" ng-class=\"{'has-error': alt.SourceFactErr!==undefined}\">\r\n                        <label for=\"sourceFact{{$index}}\" class=\"col-sm-{{colspan1}} control-label\">Mandatory Source Fact</label>\r\n                        <div class=\"col-sm-{{12 - colspan1}}\">\r\n                            <input type=\"text\" id=\"sourceFact{{$index}}\" class=\"form-control\" ng-model=\"alt.SourceFact[0]\" ng-pattern=\"/^.+$/\" ng-change=\"formula.validate(action)\">\r\n                        </div>\r\n                        <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"alt.SourceFactErr\">\r\n                            <p ng-bind=\"alt.SourceFactErr\" class=\"text-danger\"></p>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"form-group\" ng-class=\"{'has-error': alt.PrereqErr!==undefined}\">\r\n                        <label for=\"precondition{{$index}}\" class=\"col-sm-{{colspan1}} control-label\">Precondition</label>\r\n                        <div class=\"col-sm-{{12 - colspan1}}\">\r\n                            <textarea class=\"form-control\" id=\"precondition{{$index}}\" rows=\"1\" placeholder=\"\" ng-change=\"formula.compilePrereq($index, true, action)\" ng-model=\"alt.PrereqSrc\"></textarea>\r\n                        </div>\r\n                        <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"alt.PrereqErr\" style=\"margin-top: 20px;\">{{alt.PrereqErr}}</div>\r\n                    </div>\r\n                    <div class=\"form-group\" ng-class=\"{'has-error': alt.BodyErr!==undefined}\">\r\n                        <label for=\"rule{{$index}}\" class=\"col-sm-{{colspan1}} control-label\">Arithmetic Rule</label>\r\n                        <div  class=\"col-sm-{{12 - colspan1}}\">\r\n                            <textarea class=\"form-control\" id=\"rule{{$index}}\" rows=\"6\" placeholder=\"\" ng-change=\"formula.compileBody($index, true, action)\" ng-model=\"alt.BodySrc\"></textarea>\r\n                        </div>\r\n                        <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"alt.BodyErr\" style=\"margin-top: 20px;\">{{alt.BodyErr}}</div>\r\n                    </div>\r\n                </div>\r\n            </tab>\r\n            <tab select=\"formula.addAlternative()\">\r\n                <tab-heading>\r\n                    <span><i class=\"glyphicon glyphicon-plus\"></i> Add An Alternative</span>\r\n                </tab-heading>\r\n            </tab>\r\n        </tabset>\r\n\r\n        <!-- if 'xbrl28:formula' || 'xbrl28:validation'-->\r\n        <div ng-if=\"formula.model.Type === 'xbrl28:formula' && formula.model.OriginalLanguage !== 'SpreadsheetFormula'\">\r\n            <div class=\"form-group\" ng-class=\"{'has-error': formula.model.FormulaErr!==undefined}\">\r\n                <label for=\"rule\" class=\"col-sm-{{colspan1}} control-label\">Advanced Rule</label>\r\n                <div  class=\"col-sm-{{12 - colspan1}}\">\r\n                    <textarea class=\"form-control\" id=\"rule\" rows=\"20\" placeholder=\"\" ng-change=\"formula.compile()\" ng-model=\"formula.model.Formula\"></textarea>\r\n                </div>\r\n                <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"formula.model.FormulaErr\" style=\"margin-top: 20px;\">{{formula.model.FormulaErr}}</div>\r\n            </div>\r\n        </div>\r\n        <div ng-if=\"formula.model.Type === 'xbrl28:validation' && formula.model.OriginalLanguage !== 'SpreadsheetFormula'\">\r\n            <div class=\"form-group\" ng-class=\"{'has-error': formula.model.ValidatedConceptsErr!==undefined}\">\r\n                <label for=\"validatedConcept\" class=\"col-sm-{{colspan1}} control-label\">Validated Concept</label>\r\n                <div class=\"col-sm-{{12 - colspan1}}\">\r\n                    <input type=\"text\" id=\"validatedConcept\" class=\"form-control\" ng-model=\"formula.model.ValidatedConcepts\" ng-pattern=\"/^.+$/\" ng-list ng-change=\"formula.validate(action)\">\r\n                </div>\r\n                <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.ValidatedConceptsErr\">\r\n                    <p ng-bind=\"formula.model.ComputableConceptsErr\" class=\"text-danger\"></p>\r\n                </div>\r\n            </div>\r\n            <div class=\"form-group\" ng-class=\"{'has-error': formula.model.FormulaErr!==undefined}\">\r\n                <label for=\"validation\" class=\"col-sm-{{colspan1}} control-label\">Advanced Validation Rule</label>\r\n                <div  class=\"col-sm-{{12 - colspan1}}\">\r\n                    <textarea class=\"form-control\" id=\"validation\" rows=\"20\" placeholder=\"\" ng-change=\"formula.compile()\" ng-model=\"formula.model.Formula\"></textarea>\r\n                </div>\r\n                <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"formula.model.FormulaErr\" style=\"margin-top: 20px;\">{{formula.model.FormulaErr}}</div>\r\n            </div>\r\n        </div>\r\n    </form>\r\n</div>")
 
 .constant("ConceptTpl", "<form name=\"editConceptForm\" ng-submit=\"ok\" role=\"form\" spellcheck=\"false\" novalidate>\r\n    <div class=\"modal-header\">\r\n    <button class=\"pull-right btn btn-default\"><i class=\"fa fa-times\" ng-click=\"remove()\"></i></button>\r\n        <h3 class=\"modal-title\" ng-bind=\"concept.Name\"></h3>\r\n    </div>\r\n    <div class=\"modal-body\">\r\n        <div class=\"form-group\">\r\n            <label for=\"label\">Label</label>\r\n           <input type=\"text\" class=\"form-control\" id=\"label\" ng-model=\"concept.Label\" placeholder=\"Label\" required>\r\n        </div>\r\n        <div class=\"checkbox\">\r\n            <label>\r\n                <input type=\"checkbox\" ng-model=\"concept.IsAbstract\"> Abstract\r\n            </label>\r\n        </div>\r\n    </div>\r\n</form>")
 
@@ -3339,7 +4111,7 @@ angular
 .factory('Report', function(){
 
     //Constructor
-    var Report = function(modelOrName, label, description, role){
+    var Report = function(modelOrName, label, description, role, prefix){
         if ( modelOrName === null) {
             throw new Error('new Report creation with null');
         } else if (typeof modelOrName !== 'object' &&
@@ -3405,6 +4177,9 @@ angular
                     },
                     'Rules' : []
                 };
+            if(prefix !== undefined || prefix !== null || typeof prefix === 'string'){
+                this.model.Prefix = prefix;
+            }
         } // if
     };
 
@@ -3455,7 +4230,7 @@ angular
     };
 
     var ensureExists = function(value, valueType, functionName, errorMessage) {
-        if(value === null || value === undefined) {
+        if(value === null || value === undefined || value === '') {
             throw new Error(functionName + ': ' + errorMessage);
         }
         if(typeof value !== valueType) {
@@ -3464,7 +4239,7 @@ angular
     };
 
     // helper to create a unique id
-    var uuid = function () {
+    var _uuid = function () {
         // thanks to https://gist.github.com/ae6rt/7894539
         // http://www.ietf.org/rfc/rfc4122.txt
         var s = [];
@@ -3478,6 +4253,38 @@ angular
         /* jslint bitwise: false */
         s[8] = s[13] = s[18] = s[23] = '-';
         return s.join('');
+    };
+
+    Report.prototype.uuid = function(){
+        return _uuid();
+    };
+
+    Report.prototype.getPrefix = function(){
+        var model = this.getModel();
+        ensureExists(model, 'object', 'getPrefix', 'Report doesn\'t have a model.');
+        if(model.Prefix !== undefined && model.Prefix !== null && typeof model.Prefix === 'string'){
+           return model.Prefix;
+        }
+
+        // try to guess the prefix
+        var concepts = this.listConcepts();
+        if(concepts.length === 0){
+            // no chance to guess the prefix
+            return null;
+        }
+        var map = concepts.reduce(function (prefixes, concept) {
+            var found = concept.Name.indexOf(':');
+            if(found !== -1){
+                var prefix = concept.Name.substring(0,found);
+                prefixes[prefix] = (prefixes[prefix] || 0) + 1;
+            }
+            return prefixes;
+        }, {});
+        var allPrefixes = Object.keys(map).sort(function (a, b) {
+            return map[a] < map[b];
+        });
+        model.Prefix = allPrefixes[0];
+        return model.Prefix;
     };
 
     Report.prototype.getModel = function(){
@@ -3817,7 +4624,7 @@ angular
             _order = order;
         }
         var element = {
-            Id: uuid(),
+            Id: _uuid(),
             Name : concept.Name,
             Label : concept.Label,
             Order : _order
@@ -4014,13 +4821,13 @@ angular
             var name = toConceptNamesArray[i];
             ensureConceptName(name, 'toConceptNamesArray', 'addConceptMap');
             toObj[name] = {
-                'Id': uuid(),
+                'Id': _uuid(),
                 'Name': name,
                 'Order': parseInt(i, 10) + 1
             };
         }
         var conceptMap = {
-            'Id': uuid(),
+            'Id': _uuid(),
             'Name': fromConcept.Name,
             'To': toObj
         };
@@ -4134,7 +4941,32 @@ angular
         return false;
     };
 
-    Report.prototype.computableByRules = function(conceptName) {
+    Report.prototype.validatedByRules = function(conceptName) {
+        ensureConceptName(conceptName, 'conceptName', 'validatedByRules');
+
+        var result = [];
+        var model = this.getModel();
+        ensureExists(model, 'object', 'validatedByRules', 'Report doesn\'t have a model.');
+
+        if(model.Rules === null || model.Rules === undefined || model.Rules.length === 0) {
+            return result;
+        }
+
+        for (var i in model.Rules) {
+            var rule = model.Rules[i];
+            if(rule.ValidatedConcepts !== undefined && rule.ValidatedConcepts !== null) {
+                for (var j in rule.ValidatedConcepts) {
+                    if (rule.ValidatedConcepts[j] === conceptName) {
+                        result.push(rule);
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
+    };
+
+     Report.prototype.computableByRules = function(conceptName) {
         ensureConceptName(conceptName, 'conceptName', 'computableByRules');
 
         var result = [];
@@ -4162,7 +4994,7 @@ angular
 
         var result = [];
         var model = this.getModel();
-        ensureExists(model, 'object', 'computableByRules', 'Report doesn\'t have a model.');
+        ensureExists(model, 'object', 'findInRules', 'Report doesn\'t have a model.');
 
         if(model.Rules === null || model.Rules === undefined || model.Rules.length === 0) {
             return result;
@@ -4204,7 +5036,6 @@ angular
     var createNewRule = function(id, label, description, type, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray, report) {
         ensureParameter(id, 'id', 'string', 'createNewRule');
         ensureParameter(label, 'label', 'string', 'createNewRule');
-        ensureParameter(description, 'description', 'string', 'createNewRule');
         ensureRuleType(type, 'type', 'createNewRule');
         ensureParameter(formula, 'formula', 'string', 'createNewRule');
         ensureExists(computableConceptsArray, 'object', 'createNewRule', 'function called without computableConceptsArray.');
@@ -4253,48 +5084,99 @@ angular
         return rule;
     };
 
-    Report.prototype.createRule = function(rule){
+    var validate = function(report, errorMsgPrefix, action, id, label, type, description, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray){
+        ensureExists(id, 'string', errorMsgPrefix, 'Mandatory Id missing.');
+        var existingRule = report.getRule(id);
+        if(action === 'Create' && existingRule !== undefined && existingRule !== null){
+            throw new Error(errorMsgPrefix + ': Rule with ID "' + id + '" already exists!');
+        } else if(action === 'Update' && (existingRule === undefined || existingRule === null)){
+            throw new Error(errorMsgPrefix + ': Rule with ID "' + id + '" doesn\'t exist!');
+        } else if(action !== 'Create' && action !== 'Update'){
+            throw new Error(errorMsgPrefix + ': Unknown action "' + action + '"!');
+        }
+        ensureExists(label, 'string', errorMsgPrefix, 'Mandatory Label missing.');
+        ensureExists(formula, 'string', errorMsgPrefix, 'Cannot store rule with empty source code.');
+        ensureExists(computableConceptsArray[0], 'string', errorMsgPrefix, 'Mandatory computable concept missing.');
+        for(var i in computableConceptsArray) {
+            if(computableConceptsArray.hasOwnProperty(i)) {
+                var cname = computableConceptsArray[i];
+                ensureConceptName(cname, 'computableConceptsArray', errorMsgPrefix, 'The computable concept name ' + cname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
+                var cconcept = report.getConcept(cname);
+                if (cconcept === undefined || cconcept === null) {
+                    throw new Error(errorMsgPrefix + ': the computable concept with name "' + cname + '" does not exist. You need to <b>create this concept</b> or adapt it to an existing one before you can create the rule.');
+                }
+                var rulesComputableConcepts = report.computableByRules(cname);
+                if (rulesComputableConcepts.lenght > 0 && rulesComputableConcepts[0].Id !== id) {
+                    throw new Error(errorMsgPrefix + ': A rule which can compute facts for concept "' + cname + '" exists already: "' + rulesComputableConcepts[0].Id + '. Currently, only one rule must be able to compute a fact for a certain concept.');
+                }
+            }
+        }
+        if(dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
+            for (var j in dependingConceptsArray) {
+                if(dependingConceptsArray.hasOwnProperty(j)) {
+                    var dname = dependingConceptsArray[j];
+                    ensureConceptName(dname, 'dependingConceptsArray', errorMsgPrefix, 'The dependency concept name ' + dname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
+                    var dconcept = report.getConcept(dname);
+                    if (dconcept === undefined || dconcept === null) {
+                        throw new Error(errorMsgPrefix + ': A concept with name "' + dname + '" does not exist (as used in the dependencies). You need to create this concept or remove it from the dependencies before you can create the rule.');
+                    }
+                }
+            }
+        }
+        if(validatedConceptsArray !== null && typeof validatedConceptsArray === 'object') {
+            for(var x in validatedConceptsArray) {
+                if(validatedConceptsArray.hasOwnProperty(x)) {
+                    var vname = validatedConceptsArray[x];
+                    ensureConceptName(vname, 'validatedConceptsArray', errorMsgPrefix, 'The validated concept name ' + vname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
+                    var vconcept = report.getConcept(vname);
+                    if (vconcept === undefined || vconcept === null) {
+                        throw new Error(errorMsgPrefix + ': The validated concept with name "' + vname + '" does not exist. You need to create this concept or adapt it to an existing one before you can create the rule.');
+                    }
+                }
+            }
+        }
+    };
+
+    Report.prototype.updateRule = function(rule){
         var id = rule.Id;
         var label = rule.Label;
+        var language = rule.OriginalLanguage;
         var type = rule.Type;
         var description = rule.Description;
         var formula = rule.Formula;
         var computableConceptsArray = rule.ComputableConcepts;
         var dependingConceptsArray = rule.DependsOn;
         var validatedConceptsArray = rule.ValidatedConcepts;
-        ensureExists(id, 'string', 'Rule Creation Error', 'Mandatory Id missing.');
-        var existingRule = this.getRule(id);
-        if(existingRule !== undefined){
-            throw new Error('Rule with ID "' + id + '" already exists!');
-        }
-        ensureExists(label, 'string', 'Rule Creation Error', 'Mandatory Label missing.');
-        ensureExists(formula, 'string', 'Rule Creation Error', 'Cannot store rule with empty source code.');
-        ensureExists(computableConceptsArray[0], 'string', 'Rule Creation Error', 'Mandatory computable concept missing.');
-        for(var i in computableConceptsArray) {
-            var cname = computableConceptsArray[i];
-            ensureConceptName(cname, 'computableConceptsArray', 'Rule Creation Error', 'The computable concept name ' + cname + 'is not a valid concept name (correct pattern e.g. fac:Revenues).');
-            var rulesComputableConcepts = this.computableByRules(cname);
-            if(rulesComputableConcepts.lenght > 0 && rulesComputableConcepts[0].Id !== id) {
-                throw new Error('Rule Creation Error: A rule which can compute facts for concept "' + cname + '" exists already: "' + rulesComputableConcepts[0].Id + '. Currently, only one rule must be able to compute a fact for a certain concept.');
-            }
-        }
-        if(dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
-            for(var j in dependingConceptsArray) {
-                var dname = dependingConceptsArray[j];
-                ensureConceptName(dname, 'dependingConceptsArray', 'Rule Creation Error', 'The dependency concept name ' + dname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
-            }
-        }
-        if(validatedConceptsArray !== null && typeof validatedConceptsArray === 'object') {
-            for(var x in validatedConceptsArray) {
-                var vname = validatedConceptsArray[x];
-                ensureConceptName(vname, 'validatedConceptsArray', 'Rule Creation Error', 'The validated concept name ' + vname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
-            }
-        }
-        if(type === 'xbrl28:formula'){
+        validate(this, 'Rule Updating Error', 'Update', id, label, type, description, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray);
+        if(type === 'xbrl28:formula' && language === undefined){
             this.setFormulaRule(id, label, description, formula, computableConceptsArray, dependingConceptsArray);
-        } else if (type === 'xbrl28:validation') {
+        } else if (type === 'xbrl28:validation' && language === undefined) {
             this.setValidationRule(id, label, description, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray);
-        } else if (type === 'xbrl28:excel' || type === 'xbrl28:arithmetic') {
+        } else if (language === 'SpreadsheetFormula') {
+            var model = this.getModel();
+            ensureExists(model, 'object', 'updateRule', 'Report doesn\'t have a model.');
+
+            this.removeRule(id);
+            model.Rules.push(rule);
+        }
+    };
+
+    Report.prototype.createRule = function(rule){
+        var id = rule.Id;
+        var label = rule.Label;
+        var language = rule.OriginalLanguage;
+        var type = rule.Type;
+        var description = rule.Description;
+        var formula = rule.Formula;
+        var computableConceptsArray = rule.ComputableConcepts;
+        var dependingConceptsArray = rule.DependsOn;
+        var validatedConceptsArray = rule.ValidatedConcepts;
+        validate(this, 'Rule Creation Error', 'Create', id, label, type, description, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray);
+        if(type === 'xbrl28:formula' && language === undefined){
+            this.setFormulaRule(id, label, description, formula, computableConceptsArray, dependingConceptsArray);
+        } else if (type === 'xbrl28:validation' && language === undefined) {
+            this.setValidationRule(id, label, description, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray);
+        } else if (language === 'SpreadsheetFormula') {
             var model = this.getModel();
             ensureExists(model, 'object', 'createRule', 'Report doesn\'t have a model.');
 
@@ -4337,20 +5219,42 @@ angular
         model.Rules.push(rule);
     };
 
-    Report.prototype.listRules = function(concept){
+    Report.prototype.listValidatingRules = function(concept){
 
         var result = [];
         var model = this.getModel();
-        if(model === null || model === undefined || model.Rules === null || model.Rules === undefined) {
+        if (model === null || model === undefined || model.Rules === null || model.Rules === undefined) {
             return result;
         }
-        if(concept !== undefined && concept !== null){
-            ensureParameter(concept, 'concept', 'string', 'listRules');
-            result = this.computableByRules(concept);
-        } else {
-            result = model.Rules;
+        if (concept !== undefined && concept !== null) {
+            ensureParameter(concept, 'concept', 'string', 'listValidatingRules');
+            result = this.validatedByRules(concept);
         }
         return result;
+    };
+
+    Report.prototype.listRules = function(concept, rulesType){
+
+        if(rulesType === undefined || rulesType === null) {
+            var result = [];
+            var model = this.getModel();
+            if (model === null || model === undefined || model.Rules === null || model.Rules === undefined) {
+                return result;
+            }
+            if (concept !== undefined && concept !== null) {
+                ensureParameter(concept, 'concept', 'string', 'listRules');
+                result = this.computableByRules(concept);
+            } else {
+                result = model.Rules;
+            }
+            return result;
+        }else if(rulesType === 'xbrl28:formula'){
+            return this.listFormulaRules(concept);
+        }else if(rulesType === 'xbrl28:validation'){
+            return this.listValidationRules(concept);
+        }else if(rulesType === 'SpreadsheetFormula'){
+            return this.listSpreadsheetRules(concept);
+        }
     };
 
     Report.prototype.listFormulaRules = function(concept){
@@ -4377,12 +5281,12 @@ angular
         return result;
     };
 
-    Report.prototype.listExcelRules = function(concept){
+    Report.prototype.listSpreadsheetRules = function(concept){
         var result = [];
         var rules = this.listRules(concept);
         for(var i in rules) {
             var rule = rules[i];
-            if(rule.Type === 'xbrl28:excel'){
+            if(rule.OriginalLanguage === 'SpreadsheetFormula'){
                 result.push(rule);
             }
         }

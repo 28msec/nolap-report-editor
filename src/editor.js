@@ -46,24 +46,6 @@ angular
                 return this.getReport().getNetwork('Presentation').Trees;
             };
 
-            this.getRules = function(ruleType, concept){
-                var rules = [];
-                var report = this.getReport();
-                this.getReport().listRules();
-                if(ruleType !== undefined && ruleType !== null){
-                    if(ruleType === 'xbrl28:formula'){
-                        rules = report.listFormulaRules(concept);
-                    } else if(ruleType === 'xbrl28:validation'){
-                        rules = report.listValidationRules(concept);
-                    } else if(ruleType === 'xbrl28:excel'){
-                        rules = report.listExcelRules(concept);
-                    }
-                } else {
-                    rules = report.listRules(concept);
-                }
-                return rules;
-            };
-
             this.getConceptMap = function(){
                 return this.getReport().getNetwork('ConceptMap').Trees;
             };
@@ -208,14 +190,6 @@ console.log(delta);
                 }
             };
             
-            /*
-            $scope.$watch('conceptName', function(conceptName){
-                if(conceptName !== undefined) {
-                    $scope.toDrop = [conceptName];
-                }
-            });
-            */
-
             $scope.select = function(row) {
                 if(row.branch.To) {
                     row.branch.expanded = !row.branch.expanded;
@@ -369,63 +343,52 @@ console.log(delta);
     return {
         restrict: 'E',
         scope: {
-            'conceptName': '@'
+            'conceptName': '@',
+            'report': '='
         },
         template: BusinessRuleTpl,
-        require: '^report',
-        link: function($scope, element, attrs, reportCtrl) {
+        link: function($scope) {
 
-            //$scope.concept = reportCtrl.getReport().getConcept($scope.conceptName);
+            $scope.hasComputingRule = false;
+            $scope.hasValidatingRules = false;
 
-            var updateRules = function(rulesType, concept){
+            var updateRules = function(concept){
                 if(concept === undefined || concept === null){
-                    $scope.formulaRules = undefined;
-                    $scope.validationRules = undefined;
-                    $scope.excelRules = undefined;
-                } else if(rulesType === undefined || rulesType === null) {
-                    updateRules('xbrl28:formula', concept);
-                    updateRules('xbrl28:validation', concept);
-                    updateRules('xbrl28:excel', concept);
+                    $scope.allRules = undefined;
+                    $scope.hasComputingRule = false;
+
+                    $scope.validatingRules = undefined;
+                    $scope.hasValidatingRules = false;
                 } else {
-                    var rules = reportCtrl.getRules(rulesType, concept);
-                    for(var i in rules){
-                        var rule = rules[i];
-                        if(rule.expanded === undefined || rule.expanded === null) {
-                            rule.expanded = false;
-                        }
+                    $scope.allRules = $scope.report.listRules(concept);
+                    if($scope.allRules.length > 0){
+                        $scope.hasComputingRule = true;
+                    } else {
+                        $scope.hasComputingRule = false;
                     }
-                    if (rulesType === 'xbrl28:formula'){
-                        $scope.formulaRules = rules;
-                    } else if(rulesType === 'xbrl28:validation') {
-                        $scope.validationRules = rules;
-                    }else if (rulesType === 'xbrl28:excel'){
-                        $scope.excelRules = rules;
+
+                    $scope.validatingRules = $scope.report.listValidatingRules(concept);
+                    if($scope.validatingRules.length > 0){
+                        $scope.hasValidatingRules = true;
+                    } else {
+                        $scope.hasValidatingRules = false;
                     }
                 }
             };
-            updateRules(undefined, $scope.conceptName);
+            updateRules($scope.conceptName);
 
             $scope.$watch(function(){
-                return reportCtrl.getConcepts();
-            }, function(concepts){
-                $scope.concepts = [];
-                concepts.forEach(function(concept){
-                    $scope.concepts.push(concept.Name);
-                });
-            });
-            $scope.$watch(function(){
-                return reportCtrl.getRules();
+                return $scope.report.listRules();
             }, function(){
-                updateRules(undefined, $scope.conceptName);
-            });
+                updateRules($scope.conceptName);
+            }, true);
 
             $scope.removeRule = function(id){
-                reportCtrl.getReport().removeRule(id);
-                updateRules(undefined, $scope.conceptName);
+                $rootScope.$emit('removeRule', id);
             };
 
-            $scope.addRule = function(concept, ruleType){
-                $rootScope.$emit('createRule', concept, ruleType);
+            $scope.addRule = function(concept, ruleType, language){
+                $rootScope.$emit('createRule', concept, ruleType, language);
             };
 
             $scope.editRule = function(id) {
@@ -446,6 +409,7 @@ console.log(delta);
         template: RulesEditorTpl,
         link: function($scope) {
             $scope.colspan1 = 2;
+            $scope.tooltipPlacement = 'top';
         }
     };
 })
