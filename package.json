@@ -55,7 +55,8 @@
     "request": "~2.33.0",
     "requirejs": "~2.1.11",
     "time-grunt": "~0.1.1",
-    "grunt-contrib-less": "~0.11.2"
+    "grunt-contrib-less": "~0.11.2",
+    "grunt-protractor-runner": "~1.0.0"
   },
   "contributors": [
     {

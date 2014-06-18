@@ -126,7 +126,7 @@ module.exports = function (grunt) {
             options: {
                 jshintrc: '.jshintrc'
             },
-            src: ['Gruntfile.js', '<%= config.app %>/modules/**/*.js', 'test/*.js', 'tasks/*.js'],
+            src: ['Gruntfile.js', '<%= config.app %>/modules/**/*.js', 'tests/*.js', 'tasks/*.js'],
         },
         karma: {
             options: {
@@ -146,8 +146,8 @@ module.exports = function (grunt) {
                         '<%= config.app %>/modules/formula-parser.js',
                         '<%= config.app %>/modules/report-api.js',
                         '<%= config.app %>/modules/report-model.js',
-                        'test/karma.start.js',
-                        'test/*.js'
+                        'tests/unit/karma.start.js',
+                        'tests/unit/*.js'
                     ]
                 }
             }
@@ -156,7 +156,23 @@ module.exports = function (grunt) {
             options: {
                 'coverage_dir': 'coverage'
             }
-        }
+        },
+        protractor: {
+    options: {
+      configFile: "node_modules/protractor/referenceConf.js", // Default config file
+      keepAlive: true, // If false, the grunt process stops when the test fails.
+      noColor: false, // If true, protractor will not use colors in its output.
+      args: {
+        // Arguments passed to the command
+      }
+    },
+    all: {
+      options: {
+//        configFile: "e2e.conf.js", // Target-specific config file
+        args: {} // Target-specific arguments
+      }
+    },
+  }
     });
 
     grunt.registerTask('server', function () {
