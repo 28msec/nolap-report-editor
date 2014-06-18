@@ -21,6 +21,24 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        config: config,
+        watch: {
+            recess: {
+                files:  ['<%= config.app %>/styles/{,*/}*.less'],
+                tasks: ['recess']
+            },
+            livereload: {
+                options: {
+                    livereload: LIVERELOAD_PORT
+                },
+                files: [
+                    '<%= config.app %>/{,*/}*.html',
+                    '{.tmp,<%= config.app %>}/styles/{,*/}*.css',
+                    '{.tmp,<%= config.app %>}/scripts/{,*/}*.js',
+                    '<%= config.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
+                ]
+            }
+        },
         //Connect
         connect: {
             options: {
@@ -50,6 +68,11 @@ module.exports = function (grunt) {
                         ];
                     }
                 }
+            }
+        },
+        open: {
+            server: {
+                url: 'http://localhost:<%= connect.options.port %>'
             }
         },
         ngconstant: {
@@ -307,6 +330,15 @@ module.exports = function (grunt) {
                 'coverage_dir': 'coverage'
             }
         }
+    });
+
+    grunt.registerTask('server', function () {
+        grunt.task.run([
+            'default',
+            'connect:livereload',
+            'open',
+            'watch'
+        ]);
     });
 
     grunt.registerTask('test', ['karma:1.2.0']);
