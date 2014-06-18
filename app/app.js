@@ -48,15 +48,15 @@ angular.module('report-editor', [
     
     $stateProvider
     .state('reports', {
-        templateUrl: '/views/reports.html',
+        templateUrl: '/reports/reports.html',
         controller: 'ReportsCtrl',
         url: '/'
     })
-    .state('report', {
-        templateUrl: '/views/report.html',
-        controller: 'ReportCtrl',
-        url: '/:id'
-    })
+    //.state('report', {
+    //    templateUrl: '/views/report.html',
+    //    controller: 'ReportCtrl',
+    //    url: '/:id'
+    //})
     ;
     
 })

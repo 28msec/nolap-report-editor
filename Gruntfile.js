@@ -170,8 +170,7 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('test', ['less', 'karma:1.2.9']);
-    grunt.registerTask('release', ['clean:pre', 'test', 'clean:post']);
-    grunt.registerTask('build', ['clean:pre', 'peg', 'swagger', 'release']);
-    grunt.registerTask('default', ['jshint', 'build']);
+    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post']);
+    grunt.registerTask('build', ['clean:pre', 'peg', 'swagger']);
+    grunt.registerTask('default', ['jshint', 'build', 'test']);
 };
