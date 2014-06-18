@@ -9,7 +9,8 @@ angular.module('report-editor', [
     'report-api',
     'report-model',
     'excel-parser',
-    'formula-parser'
+    'formula-parser',
+    'forms-ui'
 ])
 .run(function($rootScope, ngProgressLite) {
   
@@ -25,6 +26,15 @@ angular.module('report-editor', [
         console.error(error);
         ngProgressLite.done();
     });
+})
+//TODO: to be removed by the final version of the REST API
+.factory('ReportEditorConfig', function(){
+    return {
+        api: {
+            endpoint: 'http://secxbrld.xbrl.io/v1/_queries/public/reports',
+            token: '0ed3b9a9-2795-412d-9863-6186d1cb64bc'
+        }
+    };
 })
 .config(function ($urlRouterProvider, $stateProvider, $locationProvider, $httpProvider) {
 
@@ -50,6 +60,15 @@ angular.module('report-editor', [
     .state('reports', {
         templateUrl: '/reports/reports.html',
         controller: 'ReportsCtrl',
+        resolve: {
+            reports: ['ReportEditorConfig', 'ReportAPI', function(ReportEditorConfig, ReportAPI){
+                var api = new ReportAPI(ReportEditorConfig.api.endpoint);
+                return api.listReports({
+                    token: ReportEditorConfig.api.token,
+                    $method: 'POST'
+                });
+            }]
+        },
         url: '/'
     })
     //.state('report', {

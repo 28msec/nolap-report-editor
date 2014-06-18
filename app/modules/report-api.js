@@ -2,7 +2,7 @@ angular.module('report-api', [])
 /**
  * <p>This API can be used to manage reports.</p> <p>This API is only accesible for users having granted priviliges to work with reports.</p> <p>Note, that the POST method can be simulated by using GET and adding the _method=POST parameter to the HTTP request.</p>
  */
-.factory('report-api', function($q, $http, $rootScope){
+.factory('ReportAPI', function($q, $http, $rootScope){
     /**
      * @class report-api
      * @param {string} domain - The project domain

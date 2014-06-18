@@ -1,0 +1,32 @@
+<header class="navbar navbar-default">
+    <div class="container">
+        <div class="navbar-header">
+            <span class="navbar-brand">Reports</span>
+        </div>
+    </div>
+</header>
+<div class="container">
+    <section>
+        <button class="btn btn-primary" ng-click="createReport()">CREATE</button>
+        <button class="btn btn-default fa fa-trash-o" ng-show="hasSelectedReport" ng-click="deleteReports()"></button>
+    </section>
+    <table class="table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" ng-model="toggle" ng-change="toggleAll()" tristate="toggle"></th>
+                <th>Name</th>
+                <th>Last Opened</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="report in reports">
+                <td><input type="checkbox" ng-model="selectedReports[report._id]" ng-change="toggleReport()"></td>
+                <td>
+                    <a ng-href="/{{report._id}}" ng-bind="report._id"></a>
+                    <small>&ndash; {{report.Label}}</small>
+                </td>
+                <td>June 14</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
