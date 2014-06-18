@@ -75,6 +75,26 @@ module.exports = function (grunt) {
                 url: 'http://localhost:<%= connect.options.port %>'
             }
         },
+        peg: {
+            // https://github.com/dvberkel/grunt-peg
+            options: { trackLineAndColumn: true },
+            excelGrammar : {
+                src: 'pegjs/excelGrammar.pegjs',
+                dest: 'src/pegjs/excelParser.js',
+                angular: {
+                    module: 'excelParser',
+                    factory: 'ExcelParser'
+                }
+            },
+            formulaGrammar : {
+                src: 'pegjs/formulaGrammar.pegjs',
+                dest: 'src/pegjs/formulaParser.js',
+                angular: {
+                    module: 'formulaParser',
+                    factory: 'FormulaParser'
+                }
+            }
+        },
         ngconstant: {
             options: {
                 space: '    ',
@@ -86,6 +106,8 @@ module.exports = function (grunt) {
                 constants: {
                     PresentationTreeTpl: grunt.file.read('tpl/tree.html'),
                     ConceptMapTpl: grunt.file.read('tpl/concept-map.html'),
+                    BusinessRuleTpl: grunt.file.read('tpl/business-rule.html'),
+                    RulesEditorTpl: grunt.file.read('tpl/rules-editor.html'),
                     ConceptTpl: grunt.file.read('tpl/concept.html')
                 }
             }
@@ -135,7 +157,7 @@ module.exports = function (grunt) {
                 separator: ''
             },
             dist: {
-                src: ['src/editor.js', 'src/swagger/ReportAPI.js', 'src/tpl.js', 'src/report.js'],
+                src: ['src/pegjs/excelParser.js', 'src/pegjs/formulaParser.js', 'src/formula.js', 'src/editor.js', 'src/swagger/ReportAPI.js', 'src/tpl.js', 'src/report.js'],
                 dest: 'dist/nolap-report-editor.js'
             }
         },
@@ -343,6 +365,6 @@ module.exports = function (grunt) {
 
     grunt.registerTask('test', ['karma:1.2.0']);
     grunt.registerTask('release', ['clean:pre', 'concat', 'test', 'jsdoc', 'clean:post']);//uglify
-    grunt.registerTask('build', ['clean:pre', 'ngconstant:tpl', 'swagger', 'release']);
+    grunt.registerTask('build', ['clean:pre', 'ngconstant:tpl', 'peg', 'swagger', 'release']);
     grunt.registerTask('default', ['jshint', 'build']);
 };

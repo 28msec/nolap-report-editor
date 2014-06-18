@@ -5,7 +5,7 @@ angular
 .factory('Report', function(){
 
     //Constructor
-    var Report = function(modelOrName, label, description, role){
+    var Report = function(modelOrName, label, description, role, prefix){
         if ( modelOrName === null) {
             throw new Error('new Report creation with null');
         } else if (typeof modelOrName !== 'object' &&
@@ -71,6 +71,9 @@ angular
                     },
                     'Rules' : []
                 };
+            if(prefix !== undefined || prefix !== null || typeof prefix === 'string'){
+                this.model.Prefix = prefix;
+            }
         } // if
     };
 
@@ -91,9 +94,16 @@ angular
             'invalid networkShortName parameter value passed "' + networkShortName + '" (allowed values: Presentation, ConceptMap).');
     };
 
-    var ensureConceptName = function(conceptName, paramName, functionName) {
-        ensureParameter(conceptName, paramName, 'string', functionName, /^\w(\w|\d|[-_])*:(\w|\d|[-_])*$/g,
-            'function called with mandatory "' + paramName + '" parameter which is not a QName: ' + conceptName);
+    var ensureConceptName = function(conceptName, paramName, functionName, errorMsg) {
+        var regex = /^\w(\w|\d|[-_])*:(\w|\d|[-_])*$/g;
+        if(errorMsg === undefined || errorMsg === null) {
+            ensureParameter(conceptName, paramName, 'string', functionName, regex,
+                    'function called with mandatory "' + paramName + '" parameter which is not a QName: ' + conceptName);
+        } else {
+            if(conceptName.match(regex) === null) {
+                throw new Error(errorMsg);
+            }
+        }
     };
     
     var ensureRuleType = function(ruleType, paramName, functionName) {
@@ -114,7 +124,7 @@ angular
     };
 
     var ensureExists = function(value, valueType, functionName, errorMessage) {
-        if(value === null || value === undefined) {
+        if(value === null || value === undefined || value === '') {
             throw new Error(functionName + ': ' + errorMessage);
         }
         if(typeof value !== valueType) {
@@ -123,7 +133,7 @@ angular
     };
 
     // helper to create a unique id
-    var uuid = function () {
+    var _uuid = function () {
         // thanks to https://gist.github.com/ae6rt/7894539
         // http://www.ietf.org/rfc/rfc4122.txt
         var s = [];
@@ -137,6 +147,38 @@ angular
         /* jslint bitwise: false */
         s[8] = s[13] = s[18] = s[23] = '-';
         return s.join('');
+    };
+
+    Report.prototype.uuid = function(){
+        return _uuid();
+    };
+
+    Report.prototype.getPrefix = function(){
+        var model = this.getModel();
+        ensureExists(model, 'object', 'getPrefix', 'Report doesn\'t have a model.');
+        if(model.Prefix !== undefined && model.Prefix !== null && typeof model.Prefix === 'string'){
+           return model.Prefix;
+        }
+
+        // try to guess the prefix
+        var concepts = this.listConcepts();
+        if(concepts.length === 0){
+            // no chance to guess the prefix
+            return null;
+        }
+        var map = concepts.reduce(function (prefixes, concept) {
+            var found = concept.Name.indexOf(':');
+            if(found !== -1){
+                var prefix = concept.Name.substring(0,found);
+                prefixes[prefix] = (prefixes[prefix] || 0) + 1;
+            }
+            return prefixes;
+        }, {});
+        var allPrefixes = Object.keys(map).sort(function (a, b) {
+            return map[a] < map[b];
+        });
+        model.Prefix = allPrefixes[0];
+        return model.Prefix;
     };
 
     Report.prototype.getModel = function(){
@@ -476,7 +518,7 @@ angular
             _order = order;
         }
         var element = {
-            Id: uuid(),
+            Id: _uuid(),
             Name : concept.Name,
             Label : concept.Label,
             Order : _order
@@ -673,13 +715,13 @@ angular
             var name = toConceptNamesArray[i];
             ensureConceptName(name, 'toConceptNamesArray', 'addConceptMap');
             toObj[name] = {
-                'Id': uuid(),
+                'Id': _uuid(),
                 'Name': name,
                 'Order': parseInt(i, 10) + 1
             };
         }
         var conceptMap = {
-            'Id': uuid(),
+            'Id': _uuid(),
             'Name': fromConcept.Name,
             'To': toObj
         };
@@ -793,7 +835,32 @@ angular
         return false;
     };
 
-    Report.prototype.computableByRules = function(conceptName) {
+    Report.prototype.validatedByRules = function(conceptName) {
+        ensureConceptName(conceptName, 'conceptName', 'validatedByRules');
+
+        var result = [];
+        var model = this.getModel();
+        ensureExists(model, 'object', 'validatedByRules', 'Report doesn\'t have a model.');
+
+        if(model.Rules === null || model.Rules === undefined || model.Rules.length === 0) {
+            return result;
+        }
+
+        for (var i in model.Rules) {
+            var rule = model.Rules[i];
+            if(rule.ValidatedConcepts !== undefined && rule.ValidatedConcepts !== null) {
+                for (var j in rule.ValidatedConcepts) {
+                    if (rule.ValidatedConcepts[j] === conceptName) {
+                        result.push(rule);
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
+    };
+
+     Report.prototype.computableByRules = function(conceptName) {
         ensureConceptName(conceptName, 'conceptName', 'computableByRules');
 
         var result = [];
@@ -821,7 +888,7 @@ angular
 
         var result = [];
         var model = this.getModel();
-        ensureExists(model, 'object', 'computableByRules', 'Report doesn\'t have a model.');
+        ensureExists(model, 'object', 'findInRules', 'Report doesn\'t have a model.');
 
         if(model.Rules === null || model.Rules === undefined || model.Rules.length === 0) {
             return result;
@@ -863,7 +930,6 @@ angular
     var createNewRule = function(id, label, description, type, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray, report) {
         ensureParameter(id, 'id', 'string', 'createNewRule');
         ensureParameter(label, 'label', 'string', 'createNewRule');
-        ensureParameter(description, 'description', 'string', 'createNewRule');
         ensureRuleType(type, 'type', 'createNewRule');
         ensureParameter(formula, 'formula', 'string', 'createNewRule');
         ensureExists(computableConceptsArray, 'object', 'createNewRule', 'function called without computableConceptsArray.');
@@ -912,6 +978,109 @@ angular
         return rule;
     };
 
+    var validate = function(report, errorMsgPrefix, action, id, label, type, description, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray){
+        ensureExists(id, 'string', errorMsgPrefix, 'Mandatory Id missing.');
+        var existingRule = report.getRule(id);
+        if(action === 'Create' && existingRule !== undefined && existingRule !== null){
+            throw new Error(errorMsgPrefix + ': Rule with ID "' + id + '" already exists!');
+        } else if(action === 'Update' && (existingRule === undefined || existingRule === null)){
+            throw new Error(errorMsgPrefix + ': Rule with ID "' + id + '" doesn\'t exist!');
+        } else if(action !== 'Create' && action !== 'Update'){
+            throw new Error(errorMsgPrefix + ': Unknown action "' + action + '"!');
+        }
+        ensureExists(label, 'string', errorMsgPrefix, 'Mandatory Label missing.');
+        ensureExists(formula, 'string', errorMsgPrefix, 'Cannot store rule with empty source code.');
+        ensureExists(computableConceptsArray[0], 'string', errorMsgPrefix, 'Mandatory computable concept missing.');
+        for(var i in computableConceptsArray) {
+            if(computableConceptsArray.hasOwnProperty(i)) {
+                var cname = computableConceptsArray[i];
+                ensureConceptName(cname, 'computableConceptsArray', errorMsgPrefix, 'The computable concept name ' + cname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
+                var cconcept = report.getConcept(cname);
+                if (cconcept === undefined || cconcept === null) {
+                    throw new Error(errorMsgPrefix + ': the computable concept with name "' + cname + '" does not exist. You need to <b>create this concept</b> or adapt it to an existing one before you can create the rule.');
+                }
+                var rulesComputableConcepts = report.computableByRules(cname);
+                if (rulesComputableConcepts.lenght > 0 && rulesComputableConcepts[0].Id !== id) {
+                    throw new Error(errorMsgPrefix + ': A rule which can compute facts for concept "' + cname + '" exists already: "' + rulesComputableConcepts[0].Id + '. Currently, only one rule must be able to compute a fact for a certain concept.');
+                }
+            }
+        }
+        if(dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
+            for (var j in dependingConceptsArray) {
+                if(dependingConceptsArray.hasOwnProperty(j)) {
+                    var dname = dependingConceptsArray[j];
+                    ensureConceptName(dname, 'dependingConceptsArray', errorMsgPrefix, 'The dependency concept name ' + dname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
+                    var dconcept = report.getConcept(dname);
+                    if (dconcept === undefined || dconcept === null) {
+                        throw new Error(errorMsgPrefix + ': A concept with name "' + dname + '" does not exist (as used in the dependencies). You need to create this concept or remove it from the dependencies before you can create the rule.');
+                    }
+                }
+            }
+        }
+        if(validatedConceptsArray !== null && typeof validatedConceptsArray === 'object') {
+            for(var x in validatedConceptsArray) {
+                if(validatedConceptsArray.hasOwnProperty(x)) {
+                    var vname = validatedConceptsArray[x];
+                    ensureConceptName(vname, 'validatedConceptsArray', errorMsgPrefix, 'The validated concept name ' + vname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
+                    var vconcept = report.getConcept(vname);
+                    if (vconcept === undefined || vconcept === null) {
+                        throw new Error(errorMsgPrefix + ': The validated concept with name "' + vname + '" does not exist. You need to create this concept or adapt it to an existing one before you can create the rule.');
+                    }
+                }
+            }
+        }
+    };
+
+    Report.prototype.updateRule = function(rule){
+        var id = rule.Id;
+        var label = rule.Label;
+        var language = rule.OriginalLanguage;
+        var type = rule.Type;
+        var description = rule.Description;
+        var formula = rule.Formula;
+        var computableConceptsArray = rule.ComputableConcepts;
+        var dependingConceptsArray = rule.DependsOn;
+        var validatedConceptsArray = rule.ValidatedConcepts;
+        validate(this, 'Rule Updating Error', 'Update', id, label, type, description, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray);
+        if(type === 'xbrl28:formula' && language === undefined){
+            this.setFormulaRule(id, label, description, formula, computableConceptsArray, dependingConceptsArray);
+        } else if (type === 'xbrl28:validation' && language === undefined) {
+            this.setValidationRule(id, label, description, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray);
+        } else if (language === 'SpreadsheetFormula') {
+            var model = this.getModel();
+            ensureExists(model, 'object', 'updateRule', 'Report doesn\'t have a model.');
+
+            this.removeRule(id);
+            model.Rules.push(rule);
+        }
+    };
+
+    Report.prototype.createRule = function(rule){
+        var id = rule.Id;
+        var label = rule.Label;
+        var language = rule.OriginalLanguage;
+        var type = rule.Type;
+        var description = rule.Description;
+        var formula = rule.Formula;
+        var computableConceptsArray = rule.ComputableConcepts;
+        var dependingConceptsArray = rule.DependsOn;
+        var validatedConceptsArray = rule.ValidatedConcepts;
+        validate(this, 'Rule Creation Error', 'Create', id, label, type, description, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray);
+        if(type === 'xbrl28:formula' && language === undefined){
+            this.setFormulaRule(id, label, description, formula, computableConceptsArray, dependingConceptsArray);
+        } else if (type === 'xbrl28:validation' && language === undefined) {
+            this.setValidationRule(id, label, description, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray);
+        } else if (language === 'SpreadsheetFormula') {
+            var model = this.getModel();
+            ensureExists(model, 'object', 'createRule', 'Report doesn\'t have a model.');
+
+            if(model.Rules === null || model.Rules === undefined) {
+                model.Rules = [];
+            }
+            model.Rules.push(rule);
+        }
+    };
+
     Report.prototype.setFormulaRule = function(id, label, description, formula, computableConceptsArray, dependingConceptsArray){
         // sanity checks are done in createNewRule
         var rule = createNewRule(id, label, description, 'xbrl28:formula', formula, computableConceptsArray, dependingConceptsArray, null, this);
@@ -944,19 +1113,47 @@ angular
         model.Rules.push(rule);
     };
 
-    Report.prototype.listRules = function(){
+    Report.prototype.listValidatingRules = function(concept){
 
         var result = [];
         var model = this.getModel();
-        if(model === null || model === undefined || model.Rules === null || model.Rules === undefined) {
+        if (model === null || model === undefined || model.Rules === null || model.Rules === undefined) {
             return result;
         }
-        return model.Rules;
+        if (concept !== undefined && concept !== null) {
+            ensureParameter(concept, 'concept', 'string', 'listValidatingRules');
+            result = this.validatedByRules(concept);
+        }
+        return result;
     };
 
-    Report.prototype.listFormulaRules = function(){
+    Report.prototype.listRules = function(concept, rulesType){
+
+        if(rulesType === undefined || rulesType === null) {
+            var result = [];
+            var model = this.getModel();
+            if (model === null || model === undefined || model.Rules === null || model.Rules === undefined) {
+                return result;
+            }
+            if (concept !== undefined && concept !== null) {
+                ensureParameter(concept, 'concept', 'string', 'listRules');
+                result = this.computableByRules(concept);
+            } else {
+                result = model.Rules;
+            }
+            return result;
+        }else if(rulesType === 'xbrl28:formula'){
+            return this.listFormulaRules(concept);
+        }else if(rulesType === 'xbrl28:validation'){
+            return this.listValidationRules(concept);
+        }else if(rulesType === 'SpreadsheetFormula'){
+            return this.listSpreadsheetRules(concept);
+        }
+    };
+
+    Report.prototype.listFormulaRules = function(concept){
         var result = [];
-        var rules = this.listRules();
+        var rules = this.listRules(concept);
         for(var i in rules) {
             var rule = rules[i];
             if(rule.Type === 'xbrl28:formula'){
@@ -966,12 +1163,24 @@ angular
         return result;
     };
 
-    Report.prototype.listValidationRules = function(){
+    Report.prototype.listValidationRules = function(concept){
         var result = [];
-        var rules = this.listRules();
+        var rules = this.listRules(concept);
         for(var i in rules) {
             var rule = rules[i];
             if(rule.Type === 'xbrl28:validation'){
+                result.push(rule);
+            }
+        }
+        return result;
+    };
+
+    Report.prototype.listSpreadsheetRules = function(concept){
+        var result = [];
+        var rules = this.listRules(concept);
+        for(var i in rules) {
+            var rule = rules[i];
+            if(rule.OriginalLanguage === 'SpreadsheetFormula'){
                 result.push(rule);
             }
         }
