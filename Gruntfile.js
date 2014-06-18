@@ -2,7 +2,8 @@ module.exports = function (grunt) {
     'use strict';
     
     var config = {
-        app: 'demo'
+        app: 'app',
+        dist: 'dist'
     };
 
     require('load-grunt-tasks')(grunt);
@@ -23,9 +24,9 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         config: config,
         watch: {
-            recess: {
+            less: {
                 files:  ['<%= config.app %>/styles/{,*/}*.less'],
-                tasks: ['recess']
+                tasks: ['less']
             },
             livereload: {
                 options: {
@@ -75,40 +76,31 @@ module.exports = function (grunt) {
                 url: 'http://localhost:<%= connect.options.port %>'
             }
         },
+        less: {
+            dist: {
+                options: {
+                },
+                files: {
+                    '<%= config.app %>/styles/index.css': ['<%= config.app %>/styles/index.less']
+                }
+            }
+        },
         peg: {
-            // https://github.com/dvberkel/grunt-peg
             options: { trackLineAndColumn: true },
             excelGrammar : {
                 src: 'pegjs/excelGrammar.pegjs',
-                dest: 'src/pegjs/excelParser.js',
+                dest: '<%= config.app %>/modules/excel-parser.js',
                 angular: {
-                    module: 'excelParser',
+                    module: 'excel-parser',
                     factory: 'ExcelParser'
                 }
             },
             formulaGrammar : {
                 src: 'pegjs/formulaGrammar.pegjs',
-                dest: 'src/pegjs/formulaParser.js',
+                dest: '<%= config.app %>/modules/formula-parser.js',
                 angular: {
-                    module: 'formulaParser',
+                    module: 'formula-parser',
                     factory: 'FormulaParser'
-                }
-            }
-        },
-        ngconstant: {
-            options: {
-                space: '    ',
-                deps: false
-            },
-            tpl: {
-                name: 'nolapReportEditor',
-                dest: 'src/tpl.js',
-                constants: {
-                    PresentationTreeTpl: grunt.file.read('tpl/tree.html'),
-                    ConceptMapTpl: grunt.file.read('tpl/concept-map.html'),
-                    BusinessRuleTpl: grunt.file.read('tpl/business-rule.html'),
-                    RulesEditorTpl: grunt.file.read('tpl/rules-editor.html'),
-                    ConceptTpl: grunt.file.read('tpl/concept.html')
                 }
             }
         },
@@ -117,30 +109,14 @@ module.exports = function (grunt) {
                 apis: [
                     {
                         swagger: 'swagger/reports.json',
-                        module: 'reports.api.28.io',
+                        module: 'report-api',
                         newModule: true,
-                        service: 'ReportAPI'
+                        service: 'report-api'
                     }
                 ],
-                dest: 'src/swagger'
+                dest: '<%= config.app %>/modules'
             },
             all: {}
-        },
-        jsdoc: {
-            docs: {
-                src: ['src/editor.js', 'src/report.js'],
-                options: {
-                    destination: 'out'
-                }
-            }
-        },
-        'gh-pages': {
-            docs: {
-                src: '**/*',
-                options: {
-                    base: 'out'
-                }
-            }
         },
         clean: {
             pre: ['dist/', 'coverage/', 'out/'],
@@ -150,26 +126,7 @@ module.exports = function (grunt) {
             options: {
                 jshintrc: '.jshintrc'
             },
-            src: ['Gruntfile.js', 'src/**/*.js', 'test/*.js', 'tasks/*.js'],
-        },
-        concat: {
-            options: {
-                separator: ''
-            },
-            dist: {
-                src: ['src/pegjs/excelParser.js', 'src/pegjs/formulaParser.js', 'src/formula.js', 'src/editor.js', 'src/swagger/ReportAPI.js', 'src/tpl.js', 'src/report.js'],
-                dest: 'dist/nolap-report-editor.js'
-            }
-        },
-        uglify: {
-            main: {
-                options: {
-                    
-                },
-                files: {
-                    'dist/nolap-report-editor.min.js': ['dist/nolap-report-editor.js']
-                }
-            }
+            src: ['Gruntfile.js', '<%= config.app %>/modules/**/*.js', 'test/*.js', 'tasks/*.js'],
         },
         karma: {
             options: {
@@ -180,167 +137,15 @@ module.exports = function (grunt) {
                 autoWatch: true,
                 singleRun: false
             },
-            '1.0.4': {
+            '1.2.9': {
                 options: {
                     files: [
-                        'bower_components/angular-1.0.4/angular.js',
-                        'bower_components/angular-mocks-1.0.4/angular-mocks.js',
-                        'dist/nolap-report-editor.js',
-                        'test/karma.start.js',
-                        'test/*.js'
-                    ]
-                }
-            },
-            '1.0.5': {
-                options: {
-                    files: [
-                        'bower_components/angular-1.0.5/angular.js',
-                        'bower_components/angular-mocks-1.0.5/angular-mocks.js',
-                        'dist/nolap-report-editor.js',
-                        'test/karma.start.js',
-                        'test/*.js'
-                    ]
-                }
-            },
-            '1.0.6': {
-                options: {
-                    files: [
-                        'bower_components/angular-1.0.6/angular.js',
-                        'bower_components/angular-mocks-1.0.6/angular-mocks.js',
-                        'dist/nolap-report-editor.js',
-                        'test/karma.start.js',
-                        'test/*.js'
-                    ]
-                }
-            },
-            '1.0.7': {
-                options: {
-                    files: [
-                        'bower_components/angular-1.0.7/angular.js',
-                        'bower_components/angular-mocks-1.0.7/angular-mocks.js',
-                        'dist/nolap-report-editor.js',
-                        'test/karma.start.js',
-                        'test/*.js'
-                    ]
-                }
-            },
-            '1.0.8': {
-                options: {
-                    files: [
-                        'bower_components/angular-1.0.8/angular.js',
-                        'bower_components/angular-mocks-1.0.8/angular-mocks.js',
-                        'dist/nolap-report-editor.js',
-                        'test/karma.start.js',
-                        'test/*.js'
-                    ]
-                }
-            },
-            '1.1.4': {
-                options: {
-                    files: [
-                        'bower_components/angular-1.1.4/angular.js',
-                        // hopefully this works. 1.1.4 isn't available on bower
-                        'bower_components/angular-mocks-1.1.5/angular-mocks.js',
-                        'dist/nolap-report-editor.js',
-                        'test/karma.start.js',
-                        'test/*.js'
-                    ]
-                }
-            },
-            '1.1.5': {
-                options: {
-                    files: [
-                        'bower_components/angular-1.1.5/angular.js',
-                        'bower_components/angular-mocks-1.1.5/angular-mocks.js',
-                        'dist/nolap-report-editor.js',
-                        'test/karma.start.js',
-                        'test/*.js'
-                    ]
-                }
-            },
-            '1.2.0': {
-                options: {
-                    files: [
-                        'bower_components/angular-1.2.0/angular.js',
-                        'bower_components/angular-mocks-1.2.0/angular-mocks.js',
-                        'dist/nolap-report-editor.js',
-                        'test/karma.start.js',
-                        'test/*.js'
-                    ]
-                }
-            },
-            '1.2.1': {
-                options: {
-                    files: [
-                        'bower_components/angular-1.2.1/angular.js',
-                        'bower_components/angular-mocks-1.2.1/angular-mocks.js',
-                        'dist/nolap-report-editor.js',
-                        'test/karma.start.js',
-                        'test/*.js'
-                    ]
-                }
-            },
-            '1.2.2': {
-                options: {
-                    files: [
-                        'bower_components/angular-1.2.2/angular.js',
-                        'bower_components/angular-mocks-1.2.2/angular-mocks.js',
-                        'dist/nolap-report-editor.js',
-                        'test/karma.start.js',
-                        'test/*.js'
-                    ]
-                }
-            },
-            '1.2.3': {
-                options: {
-                    files: [
-                        'bower_components/angular-1.2.3/angular.js',
-                        'bower_components/angular-mocks-1.2.3/angular-mocks.js',
-                        'dist/nolap-report-editor.js',
-                        'test/karma.start.js',
-                        'test/*.js'
-                    ]
-                }
-            },
-            '1.2.4': {
-                options: {
-                    files: [
-                        'bower_components/angular-1.2.4/angular.js',
-                        'bower_components/angular-mocks-1.2.4/angular-mocks.js',
-                        'dist/nolap-report-editor.js',
-                        'test/karma.start.js',
-                        'test/*.js'
-                    ]
-                }
-            },
-            '1.2.5': {
-                options: {
-                    files: [
-                        'bower_components/angular-1.2.5/angular.js',
-                        'bower_components/angular-mocks-1.2.5/angular-mocks.js',
-                        'dist/nolap-report-editor.js',
-                        'test/karma.start.js',
-                        'test/*.js'
-                    ]
-                }
-            },
-            '1.2.6': {
-                options: {
-                    files: [
-                        'bower_components/angular-1.2.6/angular.js',
-                        'bower_components/angular-mocks-1.2.6/angular-mocks.js',
-                        'dist/nolap-report-editor.js',
-                        'test/karma.start.js',
-                        'test/*.js'
-                    ]
-                }
-            },
-            '1.2.7': {
-                options: {
-                    files: [
-                        'bower_components/angular-1.2.7/angular.js',
-                        'bower_components/angular-mocks-1.2.7/angular-mocks.js',
-                        'dist/nolap-report-editor.js',
+                        '<%= config.app %>/bower_components/angular/angular.js',
+                        '<%= config.app %>/bower_components/angular-mocks-1.2.9/angular-mocks.js',
+                        '<%= config.app %>/modules/excel-parser.js',
+                        '<%= config.app %>/modules/formula-parser.js',
+                        '<%= config.app %>/modules/report-api.js',
+                        '<%= config.app %>/modules/report-model.js',
                         'test/karma.start.js',
                         'test/*.js'
                     ]
@@ -356,15 +161,17 @@ module.exports = function (grunt) {
 
     grunt.registerTask('server', function () {
         grunt.task.run([
-            'default',
+            'peg',
+            'swagger',
+            'less',
             'connect:livereload',
             'open',
             'watch'
         ]);
     });
 
-    grunt.registerTask('test', ['karma:1.2.0']);
-    grunt.registerTask('release', ['clean:pre', 'concat', 'test', 'jsdoc', 'clean:post']);//uglify
-    grunt.registerTask('build', ['clean:pre', 'ngconstant:tpl', 'peg', 'swagger', 'release']);
+    grunt.registerTask('test', ['less', 'karma:1.2.9']);
+    grunt.registerTask('release', ['clean:pre', 'test', 'clean:post']);
+    grunt.registerTask('build', ['clean:pre', 'peg', 'swagger', 'release']);
     grunt.registerTask('default', ['jshint', 'build']);
 };

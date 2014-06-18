@@ -1,5 +1,5 @@
-src/swagger
-src/tpl.js
+app/modules/excel-parser.js
+app/modules/formula-parser.js
 node_modules
 bower_components
 coverage

@@ -1,11 +1,15 @@
 <!doctype html>
-<html ng-app="main">
+<html ng-app="report-editor">
 
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
+        <title>Report Editor</title>
         <meta name="viewport" content="width=device-width">
+        <!-- build:css({.tmp,app}) styles/main.css -->
+        <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.css">
+        <link rel="stylesheet" href="/styles/index.css">
+        <!-- endbuild -->
     </head>
 
     <body class="ng-cloak">
@@ -19,8 +23,14 @@
         <script src="/bower_components/angular-ui-bootstrap-bower/ui-bootstrap.js"></script>
         <script src="/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js"></script>
         <script src="/bower_components/angular-cache/dist/angular-cache.js"></script>
-    
-        <script src="/scripts/app.js"></script>
+
+        <!-- Modules -->
+        <script src="/modules/excel-parser.js"></script>
+        <script src="/modules/formula-parser.js"></script>
+        <script src="/modules/report-api.js"></script>
+        <script src="/modules/report-model.js"></script>
+
+        <script src="/app.js"></script>
         <!-- endbuild -->
     </body>
 </html>

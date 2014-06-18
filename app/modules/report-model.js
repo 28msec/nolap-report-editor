@@ -1,7 +1,7 @@
 'use strict';
 
 angular
-.module('nolapReportEditor')
+.module('report-model', [])
 .factory('Report', function(){
 
     //Constructor

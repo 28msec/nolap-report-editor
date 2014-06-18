@@ -4,9 +4,14 @@ module.exports = function (config) {
         frameworks: ['jasmine'],
         browsers: ['Firefox', 'PhantomJS'],
         files: [
-            'bower_components/angular-1.2.0/angular.min.js',
-            'bower_components/angular-mocks-1.2.0/angular-mocks.js',
-            'dist/nolap-report-editor.js',
+            'bower_components/angular/angular.min.js',
+            'bower_components/angular-mocks-1.2.9/angular-mocks.js',
+
+            '/modules/excel-parser.js',
+            '/modules/formula-parser.js',
+            '/modules/report-api.js',
+            '/modules/report-model.js',
+
             'test/karma.start.js',
             'test/*.js'
         ],
@@ -30,7 +35,6 @@ module.exports = function (config) {
             dir: 'coverage/'
         },
         preprocessors: {
-            'src/nolap-report-editor.js': ['coverage']
         },
         reporters: ['progress', 'coverage']
     });

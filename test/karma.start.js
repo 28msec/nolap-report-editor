@@ -1,7 +1,7 @@
 'use strict';
 
 var Report;
-beforeEach(module('nolapReportEditor'));
+beforeEach(module('report-model'));
 
 beforeEach(inject(function (_Report_) {
     Report = _Report_;
