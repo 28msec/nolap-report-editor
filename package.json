@@ -48,7 +48,7 @@
     "connect-modrewrite": "~0.7.6",
     "grunt-open": "~0.2.3",
     "grunt-concurrent": "~0.5.0",
-    "grunt-contrib-watch": "~0.6.1"
+    "grunt-contrib-watch": "~0.6.1",
     "karma-script-launcher": "~0.1.0",
     "load-grunt-tasks": "~0.2.0",
     "pegjs": "^0.8.0",
