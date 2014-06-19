@@ -158,21 +158,21 @@ module.exports = function (grunt) {
             }
         },
         protractor: {
-    options: {
-      configFile: "node_modules/protractor/referenceConf.js", // Default config file
-      keepAlive: true, // If false, the grunt process stops when the test fails.
-      noColor: false, // If true, protractor will not use colors in its output.
-      args: {
-        // Arguments passed to the command
-      }
-    },
-    all: {
-      options: {
-//        configFile: "e2e.conf.js", // Target-specific config file
-        args: {} // Target-specific arguments
-      }
-    },
-  }
+            options: {
+                configFile: 'node_modules/protractor/referenceConf.js', // Default config file
+                keepAlive: true, // If false, the grunt process stops when the test fails.
+                noColor: false, // If true, protractor will not use colors in its output.
+                args: {}
+            },
+            all: {
+                options: {
+                    //configFile: "e2e.conf.js", // Target-specific config file
+                    args: {
+                        'specs': ['node_modules/protractor/example/example_spec.js']
+                    } // Target-specific arguments
+                }
+            }
+        }
     });
 
     grunt.registerTask('server', function () {
@@ -186,7 +186,7 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post']);
+    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'protractor']);
     grunt.registerTask('build', ['clean:pre', 'peg', 'swagger']);
     grunt.registerTask('default', ['jshint', 'build', 'test']);
 };
