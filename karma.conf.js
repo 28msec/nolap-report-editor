@@ -4,16 +4,6 @@ module.exports = function (config) {
         frameworks: ['jasmine'],
         browsers: ['Firefox', 'PhantomJS'],
         files: [
-            'bower_components/angular/angular.min.js',
-            'bower_components/angular-mocks-1.2.9/angular-mocks.js',
-
-            '/modules/excel-parser.js',
-            '/modules/formula-parser.js',
-            '/modules/report-api.js',
-            '/modules/report-model.js',
-
-            'test/karma.start.js',
-            'test/*.js'
         ],
         captureTimeout: 60000,
         colors: true,

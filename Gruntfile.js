@@ -126,7 +126,7 @@ module.exports = function (grunt) {
             options: {
                 jshintrc: '.jshintrc'
             },
-            src: ['Gruntfile.js', '<%= config.app %>/modules/**/*.js', 'test/*.js', 'tasks/*.js'],
+            src: ['Gruntfile.js', '<%= config.app %>/modules/**/*.js', 'tests/*.js', 'tasks/*.js'],
         },
         karma: {
             options: {
@@ -146,8 +146,8 @@ module.exports = function (grunt) {
                         '<%= config.app %>/modules/formula-parser.js',
                         '<%= config.app %>/modules/report-api.js',
                         '<%= config.app %>/modules/report-model.js',
-                        'test/karma.start.js',
-                        'test/*.js'
+                        'tests/unit/karma.start.js',
+                        'tests/unit/*.js'
                     ]
                 }
             }
@@ -155,6 +155,21 @@ module.exports = function (grunt) {
         coveralls: {
             options: {
                 'coverage_dir': 'coverage'
+            }
+        },
+        protractor: {
+            options: {
+                configFile: 'tests/e2e/e2e.conf.js',
+                keepAlive: false, // If false, the grunt process stops when the test fails.
+                noColor: false, // If true, protractor will not use colors in its output.
+                args: {}
+            },
+            all: {
+                options: {
+                    args: {
+                        'specs': ['node_modules/protractor/example/example_spec.js']
+                    }
+                }
             }
         }
     });
@@ -170,7 +185,7 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post']);
+    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'protractor']);
     grunt.registerTask('build', ['clean:pre', 'peg', 'swagger']);
     grunt.registerTask('default', ['jshint', 'build', 'test']);
 };
