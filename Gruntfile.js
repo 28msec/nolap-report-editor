@@ -180,7 +180,7 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('e2e-tests', function(){
+    grunt.registerTask('e2e', function(){
         grunt.task.run([
             'connect:test',
             'protractor'
@@ -202,7 +202,7 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e-tests']);
+    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e']);
     grunt.registerTask('build', ['clean:pre', 'peg', 'swagger']);
     grunt.registerTask('default', ['jshint', 'build', 'test']);
 };
