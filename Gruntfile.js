@@ -33,9 +33,9 @@ module.exports = function (grunt) {
                     livereload: LIVERELOAD_PORT
                 },
                 files: [
-                    '<%= config.app %>/{,*/}*.html',
+                    '<%= config.app %>/**/*.html',
                     '{.tmp,<%= config.app %>}/styles/{,*/}*.css',
-                    '{.tmp,<%= config.app %>}/scripts/{,*/}*.js',
+                    '{.tmp,<%= config.app %>}/**/*.js',
                     '<%= config.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
                 ]
             }
@@ -62,10 +62,15 @@ module.exports = function (grunt) {
             },
             test: {
                 options: {
+                    keepalive: false,
                     middleware: function (connect) {
                         return [
+                            lrSnippet,
+                            modRewrite([
+                                '!\\.html|\\.xml|\\images|\\.js|\\.css|\\.png|\\.jpg|\\.woff|\\.ttf|\\.svg|\\.ico /index.html [L]'
+                            ]),
                             mountFolder(connect, '.tmp'),
-                            mountFolder(connect, 'test')
+                            mountFolder(connect, config.app)
                         ];
                     }
                 }
@@ -111,7 +116,8 @@ module.exports = function (grunt) {
                         swagger: 'swagger/reports.json',
                         module: 'report-api',
                         newModule: true,
-                        service: 'report-api'
+                        service: 'ReportAPI',
+                        filename: 'report-api'
                     }
                 ],
                 dest: '<%= config.app %>/modules'
@@ -126,7 +132,7 @@ module.exports = function (grunt) {
             options: {
                 jshintrc: '.jshintrc'
             },
-            src: ['Gruntfile.js', '<%= config.app %>/modules/**/*.js', 'tests/*.js', 'tasks/*.js'],
+            src: ['Gruntfile.js', '<%= config.app %>/modules/**/*.js', 'tasks/**/*.js', 'tests/**/*.js'],
         },
         karma: {
             options: {
@@ -167,14 +173,25 @@ module.exports = function (grunt) {
             all: {
                 options: {
                     args: {
-                        'specs': ['node_modules/protractor/example/example_spec.js']
+                        'specs': ['tests/e2e/reports_spec.js']
                     }
                 }
             }
         }
     });
 
-    grunt.registerTask('server', function () {
+    grunt.registerTask('e2e-tests', function(){
+        grunt.task.run([
+            'connect:test',
+            'protractor'
+        ]); 
+    });
+
+    grunt.registerTask('server', function (target) {
+        if(target === 'dist'){
+            return grunt.task.run(['build', 'open', 'connect:dist:keepalive']);
+        }
+
         grunt.task.run([
             'peg',
             'swagger',
@@ -185,7 +202,7 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'protractor']);
+    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e-tests']);
     grunt.registerTask('build', ['clean:pre', 'peg', 'swagger']);
     grunt.registerTask('default', ['jshint', 'build', 'test']);
 };

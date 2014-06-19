@@ -2,9 +2,9 @@ angular.module('report-api', [])
 /**
  * <p>This API can be used to manage reports.</p> <p>This API is only accesible for users having granted priviliges to work with reports.</p> <p>Note, that the POST method can be simulated by using GET and adding the _method=POST parameter to the HTTP request.</p>
  */
-.factory('report-api', function($q, $http, $rootScope){
+.factory('ReportAPI', function($q, $http, $rootScope){
     /**
-     * @class report-api
+     * @class ReportAPI
      * @param {string} domain - The project domain
      */
     return function(domain) {
@@ -31,7 +31,7 @@ angular.module('report-api', [])
         /**
          * 
          * @method
-         * @name report-api#listReports
+         * @name ReportAPI#listReports
          * @param {string} _id - A report id (e.g. FundamentalAccountingConcepts),
          * @param {string} token - The token of the current session,
          * 
@@ -79,7 +79,7 @@ parameters.$cacheItemOpts : {});
         /**
          * 
          * @method
-         * @name report-api#addOrReplaceOrValidateReport
+         * @name ReportAPI#addOrReplaceOrValidateReport
          * @param {object} report - A JSON object containing the report,
          * @param {boolean} validation-only - This parameter is either given without any value (means: on) or absent (means: off) or its value is castable to a boolean. Turns validation-only mode on or off.,
          * @param {string} token - The token of the current session,
@@ -127,7 +127,7 @@ data: body,
         /**
          * 
          * @method
-         * @name report-api#removeReport
+         * @name ReportAPI#removeReport
          * @param {string} _id - A report id (e.g. FundamentalAccountingConcepts),
          * @param {string} token - The token of the current session,
          * 

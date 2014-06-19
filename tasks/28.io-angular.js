@@ -37,8 +37,8 @@ module.exports = function(grunt) {
                 if(response.statusCode !== 200) {
                     grunt.fail.fatal('Server replied: ' + response.statusCode);
                 }
-                fs.writeFileSync(dest + '/' + api.service + '.js', body);
-                grunt.log.writeln(dest + '/' + api.service + '.js written (' + api.module + '.' + api.service + ')');
+                fs.writeFileSync(dest + '/' + api.filename + '.js', body);
+                grunt.log.writeln(dest + '/' + api.filename + '.js written (' + api.module + '.' + api.service + ')');
                 count--;
                 if(count === 0) {
                     done();
