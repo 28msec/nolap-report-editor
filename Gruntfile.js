@@ -159,17 +159,16 @@ module.exports = function (grunt) {
         },
         protractor: {
             options: {
-                configFile: 'node_modules/protractor/referenceConf.js', // Default config file
-                keepAlive: true, // If false, the grunt process stops when the test fails.
+                configFile: 'tests/e2e/e2e.conf.js',
+                keepAlive: false, // If false, the grunt process stops when the test fails.
                 noColor: false, // If true, protractor will not use colors in its output.
                 args: {}
             },
             all: {
                 options: {
-                    //configFile: "e2e.conf.js", // Target-specific config file
                     args: {
                         'specs': ['node_modules/protractor/example/example_spec.js']
-                    } // Target-specific arguments
+                    }
                 }
             }
         }
