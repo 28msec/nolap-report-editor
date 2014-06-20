@@ -45,7 +45,7 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
                         break; // found one that we can use
                     }
                     //does it have a rule attached?
-                    if(this.report.computableByRules(alignedComputableConcept).length == 0){
+                    if(this.report.computableByRules(alignedComputableConcept).length === 0){
                         break; // found one that we can use
                     }
                     alignedComputableConcept = computableConcept + 'Validation' + count;
@@ -59,8 +59,8 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
                         'Type': modelOrRuleType,
                         'OriginalLanguage': language,
                         'Label': concept.Label,
-                        'Description': 'Rule to validate ' + concept.Label + ' (' + computableConcept
-                            + '). It also creates a new fact (' + alignedComputableConcept + ') that contains the validation result.',
+                        'Description': 'Rule to validate ' + concept.Label + ' (' + computableConcept +
+                            '). It also creates a new fact (' + alignedComputableConcept + ') that contains the validation result.',
                         'ComputableConcepts': [ alignedComputableConcept ],
                         'ValidatedConcepts': [ this.report.hideDefaultConceptPrefix(computableConcept) ],
                         'DependsOn': [],
@@ -82,8 +82,8 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
                         'Id': report.uuid(),
                         'Type': modelOrRuleType,
                         'Label': concept.Label + ' Validation',
-                        'Description': 'Rule to validate ' + concept.Label + ' (' + computableConcept
-                            + '). It also creates a new fact (' + alignedComputableConcept + ') that contains the validation result.',
+                        'Description': 'Rule to validate ' + concept.Label + ' (' + computableConcept +
+                            '). It also creates a new fact (' + alignedComputableConcept + ') that contains the validation result.',
                         'ComputableConcepts': [ computableConcept + 'Validation' ],
                         'ValidatedConcepts': [ computableConcept ],
                         'DependsOn': [],
@@ -193,14 +193,14 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
     };
 
     Formula.prototype.listConcepts = function(){
-        if(this.report !== undefined
-            && this.report.model !== undefined && this.report.model.Hypercubes !== undefined
-            && this.report.model.Hypercubes['xbrl:DefaultHypercube'] !== undefined
-            && this.report.model.Hypercubes['xbrl:DefaultHypercube'].Aspects !== undefined
-            && this.report.model.Hypercubes['xbrl:DefaultHypercube'].Aspects['xbrl:Concept'] !== undefined
-            && this.report.model.Hypercubes['xbrl:DefaultHypercube'].Aspects['xbrl:Concept'].Domains !== undefined
-            && this.report.model.Hypercubes['xbrl:DefaultHypercube'].Aspects['xbrl:Concept'].Domains['xbrl:ConceptDomain'] !== undefined
-            && this.report.model.Hypercubes['xbrl:DefaultHypercube'].Aspects['xbrl:Concept'].Domains['xbrl:ConceptDomain'].Members !== undefined) {
+        if(this.report !== undefined &&
+            this.report.model !== undefined && this.report.model.Hypercubes !== undefined &&
+            this.report.model.Hypercubes['xbrl:DefaultHypercube'] !== undefined &&
+            this.report.model.Hypercubes['xbrl:DefaultHypercube'].Aspects !== undefined &&
+            this.report.model.Hypercubes['xbrl:DefaultHypercube'].Aspects['xbrl:Concept'] !== undefined &&
+            this.report.model.Hypercubes['xbrl:DefaultHypercube'].Aspects['xbrl:Concept'].Domains !== undefined &&
+            this.report.model.Hypercubes['xbrl:DefaultHypercube'].Aspects['xbrl:Concept'].Domains['xbrl:ConceptDomain'] !== undefined &&
+            this.report.model.Hypercubes['xbrl:DefaultHypercube'].Aspects['xbrl:Concept'].Domains['xbrl:ConceptDomain'].Members !== undefined) {
             return this.report.model.Hypercubes['xbrl:DefaultHypercube']
                 .Aspects['xbrl:Concept']
                 .Domains['xbrl:ConceptDomain']

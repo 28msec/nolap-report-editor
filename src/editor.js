@@ -339,7 +339,7 @@ console.log(delta);
         }
     };
 })
-.directive('businessRules', function($rootScope, BusinessRuleTpl, Report){
+.directive('businessRules', function($rootScope, BusinessRuleTpl){
     return {
         restrict: 'E',
         scope: {
@@ -444,6 +444,6 @@ console.log(delta);
                 $compile(element, null, -9999 /*skip directives*/)($scope);
             });
         }
-    }
-});
+    };
+})
 ;
