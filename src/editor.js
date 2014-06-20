@@ -45,7 +45,7 @@ angular
             this.getPresentationTree = function(){
                 return this.getReport().getNetwork('Presentation').Trees;
             };
-            
+
             this.getConceptMap = function(){
                 return this.getReport().getNetwork('ConceptMap').Trees;
             };
@@ -190,14 +190,6 @@ console.log(delta);
                 }
             };
             
-            /*
-            $scope.$watch('conceptName', function(conceptName){
-                if(conceptName !== undefined) {
-                    $scope.toDrop = [conceptName];
-                }
-            });
-            */
-
             $scope.select = function(row) {
                 if(row.branch.To) {
                     row.branch.expanded = !row.branch.expanded;
@@ -330,7 +322,6 @@ console.log(delta);
         template: ConceptTpl,
         require: '^report',
         link: function($scope, element, attrs, reportCtrl) {
-            
             $scope.concept = reportCtrl.getReport().getConcept($scope.conceptName);
 
             $scope.remove = function(){
@@ -346,6 +337,113 @@ console.log(delta);
                 reportCtrl.getReport().updateConcept($scope.concept.Name, $scope.concept.Label, $scope.concept.IsAbstract);
             };
         }
-    };    
+    };
 })
+.directive('businessRules', function($rootScope, BusinessRuleTpl, Report){
+    return {
+        restrict: 'E',
+        scope: {
+            'conceptName': '@',
+            'report': '='
+        },
+        template: BusinessRuleTpl,
+        link: function($scope) {
+
+            $scope.hasComputingRule = false;
+            $scope.hasValidatingRules = false;
+
+            var updateRules = function(concept){
+                if(concept === undefined || concept === null){
+                    $scope.allRules = undefined;
+                    $scope.hasComputingRule = false;
+
+                    $scope.validatingRules = undefined;
+                    $scope.hasValidatingRules = false;
+                } else {
+                    $scope.allRules = $scope.report.listRules(concept);
+                    if($scope.allRules.length > 0){
+                        $scope.hasComputingRule = true;
+                    } else {
+                        $scope.hasComputingRule = false;
+                    }
+
+                    $scope.validatingRules = $scope.report.listValidatingRules(concept);
+                    if($scope.validatingRules.length > 0){
+                        $scope.hasValidatingRules = true;
+                    } else {
+                        $scope.hasValidatingRules = false;
+                    }
+                }
+            };
+            updateRules($scope.conceptName);
+
+            $scope.$watch(function(){
+                return $scope.report.listRules();
+            }, function(){
+                updateRules($scope.conceptName);
+            }, true);
+
+            $scope.removeRule = function(id){
+                $rootScope.$emit('removeRule', id);
+            };
+
+            $scope.addRule = function(concept, ruleType, language){
+                $rootScope.$emit('createRule', concept, ruleType, language);
+            };
+
+            $scope.editRule = function(id) {
+                $rootScope.$emit('editRule', id);
+            };
+
+        }
+    };
+})
+.directive('rulesEditor', function($rootScope, $timeout, RulesEditorTpl){
+    return {
+        restrict: 'E',
+        scope: {
+            'conceptName': '@',
+            'formula': '=',
+            'action': '='
+        },
+        template: RulesEditorTpl,
+        link: function($scope) {
+            $scope.colspan1 = 2;
+            $scope.tooltipPlacement = 'top';
+            $scope.availableConceptNames = $scope.formula.listAvailableConceptNames();
+            $scope.onSelectTypeAhead = function(updateDependencies){
+                $scope.formula.validate($scope.action, updateDependencies);
+            };
+            $scope.createConcept = function(concept){
+                $rootScope.$emit('createConcept', false, concept);
+            };
+            $scope.$watch(function () {
+                if($scope.formula === undefined){
+                    return undefined;
+                } else {
+                    return $scope.formula.listConcepts();
+                }
+            }, function () {
+                if($scope.formula !== undefined) {
+                    $scope.availableConceptNames = $scope.formula.listAvailableConceptNames();
+                    $scope.formula.validate($scope.action, true);
+                }
+            });
+        }
+    };
+})
+.directive('autoRecompileBindHtml', function($compile, $parse){
+    return {
+        link: function($scope, element, attr){
+            // Recompile the ng bind html
+            $scope.$watch(function() {
+                var parsed = $parse(attr.ngBindHtml);
+                var val = parsed($scope) || '';
+                return val.toString();
+            }, function() {
+                $compile(element, null, -9999 /*skip directives*/)($scope);
+            });
+        }
+    }
+});
 ;
