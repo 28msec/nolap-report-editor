@@ -28,12 +28,15 @@
                 <p ng-bind="formula.model.DescriptionErr" class="text-danger"></p>
             </div>
         </div>
-        <div class="form-group" ng-class="{'has-error': formula.model.ComputableConceptsErr!==undefined}">
+        <div class="form-group" ng-class="{'has-error': formula.model.ComputableConceptsErr!==undefined && formula.model.OriginalLanguage !== 'SpreadsheetFormula'}">
             <label for="compFact" class="col-sm-{{colspan1}} control-label">Computed Fact Name</label>
             <div class="col-sm-{{12 - colspan1}}">
-                <input type="text" id="compFact" class="form-control" ng-model="formula.model.ComputableConcepts" ng-list ng-change="formula.validate(action)">
+                <input type="text" id="compFact" class="form-control" ng-model="formula.model.ComputableConcepts"
+                       ng-list ng-change="formula.validate(action)" ng-if="formula.model.OriginalLanguage !== 'SpreadsheetFormula'">
+                <input type="text" id="compFact" class="form-control" ng-model="formula.model.ComputableConcepts"
+                       ng-list readonly ng-if="formula.model.OriginalLanguage === 'SpreadsheetFormula'">
             </div>
-            <div class="col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}" ng-if="formula.model.ComputableConceptsErr">
+            <div class="col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}" ng-if="formula.model.ComputableConceptsErr &&  formula.model.OriginalLanguage !== 'SpreadsheetFormula'"">
                 <p ng-bind="formula.model.ComputableConceptsErr" class="text-danger"></p>
             </div>
         </div>
@@ -50,10 +53,20 @@
             </div>
         </div>
 
-
         <!-- if 'SpreadsheetFormula'-->
+        <div ng-if="formula.model.Type === 'xbrl28:validation' && formula.model.OriginalLanguage === 'SpreadsheetFormula'">
+            <div class="form-group" ng-class="{'has-error': formula.model.ValidatedConceptsErr!==undefined}">
+                <label for="validatedConcept1" class="col-sm-{{colspan1}} control-label">Validated Concept</label>
+                <div class="col-sm-{{12 - colspan1}}">
+                    <input type="text" readonly id="validatedConcept1" class="form-control" ng-model="formula.model.ValidatedConcepts" ng-list>
+                </div>
+                <div class="col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}" ng-if="formula.model.ValidatedConceptsErr">
+                    <p ng-bind="formula.model.ValidatedConceptsErr" class="text-danger"></p>
+                </div>
+            </div>
+        </div>
         <div class="form-group" ng-if="formula.model.OriginalLanguage === 'SpreadsheetFormula'">
-            <label for="coverAspects" class="col-sm-{{colspan1}} control-label">Implicit Filtering Options</label>
+            <label for="coverAspects" class="col-sm-{{colspan1}} control-label">Options</label>
             <div class="col-sm-{{12 - colspan1}}">
                 <input type="checkbox" id="coverAspects" ng-model="formula.model.AllowCrossPeriod">
                     <span tooltip="Allow facts to be computable across different period types (e.g. divide Revenue [duration] by Assets [instant])." tooltip-trigger="mouseenter" tooltip-placement="{{tooltipPlacement}}">
@@ -81,10 +94,12 @@
                     <div class="form-group" ng-class="{'has-error': alt.SourceFactErr!==undefined}">
                         <label for="sourceFact{{$index}}" class="col-sm-{{colspan1}} control-label">Mandatory Source Fact</label>
                         <div class="col-sm-{{12 - colspan1}}">
-                            <input type="text" id="sourceFact{{$index}}" class="form-control" ng-model="alt.SourceFact[0]" ng-pattern="/^.+$/" ng-change="formula.validate(action)">
+                            <input type="text" id="sourceFact{{$index}}" class="form-control" ng-model="alt.SourceFact[0]" ng-pattern="/^.+$/"
+                                   ng-change="formula.validate(action, true)" typeahead="key for key in availableConceptNames | filter:$viewValue | limitTo: 20"
+                                   typeahead-on-select="onSelectTypeAhead(true)">
                         </div>
                         <div class="col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}" ng-if="alt.SourceFactErr">
-                            <p ng-bind="alt.SourceFactErr" class="text-danger"></p>
+                            <p ng-bind-html="alt.SourceFactErr" auto-recompile-bind-html class="text-danger"></p>
                         </div>
                     </div>
                     <div class="form-group" ng-class="{'has-error': alt.PrereqErr!==undefined}">
@@ -105,7 +120,8 @@
             </tab>
             <tab select="formula.addAlternative()">
                 <tab-heading>
-                    <span><i class="glyphicon glyphicon-plus"></i> Add An Alternative</span>
+                    <span tooltip-trigger="mouseenter" tooltip-placement="{{tooltipPlacement}}"
+                          tooltip="Add an alternative that will get executed if the precondition of the previous alternative fails."><i class="glyphicon glyphicon-plus"></i> Add An Alternative</span>
                 </tab-heading>
             </tab>
         </tabset>
@@ -127,7 +143,7 @@
                     <input type="text" id="validatedConcept" class="form-control" ng-model="formula.model.ValidatedConcepts" ng-pattern="/^.+$/" ng-list ng-change="formula.validate(action)">
                 </div>
                 <div class="col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}" ng-if="formula.model.ValidatedConceptsErr">
-                    <p ng-bind="formula.model.ComputableConceptsErr" class="text-danger"></p>
+                    <p ng-bind="formula.model.ValidatedConceptsErr" class="text-danger"></p>
                 </div>
             </div>
             <div class="form-group" ng-class="{'has-error': formula.model.FormulaErr!==undefined}">
