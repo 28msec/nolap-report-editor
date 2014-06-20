@@ -189,6 +189,7 @@ angular
      ** Concepts API
      **********************/
     Report.prototype.addConcept = function(name, label, abstract) {
+        var name = this.alignConceptPrefix(name);
         ensureConceptName(name, 'name', 'addConcept');
         ensureParameter(label, 'label', 'string', 'addConcept');
         ensureParameter(abstract, 'abstract', 'boolean', 'addConcept');
@@ -220,6 +221,7 @@ angular
     };
 
     Report.prototype.updateConcept = function(name, label, abstract) {
+        var name = this.alignConceptPrefix(name);
         ensureConceptName(name, 'name', 'updateConcept');
         ensureParameter(label, 'label', 'string', 'updateConcept');
         abstract = abstract === true;
@@ -234,6 +236,7 @@ angular
     };
 
     Report.prototype.removeConcept = function(name) {
+        var name = this.alignConceptPrefix(name);
         ensureConceptName(name, 'name', 'removeConcept');
 
         if(!this.existsConcept(name)){
@@ -255,6 +258,7 @@ angular
     };
 
     Report.prototype.existsConcept = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'existsConcept');
 
         var concept = this.getConcept(conceptName);
@@ -265,6 +269,7 @@ angular
     };
 
     Report.prototype.getConcept = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'getConcept');
 
         var model = this.getModel();
@@ -545,6 +550,7 @@ angular
 
     Report.prototype.addTreeChild = function(networkShortName, parentElementID, conceptName, offset) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'addTreeChild');
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'addTreeChild');
         var concept = this.getConcept(conceptName);
         ensureExists(concept, 'object', 'addTreeChild', 'concept with name "' + conceptName + '" doesn\'t exist.');
@@ -661,6 +667,7 @@ angular
      ** Concept Maps API
      **********************/
     Report.prototype.getConceptMap = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'getConceptMap');
 
         var network = this.getNetwork('ConceptMap');
@@ -692,6 +699,7 @@ angular
     };
 
     Report.prototype.existsConceptMap = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'existsConceptMap');
 
         var map = this.getConceptMap(conceptName);
@@ -702,6 +710,7 @@ angular
     };
 
     Report.prototype.addConceptMap = function(fromConceptName, toConceptNamesArray) {
+        var fromConceptName = this.alignConceptPrefix(fromConceptName);
         ensureConceptName(fromConceptName, 'fromConceptName', 'addConceptMap');
         var fromConcept = this.getConcept(fromConceptName);
         ensureExists(fromConcept, 'object', 'addConceptMap', 'concept with name "' + fromConceptName + '" doesn\'t exist.');
@@ -712,7 +721,7 @@ angular
 
         var toObj = {};
         for(var i in toConceptNamesArray) {
-            var name = toConceptNamesArray[i];
+            var name = this.alignConceptPrefix(toConceptNamesArray[i]);
             ensureConceptName(name, 'toConceptNamesArray', 'addConceptMap');
             toObj[name] = {
                 'Id': _uuid(),
@@ -737,6 +746,7 @@ angular
     };
 
     Report.prototype.updateConceptMap = function(fromConceptName, toConceptNamesArray) {
+        var fromConceptName = this.alignConceptPrefix(fromConceptName);
         ensureConceptName(fromConceptName, 'fromConceptName', 'updateConceptMap');
         var fromConcept = this.getConcept(fromConceptName);
         ensureExists(fromConcept, 'object', 'updateConceptMap', 'concept with name "' + fromConceptName + '" doesn\'t exist.');
@@ -746,7 +756,7 @@ angular
 
         var toObj = {};
         for(var i in toConceptNamesArray) {
-            var name = toConceptNamesArray[i];
+            var name = this.alignConceptPrefix(toConceptNamesArray[i]);
             ensureConceptName(name, 'toConceptNamesArray', 'updateConceptMap');
             toObj[name] = {
                 'Name': name,
@@ -757,6 +767,7 @@ angular
     };
 
     Report.prototype.findInConceptMap = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'findInConceptMap');
         
         var result = [];
@@ -780,6 +791,7 @@ angular
     };
 
     Report.prototype.removeConceptMap = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'removeConceptMap');
         
         var conceptMap = this.getConceptMap(conceptName);
@@ -836,6 +848,7 @@ angular
     };
 
     Report.prototype.validatedByRules = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'validatedByRules');
 
         var result = [];
@@ -861,7 +874,8 @@ angular
     };
 
      Report.prototype.computableByRules = function(conceptName) {
-        ensureConceptName(conceptName, 'conceptName', 'computableByRules');
+         var conceptName = this.alignConceptPrefix(conceptName);
+         ensureConceptName(conceptName, 'conceptName', 'computableByRules');
 
         var result = [];
         var model = this.getModel();
@@ -884,6 +898,7 @@ angular
     };
 
     Report.prototype.findInRules = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'findInRules');
 
         var result = [];
@@ -935,7 +950,7 @@ angular
         ensureExists(computableConceptsArray, 'object', 'createNewRule', 'function called without computableConceptsArray.');
 
         for(var i in computableConceptsArray) {
-            var cname = computableConceptsArray[i];
+            var cname = report.alignConceptPrefix(computableConceptsArray[i]);
             ensureConceptName(cname, 'computableConceptsArray', 'createNewRule');
             var rulesComputableConcepts = report.computableByRules(cname);
             if(rulesComputableConcepts.lenght > 0 && rulesComputableConcepts[0].Id !== id) {
@@ -944,13 +959,13 @@ angular
         }
         if(dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
             for(var j in dependingConceptsArray) {
-                var dname = dependingConceptsArray[j];
+                var dname = report.alignConceptPrefix(dependingConceptsArray[j]);
                 ensureConceptName(dname, 'dependingConceptsArray', 'createNewRule');
             }
         }
         if(validatedConceptsArray !== null && typeof validatedConceptsArray === 'object') {
             for(var x in validatedConceptsArray) {
-                var vname = validatedConceptsArray[x];
+                var vname = report.alignConceptPrefix(validatedConceptsArray[x]);
                 ensureConceptName(vname, 'validatedConceptsArray', 'createNewRule');
             }
         }
@@ -993,7 +1008,7 @@ angular
         ensureExists(computableConceptsArray[0], 'string', errorMsgPrefix, 'Mandatory computable concept missing.');
         for(var i in computableConceptsArray) {
             if(computableConceptsArray.hasOwnProperty(i)) {
-                var cname = computableConceptsArray[i];
+                var cname = report.alignConceptPrefix(computableConceptsArray[i]);
                 ensureConceptName(cname, 'computableConceptsArray', errorMsgPrefix, 'The computable concept name ' + cname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
                 var cconcept = report.getConcept(cname);
                 if (cconcept === undefined || cconcept === null) {
@@ -1008,7 +1023,7 @@ angular
         if(dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
             for (var j in dependingConceptsArray) {
                 if(dependingConceptsArray.hasOwnProperty(j)) {
-                    var dname = dependingConceptsArray[j];
+                    var dname = report.alignConceptPrefix(dependingConceptsArray[j]);
                     ensureConceptName(dname, 'dependingConceptsArray', errorMsgPrefix, 'The dependency concept name ' + dname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
                     var dconcept = report.getConcept(dname);
                     if (dconcept === undefined || dconcept === null) {
@@ -1020,7 +1035,7 @@ angular
         if(validatedConceptsArray !== null && typeof validatedConceptsArray === 'object') {
             for(var x in validatedConceptsArray) {
                 if(validatedConceptsArray.hasOwnProperty(x)) {
-                    var vname = validatedConceptsArray[x];
+                    var vname = report.alignConceptPrefix(validatedConceptsArray[x]);
                     ensureConceptName(vname, 'validatedConceptsArray', errorMsgPrefix, 'The validated concept name ' + vname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
                     var vconcept = report.getConcept(vname);
                     if (vconcept === undefined || vconcept === null) {
@@ -1182,6 +1197,56 @@ angular
             var rule = rules[i];
             if(rule.OriginalLanguage === 'SpreadsheetFormula'){
                 result.push(rule);
+            }
+        }
+        return result;
+    };
+
+    Report.prototype.alignConceptPrefix = function(concept){
+        var prefix = this.getPrefix();
+        var result;
+        if(concept !== undefined && concept !== null && typeof concept === 'string') {
+            if (concept.indexOf(':') === -1) {
+                result = prefix + ':' + concept;
+            } else {
+                result = concept;
+            }
+        }
+        return result;
+    };
+
+    Report.prototype.hideDefaultConceptPrefix = function(concept){
+        var prefix = this.getPrefix();
+        var result;
+        if(concept !== undefined && concept !== null && typeof concept === 'string') {
+            if(concept.indexOf(prefix + ':') === 0){
+                result = concept.substring(prefix.length + 1);
+            } else {
+                result = concept;
+            }
+        }
+        return result;
+    };
+
+    Report.prototype.hideDefaultConceptPrefixes = function(conceptsArray){
+        var result = [];
+        if(conceptsArray !== undefined && conceptsArray !== null && typeof conceptsArray === 'object') {
+            for (var i in conceptsArray) {
+                if(conceptsArray.hasOwnProperty(i)) {
+                    var concept = conceptsArray[i];
+                    result.push(this.hideDefaultConceptPrefix(concept));
+                }
+            }
+        }
+        return result;
+    };
+
+    Report.prototype.alignConceptPrefixes = function(conceptsArray){
+        var result = [];
+        if(conceptsArray !== undefined && conceptsArray !== null && typeof conceptsArray === 'object') {
+            for (var i in conceptsArray) {
+                var concept = conceptsArray[i];
+                result.push(this.alignConceptPrefix(concept));
             }
         }
         return result;

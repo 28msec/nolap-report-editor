@@ -2583,7 +2583,7 @@ angular.module('excelParser', []).factory('ExcelParser',function(){ return (func
 })()});'use strict';
 
 angular.module('formulaEditor',['excelParser', 'formulaParser'])
-.factory('Formula', ['$q', '$log', 'ExcelParser', 'FormulaParser', function($q, $log, ExcelParser, FormulaParser){
+.factory('Formula', ['$q', '$log', '$sce', 'ExcelParser', 'FormulaParser', function($q, $log, $sce, ExcelParser, FormulaParser){
 
     var ensureParameter = function(paramValue, paramName, paramType, functionName, regex, regexErrorMessage) {
         if(paramValue === null || paramValue === undefined) {
@@ -2599,35 +2599,87 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
 
     //Constructor
     var Formula = function(modelOrRuleType, report, computableConcept, language){
+        ensureParameter(report, 'report', 'object', 'Formula (Const.)');
         if(typeof modelOrRuleType === 'object' && modelOrRuleType !== null){
             this.report = report;
             this.setModel(modelOrRuleType);
         } else {
             ensureParameter(modelOrRuleType, 'modelOrRuleType', 'string', 'Formula (Const.)',/^(xbrl28:formula)|(xbrl28:validation)$/g,'unknown rule type: ' + modelOrRuleType);
             ensureParameter(computableConcept, 'computableConcept', 'string', 'Formula (Const.)');
-            ensureParameter(language, 'language', 'string', 'Formula (Const.)');
-            ensureParameter(report, 'report', 'object', 'Formula (Const.)');
+            if(language !== undefined && language !== null && language !== 'SpreadsheetFormula'){
+                throw new Error('Formula (Const.): unknown original language "' + language + '"');
+            }
             this.report = report;
             this.parser = null;
+            var concept = report.getConcept(computableConcept);
+            if (concept === undefined || concept === null){
+                throw new Error('Concept with name ' + computableConcept + ' does not exist.');
+            }
             if (modelOrRuleType === 'xbrl28:validation'){
-                this.setModel({
-                    'Id': report.uuid(),
-                    'Type': modelOrRuleType,
-                    'Label': '',
-                    'Description': '',
-                    'ComputableConcepts': [ computableConcept + 'Validation' ],
-                    'ValidatedConcepts': [ computableConcept ],
-                    'DependsOn': [],
-                    'Formula': ''
-                });
+
+                // find a suitable concept name for the validation result
+                var alignedComputableConcept = computableConcept + 'Validation';
+                //does a concept with this name already exist?
+                var existingConcept = this.report.existsConcept(alignedComputableConcept);
+                var count = 2;
+                do {
+                    if(!existingConcept){
+                        break; // found one that we can use
+                    }
+                    //does it have a rule attached?
+                    if(this.report.computableByRules(alignedComputableConcept).length == 0){
+                        break; // found one that we can use
+                    }
+                    alignedComputableConcept = computableConcept + 'Validation' + count;
+                    count++;
+                    existingConcept = this.report.existsConcept(alignedComputableConcept);
+                } while(existingConcept);
+
+                if(language === 'SpreadsheetFormula') {
+                    this.setModel({
+                        'Id': report.uuid(),
+                        'Type': modelOrRuleType,
+                        'OriginalLanguage': language,
+                        'Label': concept.Label,
+                        'Description': 'Rule to validate ' + concept.Label + ' (' + computableConcept
+                            + '). It also creates a new fact (' + alignedComputableConcept + ') that contains the validation result.',
+                        'ComputableConcepts': [ alignedComputableConcept ],
+                        'ValidatedConcepts': [ this.report.hideDefaultConceptPrefix(computableConcept) ],
+                        'DependsOn': [],
+                        'AllowCrossPeriod': true,
+                        'AllowCrossBalance': true,
+                        'Formulae': [
+                            {
+                                'PrereqSrc': 'TRUE',
+                                'Prereq': {},
+                                'SourceFact': [ this.report.hideDefaultConceptPrefix(computableConcept) ],
+                                'BodySrc': this.report.hideDefaultConceptPrefix(computableConcept) + ' = ',
+                                'Body': {},
+                                'active': true
+                            }
+                        ]
+                    });
+                } else {
+                    this.setModel({
+                        'Id': report.uuid(),
+                        'Type': modelOrRuleType,
+                        'Label': concept.Label + ' Validation',
+                        'Description': 'Rule to validate ' + concept.Label + ' (' + computableConcept
+                            + '). It also creates a new fact (' + alignedComputableConcept + ') that contains the validation result.',
+                        'ComputableConcepts': [ computableConcept + 'Validation' ],
+                        'ValidatedConcepts': [ computableConcept ],
+                        'DependsOn': [],
+                        'Formula': ''
+                    });
+                }
             } else if (modelOrRuleType === 'xbrl28:formula') {
                 if(language === 'SpreadsheetFormula') {
                     this.setModel({
                         'Id': report.uuid(),
                         'Type': modelOrRuleType,
                         'OriginalLanguage': language,
-                        'Label': '',
-                        'Description': '',
+                        'Label': concept.Label,
+                        'Description': 'Rule to compute ' + concept.Label + ' (' + computableConcept + ').',
                         'ComputableConcepts': [ computableConcept ],
                         'DependsOn': [],
                         'AllowCrossPeriod': true,
@@ -2647,8 +2699,8 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
                     this.setModel({
                         'Id': report.uuid(),
                         'Type': modelOrRuleType,
-                        'Label': '',
-                        'Description': '',
+                        'Label': concept.Label,
+                        'Description': 'Rule to compute ' + concept.Label + ' (' + computableConcept + ').',
                         'ComputableConcepts': [ computableConcept ],
                         'DependsOn': [],
                         'Formula': ''
@@ -2708,6 +2760,38 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         return prefix;
     };
 
+    Formula.prototype.listAvailableConceptNames = function(){
+        var result = [];
+        if(this.report !== undefined && this.report !== null && typeof this.report === 'object'){
+            var concepts = this.report.listConcepts();
+            for (var i in concepts){
+                var concept = concepts[i];
+                if(concepts.hasOwnProperty(i) && (concept.IsAbstract === undefined || concept.IsAbstract === false)){
+                    result.push(this.report.hideDefaultConceptPrefix(concept.Name));
+                }
+            }
+        }
+        return result;
+    };
+
+    Formula.prototype.listConcepts = function(){
+        if(this.report !== undefined
+            && this.report.model !== undefined && this.report.model.Hypercubes !== undefined
+            && this.report.model.Hypercubes['xbrl:DefaultHypercube'] !== undefined
+            && this.report.model.Hypercubes['xbrl:DefaultHypercube'].Aspects !== undefined
+            && this.report.model.Hypercubes['xbrl:DefaultHypercube'].Aspects['xbrl:Concept'] !== undefined
+            && this.report.model.Hypercubes['xbrl:DefaultHypercube'].Aspects['xbrl:Concept'].Domains !== undefined
+            && this.report.model.Hypercubes['xbrl:DefaultHypercube'].Aspects['xbrl:Concept'].Domains['xbrl:ConceptDomain'] !== undefined
+            && this.report.model.Hypercubes['xbrl:DefaultHypercube'].Aspects['xbrl:Concept'].Domains['xbrl:ConceptDomain'].Members !== undefined) {
+            return this.report.model.Hypercubes['xbrl:DefaultHypercube']
+                .Aspects['xbrl:Concept']
+                .Domains['xbrl:ConceptDomain']
+                .Members;
+        } else {
+            return undefined;
+        }
+    };
+
     Formula.prototype.getParser = function() {
         if(this.parser === undefined || this.parser === null ) {
             if(this.model.OriginalLanguage === 'ArithmeticFormula') {
@@ -2726,29 +2810,6 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         this.view = JSON.stringify(this.model, null, ' ');
     };*/
 
-    var alignConceptPrefix = function(prefix, concept){
-        var result;
-        if(concept !== undefined && concept !== null && typeof concept === 'string') {
-            if (concept.indexOf(':') === -1) {
-                result = prefix + ':' + concept;
-            } else {
-                result = concept;
-            }
-        }
-        return result;
-    };
-
-    var alignConceptPrefixes = function(prefix, conceptsArray){
-        var result = [];
-        if(conceptsArray !== undefined && conceptsArray !== null && typeof conceptsArray === 'object') {
-            for (var i in conceptsArray) {
-                var concept = conceptsArray[i];
-                result.push(alignConceptPrefix(prefix, concept));
-            }
-        }
-        return result;
-    };
-
     var makeUnique = function(array){
         ensureParameter(array, 'array', 'object', 'makeUnique');
         var unique = {}, result = [];
@@ -2766,7 +2827,6 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
     var inferDependenciesImpl = function(formula, obj){
         ensureParameter(formula, 'formula', 'object', 'inferDependenciesImpl');
         ensureParameter(obj, 'obj', 'object', 'inferDependenciesImpl');
-        var prefix = formula.getPrefix();
         var result = [];
         var formulae = obj.Formulae;
         if(formulae !== undefined && formulae !== null && typeof formulae === 'object'){
@@ -2774,7 +2834,7 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
                 var alternative = formulae[i];
                 result = result.concat(inferDependenciesImpl(formula, alternative));
             }
-            result = alignConceptPrefixes(prefix, result);
+            result = formula.report.alignConceptPrefixes(result);
             result = makeUnique(result);
             obj.DependsOn = result;
         } else {
@@ -2899,12 +2959,12 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
             var result = [];
             switch(type){
                 // comparisons
-                case 'eq':
-                case 'ne':
-                case 'gt':
-                case 'ge':
-                case 'lt':
-                case 'le': result.push(toAuditTrail(children[0]) + ' || " ' + type + ' " || ' + toAuditTrail(children[1])); break;
+                case 'eq': result.push(toAuditTrail(children[0]) + ' || " = " || ' + toAuditTrail(children[1])); break;
+                case 'ne': result.push(toAuditTrail(children[0]) + ' || " <> " || ' + toAuditTrail(children[1])); break;
+                case 'gt': result.push(toAuditTrail(children[0]) + ' || " > " || ' + toAuditTrail(children[1])); break;
+                case 'ge': result.push(toAuditTrail(children[0]) + ' || " >= " || ' + toAuditTrail(children[1])); break;
+                case 'lt': result.push(toAuditTrail(children[0]) + ' || " < " || ' + toAuditTrail(children[1])); break;
+                case 'le': result.push(toAuditTrail(children[0]) + ' || " <= " || ' + toAuditTrail(children[1])); break;
 
                 // arithmetics
                 case 'add': result.push(toAuditTrail(children[0]) + ' || " + " || ' + toAuditTrail(children[1])); break;
@@ -2947,31 +3007,32 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         }
     };
 
-    var getUniqueFacts = function(report, prefix){
+    var getUniqueFacts = function(report, rule){
         var facts = [];
-        facts = facts.concat(report.model.ComputableConcepts);
-        facts = facts.concat(report.model.DependsOn);
-        if((report.model.OriginalLanguage === 'SpreadsheetFormula') &&
-            report.model.Formulae !== undefined && report.model.Formulae !== null) {
-            for (var i in report.model.Formulae) {
-                facts = facts.concat(report.model.Formulae[i].SourceFact);
+        facts = facts.concat(rule.ComputableConcepts);
+        facts = facts.concat(rule.DependsOn);
+        if((rule.OriginalLanguage === 'SpreadsheetFormula') &&
+            rule.Formulae !== undefined && rule.Formulae !== null) {
+            for (var i in rule.Formulae) {
+                facts = facts.concat(rule.Formulae[i].SourceFact);
             }
         }
-        return makeUnique(alignConceptPrefixes(prefix, facts));
+        return makeUnique(report.alignConceptPrefixes(facts));
     };
 
     Formula.prototype.toJsoniq = function() {
         var result = [];
         var prefix = this.getPrefix();
-        var computedConcept = alignConceptPrefix(prefix, this.model.ComputableConcepts[0]);
+        var report = this.report;
+        var computedConcept = report.alignConceptPrefix(this.model.ComputableConcepts[0]);
         if(this.model !== undefined && this.model !== null && typeof this.model ==='object') {
             if ((this.model.OriginalLanguage === 'SpreadsheetFormula') &&
                 this.model.Formulae !== undefined && this.model.Formulae !== null) {
 
-                var facts = getUniqueFacts(this, prefix);
+                var facts = getUniqueFacts(report, this.model);
                 var computedFactVariable;
                 if(computedConcept.indexOf( prefix + ':') === 0){
-                    computedFactVariable = computedConcept.substring(prefix.length + 1);
+                    computedFactVariable = report.hideDefaultConceptPrefix(computedConcept);
                 }else{
                     computedFactVariable = computedConcept.replace(/:/g, '_');
                 }
@@ -2996,7 +3057,7 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
                     }else{
                         variable.Name = concept.replace(/:/g, '_');
                     }
-                    variable.Concept = alignConceptPrefix(prefix, concept);
+                    variable.Concept = report.alignConceptPrefix(concept);
                     variables.push(variable);
                 }
                 var auditTrailSourceFacts = '';
@@ -3020,11 +3081,15 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
                     result.push('let $aligned-period := ( facts:duration-for-fact($facts).End, facts:instant-for-fact($facts), "forever")[1]');
                 }
                 result.push('group by $canonical-filter-string := ');
+                var canonicalSerialization = '  facts:canonically-serialize-object($facts, ($facts:CONCEPT, "_id", "IsInDefaultHypercube", "Type", "Value", "Decimals", "AuditTrails", "xbrl28:Type"';
                 if (allowCrossBalance) {
-                    result.push('  facts:canonically-serialize-object($facts, ($facts:CONCEPT, "_id", "IsInDefaultHypercube", "Type", "Value", "Decimals", "AuditTrails", "xbrl28:Type", "Balance"))');
-                } else {
-                    result.push('  facts:canonically-serialize-object($facts, ($facts:CONCEPT, "_id", "IsInDefaultHypercube", "Type", "Value", "Decimals", "AuditTrails", "xbrl28:Type"))');
+                    canonicalSerialization += ', "Balance"';
                 }
+                if (allowCrossPeriod) {
+                    canonicalSerialization += ', $facts:PERIOD';
+                }
+                canonicalSerialization += '))';
+                result.push(canonicalSerialization);
                 if (allowCrossPeriod) {
                     result.push('  , $aligned-period');
                 }
@@ -3044,7 +3109,7 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
                         var alternative = this.model.Formulae[k];
                         var body = alternative.Body;
                         var prereq = alternative.Prereq;
-                        var sourceFacts = alignConceptPrefixes(prefix, alternative.SourceFact);
+                        var sourceFacts = report.alignConceptPrefixes(alternative.SourceFact);
                         var sourceFactVariable;
                         if(sourceFacts[0] !== undefined && sourceFacts[0].indexOf( prefix + ':') === 0){
                             sourceFactVariable = sourceFacts[0].substring(prefix.length + 1);
@@ -3071,11 +3136,29 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
                         result.push('  return');
                         result.push('    let $computed-value := ' + toComputation(body));
                         result.push('    let $audit-trail-message := ');
-                        result.push('	     rules:fact-trail({"Aspects": { "xbrl:Unit" : $_unit, "xbrl:Concept" : "' + computedConcept + '" }, Value: $computed-value }) || " = "');
-                        result.push('	        || ' + toAuditTrail(body));
+                        if(this.model.Type === 'xbrl28:formula'){
+                            result.push('	     rules:fact-trail({"Aspects": { "xbrl:Unit" : $_unit, "xbrl:Concept" : "' + computedConcept + '" }, Value: $computed-value }) || " = " || ');
+                        }
+                        result.push('	        ' + toAuditTrail(body));
                         result.push('	 let $source-facts := (' + auditTrailSourceFacts + ')');
                         result.push('    return');
-                        result.push('      rules:create-computed-fact(');
+                        result.push('      if(string(number($computed-value)) != "NaN" and not($computed-value instance of xs:boolean) and $computed-value ne xs:integer($computed-value))');
+                        result.push('      then');
+                        result.push('        copy $newfact :=');
+                        result.push('          rules:create-computed-fact(');
+                        result.push('            $' + sourceFactVariable + ',');
+                        result.push('            "' + computedConcept + '",');
+                        result.push('            $computed-value,');
+                        result.push('            $rule,');
+                        result.push('            $audit-trail-message,');
+                        result.push('            $source-facts,');
+                        result.push('            $options)');
+                        result.push('        modify (');
+                        result.push('            replace value of json $newfact("Decimals") with 2');
+                        result.push('          )');
+                        result.push('        return $newfact');
+                        result.push('      else');
+                        result.push('        rules:create-computed-fact(');
                         result.push('          $' + sourceFactVariable + ',');
                         result.push('          "' + computedConcept + '",');
                         result.push('          $computed-value,');
@@ -3272,16 +3355,18 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         }
     };
 
-    var validateComputableConcepts = function(rule, report, prefix){
+    var validateComputableConcepts = function(rule, report){
         var computableConcepts = rule.ComputableConcepts;
         if(computableConcepts[0] === '' || computableConcepts.length === 0){
             rule.ComputableConceptsErr = 'Computable Concept is mandatory.';
             rule.valid = false;
+        } else if(rule.Type === 'xbrl28:validation' && rule.OriginalLanguage === 'SpreadsheetFormula'){
+            delete rule.ComputableConceptsErr;
         } else {
             var notExistingConcepts = [];
             for (var i in computableConcepts){
                 if(computableConcepts.hasOwnProperty(i)) {
-                    var concept = report.getConcept(alignConceptPrefix(prefix, computableConcepts[i]));
+                    var concept = report.getConcept(report.alignConceptPrefix(computableConcepts[i]));
                     if (concept === undefined || concept === null) {
                         notExistingConcepts.push(computableConcepts[i]);
                     }
@@ -3299,12 +3384,12 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         }
     };
 
-    var validateDependsOnConcepts = function(rule, report, prefix){
+    var validateDependsOnConcepts = function(rule, report){
         var dependsOnConcepts = rule.DependsOn;
         var notExistingConcepts = [];
         for (var i in dependsOnConcepts){
             if(dependsOnConcepts.hasOwnProperty(i)) {
-                var concept = report.getConcept(alignConceptPrefix(prefix, dependsOnConcepts[i]));
+                var concept = report.getConcept(report.alignConceptPrefix(dependsOnConcepts[i]));
                 if (concept === undefined || concept === null) {
                     notExistingConcepts.push(dependsOnConcepts[i]);
                 }
@@ -3321,7 +3406,7 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         }
     };
 
-    var validateValidatedConcepts = function(rule, report, prefix){
+    var validateValidatedConcepts = function(rule, report){
         var validatedConcepts = rule.ValidatedConcepts;
         if(validatedConcepts[0] === '' || validatedConcepts.length === 0){
             rule.ValidatedConceptsErr = 'Validated Concept is mandatory.';
@@ -3330,7 +3415,7 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
             var notExistingConcepts = [];
             for (var i in validatedConcepts){
                 if(validatedConcepts.hasOwnProperty(i)) {
-                    var concept = report.getConcept(alignConceptPrefix(prefix, validatedConcepts[i]));
+                    var concept = report.getConcept(report.alignConceptPrefix(validatedConcepts[i]));
                     if (concept === undefined || concept === null) {
                         notExistingConcepts.push(validatedConcepts[i]);
                     }
@@ -3350,7 +3435,7 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
 
     var validateFormula = function(rule){
         var formula = rule.Formula;
-        if(formula === undefined || formula === null || formula === ''){
+        if((formula === undefined || formula === null || formula === '') && rule.OriginalLanguage !== 'SpreadsheetFormula'){
             rule.FormulaErr = 'Rule Code Section is mandatory.';
             rule.valid = false;
         } else {
@@ -3358,27 +3443,30 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         }
     };
 
-    var validateAlternative = function(rule, alternative, report, prefix){
+    var validateAlternative = function(rule, alternative, report){
         var sourceFact = alternative.SourceFact;
         if(sourceFact === undefined || sourceFact === null || sourceFact[0] === '' || sourceFact.length === 0){
-            alternative.SourceFactErr = 'Source Fact is mandatory (general characteristics - e.g. credit or debit - will be copied from this fact).';
+            alternative.SourceFactErr = $sce.trustAsHtml('Source Fact is mandatory (general characteristics - e.g. credit or debit - will be copied from this fact).');
             alternative.valid = false;
         } else {
             var notExistingConcepts = [];
             // multiple source facts are not supported, this is for future compatibility
             for (var i in sourceFact){
                 if(sourceFact.hasOwnProperty(i)) {
-                    var concept = report.getConcept(alignConceptPrefix(prefix, sourceFact[i]));
+                    var concept = report.getConcept(report.alignConceptPrefix(sourceFact[i]));
                     if (concept === undefined || concept === null) {
                         notExistingConcepts.push(sourceFact[i]);
                     }
                 }
             }
             if(notExistingConcepts.length === 1) {
-                alternative.SourceFactErr = 'The source concept "' + notExistingConcepts[0] + '" does not exist.';
+                alternative.SourceFactErr =
+                    $sce.trustAsHtml(
+                            'The source concept <a href="#" tooltip-trigger="mouseenter" tooltip-placement="top" ' +
+                            'tooltip="Create this Concept." ng-click="createConcept(\'' + notExistingConcepts[0] + '\')">"' + notExistingConcepts[0] + '"</a> does not exist.');
                 alternative.valid = false;
             } else if(notExistingConcepts.length > 1) {
-                alternative.SourceFactErr = 'The following source concepts do not exist: "' + notExistingConcepts.join('", "') + '".';
+                alternative.SourceFactErr = $sce.trustAsHtml('The following source concepts do not exist: "' + notExistingConcepts.join('", "') + '".');
                 alternative.valid = false;
             }else {
                 delete alternative.SourceFactErr;
@@ -3391,7 +3479,7 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         }
     };
 
-    var validateAlternatives = function(rule, report, prefix){
+    var validateAlternatives = function(rule, report){
         var formulae = rule.Formulae;
         if(formulae === undefined || formulae === null || formulae[0] === '' || formulae.length === 0){
             rule.FormulaeErr = 'At least one alternative code section is mandatory.';
@@ -3400,7 +3488,7 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
             for (var i in formulae){
                 if(formulae.hasOwnProperty(i)) {
                     var alternative = formulae[i];
-                    validateAlternative(rule, alternative, report, prefix);
+                    validateAlternative(rule, alternative, report);
                     if (!alternative.valid) {
                         rule.valid = false;
                     }
@@ -3409,24 +3497,26 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         }
     };
 
-    Formula.prototype.validate = function (action) {
+    Formula.prototype.validate = function (action, updateDependencies) {
         var report = this.report;
         var rule = this.getModel();
 
         if(rule !== undefined && rule !== null && typeof rule === 'object') {
-            var prefix = this.getPrefix();
             var type = rule.Type;
             rule.valid = true;
             validateId(rule, report, action);
             validateLabel(rule);
-            validateComputableConcepts(rule, report, prefix);
-            validateDependsOnConcepts(rule, report, prefix);
+            validateComputableConcepts(rule, report);
+            if(updateDependencies !== undefined && updateDependencies){
+                inferDependencies(this, this.model, true);
+            }
+            validateDependsOnConcepts(rule, report);
             if(type === 'xbrl28:validation' ){
-                validateValidatedConcepts(rule, report, prefix);
+                validateValidatedConcepts(rule, report);
             }
             validateFormula(rule);
             if(rule.OriginalLanguage === 'SpreadsheetFormula' ){
-                validateAlternatives(rule, report, prefix);
+                validateAlternatives(rule, report);
             }
             return rule.valid;
         }
@@ -3448,7 +3538,8 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
         if(model.OriginalLanguage === 'SpreadsheetFormula') {
             this.compile();
         }
-        var computableConcepts = alignConceptPrefixes(this.getPrefix(), model.ComputableConcepts);
+        var report = this.report;
+        var computableConcepts = report.alignConceptPrefixes(model.ComputableConcepts);
         var rule = {
             'Id': model.Id,
             'OriginalLanguage': model.OriginalLanguage,
@@ -3460,7 +3551,7 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
             'Formula': model.Formula
         };
         if(model.ValidatedConcepts !== undefined){
-            rule.ValidatedConcepts = alignConceptPrefixes(this.getPrefix(), model.ValidatedConcepts);
+            rule.ValidatedConcepts = report.alignConceptPrefixes(model.ValidatedConcepts);
         }
         if(model.Formulae !== undefined && model.Formulae !== null && typeof model.Formulae === 'object') {
             rule.Formulae = model.Formulae;
@@ -3477,19 +3568,10 @@ angular.module('formulaEditor',['excelParser', 'formulaParser'])
 
     Formula.prototype.setModel = function (model) {
         ensureParameter(model, 'model', 'object', 'setModel');
-        var prefix = this.getPrefix();
         this.model = angular.copy(model);
-        if(this.model.ComputableConcepts !== undefined && this.model.ComputableConcepts !== null && typeof this.model.ComputableConcepts === 'object'){
-            for (var i in this.model.ComputableConcepts){
-                var computableConcept = this.model.ComputableConcepts[i];
-                if(computableConcept.indexOf(prefix + ':') === 0){
-                    this.model.ComputableConcepts[i] = computableConcept.substring(computableConcept.indexOf(':')+1);
-                }
-            }
-        }
-
+        this.model.ComputableConcepts = this.report.hideDefaultConceptPrefixes(this.model.ComputableConcepts);
         this.parser = null;
-        this.compile();
+        //this.compile();
     };
 
     Formula.prototype.Id = function() {
@@ -3840,7 +3922,7 @@ console.log(delta);
         }
     };
 })
-.directive('businessRules', function($rootScope, BusinessRuleTpl){
+.directive('businessRules', function($rootScope, BusinessRuleTpl, Report){
     return {
         restrict: 'E',
         scope: {
@@ -3899,7 +3981,7 @@ console.log(delta);
         }
     };
 })
-.directive('rulesEditor', function($rootScope, RulesEditorTpl){
+.directive('rulesEditor', function($rootScope, $timeout, RulesEditorTpl){
     return {
         restrict: 'E',
         scope: {
@@ -3911,9 +3993,42 @@ console.log(delta);
         link: function($scope) {
             $scope.colspan1 = 2;
             $scope.tooltipPlacement = 'top';
+            $scope.availableConceptNames = $scope.formula.listAvailableConceptNames();
+            $scope.onSelectTypeAhead = function(updateDependencies){
+                $scope.formula.validate($scope.action, updateDependencies);
+            };
+            $scope.createConcept = function(concept){
+                $rootScope.$emit('createConcept', false, concept);
+            };
+            $scope.$watch(function () {
+                if($scope.formula === undefined){
+                    return undefined;
+                } else {
+                    return $scope.formula.listConcepts();
+                }
+            }, function () {
+                if($scope.formula !== undefined) {
+                    $scope.availableConceptNames = $scope.formula.listAvailableConceptNames();
+                    $scope.formula.validate($scope.action, true);
+                }
+            });
         }
     };
 })
+.directive('autoRecompileBindHtml', function($compile, $parse){
+    return {
+        link: function($scope, element, attr){
+            // Recompile the ng bind html
+            $scope.$watch(function() {
+                var parsed = $parse(attr.ngBindHtml);
+                var val = parsed($scope) || '';
+                return val.toString();
+            }, function() {
+                $compile(element, null, -9999 /*skip directives*/)($scope);
+            });
+        }
+    }
+});
 ;
 angular.module('reports.api.28.io', [])
 /**
@@ -4098,9 +4213,9 @@ data: body,
 
 .constant("ConceptMapTpl", "<div ng-if=\"map === undefined\">\r\n    <h3 ng-bind=\"concept.Name\"></h3>\r\n    <div ng-if=\"concept.IsAbstract !== true\">\r\n        <p>There is no concept map associated to <i ng-bind=\"conceptName\"></i>.</p>\r\n        <button ng-click=\"addConceptMap()\" class=\"btn btn-primary\">Add concept Map</button>\r\n    </div>\r\n    <div ng-if=\"concept.IsAbstract === true\">\r\n        <p>This concept is abstract.</p>\r\n    </div>\r\n</div>\r\n<div ng-if=\"map !== undefined\">\r\n    <button class=\"pull-right btn btn-default\"><i class=\"fa fa-times\" ng-click=\"removeConceptMap()\"></i></button>\r\n    <h3 ng-bind=\"concept.Name\"></h3>\r\n    <p ng-bind=\"concept.Label\"></p>\r\n    <ul class=\"list-group\">\r\n        <li class=\"list-group-item clearfix\" ng-repeat=\"key in map\">\r\n            <span ng-bind=\"key\"></span>\r\n            <div class=\"btn-group pull-right\">\r\n                <button class=\"btn btn-default\" type=\"button\" ng-click=\"moveTo(key, $index - 1)\" ng-if=\"$last === false\"><i class=\"fa fa-long-arrow-down\"></i></button>\r\n                <button class=\"btn btn-default\" type=\"button\" ng-click=\"moveTo(key, $index + 1)\" ng-if=\"$first === false\"><i class=\"fa fa-long-arrow-up\"></i></button>\r\n                <button class=\"btn btn-default\" type=\"button\" ng-click=\"removeValue(key)\"><i class=\"fa fa-times\"></i></button>\r\n            </div>\r\n        </li>\r\n    </ul>\r\n    <form class=\"form-inline\" role=\"form\" ng-submit=\"addValue(newConceptValue)\" ui-keypress=\"{ 13:'addValue(newConceptValue)' }\">\r\n        <div class=\"form-group\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-6\">\r\n                    <div class=\"input-group\">\r\n                        <input type=\"text\" class=\"form-control\" id=\"conceptValue\" placeholder=\"Concept Name\" ng-model=\"newConceptValue\" typeahead=\"concept for concept in concepts | filter:$viewValue | limitTo:8\">\r\n                        <span class=\"input-group-btn\">\r\n                            <button type=\"submit\" class=\"btn btn-primary\">Add</button>\r\n                        </span>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </form>\r\n</div>")
 
-.constant("BusinessRuleTpl", "<div ng-if=\"hasComputingRule\">\r\n    <h2>Computing Rule</h2>\r\n    <table class=\"table table-hover\">\r\n        <thead>\r\n        <tr>\r\n            <th>Id</th>\r\n            <th>Label</th>\r\n            <th>Rule Type</th>\r\n            <th>Action</th>\r\n        </tr>\r\n        </thead>\r\n        <tbody>\r\n        <tr ng-repeat=\"(key, rule) in allRules\">\r\n            <td ng-bind=\"rule.Id\"></td>\r\n            <td ng-bind=\"rule.Label\"></td>\r\n            <td ng-bind=\"rule.Type\"></td>\r\n            <td>\r\n                <button type=\"button\" class=\"btn btn-primary\" ng-click=\"editRule(rule.Id)\">Edit Rule</button>\r\n                <button type=\"button\" class=\"btn btn-danger\" ng-click=\"removeRule(rule.Id)\">Delete Rule</button>\r\n            </td>\r\n        </tr>\r\n        </tbody>\r\n    </table>\r\n</div>\r\n<div ng-if=\"!hasComputingRule\">\r\n    <h2>Create a Business Rule to Compute a Fact</h2>\r\n    <h3>Excel Rule</h3>\r\n    <div>\r\n        <p class=\"\">Create a simple rule for concept \"{{conceptName}}\" using spreadsheet formula syntax.</p>\r\n        <form class=\"form-inline\" role=\"form\" ng-submit=\"addRule(conceptName, 'xbrl28:formula', 'SpreadsheetFormula')\">\r\n            <button type=\"submit\" class=\"btn btn-primary\">Add Simple Rule</button>\r\n        </form>\r\n    </div>\r\n    <h3>Advanced Rule</h3>\r\n    <div>\r\n        <p class=\"\">Create an advanced rule for concept \"{{conceptName}}\" using Jsoniq syntax (advanced users only).</p>\r\n        <form class=\"form-inline\" role=\"form\" ng-submit=\"addRule(conceptName, 'xbrl28:formula', undefined)\">\r\n            <button type=\"submit\" class=\"btn btn-primary\">Add Advanced Rule</button>\r\n        </form>\r\n    </div>\r\n    <h3>Validation Rule</h3>\r\n    <div>\r\n        <p class=\"\">Create an advanced validation rule for concept \"{{conceptName}}\" using Jsoniq syntax (advanced users only).</p>\r\n        <form class=\"form-inline\" role=\"form\" ng-submit=\"addRule(conceptName, 'xbrl28:validation', undefined)\">\r\n            <button type=\"submit\" class=\"btn btn-primary\">Add Validation Rule</button>\r\n        </form>\r\n    </div>\r\n</div>\r\n<div ng-if=\"hasComputingRule && allRules[0].Type !== 'xbrl28:validation'\">\r\n    <h2>Validating Rules for Concept \"{{conceptName}}\"</h2>\r\n    <table class=\"table table-hover\" ng-if=\"hasValidatingRules\">\r\n        <thead>\r\n        <tr>\r\n            <th>Id</th>\r\n            <th>Label</th>\r\n            <th>Rule Type</th>\r\n            <th>Action</th>\r\n        </tr>\r\n        </thead>\r\n        <tbody>\r\n        <tr ng-repeat=\"(key, rule) in validatingRules\">\r\n            <td ng-bind=\"rule.Id\"></td>\r\n            <td ng-bind=\"rule.Label\"></td>\r\n            <td ng-bind=\"rule.Type\"></td>\r\n            <td>\r\n                <button type=\"button\" class=\"btn btn-primary\" ng-click=\"editRule(rule.Id)\">Edit Rule</button>\r\n                <button type=\"button\" class=\"btn btn-danger\" ng-click=\"removeRule(rule.Id)\">Delete Rule</button>\r\n            </td>\r\n        </tr>\r\n        </tbody>\r\n    </table>\r\n    <div ng-if=\"!hasValidatingRules\">\r\n        <p class=\"alert alert-info\">There are no validation rules validating concept \"{{conceptName}}\", yet.</p>\r\n    </div>\r\n</div>")
+.constant("BusinessRuleTpl", "<div ng-if=\"hasComputingRule\">\r\n    <h2>Computing Rule</h2>\r\n    <table class=\"table table-hover\">\r\n        <thead>\r\n        <tr>\r\n            <th>Id</th>\r\n            <th>Label</th>\r\n            <th>Rule Type</th>\r\n            <th>Action</th>\r\n        </tr>\r\n        </thead>\r\n        <tbody>\r\n        <tr ng-repeat=\"(key, rule) in allRules\">\r\n            <td ng-bind=\"rule.Id\"></td>\r\n            <td ng-bind=\"rule.Label\"></td>\r\n            <td ng-bind=\"rule.Type\"></td>\r\n            <td>\r\n                <button type=\"button\" class=\"btn btn-primary\" ng-click=\"editRule(rule.Id)\">Edit Rule</button>\r\n                <button type=\"button\" class=\"btn btn-danger\" ng-click=\"removeRule(rule.Id)\">Delete Rule</button>\r\n            </td>\r\n        </tr>\r\n        </tbody>\r\n    </table>\r\n</div>\r\n<div ng-if=\"!hasComputingRule\">\r\n    <h2>Compute {{conceptName}}</h2>\r\n    <div>\r\n        <br/>\r\n        <nav class=\"navbar navbar-default\" role=\"navigation\">\r\n            <div class=\"container-fluid\">\r\n                <div class=\"navbar-header\">\r\n                </div>\r\n                <div class=\"collapse navbar-collapse\">\r\n                    <form class=\"navbar-form navbar-right\" role=\"navigation\">\r\n                        <button type=\"submit\" class=\"btn btn-primary\" tooltip-trigger=\"mouseenter\" tooltip-placement=\"top\"\r\n                                tooltip=\"Create a simple rule to compute concept {{conceptName}} using spreadsheet formula syntax.\"\r\n                                ng-click=\"addRule(conceptName, 'xbrl28:formula', 'SpreadsheetFormula')\">Add Simple Rule</button>\r\n                        <button type=\"submit\" class=\"btn btn-default\" tooltip-trigger=\"mouseenter\" tooltip-placement=\"top\"\r\n                                tooltip=\"Create an advanced rule to compute concept {{conceptName}} using JSONiq syntax (Advanced Users only).\"\r\n                                ng-click=\"addRule(conceptName, 'xbrl28:formula', undefined)\">Add Advanced Rule</button>\r\n                    </form>\r\n                </div>\r\n            </div>\r\n        </nav>\r\n    </div>\r\n</div>\r\n<div ng-if=\"allRules[0].Type !== 'xbrl28:validation'\">\r\n    <h2>Validate \"{{conceptName}}\"</h2>\r\n    <table class=\"table table-hover\" ng-if=\"hasValidatingRules\">\r\n        <thead>\r\n        <tr>\r\n            <th>Id</th>\r\n            <th>Label</th>\r\n            <th>Rule Type</th>\r\n            <th>Action</th>\r\n        </tr>\r\n        </thead>\r\n        <tbody>\r\n        <tr ng-repeat=\"(key, rule) in validatingRules\">\r\n            <td ng-bind=\"rule.Id\"></td>\r\n            <td ng-bind=\"rule.Label\"></td>\r\n            <td ng-bind=\"rule.Type\"></td>\r\n            <td>\r\n                <button type=\"button\" class=\"btn btn-primary\" ng-click=\"editRule(rule.Id)\">Edit Rule</button>\r\n                <button type=\"button\" class=\"btn btn-danger\" ng-click=\"removeRule(rule.Id)\">Delete Rule</button>\r\n            </td>\r\n        </tr>\r\n        </tbody>\r\n    </table>\r\n    <div>\r\n        <br/>\r\n        <nav class=\"navbar navbar-default\" role=\"navigation\">\r\n            <div class=\"container-fluid\">\r\n                <div class=\"navbar-header\">\r\n                </div>\r\n                <div class=\"collapse navbar-collapse\">\r\n                    <form class=\"navbar-form navbar-right\" role=\"navigation\">\r\n                        <button type=\"submit\" class=\"btn btn-primary navbar-btn\" tooltip-trigger=\"mouseenter\" tooltip-placement=\"top\"\r\n                                tooltip=\"Create a simple validation rule for concept {{conceptName}} using spreadsheet formula syntax.\"\r\n                                ng-click=\"addRule(conceptName, 'xbrl28:validation', 'SpreadsheetFormula')\">Add Simple Validation Rule</button>\r\n                        <button type=\"submit\" class=\"btn btn-default navbar-btn\" tooltip-trigger=\"mouseenter\" tooltip-placement=\"top\"\r\n                                tooltip=\"Create an advanced validation rule for concept {{conceptName}} using JSONiq syntax (Advanced Users only).\"\r\n                                ng-click=\"addRule(conceptName, 'xbrl28:validation', undefined)\">Add Advanced Validation Rule</button>\r\n                    </form>\r\n                </div>\r\n            </div>\r\n        </nav>\r\n    </div>\r\n</div>")
 
-.constant("RulesEditorTpl", "<div class=\"container\">\r\n    <form novalidate class=\"form-horizontal\" role=\"form\">\r\n        <div class=\"form-group\" ng-class=\"{'has-error': formula.model.IdErr!==undefined}\">\r\n            <label for=\"ruleID\" class=\"col-sm-{{colspan1}} control-label\">ID</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input ng-if=\"action === 'Create'\" type=\"text\" id=\"ruleID\" class=\"form-control\" ng-model=\"formula.model.Id\" ng-pattern=\"/^.+$/\" required ng-change=\"formula.validate(action)\">\r\n                <input ng-if=\"action === 'Update'\" type=\"text\" id=\"ruleID\" readonly=\"readonly\" class=\"form-control\" ng-model=\"formula.model.Id\" ng-pattern=\"/^.+$/\" required>\r\n            </div>\r\n            <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.IdErr\">\r\n                <p ng-bind=\"formula.model.IdErr\" class=\"text-danger\"></p>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\" ng-class=\"{'has-error': formula.model.LabelErr!==undefined}\">\r\n            <label for=\"ruleLabel\" class=\"col-sm-{{colspan1}} control-label\">Label</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"text\" id=\"ruleLabel\" class=\"form-control\" ng-model=\"formula.model.Label\" required ng-change=\"formula.validate(action)\">\r\n            </div>\r\n            <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.LabelErr\">\r\n                <p ng-bind=\"formula.model.LabelErr\" class=\"text-danger\"></p>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\" ng-class=\"{'has-error': formula.model.DescriptionErr!==undefined}\">\r\n            <label for=\"ruleDescription\" class=\"col-sm-{{colspan1}} control-label\">Description</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <textarea class=\"form-control\" id=\"ruleDescription\" rows=\"3\" placeholder=\"\" ng-model=\"formula.model.Description\" ng-change=\"formula.validate(action)\"></textarea>\r\n            </div>\r\n            <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.DescriptionErr\">\r\n                <p ng-bind=\"formula.model.DescriptionErr\" class=\"text-danger\"></p>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\" ng-class=\"{'has-error': formula.model.ComputableConceptsErr!==undefined}\">\r\n            <label for=\"compFact\" class=\"col-sm-{{colspan1}} control-label\">Computed Fact Name</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"text\" id=\"compFact\" class=\"form-control\" ng-model=\"formula.model.ComputableConcepts\" ng-list ng-change=\"formula.validate(action)\">\r\n            </div>\r\n            <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.ComputableConceptsErr\">\r\n                <p ng-bind=\"formula.model.ComputableConceptsErr\" class=\"text-danger\"></p>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\" ng-class=\"{'has-error': formula.model.DependsOnErr!==undefined}\">\r\n            <label for=\"deps\" class=\"col-sm-{{colspan1}} control-label\">Dependencies</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input ng-if=\"formula.model.OriginalLanguage === 'SpreadsheetFormula'\"\r\n                       class=\"form-control\" ng-model=\"formula.model.DependsOn\" ng-list ng-change=\"formula.validate(action)\" type=\"text\" id=\"deps\" readonly>\r\n                <input ng-if=\"formula.model.OriginalLanguage !== 'SpreadsheetFormula'\"\r\n                       class=\"form-control\" ng-model=\"formula.model.DependsOn\" ng-list ng-change=\"formula.validate(action)\" type=\"text\" id=\"deps\">\r\n            </div>\r\n            <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.DependsOnErr\">\r\n                <p ng-bind=\"formula.model.DependsOnErr\" class=\"text-danger\"></p>\r\n            </div>\r\n        </div>\r\n\r\n\r\n        <!-- if 'SpreadsheetFormula'-->\r\n        <div class=\"form-group\" ng-if=\"formula.model.OriginalLanguage === 'SpreadsheetFormula'\">\r\n            <label for=\"coverAspects\" class=\"col-sm-{{colspan1}} control-label\">Implicit Filtering Options</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"checkbox\" id=\"coverAspects\" ng-model=\"formula.model.AllowCrossPeriod\">\r\n                    <span tooltip=\"Allow facts to be computable across different period types (e.g. divide Revenue [duration] by Assets [instant]).\" tooltip-trigger=\"mouseenter\" tooltip-placement=\"{{tooltipPlacement}}\">\r\n                        Compute facts across different period types (duration/instant)</span>\r\n            </div>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"checkbox\" ng-model=\"formula.model.AllowCrossBalance\">\r\n                    <span tooltip=\"Allow facts to be computable across different balance types (e.g. allow to compare Assets [debit] with Equity [debit]).\" tooltip-trigger=\"mouseenter\" tooltip-placement=\"{{tooltipPlacement}}\">\r\n                        Compute facts across different balance types (debit/credit)</span>\r\n            </div>\r\n        </div>\r\n        <tabset ng-if=\"formula.model.OriginalLanguage === 'SpreadsheetFormula'\">\r\n            <tab ng-repeat=\"alt in formula.model.Formulae track by $index\" active=\"alt.active\">\r\n                <tab-heading>\r\n                    <span ng-class=\"{'text-danger': alt.valid===false}\"><i class=\"glyphicon glyphicon-bell\" style=\"color: #a94442\" ng-show=\"alt.valid===false\"></i> Alternative {{$index +1}}</span>\r\n                    <span class=\"btn-group\" dropdown is-open=\"status.isopen\" style=\"margin-left: 10px; margin-right: 10px;\">\r\n                        <button type=\"button\" class=\"btn btn-default dropdown-toggle btn-xs\" ng-disabled=\"disabled\"><span class=\"caret\"></span></button>\r\n                        <ul class=\"dropdown-menu\" role=\"menu\">\r\n                            <li ng-if=\"formula.model.Formulae.length > 1\"><a href=\"#\" ng-click=\"formula.removeAlternative($index)\" class=\"text-danger\"><i class=\"glyphicon glyphicon-trash\"></i> Delete</a></li>\r\n                            <li><a href=\"#\" ng-click=\"formula.copyAlternative($index)\"><i class=\"glyphicon glyphicon-share\"></i> Duplicate</a></li>\r\n                        </ul>\r\n                    </span>\r\n                </tab-heading>\r\n                <div style=\"border-width: 0 1px 1px 1px;border-color: #ddd;border-radius: 4px 4px 0 0;padding-top: 15px;\">\r\n                    <div class=\"form-group\" ng-class=\"{'has-error': alt.SourceFactErr!==undefined}\">\r\n                        <label for=\"sourceFact{{$index}}\" class=\"col-sm-{{colspan1}} control-label\">Mandatory Source Fact</label>\r\n                        <div class=\"col-sm-{{12 - colspan1}}\">\r\n                            <input type=\"text\" id=\"sourceFact{{$index}}\" class=\"form-control\" ng-model=\"alt.SourceFact[0]\" ng-pattern=\"/^.+$/\" ng-change=\"formula.validate(action)\">\r\n                        </div>\r\n                        <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"alt.SourceFactErr\">\r\n                            <p ng-bind=\"alt.SourceFactErr\" class=\"text-danger\"></p>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"form-group\" ng-class=\"{'has-error': alt.PrereqErr!==undefined}\">\r\n                        <label for=\"precondition{{$index}}\" class=\"col-sm-{{colspan1}} control-label\">Precondition</label>\r\n                        <div class=\"col-sm-{{12 - colspan1}}\">\r\n                            <textarea class=\"form-control\" id=\"precondition{{$index}}\" rows=\"1\" placeholder=\"\" ng-change=\"formula.compilePrereq($index, true, action)\" ng-model=\"alt.PrereqSrc\"></textarea>\r\n                        </div>\r\n                        <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"alt.PrereqErr\" style=\"margin-top: 20px;\">{{alt.PrereqErr}}</div>\r\n                    </div>\r\n                    <div class=\"form-group\" ng-class=\"{'has-error': alt.BodyErr!==undefined}\">\r\n                        <label for=\"rule{{$index}}\" class=\"col-sm-{{colspan1}} control-label\">Arithmetic Rule</label>\r\n                        <div  class=\"col-sm-{{12 - colspan1}}\">\r\n                            <textarea class=\"form-control\" id=\"rule{{$index}}\" rows=\"6\" placeholder=\"\" ng-change=\"formula.compileBody($index, true, action)\" ng-model=\"alt.BodySrc\"></textarea>\r\n                        </div>\r\n                        <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"alt.BodyErr\" style=\"margin-top: 20px;\">{{alt.BodyErr}}</div>\r\n                    </div>\r\n                </div>\r\n            </tab>\r\n            <tab select=\"formula.addAlternative()\">\r\n                <tab-heading>\r\n                    <span><i class=\"glyphicon glyphicon-plus\"></i> Add An Alternative</span>\r\n                </tab-heading>\r\n            </tab>\r\n        </tabset>\r\n\r\n        <!-- if 'xbrl28:formula' || 'xbrl28:validation'-->\r\n        <div ng-if=\"formula.model.Type === 'xbrl28:formula' && formula.model.OriginalLanguage !== 'SpreadsheetFormula'\">\r\n            <div class=\"form-group\" ng-class=\"{'has-error': formula.model.FormulaErr!==undefined}\">\r\n                <label for=\"rule\" class=\"col-sm-{{colspan1}} control-label\">Advanced Rule</label>\r\n                <div  class=\"col-sm-{{12 - colspan1}}\">\r\n                    <textarea class=\"form-control\" id=\"rule\" rows=\"20\" placeholder=\"\" ng-change=\"formula.compile()\" ng-model=\"formula.model.Formula\"></textarea>\r\n                </div>\r\n                <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"formula.model.FormulaErr\" style=\"margin-top: 20px;\">{{formula.model.FormulaErr}}</div>\r\n            </div>\r\n        </div>\r\n        <div ng-if=\"formula.model.Type === 'xbrl28:validation' && formula.model.OriginalLanguage !== 'SpreadsheetFormula'\">\r\n            <div class=\"form-group\" ng-class=\"{'has-error': formula.model.ValidatedConceptsErr!==undefined}\">\r\n                <label for=\"validatedConcept\" class=\"col-sm-{{colspan1}} control-label\">Validated Concept</label>\r\n                <div class=\"col-sm-{{12 - colspan1}}\">\r\n                    <input type=\"text\" id=\"validatedConcept\" class=\"form-control\" ng-model=\"formula.model.ValidatedConcepts\" ng-pattern=\"/^.+$/\" ng-list ng-change=\"formula.validate(action)\">\r\n                </div>\r\n                <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.ValidatedConceptsErr\">\r\n                    <p ng-bind=\"formula.model.ComputableConceptsErr\" class=\"text-danger\"></p>\r\n                </div>\r\n            </div>\r\n            <div class=\"form-group\" ng-class=\"{'has-error': formula.model.FormulaErr!==undefined}\">\r\n                <label for=\"validation\" class=\"col-sm-{{colspan1}} control-label\">Advanced Validation Rule</label>\r\n                <div  class=\"col-sm-{{12 - colspan1}}\">\r\n                    <textarea class=\"form-control\" id=\"validation\" rows=\"20\" placeholder=\"\" ng-change=\"formula.compile()\" ng-model=\"formula.model.Formula\"></textarea>\r\n                </div>\r\n                <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"formula.model.FormulaErr\" style=\"margin-top: 20px;\">{{formula.model.FormulaErr}}</div>\r\n            </div>\r\n        </div>\r\n    </form>\r\n</div>")
+.constant("RulesEditorTpl", "<div class=\"container\">\r\n    <form novalidate class=\"form-horizontal\" role=\"form\">\r\n        <div class=\"form-group\" ng-class=\"{'has-error': formula.model.IdErr!==undefined}\">\r\n            <label for=\"ruleID\" class=\"col-sm-{{colspan1}} control-label\">ID</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input ng-if=\"action === 'Create'\" type=\"text\" id=\"ruleID\" class=\"form-control\" ng-model=\"formula.model.Id\" ng-pattern=\"/^.+$/\" required ng-change=\"formula.validate(action)\">\r\n                <input ng-if=\"action === 'Update'\" type=\"text\" id=\"ruleID\" readonly=\"readonly\" class=\"form-control\" ng-model=\"formula.model.Id\" ng-pattern=\"/^.+$/\" required>\r\n            </div>\r\n            <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.IdErr\">\r\n                <p ng-bind=\"formula.model.IdErr\" class=\"text-danger\"></p>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\" ng-class=\"{'has-error': formula.model.LabelErr!==undefined}\">\r\n            <label for=\"ruleLabel\" class=\"col-sm-{{colspan1}} control-label\">Label</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"text\" id=\"ruleLabel\" class=\"form-control\" ng-model=\"formula.model.Label\" required ng-change=\"formula.validate(action)\">\r\n            </div>\r\n            <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.LabelErr\">\r\n                <p ng-bind=\"formula.model.LabelErr\" class=\"text-danger\"></p>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\" ng-class=\"{'has-error': formula.model.DescriptionErr!==undefined}\">\r\n            <label for=\"ruleDescription\" class=\"col-sm-{{colspan1}} control-label\">Description</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <textarea class=\"form-control\" id=\"ruleDescription\" rows=\"3\" placeholder=\"\" ng-model=\"formula.model.Description\" ng-change=\"formula.validate(action)\"></textarea>\r\n            </div>\r\n            <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.DescriptionErr\">\r\n                <p ng-bind=\"formula.model.DescriptionErr\" class=\"text-danger\"></p>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\" ng-class=\"{'has-error': formula.model.ComputableConceptsErr!==undefined && formula.model.OriginalLanguage !== 'SpreadsheetFormula'}\">\r\n            <label for=\"compFact\" class=\"col-sm-{{colspan1}} control-label\">Computed Fact Name</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"text\" id=\"compFact\" class=\"form-control\" ng-model=\"formula.model.ComputableConcepts\"\r\n                       ng-list ng-change=\"formula.validate(action)\" ng-if=\"formula.model.OriginalLanguage !== 'SpreadsheetFormula'\">\r\n                <input type=\"text\" id=\"compFact\" class=\"form-control\" ng-model=\"formula.model.ComputableConcepts\"\r\n                       ng-list readonly ng-if=\"formula.model.OriginalLanguage === 'SpreadsheetFormula'\">\r\n            </div>\r\n            <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.ComputableConceptsErr &&  formula.model.OriginalLanguage !== 'SpreadsheetFormula'\"\">\r\n                <p ng-bind=\"formula.model.ComputableConceptsErr\" class=\"text-danger\"></p>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\" ng-class=\"{'has-error': formula.model.DependsOnErr!==undefined}\">\r\n            <label for=\"deps\" class=\"col-sm-{{colspan1}} control-label\">Dependencies</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input ng-if=\"formula.model.OriginalLanguage === 'SpreadsheetFormula'\"\r\n                       class=\"form-control\" ng-model=\"formula.model.DependsOn\" ng-list ng-change=\"formula.validate(action)\" type=\"text\" id=\"deps\" readonly>\r\n                <input ng-if=\"formula.model.OriginalLanguage !== 'SpreadsheetFormula'\"\r\n                       class=\"form-control\" ng-model=\"formula.model.DependsOn\" ng-list ng-change=\"formula.validate(action)\" type=\"text\" id=\"deps\">\r\n            </div>\r\n            <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.DependsOnErr\">\r\n                <p ng-bind=\"formula.model.DependsOnErr\" class=\"text-danger\"></p>\r\n            </div>\r\n        </div>\r\n\r\n        <!-- if 'SpreadsheetFormula'-->\r\n        <div ng-if=\"formula.model.Type === 'xbrl28:validation' && formula.model.OriginalLanguage === 'SpreadsheetFormula'\">\r\n            <div class=\"form-group\" ng-class=\"{'has-error': formula.model.ValidatedConceptsErr!==undefined}\">\r\n                <label for=\"validatedConcept1\" class=\"col-sm-{{colspan1}} control-label\">Validated Concept</label>\r\n                <div class=\"col-sm-{{12 - colspan1}}\">\r\n                    <input type=\"text\" readonly id=\"validatedConcept1\" class=\"form-control\" ng-model=\"formula.model.ValidatedConcepts\" ng-list>\r\n                </div>\r\n                <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.ValidatedConceptsErr\">\r\n                    <p ng-bind=\"formula.model.ValidatedConceptsErr\" class=\"text-danger\"></p>\r\n                </div>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\" ng-if=\"formula.model.OriginalLanguage === 'SpreadsheetFormula'\">\r\n            <label for=\"coverAspects\" class=\"col-sm-{{colspan1}} control-label\">Options</label>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"checkbox\" id=\"coverAspects\" ng-model=\"formula.model.AllowCrossPeriod\">\r\n                    <span tooltip=\"Allow facts to be computable across different period types (e.g. divide Revenue [duration] by Assets [instant]).\" tooltip-trigger=\"mouseenter\" tooltip-placement=\"{{tooltipPlacement}}\">\r\n                        Compute facts across different period types (duration/instant)</span>\r\n            </div>\r\n            <div class=\"col-sm-{{12 - colspan1}}\">\r\n                <input type=\"checkbox\" ng-model=\"formula.model.AllowCrossBalance\">\r\n                    <span tooltip=\"Allow facts to be computable across different balance types (e.g. allow to compare Assets [debit] with Equity [debit]).\" tooltip-trigger=\"mouseenter\" tooltip-placement=\"{{tooltipPlacement}}\">\r\n                        Compute facts across different balance types (debit/credit)</span>\r\n            </div>\r\n        </div>\r\n        <tabset ng-if=\"formula.model.OriginalLanguage === 'SpreadsheetFormula'\">\r\n            <tab ng-repeat=\"alt in formula.model.Formulae track by $index\" active=\"alt.active\">\r\n                <tab-heading>\r\n                    <span ng-class=\"{'text-danger': alt.valid===false}\"><i class=\"glyphicon glyphicon-bell\" style=\"color: #a94442\" ng-show=\"alt.valid===false\"></i> Alternative {{$index +1}}</span>\r\n                    <span class=\"btn-group\" dropdown is-open=\"status.isopen\" style=\"margin-left: 10px; margin-right: 10px;\">\r\n                        <button type=\"button\" class=\"btn btn-default dropdown-toggle btn-xs\" ng-disabled=\"disabled\"><span class=\"caret\"></span></button>\r\n                        <ul class=\"dropdown-menu\" role=\"menu\">\r\n                            <li ng-if=\"formula.model.Formulae.length > 1\"><a href=\"#\" ng-click=\"formula.removeAlternative($index)\" class=\"text-danger\"><i class=\"glyphicon glyphicon-trash\"></i> Delete</a></li>\r\n                            <li><a href=\"#\" ng-click=\"formula.copyAlternative($index)\"><i class=\"glyphicon glyphicon-share\"></i> Duplicate</a></li>\r\n                        </ul>\r\n                    </span>\r\n                </tab-heading>\r\n                <div style=\"border-width: 0 1px 1px 1px;border-color: #ddd;border-radius: 4px 4px 0 0;padding-top: 15px;\">\r\n                    <div class=\"form-group\" ng-class=\"{'has-error': alt.SourceFactErr!==undefined}\">\r\n                        <label for=\"sourceFact{{$index}}\" class=\"col-sm-{{colspan1}} control-label\">Mandatory Source Fact</label>\r\n                        <div class=\"col-sm-{{12 - colspan1}}\">\r\n                            <input type=\"text\" id=\"sourceFact{{$index}}\" class=\"form-control\" ng-model=\"alt.SourceFact[0]\" ng-pattern=\"/^.+$/\"\r\n                                   ng-change=\"formula.validate(action, true)\" typeahead=\"key for key in availableConceptNames | filter:$viewValue | limitTo: 20\"\r\n                                   typeahead-on-select=\"onSelectTypeAhead(true)\">\r\n                        </div>\r\n                        <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"alt.SourceFactErr\">\r\n                            <p ng-bind-html=\"alt.SourceFactErr\" auto-recompile-bind-html class=\"text-danger\"></p>\r\n                        </div>\r\n                    </div>\r\n                    <div class=\"form-group\" ng-class=\"{'has-error': alt.PrereqErr!==undefined}\">\r\n                        <label for=\"precondition{{$index}}\" class=\"col-sm-{{colspan1}} control-label\">Precondition</label>\r\n                        <div class=\"col-sm-{{12 - colspan1}}\">\r\n                            <textarea class=\"form-control\" id=\"precondition{{$index}}\" rows=\"1\" placeholder=\"\" ng-change=\"formula.compilePrereq($index, true, action)\" ng-model=\"alt.PrereqSrc\"></textarea>\r\n                        </div>\r\n                        <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"alt.PrereqErr\" style=\"margin-top: 20px;\">{{alt.PrereqErr}}</div>\r\n                    </div>\r\n                    <div class=\"form-group\" ng-class=\"{'has-error': alt.BodyErr!==undefined}\">\r\n                        <label for=\"rule{{$index}}\" class=\"col-sm-{{colspan1}} control-label\">Arithmetic Rule</label>\r\n                        <div  class=\"col-sm-{{12 - colspan1}}\">\r\n                            <textarea class=\"form-control\" id=\"rule{{$index}}\" rows=\"6\" placeholder=\"\" ng-change=\"formula.compileBody($index, true, action)\" ng-model=\"alt.BodySrc\"></textarea>\r\n                        </div>\r\n                        <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"alt.BodyErr\" style=\"margin-top: 20px;\">{{alt.BodyErr}}</div>\r\n                    </div>\r\n                </div>\r\n            </tab>\r\n            <tab select=\"formula.addAlternative()\">\r\n                <tab-heading>\r\n                    <span tooltip-trigger=\"mouseenter\" tooltip-placement=\"{{tooltipPlacement}}\"\r\n                          tooltip=\"Add an alternative that will get executed if the precondition of the previous alternative fails.\"><i class=\"glyphicon glyphicon-plus\"></i> Add An Alternative</span>\r\n                </tab-heading>\r\n            </tab>\r\n        </tabset>\r\n\r\n        <!-- if 'xbrl28:formula' || 'xbrl28:validation'-->\r\n        <div ng-if=\"formula.model.Type === 'xbrl28:formula' && formula.model.OriginalLanguage !== 'SpreadsheetFormula'\">\r\n            <div class=\"form-group\" ng-class=\"{'has-error': formula.model.FormulaErr!==undefined}\">\r\n                <label for=\"rule\" class=\"col-sm-{{colspan1}} control-label\">Advanced Rule</label>\r\n                <div  class=\"col-sm-{{12 - colspan1}}\">\r\n                    <textarea class=\"form-control\" id=\"rule\" rows=\"20\" placeholder=\"\" ng-change=\"formula.compile()\" ng-model=\"formula.model.Formula\"></textarea>\r\n                </div>\r\n                <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"formula.model.FormulaErr\" style=\"margin-top: 20px;\">{{formula.model.FormulaErr}}</div>\r\n            </div>\r\n        </div>\r\n        <div ng-if=\"formula.model.Type === 'xbrl28:validation' && formula.model.OriginalLanguage !== 'SpreadsheetFormula'\">\r\n            <div class=\"form-group\" ng-class=\"{'has-error': formula.model.ValidatedConceptsErr!==undefined}\">\r\n                <label for=\"validatedConcept\" class=\"col-sm-{{colspan1}} control-label\">Validated Concept</label>\r\n                <div class=\"col-sm-{{12 - colspan1}}\">\r\n                    <input type=\"text\" id=\"validatedConcept\" class=\"form-control\" ng-model=\"formula.model.ValidatedConcepts\" ng-pattern=\"/^.+$/\" ng-list ng-change=\"formula.validate(action)\">\r\n                </div>\r\n                <div class=\"col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-if=\"formula.model.ValidatedConceptsErr\">\r\n                    <p ng-bind=\"formula.model.ValidatedConceptsErr\" class=\"text-danger\"></p>\r\n                </div>\r\n            </div>\r\n            <div class=\"form-group\" ng-class=\"{'has-error': formula.model.FormulaErr!==undefined}\">\r\n                <label for=\"validation\" class=\"col-sm-{{colspan1}} control-label\">Advanced Validation Rule</label>\r\n                <div  class=\"col-sm-{{12 - colspan1}}\">\r\n                    <textarea class=\"form-control\" id=\"validation\" rows=\"20\" placeholder=\"\" ng-change=\"formula.compile()\" ng-model=\"formula.model.Formula\"></textarea>\r\n                </div>\r\n                <div class=\"container alert alert-danger col-sm-offset-{{colspan1}} col-sm-{{12 - colspan1}}\" ng-show=\"formula.model.FormulaErr\" style=\"margin-top: 20px;\">{{formula.model.FormulaErr}}</div>\r\n            </div>\r\n        </div>\r\n    </form>\r\n</div>")
 
 .constant("ConceptTpl", "<form name=\"editConceptForm\" ng-submit=\"ok\" role=\"form\" spellcheck=\"false\" novalidate>\r\n    <div class=\"modal-header\">\r\n    <button class=\"pull-right btn btn-default\"><i class=\"fa fa-times\" ng-click=\"remove()\"></i></button>\r\n        <h3 class=\"modal-title\" ng-bind=\"concept.Name\"></h3>\r\n    </div>\r\n    <div class=\"modal-body\">\r\n        <div class=\"form-group\">\r\n            <label for=\"label\">Label</label>\r\n           <input type=\"text\" class=\"form-control\" id=\"label\" ng-model=\"concept.Label\" placeholder=\"Label\" required>\r\n        </div>\r\n        <div class=\"checkbox\">\r\n            <label>\r\n                <input type=\"checkbox\" ng-model=\"concept.IsAbstract\"> Abstract\r\n            </label>\r\n        </div>\r\n    </div>\r\n</form>")
 
@@ -4295,6 +4410,7 @@ angular
      ** Concepts API
      **********************/
     Report.prototype.addConcept = function(name, label, abstract) {
+        var name = this.alignConceptPrefix(name);
         ensureConceptName(name, 'name', 'addConcept');
         ensureParameter(label, 'label', 'string', 'addConcept');
         ensureParameter(abstract, 'abstract', 'boolean', 'addConcept');
@@ -4326,6 +4442,7 @@ angular
     };
 
     Report.prototype.updateConcept = function(name, label, abstract) {
+        var name = this.alignConceptPrefix(name);
         ensureConceptName(name, 'name', 'updateConcept');
         ensureParameter(label, 'label', 'string', 'updateConcept');
         abstract = abstract === true;
@@ -4340,6 +4457,7 @@ angular
     };
 
     Report.prototype.removeConcept = function(name) {
+        var name = this.alignConceptPrefix(name);
         ensureConceptName(name, 'name', 'removeConcept');
 
         if(!this.existsConcept(name)){
@@ -4361,6 +4479,7 @@ angular
     };
 
     Report.prototype.existsConcept = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'existsConcept');
 
         var concept = this.getConcept(conceptName);
@@ -4371,6 +4490,7 @@ angular
     };
 
     Report.prototype.getConcept = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'getConcept');
 
         var model = this.getModel();
@@ -4651,6 +4771,7 @@ angular
 
     Report.prototype.addTreeChild = function(networkShortName, parentElementID, conceptName, offset) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'addTreeChild');
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'addTreeChild');
         var concept = this.getConcept(conceptName);
         ensureExists(concept, 'object', 'addTreeChild', 'concept with name "' + conceptName + '" doesn\'t exist.');
@@ -4767,6 +4888,7 @@ angular
      ** Concept Maps API
      **********************/
     Report.prototype.getConceptMap = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'getConceptMap');
 
         var network = this.getNetwork('ConceptMap');
@@ -4798,6 +4920,7 @@ angular
     };
 
     Report.prototype.existsConceptMap = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'existsConceptMap');
 
         var map = this.getConceptMap(conceptName);
@@ -4808,6 +4931,7 @@ angular
     };
 
     Report.prototype.addConceptMap = function(fromConceptName, toConceptNamesArray) {
+        var fromConceptName = this.alignConceptPrefix(fromConceptName);
         ensureConceptName(fromConceptName, 'fromConceptName', 'addConceptMap');
         var fromConcept = this.getConcept(fromConceptName);
         ensureExists(fromConcept, 'object', 'addConceptMap', 'concept with name "' + fromConceptName + '" doesn\'t exist.');
@@ -4818,7 +4942,7 @@ angular
 
         var toObj = {};
         for(var i in toConceptNamesArray) {
-            var name = toConceptNamesArray[i];
+            var name = this.alignConceptPrefix(toConceptNamesArray[i]);
             ensureConceptName(name, 'toConceptNamesArray', 'addConceptMap');
             toObj[name] = {
                 'Id': _uuid(),
@@ -4843,6 +4967,7 @@ angular
     };
 
     Report.prototype.updateConceptMap = function(fromConceptName, toConceptNamesArray) {
+        var fromConceptName = this.alignConceptPrefix(fromConceptName);
         ensureConceptName(fromConceptName, 'fromConceptName', 'updateConceptMap');
         var fromConcept = this.getConcept(fromConceptName);
         ensureExists(fromConcept, 'object', 'updateConceptMap', 'concept with name "' + fromConceptName + '" doesn\'t exist.');
@@ -4852,7 +4977,7 @@ angular
 
         var toObj = {};
         for(var i in toConceptNamesArray) {
-            var name = toConceptNamesArray[i];
+            var name = this.alignConceptPrefix(toConceptNamesArray[i]);
             ensureConceptName(name, 'toConceptNamesArray', 'updateConceptMap');
             toObj[name] = {
                 'Name': name,
@@ -4863,6 +4988,7 @@ angular
     };
 
     Report.prototype.findInConceptMap = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'findInConceptMap');
         
         var result = [];
@@ -4886,6 +5012,7 @@ angular
     };
 
     Report.prototype.removeConceptMap = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'removeConceptMap');
         
         var conceptMap = this.getConceptMap(conceptName);
@@ -4942,6 +5069,7 @@ angular
     };
 
     Report.prototype.validatedByRules = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'validatedByRules');
 
         var result = [];
@@ -4967,7 +5095,8 @@ angular
     };
 
      Report.prototype.computableByRules = function(conceptName) {
-        ensureConceptName(conceptName, 'conceptName', 'computableByRules');
+         var conceptName = this.alignConceptPrefix(conceptName);
+         ensureConceptName(conceptName, 'conceptName', 'computableByRules');
 
         var result = [];
         var model = this.getModel();
@@ -4990,6 +5119,7 @@ angular
     };
 
     Report.prototype.findInRules = function(conceptName) {
+        var conceptName = this.alignConceptPrefix(conceptName);
         ensureConceptName(conceptName, 'conceptName', 'findInRules');
 
         var result = [];
@@ -5041,7 +5171,7 @@ angular
         ensureExists(computableConceptsArray, 'object', 'createNewRule', 'function called without computableConceptsArray.');
 
         for(var i in computableConceptsArray) {
-            var cname = computableConceptsArray[i];
+            var cname = report.alignConceptPrefix(computableConceptsArray[i]);
             ensureConceptName(cname, 'computableConceptsArray', 'createNewRule');
             var rulesComputableConcepts = report.computableByRules(cname);
             if(rulesComputableConcepts.lenght > 0 && rulesComputableConcepts[0].Id !== id) {
@@ -5050,13 +5180,13 @@ angular
         }
         if(dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
             for(var j in dependingConceptsArray) {
-                var dname = dependingConceptsArray[j];
+                var dname = report.alignConceptPrefix(dependingConceptsArray[j]);
                 ensureConceptName(dname, 'dependingConceptsArray', 'createNewRule');
             }
         }
         if(validatedConceptsArray !== null && typeof validatedConceptsArray === 'object') {
             for(var x in validatedConceptsArray) {
-                var vname = validatedConceptsArray[x];
+                var vname = report.alignConceptPrefix(validatedConceptsArray[x]);
                 ensureConceptName(vname, 'validatedConceptsArray', 'createNewRule');
             }
         }
@@ -5099,7 +5229,7 @@ angular
         ensureExists(computableConceptsArray[0], 'string', errorMsgPrefix, 'Mandatory computable concept missing.');
         for(var i in computableConceptsArray) {
             if(computableConceptsArray.hasOwnProperty(i)) {
-                var cname = computableConceptsArray[i];
+                var cname = report.alignConceptPrefix(computableConceptsArray[i]);
                 ensureConceptName(cname, 'computableConceptsArray', errorMsgPrefix, 'The computable concept name ' + cname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
                 var cconcept = report.getConcept(cname);
                 if (cconcept === undefined || cconcept === null) {
@@ -5114,7 +5244,7 @@ angular
         if(dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
             for (var j in dependingConceptsArray) {
                 if(dependingConceptsArray.hasOwnProperty(j)) {
-                    var dname = dependingConceptsArray[j];
+                    var dname = report.alignConceptPrefix(dependingConceptsArray[j]);
                     ensureConceptName(dname, 'dependingConceptsArray', errorMsgPrefix, 'The dependency concept name ' + dname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
                     var dconcept = report.getConcept(dname);
                     if (dconcept === undefined || dconcept === null) {
@@ -5126,7 +5256,7 @@ angular
         if(validatedConceptsArray !== null && typeof validatedConceptsArray === 'object') {
             for(var x in validatedConceptsArray) {
                 if(validatedConceptsArray.hasOwnProperty(x)) {
-                    var vname = validatedConceptsArray[x];
+                    var vname = report.alignConceptPrefix(validatedConceptsArray[x]);
                     ensureConceptName(vname, 'validatedConceptsArray', errorMsgPrefix, 'The validated concept name ' + vname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
                     var vconcept = report.getConcept(vname);
                     if (vconcept === undefined || vconcept === null) {
@@ -5288,6 +5418,56 @@ angular
             var rule = rules[i];
             if(rule.OriginalLanguage === 'SpreadsheetFormula'){
                 result.push(rule);
+            }
+        }
+        return result;
+    };
+
+    Report.prototype.alignConceptPrefix = function(concept){
+        var prefix = this.getPrefix();
+        var result;
+        if(concept !== undefined && concept !== null && typeof concept === 'string') {
+            if (concept.indexOf(':') === -1) {
+                result = prefix + ':' + concept;
+            } else {
+                result = concept;
+            }
+        }
+        return result;
+    };
+
+    Report.prototype.hideDefaultConceptPrefix = function(concept){
+        var prefix = this.getPrefix();
+        var result;
+        if(concept !== undefined && concept !== null && typeof concept === 'string') {
+            if(concept.indexOf(prefix + ':') === 0){
+                result = concept.substring(prefix.length + 1);
+            } else {
+                result = concept;
+            }
+        }
+        return result;
+    };
+
+    Report.prototype.hideDefaultConceptPrefixes = function(conceptsArray){
+        var result = [];
+        if(conceptsArray !== undefined && conceptsArray !== null && typeof conceptsArray === 'object') {
+            for (var i in conceptsArray) {
+                if(conceptsArray.hasOwnProperty(i)) {
+                    var concept = conceptsArray[i];
+                    result.push(this.hideDefaultConceptPrefix(concept));
+                }
+            }
+        }
+        return result;
+    };
+
+    Report.prototype.alignConceptPrefixes = function(conceptsArray){
+        var result = [];
+        if(conceptsArray !== undefined && conceptsArray !== null && typeof conceptsArray === 'object') {
+            for (var i in conceptsArray) {
+                var concept = conceptsArray[i];
+                result.push(this.alignConceptPrefix(concept));
             }
         }
         return result;

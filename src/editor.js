@@ -339,7 +339,7 @@ console.log(delta);
         }
     };
 })
-.directive('businessRules', function($rootScope, BusinessRuleTpl){
+.directive('businessRules', function($rootScope, BusinessRuleTpl, Report){
     return {
         restrict: 'E',
         scope: {
@@ -398,7 +398,7 @@ console.log(delta);
         }
     };
 })
-.directive('rulesEditor', function($rootScope, RulesEditorTpl){
+.directive('rulesEditor', function($rootScope, $timeout, RulesEditorTpl){
     return {
         restrict: 'E',
         scope: {
@@ -410,7 +410,40 @@ console.log(delta);
         link: function($scope) {
             $scope.colspan1 = 2;
             $scope.tooltipPlacement = 'top';
+            $scope.availableConceptNames = $scope.formula.listAvailableConceptNames();
+            $scope.onSelectTypeAhead = function(updateDependencies){
+                $scope.formula.validate($scope.action, updateDependencies);
+            };
+            $scope.createConcept = function(concept){
+                $rootScope.$emit('createConcept', false, concept);
+            };
+            $scope.$watch(function () {
+                if($scope.formula === undefined){
+                    return undefined;
+                } else {
+                    return $scope.formula.listConcepts();
+                }
+            }, function () {
+                if($scope.formula !== undefined) {
+                    $scope.availableConceptNames = $scope.formula.listAvailableConceptNames();
+                    $scope.formula.validate($scope.action, true);
+                }
+            });
         }
     };
 })
+.directive('autoRecompileBindHtml', function($compile, $parse){
+    return {
+        link: function($scope, element, attr){
+            // Recompile the ng bind html
+            $scope.$watch(function() {
+                var parsed = $parse(attr.ngBindHtml);
+                var val = parsed($scope) || '';
+                return val.toString();
+            }, function() {
+                $compile(element, null, -9999 /*skip directives*/)($scope);
+            });
+        }
+    }
+});
 ;
