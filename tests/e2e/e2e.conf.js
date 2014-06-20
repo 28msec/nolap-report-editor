@@ -1,3 +1,7 @@
+'use strict';
+
+var ScreenShotReporter = require('protractor-screenshot-reporter');
+
 // A reference configuration file.
 exports.config = {
   // ----- How to setup Selenium -----
@@ -37,9 +41,9 @@ exports.config = {
 
   // If sauceUser and sauceKey are specified, seleniumServerJar will be ignored.
   // The tests will be run remotely using SauceLabs.
-  sauceUser: null,
-  sauceKey: null,
-
+  sauceUser: process.env.SAUCE_USERNAME,
+  sauceKey: process.env.SAUCE_ACCESS_KEY,
+  
   // The address of a running selenium server. If specified, Protractor will
   // connect to an already running instance of selenium. This usually looks like
   // seleniumAddress: 'http://localhost:4444/wd/hub'
@@ -94,7 +98,8 @@ exports.config = {
     // Maximum number of browser instances that can run in parallel for this 
     // set of capabilities. This is only needed if shardTestFiles is true. 
     // Default is 1.
-    maxInstances: 1
+    maxInstances: 1,
+    version: '28'
   },
 
   // If you would like to run more than one instance of webdriver on the same
@@ -117,6 +122,9 @@ exports.config = {
   // You can specify a file containing code to run by setting onPrepare to
   // the filename string.
   onPrepare: function() {
+      jasmine.getEnv().addReporter(new ScreenShotReporter({
+          baseDirectory: '/tmp/screenshots'
+      }));
     // At this point, global 'protractor' object will be set up, and jasmine
     // will be available. For example, you can add a Jasmine reporter with:
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(

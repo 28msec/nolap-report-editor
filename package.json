@@ -55,9 +55,10 @@
     "pegjs": "^0.8.0",
     "phantomjs": "~1.9.2-2",
     "protractor": "^0.24.2",
-    "request": "~2.33.0",
     "requirejs": "~2.1.11",
-    "time-grunt": "~0.1.1"
+    "time-grunt": "~0.1.1",
+    "protractor-screenshot-reporter": "0.0.5",
+    "request": "~2.36.0"
   },
   "contributors": [
     {
