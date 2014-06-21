@@ -164,26 +164,16 @@ module.exports = function (grunt) {
             }
         },
         protractor: {
-            options: {
-                configFile: 'tests/e2e/e2e.conf.js',
-                keepAlive: false, // If false, the grunt process stops when the test fails.
-                noColor: false, // If true, protractor will not use colors in its output.
-                args: {}
-            },
-            all: {
-                options: {
-                    args: {
-                        specs: ['tests/e2e/reports_spec.js']
-                    }
-                }
-            }
+            travis: 'tests/e2e/config/protractor-travis-conf.js',
+            local: 'tests/e2e/config/protractor-conf.js'
         }
     });
 
-    grunt.registerTask('e2e', function(){
+    grunt.registerTask('e2e', function(target){
+        target = target ? target : 'local';
         grunt.task.run([
             'connect:test',
-            'protractor'
+            'protractor:' + target
         ]); 
     });
 
@@ -202,7 +192,9 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e']);
+    grunt.registerTask('test-travis', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e:travis']);
+    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e:local']);
     grunt.registerTask('build', ['clean:pre', 'peg', 'swagger']);
     grunt.registerTask('default', ['jshint', 'build', 'test']);
+    grunt.registerTask('travis', ['jshint', 'build', 'test-travis']);
 };

@@ -41,7 +41,6 @@
     "grunt-ng-constant": "~0.4.8",
     "grunt-open": "~0.2.3",
     "grunt-peg": "^1.3.1",
-    "grunt-protractor-runner": "~1.0.0",
     "karma": "~0.12.0",
     "karma-chrome-launcher": "~0.1.2",
     "karma-coverage": "~0.2.1",
@@ -58,7 +57,8 @@
     "requirejs": "~2.1.11",
     "time-grunt": "~0.1.1",
     "protractor-screenshot-reporter": "0.0.5",
-    "request": "~2.36.0"
+    "request": "~2.36.0",
+    "shelljs": "~0.3.0"
   },
   "contributors": [
     {

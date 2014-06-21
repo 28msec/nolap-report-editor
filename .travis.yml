@@ -1,15 +1,19 @@
 language: node_js
 node_js:
-  - "0.11"
+- '0.11'
+env:
+  global:
+  - LOGS_DIR=/tmp/cellfire/logs
+  - BROWSER_PROVIDER_READY_FILE=/tmp/sauce-connect-ready
+  - secure: JjP7KN5VfGxzpPQTk0Qh+5axkJN8Tcoenu5vNvZTocH3MhH3/jOUvV3cu+e09F6Uat90WLciqs8JhGELAzfmHBnMMHSbLjMucD4XNhJNv5nVc86FrWEeJZUSBnPu08qmPZLacaRlIEdHsK4G0rZTAidsuUGNAfdSdfe8yWNHRTA=
+  - secure: ACzjKTIglg+W5I0Jhgf4n2RtUKTGth9Hkle9iTpt952ctXvB0BbsfoNVqFdQkYhPGhjsb3iJZwu5iFCzAXjmbS572/RMiuIb59UUpgGuSgxBylmfgRndb5uxGB6zwXWlcSJzdITv9Aj8y9iemT+2HtkAnYbNR4r0hICJlo/fyEo=
 addons:
-  firefox: "28.0"
-before_install:
-  - npm install -g bower
-  - bower install
-  - npm install -g grunt-cli
+  sauce_connect: true
 before_script:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-  - ./node_modules/protractor/bin/webdriver-manager update
+- npm install -g bower
+- bower install
+- npm install -g grunt-cli
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
 script:
-  - grunt
+- grunt travis
