@@ -173,7 +173,7 @@ module.exports = function (grunt) {
             all: {
                 options: {
                     args: {
-                        'specs': ['tests/e2e/reports_spec.js']
+                        specs: ['tests/e2e/reports_spec.js']
                     }
                 }
             }
