@@ -5,10 +5,6 @@ var config = require('./protractor-shared-conf').config;
 config.sauceUser = process.env.SAUCE_USERNAME;
 config.sauceKey = process.env.SAUCE_ACCESS_KEY;
 
-config.specs = [ 
-    '../*_spec.js'
-];
-
 config.multiCapabilities = [{
     'browserName': 'chrome',
     'platform': 'OS X 10.9',
