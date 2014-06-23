@@ -169,8 +169,8 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('e2e', function(target){
-        target = target ? target : 'local';
+    grunt.registerTask('e2e', function(){
+        var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
         grunt.task.run([
             'webdriver',
             'connect:test',
@@ -193,9 +193,7 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('test-travis', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e:travis']);
-    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e:local']);
+    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e']);
     grunt.registerTask('build', ['clean:pre', 'peg', 'swagger']);
     grunt.registerTask('default', ['jshint', 'build', 'test']);
-    grunt.registerTask('travis', ['jshint', 'build', 'test-travis']);
 };
