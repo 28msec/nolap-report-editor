@@ -172,6 +172,7 @@ module.exports = function (grunt) {
     grunt.registerTask('e2e', function(target){
         target = target ? target : 'local';
         grunt.task.run([
+            'webdriver',
             'connect:test',
             'protractor:' + target
         ]); 
