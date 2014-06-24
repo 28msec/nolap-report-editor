@@ -49,13 +49,12 @@ angular.module('report-editor')
     
     $scope.deleteReports = function(){
         var ids = [];
-        var oldReports = angular.copy($scope.reports);
-        Object.keys($scope.selectedReports).forEach(function(key, index){
+        Object.keys($scope.selectedReports).forEach(function(key){
             if($scope.selectedReports[key] === true) {
                 ids.push(key);
             }
         });
-        var modal = $modal.open({
+        $modal.open({
             controller: 'DeleteReportsCtrl',
             templateUrl: '/reports/delete-reports.html',
             resolve: {
