@@ -1,8 +1,9 @@
 describe('Rules Model API Tests', function () {
     'use strict';
 
-    /* global rule and report */
+    /* global Report */
     var report = null;
+    /* global Rule */
     var rule = null;
 
     it('Instantiate a New Rule', function () {
