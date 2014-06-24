@@ -5810,11 +5810,24 @@ a {
 section {
   margin-bottom: 20px;
 }
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-weight: 100;
+}
+label {
+  font-weight: normal;
+}
 .navbar-brand {
   color: white !important;
-  font-weight: 300;
+  font-weight: 100;
+}
+.modal-header {
+  background-color: #428bca;
+  color: white;
 }
 .modal-header.modal-header-danger {
-  color: white;
   background-color: #d9534f;
 }

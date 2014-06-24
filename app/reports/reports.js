@@ -44,7 +44,10 @@ angular.module('report-editor')
     }, true);
     
     $scope.createReport = function(){
-        
+        $modal.open({
+            controller: 'CreateReportCtrl',
+            templateUrl: '/reports/create-report.html'
+        });
     };
     
     $scope.deleteReports = function(){
@@ -109,5 +112,8 @@ angular.module('report-editor')
     $scope.cancel = function(){
         $modalInstance.close();
     };
+})
+.controller('CreateReportCtrl', function($scope, $modalInstance){
+    
 })
 ;

@@ -10,14 +10,27 @@ section {
     margin-bottom: 20px;
 }
 
+//Font weigths
+h1, h2, h3, h4, h5 {
+    font-weight: 100;
+}
+
+label {
+    font-weight: normal;
+}
+
 //Navbar
 .navbar-brand {
     color: white !important;
-    font-weight: 300;
+    font-weight: 100;
 }
 
 //Modals
-.modal-header.modal-header-danger {
+.modal-header {
+    background-color: @brand-primary;
     color: white;
-    background-color: @brand-danger;
+
+    &.modal-header-danger {
+        background-color: @brand-danger;
+    }
 }
