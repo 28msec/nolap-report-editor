@@ -152,6 +152,7 @@ module.exports = function (grunt) {
                         '<%= config.app %>/modules/formula-parser.js',
                         '<%= config.app %>/modules/report-api.js',
                         '<%= config.app %>/modules/report-model.js',
+                        '<%= config.app %>/modules/rules-model.js',
                         'tests/unit/karma.start.js',
                         'tests/unit/*.js'
                     ]
@@ -194,6 +195,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('test-travis', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e:travis']);
     grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e:local']);
+    grunt.registerTask('unittests', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post']);
     grunt.registerTask('build', ['clean:pre', 'peg', 'swagger']);
     grunt.registerTask('default', ['jshint', 'build', 'test']);
     grunt.registerTask('travis', ['jshint', 'build', 'test-travis']);

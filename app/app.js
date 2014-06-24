@@ -8,6 +8,7 @@ angular.module('report-editor', [
 
     'report-api',
     'report-model',
+    'rules-model',
     'excel-parser',
     'formula-parser',
     'forms-ui'
