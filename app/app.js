@@ -61,7 +61,7 @@ angular.module('report-editor', [
         templateUrl: '/reports/reports.html',
         controller: 'ReportsCtrl',
         resolve: {
-            reports: ['ReportEditorConfig', 'ReportAPI', function(ReportEditorConfig, ReportAPI){
+            reports: ['ReportEditorConfig', 'ReportAPI', function(ReportEditorConfig, ReportAPI) {
                 var api = new ReportAPI(ReportEditorConfig.api.endpoint);
                 return api.listReports({
                     token: ReportEditorConfig.api.token,

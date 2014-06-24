@@ -20,10 +20,11 @@
         </thead>
         <tbody>
             <tr ng-repeat="report in reports">
-                <td><input type="checkbox" ng-model="selectedReports[report._id]" ng-change="toggleReport()" ng-checked="false"></td>
                 <td>
-                    <a ng-href="/{{report._id}}" ng-bind="report._id"></a>
-                    <small>&ndash; {{report.Label}}</small>
+                    <input type="checkbox" ng-model="selectedReports[report._id]" ng-change="toggleReport()" ng-checked="false">
+                </td>
+                <td>
+                    <a ng-href="/{{report._id}}" ng-bind="report.Label"></a>
                 </td>
                 <td>June 14</td>
             </tr>

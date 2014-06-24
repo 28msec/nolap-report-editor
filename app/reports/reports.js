@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('ReportsCtrl', function($scope, reports){
+.controller('ReportsCtrl', function($scope, $modal, reports){
     $scope.reports = reports;
     $scope.selectedReports = {};
     $scope.reports.forEach(function(report){
@@ -48,15 +48,67 @@ angular.module('report-editor')
     };
     
     $scope.deleteReports = function(){
-        var selected = [];
-        Object.keys($scope.selectedReports).forEach(function(key){
+        var ids = [];
+        var oldReports = angular.copy($scope.reports);
+        Object.keys($scope.selectedReports).forEach(function(key, index){
             if($scope.selectedReports[key] === true) {
-                selected.push(key);
+                ids.push(key);
             }
         });
-        console.log(selected);
+        var modal = $modal.open({
+            controller: 'DeleteReportsCtrl',
+            templateUrl: '/reports/delete-reports.html',
+            resolve: {
+                reportIdsToDelete: function(){
+                    return ids;
+                },
+                reports: function(){
+                    return $scope.reports;
+                }
+            }
+        });
     };
+})
+.controller('DeleteReportsCtrl', function($q, $scope, $modalInstance, ReportEditorConfig, ReportAPI, reports, reportIdsToDelete){
 
-    console.log(reports);
+    $scope.loading = false;
+
+    var api = new ReportAPI(ReportEditorConfig.api.endpoint);
+
+    $scope.names = [];
+    reports.forEach(function(report){
+        if(reportIdsToDelete.indexOf(report._id) !== -1){
+            $scope.names.push(report.Label);
+        } 
+    });
+
+    $scope.ok = function(){
+        $scope.loading = true;
+        var promises = [];
+        reportIdsToDelete.forEach(function(id){
+            promises.push(api.removeReport({ _id: id, token: ReportEditorConfig.api.token, $method: 'POST' }).then(function(){
+                reports.forEach(function(report, index){
+                    if(report._id === id) {
+                        reports.splice(index, 1);
+                    }
+                });
+            }));
+        });
+        $q
+        .all(promises)
+        .then(function(){
+            $modalInstance.close();
+        })
+        .catch(function(error){
+            console.error(error);
+        })
+        .finally(function(){
+            $scope.loading = false;
+        });
+    };
+    
+    $scope.cancel = function(){
+        $modalInstance.close();
+    };
 })
 ;
