@@ -132,7 +132,7 @@ module.exports = function (grunt) {
             options: {
                 jshintrc: '.jshintrc'
             },
-            src: ['Gruntfile.js', '<%= config.app %>/modules/**/*.js', 'tasks/**/*.js', 'tests/**/*.js'],
+            src: ['Gruntfile.js', '<%= config.app %>/modules/**/*.js', '<%= config.app %>/report/**/*.js', '<%= config.app %>/reports/**/*.js', 'tasks/**/*.js', 'tests/**/*.js'],
         },
         karma: {
             options: {
@@ -170,9 +170,10 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('e2e', function(target){
-        target = target ? target : 'local';
+    grunt.registerTask('e2e', function(){
+        var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
         grunt.task.run([
+            'webdriver',
             'connect:test',
             'protractor:' + target
         ]); 
@@ -193,10 +194,8 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('test-travis', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e:travis']);
-    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e:local']);
-    grunt.registerTask('unittests', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post']);
+    grunt.registerTask('unit-tests', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post']);
+    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e']);
     grunt.registerTask('build', ['clean:pre', 'peg', 'swagger']);
     grunt.registerTask('default', ['jshint', 'build', 'test']);
-    grunt.registerTask('travis', ['jshint', 'build', 'test-travis']);
 };

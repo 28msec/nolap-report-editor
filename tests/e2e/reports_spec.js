@@ -63,3 +63,23 @@ describe('Report Selection', function() {
         expect(toggle.getAttribute('indeterminate')).toBe(null);
     });
 });
+
+describe('Creates and Deletes a Report', function(){
+    var createBtn = element(by.id('create-report'));
+    var originalReportCount;
+    //var deleteBtn = element(by.id('delete-reports'));
+
+    it('should create a new report', function(){
+        element.all(by.repeater('report in reports')).then(function(reportList){
+            originalReportCount = reportList.length;
+        });
+        createBtn.click();
+        var input = element(by.model('report.name'));
+        input.sendKeys('myuniquereport');
+        element(by.css('form[name="newReportForm"]')).submit();
+        element(by.id('reports')).click();
+        element.all(by.repeater('report in reports')).then(function(reportList){
+            expect(reportList.length).toBe(originalReportCount + 1);
+        });
+    });
+});

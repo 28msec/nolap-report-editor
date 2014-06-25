@@ -5795,10 +5795,39 @@ button.close {
   -ms-transform: rotate(3deg) translate(0px, -4px);
   transform: rotate(3deg) translate(0px, -4px);
 }
+#api-scheduler-status {
+  position: absolute;
+  z-index: 9000;
+  width: 200px;
+  right: 0;
+  left: 0;
+  margin: auto;
+  padding: 0;
+}
+a {
+  cursor: pointer;
+}
 section {
   margin-bottom: 20px;
 }
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-weight: 100;
+}
+label {
+  font-weight: normal;
+}
 .navbar-brand {
   color: white !important;
-  font-weight: 300;
+  font-weight: 100;
+}
+.modal-header {
+  background-color: #428bca;
+  color: white;
+}
+.modal-header.modal-header-danger {
+  background-color: #d9534f;
 }

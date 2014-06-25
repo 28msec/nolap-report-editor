@@ -7,7 +7,7 @@ module.exports = function(grunt) {
        
         var done = this.async();
         var options = this.options();
-        var url = this.data.url || 'http://secxbrl.xbrl.io';
+        var url = 'http://angular-binding.28.io';
         var dest = options.dest;
         var failIfOffline = options.failIfOffline;
         grunt.file.mkdir(dest);
@@ -17,7 +17,7 @@ module.exports = function(grunt) {
         options.apis.forEach(function(api){
             var swagger = fs.readFileSync(api.swagger);
             request({
-                uri: url + '/angular.jq',
+                uri: url + '/get2.jq',
                 qs: { module: api.module, service: api.service, 'new-module': api.newModule },
                 headers: { 'Content-Type': 'text/json; utf-8' },
                 body: swagger
