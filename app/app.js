@@ -58,6 +58,7 @@ angular.module('report-editor', [
     
     $stateProvider
     .state('reports', {
+        url: '/',
         templateUrl: '/reports/reports.html',
         controller: 'ReportsCtrl',
         resolve: {
@@ -68,15 +69,23 @@ angular.module('report-editor', [
                     $method: 'POST'
                 });
             }]
-        },
-        url: '/'
+        }
     })
-    //.state('report', {
-    //    templateUrl: '/views/report.html',
-    //    controller: 'ReportCtrl',
-    //    url: '/:id'
-    //})
+    .state('report', {
+        url: '/:id',
+        templateUrl: 'report/report.html',
+        controller: 'ReportCtrl',
+        resolve: {
+            report: ['$stateParams', 'ReportEditorConfig', 'ReportAPI', function($stateParams, ReportEditorConfig, ReportAPI) {
+                var api = new ReportAPI(ReportEditorConfig.api.endpoint);
+                return api.listReports({
+                    _id: $stateParams.id,
+                    token: ReportEditorConfig.api.token,
+                    $method: 'POST'
+                });
+            }]
+        }
+    })
     ;
-    
 })
 ;
