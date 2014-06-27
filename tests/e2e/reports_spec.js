@@ -67,7 +67,7 @@ describe('Report Selection', function() {
 describe('Creates and Deletes a Report', function(){
     var createBtn = element(by.id('create-report'));
     var originalReportCount;
-    //var deleteBtn = element(by.id('delete-reports'));
+    var deleteBtn = element(by.id('delete-reports'));
 
     it('should create a new report', function(){
         element.all(by.repeater('report in reports')).then(function(reportList){
@@ -80,6 +80,16 @@ describe('Creates and Deletes a Report', function(){
         element(by.id('reports')).click();
         element.all(by.repeater('report in reports')).then(function(reportList){
             expect(reportList.length).toBe(originalReportCount + 1);
+        });
+    });
+    
+    it('should delete a report', function() {
+        var checkbox = element.all(by.model('selectedReports[report._id]')).last();
+        checkbox.click();
+        deleteBtn.click();
+        element(by.id('confirm-delete-reports')).click();
+        element.all(by.repeater('report in reports')).then(function(reportList){
+            expect(reportList.length).toBe(originalReportCount);
         });
     });
 });
