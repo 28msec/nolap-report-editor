@@ -60,7 +60,8 @@
     "request": "~2.36.0",
     "shelljs": "~0.3.0",
     "grunt-swagger-js-codegen": "~0.1.7",
-    "grunt-jsonlint": "~1.0.4"
+    "grunt-jsonlint": "~1.0.4",
+    "node-uuid": "~1.4.1"
   },
   "contributors": [
     {
