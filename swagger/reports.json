@@ -30,6 +30,14 @@
                             "required": false,
                             "type": "string",
                             "paramType": "query"
+                        },
+                        {
+                            "name": "_method",
+                            "type": "string",
+                            "paramType": "query",
+                            "enum": [
+                                "POST"
+                            ]
                         }
                     ],
                     "responseMessages": [
@@ -146,19 +154,7 @@
                         {
                             "title": "Validate a report",
                             "description": "Validate the structure of a report JSON object. Return warnings and errors in a JSON Array.",
-                            "request": "[API_URL]/_queries/public/reports/add-report.jq?validation-only&report=%7B%27_id%27%3A%20%27FundamentalAccountingConcepts%27%7D&token=00000-00-000-00000",
-                            "response": "[
-                            {
-                              'type' : 'ERROR', 
-                              'context' : 'Presentation', 
-                              'identifier' : 'fac:Root', 
-                              'message' : 'Concept is not in the hypercube value space: fac:Root2'
-                            }, {
-                              'type' : 'INFO', 
-                              'context' : 'Presentation', 
-                              'identifier' : 'fac:Test', 
-                              'message' : 'Duplicate concept: fac:Test'
-                            }]"
+                            "request": "[API_URL]/_queries/public/reports/add-report.jq?validation-only&report=%7B%27_id%27%3A%20%27FundamentalAccountingConcepts%27%7D&token=00000-00-000-00000"
                         }
                     ]
                 }

@@ -109,15 +109,15 @@ module.exports = function (grunt) {
                 }
             }
         },
-        swagger: {
+        'swagger-js-codegen': {
             options: {
                 apis: [
                     {
                         swagger: 'swagger/reports.json',
-                        module: 'report-api',
-                        newModule: true,
-                        service: 'ReportAPI',
-                        filename: 'report-api'
+                        moduleName: 'report-api',
+                        className: 'ReportAPI',
+                        fileName: 'report-api.js',
+                        angularjs: true
                     }
                 ],
                 dest: '<%= config.app %>/modules'
@@ -167,6 +167,11 @@ module.exports = function (grunt) {
         protractor: {
             travis: 'tests/e2e/config/protractor-travis-conf.js',
             local: 'tests/e2e/config/protractor-conf.js'
+        },
+        jsonlint: {
+            all: {
+                src: ['package.json', 'swagger/*']
+            }
         }
     });
 
@@ -186,7 +191,7 @@ module.exports = function (grunt) {
 
         grunt.task.run([
             'peg',
-            'swagger',
+            'swagger-js-codegen',
             'less',
             'connect:livereload',
             'open',
@@ -196,6 +201,6 @@ module.exports = function (grunt) {
 
     grunt.registerTask('unit-tests', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post']);
     grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e']);
-    grunt.registerTask('build', ['clean:pre', 'peg', 'swagger']);
-    grunt.registerTask('default', ['jshint', 'build', 'test']);
+    grunt.registerTask('build', ['clean:pre', 'peg', 'swagger-js-codegen']);
+    grunt.registerTask('default', ['jsonlint', 'jshint', 'build', 'test']);
 };
