@@ -1,8 +1,6 @@
 /*global browser:false, element:false, by:false */
 'use strict';
 
-var uuid = require('node-uuid');
-
 //https://github.com/angular/protractor/blob/master/docs/api.md
 //GetAttribute() returns "boolean" values and will return either "true" or null
 browser.get('/');
@@ -77,7 +75,7 @@ describe('Creates and Deletes a Report', function(){
         });
         createBtn.click();
         var input = element(by.model('report.name'));
-        input.sendKeys(uuid.v1());
+        input.sendKeys('myuniquereport');
         element(by.css('form[name="newReportForm"]')).submit();
         element(by.id('reports')).click();
         element.all(by.repeater('report in reports')).then(function(reportList){
