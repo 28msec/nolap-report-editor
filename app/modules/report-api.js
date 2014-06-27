@@ -36,7 +36,10 @@ angular.module('report-api', [])
  * Retrieve a list of all Reports
  * @method
  * @name ReportAPI#listReports
- * @param {{string}} _id - A report id (e.g. FundamentalAccountingConcepts)
+ * @param {{string}} _id - A report id (e.g. 1fueA5hrxIHxvRf7Btr_J6efDJ3qp-s9KV731wDc4OOc)
+ * @param {{string}} user - A user's email address to filter reports owned by this user (i.e. all reports if user = authorized user or only public-read reports of user)
+ * @param {{boolean}} publicRead - Filter listed reports to return only those that are publicly readable.
+ * @param {{boolean}} private - Filter listed reports to return only those that are private.
  * @param {{string}} token - The token of the current session
 
  * 
@@ -51,6 +54,12 @@ angular.module('report-api', [])
                 var headers = {};
 
                 queryParameters['_id'] = parameters._id;
+
+                queryParameters['user'] = parameters.user;
+
+                queryParameters['public-read'] = parameters.publicRead;
+
+                queryParameters['private'] = parameters.private;
 
                 queryParameters['token'] = parameters.token;
 
@@ -87,6 +96,7 @@ angular.module('report-api', [])
              * @method
              * @name ReportAPI#addOrReplaceOrValidateReport
              * @param {{object}} report - A JSON object containing the report
+             * @param {{boolean}} publicRead - Shortcut to make a report publicly readable.
              * @param {{boolean}} validationOnly - This parameter is either given without any value (means: on) or absent (means: off) or its value is castable to a boolean. Turns validation-only mode on or off.
              * @param {{string}} token - The token of the current session
              *
@@ -106,6 +116,8 @@ angular.module('report-api', [])
                 }
 
                 body = parameters.report;
+
+                queryParameters['public-read'] = parameters.publicRead;
 
                 queryParameters['validation-only'] = parameters.validationOnly;
 

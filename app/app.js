@@ -31,8 +31,8 @@ angular.module('report-editor', [
 .factory('ReportEditorConfig', function(){
     return {
         api: {
-            endpoint: 'http://secxbrld.xbrl.io/v1/_queries/public/reports',
-            token: '0ed3b9a9-2795-412d-9863-6186d1cb64bc'
+            endpoint: 'http://secxbrld2.beta.28.io/v1/_queries/public/reports',
+            token: '29143de0-8328-404d-b7f0-591bb871c13f'
         }
     };
 })
