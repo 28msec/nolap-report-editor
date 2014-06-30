@@ -40,7 +40,13 @@ describe('Report Selection', function() {
         var report = checkboxes.first();
         report.click();
         expect(report.getAttribute('checked')).toBe(null);
-        expect(toggle.getAttribute('indeterminate')).toBe('true');
+        checkboxes.count().then(function(count){
+            if(count === 1) {
+                expect(toggle.getAttribute('indeterminate')).toBe(null);
+            } else {
+                expect(toggle.getAttribute('indeterminate')).toBe('true');
+            }
+        });
     });
     
     it('the toggle shouldn\'t be undeterminate if all reports are selected or unselected', function(){
