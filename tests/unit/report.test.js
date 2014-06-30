@@ -406,5 +406,4 @@ describe('Concepts Model API Tests', function () {
 
         //console.log(JSON.stringify(report));
     });
-
 });

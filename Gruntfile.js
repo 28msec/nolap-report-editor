@@ -152,6 +152,7 @@ module.exports = function (grunt) {
                         '<%= config.app %>/modules/formula-parser.js',
                         '<%= config.app %>/modules/report-api.js',
                         '<%= config.app %>/modules/report-model.js',
+                        '<%= config.app %>/modules/rules-model.js',
                         'tests/unit/karma.start.js',
                         'tests/unit/*.js'
                     ]
@@ -198,6 +199,7 @@ module.exports = function (grunt) {
         ]);
     });
 
+    grunt.registerTask('unit-tests', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post']);
     grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e']);
     grunt.registerTask('build', ['clean:pre', 'peg', 'swagger-js-codegen']);
     grunt.registerTask('default', ['jsonlint', 'jshint', 'build', 'test']);
