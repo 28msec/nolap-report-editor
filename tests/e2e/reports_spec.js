@@ -63,7 +63,7 @@ describe('Report Selection', function() {
         expect(toggle.getAttribute('indeterminate')).toBe(null);
     });
 });
-
+/*
 describe('Creates and Deletes a Report', function(){
     var createBtn = element(by.id('create-report'));
     var originalReportCount;
@@ -93,3 +93,4 @@ describe('Creates and Deletes a Report', function(){
         });
     });
 });
+*/
