@@ -972,9 +972,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
 
     // test whether auto generated AST is valid
     Rule.prototype.validateASTs = function(){
-        var rule = this.getModel();
-        var report = this.report;
-        var formulae = rule.Formulae;
+        var formulae = this.getModel().Formulae;
         if(formulae === undefined || formulae === null || formulae[0] === '' || formulae.length === 0){
             return true;
         } else {
