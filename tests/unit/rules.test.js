@@ -86,6 +86,7 @@ describe('Rules Model API Tests', function () {
         expect(model.Formulae[0].valid).toBe(true);
         expect(model.Formulae[1].valid).toBe(true);
         expect(model.valid).toBe(true);
+        expect(rule.validateASTs()).toBe(true);
     });
 
     it('Add rule to report', function () {

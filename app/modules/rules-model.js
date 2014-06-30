@@ -940,6 +940,55 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
         }
     };
 
+    var validateASTItem = function(item){
+        var type = item.Type;
+        var name = item.Name; //variable
+        var value = item.Value; //atomic
+        var children = item.Children;
+        if(type === undefined || type === null || typeof type !== 'string'){
+            throw new Error('Not a valid object in AST (expected object to have field "Type"): ' + JSON.stringify(item) + '.');
+        }
+        if(name !== undefined && typeof name === 'string'){
+            if(value !== undefined && typeof value === 'string'){
+                throw new Error('Not a valid object in AST (object contains fields "Name" and "Value"): ' + JSON.stringify(item) + '.');
+            }
+        }
+        if(value !== undefined && typeof value === 'string'){
+            if(children !== undefined && typeof children === 'object'){
+                throw new Error('Not a valid object in AST (object contains fields "Value" and "Children"): ' + JSON.stringify(item) + '.');
+            }
+        }
+        if(children !== undefined && children !== null && children.length === undefined) {
+            throw new Error('Not a valid object in AST (children not array): ' + JSON.stringify(item) + '.');
+        }
+        if(children !== undefined && children !== null && children.length !== undefined && children.length > 0) {
+            for (var i in children){
+                if(children.hasOwnProperty(i)) {
+                    validateASTItem(children[i]);
+                }
+            }
+        }
+    };
+
+    // test whether auto generated AST is valid
+    Rule.prototype.validateASTs = function(){
+        var rule = this.getModel();
+        var report = this.report;
+        var formulae = rule.Formulae;
+        if(formulae === undefined || formulae === null || formulae[0] === '' || formulae.length === 0){
+            return true;
+        } else {
+            for (var i in formulae){
+                if(formulae.hasOwnProperty(i)) {
+                    var alternative = formulae[i];
+                    validateASTItem(alternative.Prereq);
+                    validateASTItem(alternative.Body);
+                }
+            }
+        }
+        return true;
+    };
+
     Rule.prototype.isValid = function(){
         if(this.model === undefined || this.model === null || typeof this.model !== 'object'){
             return false;
