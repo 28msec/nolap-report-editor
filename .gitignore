@@ -1,5 +1,7 @@
 app/modules/excel-parser.js
 app/modules/formula-parser.js
+app/modules/swagger/*.js
+app/constants.js
 node_modules
 bower_components
 coverage
