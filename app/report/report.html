@@ -1,2 +1,17 @@
-<h1>Report</h1>
-<a ui-sref="reports()" id="reports">back</a>
+<header class="navbar navbar-default">
+    <div class="navbar-header">
+        <a class="pull-left" ui-sref="reports()" id="reports">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+        <span class="navbar-brand">Report Name</span>
+    </div>
+    <div>
+        <ul class="nav navbar-nav">
+            <li><a>Taxonomy</a></li>
+            <li><a>Filters</a></li>
+            <li><a>Fact table</a></li>
+            <li><a>Preview</a></li>
+        </ul>
+    </div>
+</header>
+<div ui-view></div>
