@@ -87,6 +87,26 @@ angular.module('report-editor', [
             }]
         }
     })
+    .state('report.taxonomy', {
+        url: '/taxonomy',
+        templateUrl: 'report/taxonomy/taxonomy.html',
+        controller: 'TaxonomyCtrl'
+    })
+    .state('report.filters', {
+        url: '/filters',
+        templateUrl: 'report/filters/filters.html',
+        controller: 'FiltersCtrl'
+    })
+    .state('report.factTable', {
+        url: '/fact-table',
+        templateUrl: 'report/fact-table/fact-table.html',
+        controller: 'FactTableCtrl'
+    })
+    .state('report.preview', {
+        url: '/preview',
+        templateUrl: 'report/preview/preview.html',
+        controller: 'PreviewCtrl'
+    })
     ;
 })
 ;
