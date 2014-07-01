@@ -1,12 +1,10 @@
 /*global angular:false */
-/**
- * <p>This API can be used to manage reports.</p> <p>This API is only accesible for users having granted priviliges to work with reports.</p> <p>Note, that the POST method can be simulated by using GET and adding the _method=POST parameter to the HTTP request.</p>
- */
 angular.module('report-api', [])
     .factory('ReportAPI', function($q, $http, $rootScope) {
         'use strict';
 
         /**
+         * <p>This API can be used to manage reports.</p> <p>This API is only accesible for users having granted priviliges to work with reports.</p> <p>Note, that the POST method can be simulated by using GET and adding the _method=POST parameter to the HTTP request.</p>
          * @class " || ReportAPI || "
          * @param {string} domain - The project domain
          * @param {string} cache - An angularjs cache implementation
@@ -50,9 +48,13 @@ angular.module('report-api', [])
                 var queryParameters = {};
                 var headers = {};
 
-                queryParameters['_id'] = parameters._id;
+                if (parameters._id !== undefined) {
+                    queryParameters['_id'] = parameters._id;
+                }
 
-                queryParameters['token'] = parameters.token;
+                if (parameters.token !== undefined) {
+                    queryParameters['token'] = parameters.token;
+                }
 
                 queryParameters['_method'] = 'POST';
 
@@ -77,9 +79,13 @@ angular.module('report-api', [])
                         }
                     })
                     .error(function(data, status, headers, config) {
-                        deferred.reject(data);
+                        deferred.reject({
+                            status: status,
+                            headers: headers,
+                            config: config,
+                            body: data
+                        });
                     });
-
                 return deferred.promise;
             };
             /**
@@ -105,11 +111,17 @@ angular.module('report-api', [])
                     return deferred.promise;
                 }
 
-                body = parameters.report;
+                if (parameters.report !== undefined) {
+                    body = parameters.report;
+                }
 
-                queryParameters['validation-only'] = parameters.validationOnly;
+                if (parameters.validationOnly !== undefined) {
+                    queryParameters['validation-only'] = parameters.validationOnly;
+                }
 
-                queryParameters['token'] = parameters.token;
+                if (parameters.token !== undefined) {
+                    queryParameters['token'] = parameters.token;
+                }
 
                 var url = domain + path;
                 $http({
@@ -127,9 +139,13 @@ angular.module('report-api', [])
                         }
                     })
                     .error(function(data, status, headers, config) {
-                        deferred.reject(data);
+                        deferred.reject({
+                            status: status,
+                            headers: headers,
+                            config: config,
+                            body: data
+                        });
                     });
-
                 return deferred.promise;
             };
             /**
@@ -154,9 +170,13 @@ angular.module('report-api', [])
                     return deferred.promise;
                 }
 
-                queryParameters['_id'] = parameters._id;
+                if (parameters._id !== undefined) {
+                    queryParameters['_id'] = parameters._id;
+                }
 
-                queryParameters['token'] = parameters.token;
+                if (parameters.token !== undefined) {
+                    queryParameters['token'] = parameters.token;
+                }
 
                 var url = domain + path;
                 $http({
@@ -174,9 +194,13 @@ angular.module('report-api', [])
                         }
                     })
                     .error(function(data, status, headers, config) {
-                        deferred.reject(data);
+                        deferred.reject({
+                            status: status,
+                            headers: headers,
+                            config: config,
+                            body: data
+                        });
                     });
-
                 return deferred.promise;
             };
         };
