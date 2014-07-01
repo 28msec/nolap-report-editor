@@ -56,57 +56,5 @@ angular.module('report-editor', [
     };
 
     $locationProvider.html5Mode(true);
-    
-    $stateProvider
-    .state('reports', {
-        url: '/',
-        templateUrl: '/reports/reports.html',
-        controller: 'ReportsCtrl',
-        resolve: {
-            reports: ['ReportEditorConfig', 'ReportAPI', function(ReportEditorConfig, ReportAPI) {
-                var api = new ReportAPI(ReportEditorConfig.api.endpoint);
-                return api.listReports({
-                    token: ReportEditorConfig.api.token,
-                    $method: 'POST'
-                });
-            }]
-        }
-    })
-    .state('report', {
-        url: '/:id',
-        templateUrl: 'report/report.html',
-        controller: 'ReportCtrl',
-        resolve: {
-            report: ['$stateParams', 'ReportEditorConfig', 'ReportAPI', function($stateParams, ReportEditorConfig, ReportAPI) {
-                var api = new ReportAPI(ReportEditorConfig.api.endpoint);
-                return api.listReports({
-                    _id: $stateParams.id,
-                    token: ReportEditorConfig.api.token,
-                    $method: 'POST'
-                });
-            }]
-        }
-    })
-    .state('report.taxonomy', {
-        url: '/taxonomy',
-        templateUrl: 'report/taxonomy/taxonomy.html',
-        controller: 'TaxonomyCtrl'
-    })
-    .state('report.filters', {
-        url: '/filters',
-        templateUrl: 'report/filters/filters.html',
-        controller: 'FiltersCtrl'
-    })
-    .state('report.factTable', {
-        url: '/fact-table',
-        templateUrl: 'report/fact-table/fact-table.html',
-        controller: 'FactTableCtrl'
-    })
-    .state('report.preview', {
-        url: '/preview',
-        templateUrl: 'report/preview/preview.html',
-        controller: 'PreviewCtrl'
-    })
-    ;
 })
 ;
