@@ -59,7 +59,7 @@ angular
                         // success
                         function(data) {
                             setToken(data.token);
-                            setUser(data._id, $scope.loginEmail, data.firstname, data.lastname);
+                            setUser(data._id, email, data.firstname, data.lastname);
                             if(successCallback !== undefined){
                                 successCallback(data);
                             }
@@ -73,13 +73,10 @@ angular
             }
 
             function logout() {
-                $rootScope.token = null;
-                $rootScope.user = null;
-                var cache = $angularCacheFactory.get(APPNAME);
-                if (cache) {
-                    cache.remove('token');
-                    cache.remove('user');
-                }
+                token = undefined;
+                user = undefined;
+                getCache().remove('token');
+                getCache().remove('user');
             }
 
             return {

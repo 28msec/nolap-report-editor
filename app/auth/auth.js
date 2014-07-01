@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('report-editor')
-    .controller('AuthCtrl', function($scope, $stateParams, $http, $window, Session) {
+    .controller('AuthCtrl', function($scope, $stateParams, $location, $http, $window, Session) {
         $scope.returnPage = $stateParams.returnPage;
         $scope.registerAttempted = false;
         $scope.loginAttempted = false;

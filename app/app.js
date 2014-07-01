@@ -45,45 +45,7 @@ angular.module('report-editor', [
             data: {
                 title: 'Login'
             }
-        })
-
-        .state('reports', {
-            url: '/',
-            templateUrl: '/reports/reports.html',
-            controller: 'ReportsCtrl',
-            resolve: {
-                reports: ['$rootScope', '$log', 'ReportAPI', function($rootScope, $log, ReportAPI) {
-                    return ReportAPI.listReports({
-                        token: $rootScope.session.getToken(),
-                        $method: 'POST'
-                    }).then(
-                        function(data){
-                            $log.log('listReports' + JSON.stringify(data));
-                        },
-                        function(data){
-                            $log.error('listReports' + JSON.stringify(data));
-                            $rootScope.$emit('auth');
-                        }
-                    );
-                }]
-            }
-        })
-
-        .state('report', {
-            url: '/:id',
-            templateUrl: 'report/report.html',
-            controller: 'ReportCtrl',
-            resolve: {
-                report: ['$rootScope', '$stateParams', 'ReportAPI', function($rootScope, $stateParams, ReportAPI) {
-                    return ReportAPI.listReports({
-                        _id: $stateParams.id,
-                        token: $rootScope.session.getToken(),
-                        $method: 'POST'
-                    });
-                }]
-            }
-        })
-    ;
+        });
 })
 
 .run(function($rootScope, ngProgressLite, $state, $location, $angularCacheFactory, Session) {
