@@ -252,8 +252,10 @@ module.exports = function (grunt) {
             return grunt.task.run(['build', 'open', 'connect:dist:keepalive']);
         }
 
+        grunt.file.mkdir(config.app + '/modules/swagger');
         grunt.task.run([
             'peg',
+            'ngconstant:server',
             'swagger-js-codegen',
             'less',
             'connect:livereload',
