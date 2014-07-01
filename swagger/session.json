@@ -1,0 +1,398 @@
+{
+    "apiVersion": "1.0",
+    "swaggerVersion": "1.2",
+    "basePath": "http://secxbrl.alpha.xbrl.io/v1/_queries/public",
+    "resourcePath": "",
+    "produces": [
+        "application/json"
+    ],
+    "description": "<p>This API can be used to authorize requests.</p><p>Exposes endpoints used for logging in with an email address and a password in order to retrieve a token that can be used for authorizing future request, creating or revoking a token having a custom expiration that can be used in consumer applications, destroying a session identified by a token, and listing the active tokens.</p><p>Also note, that the POST method can be simulated by using GET and adding the _method=POST parameter to the HTTP request.</p><p>Please keep in mind that URLs are case sensitive. That is, all parameters need to be provided as shown in the documentation.</p>",
+    "apis": [
+        {
+            "path":"/session/login.jq",
+            "description" : "Login",
+            "operations":[
+                {
+                    "method":"POST",
+                    "summary":"Login with email and password in order to retrieve a token.",
+                    "type":"User",
+                    "nickname":"login",
+                    "parameters":[
+                        {
+                            "name": "format",
+                            "description": "The result format",
+                            "required": false,
+                            "type": "string",
+                            "enum": [
+                                "json",
+                                "text",
+                                "xml",
+                                "excel"
+                            ],
+                            "paramType": "query"
+                        },
+                        {
+                            "name":"email",
+                            "description":"Email of user to login",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"query"
+                        },
+                        {
+                            "name":"password",
+                            "description":"Password of user to login",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"query"
+                        }
+                    ],
+                    "responseMessages":[
+                        {
+                            "code": 400,
+                            "message": "if a mandatory parameter is missing",
+                            "responseModel": "Error"
+                        },
+                        {
+                            "code" : 403,
+                            "message": "if the user doesn't exist or could not be authenticated",
+                            "responseModel": "Error"
+                        }
+                    ],
+                    "successMessages" : [
+                        {
+                            "code": 200,
+                            "message": "if the user was logged in successfully",
+                            "responseModel": "ProjectToken"
+                        }
+                    ],
+                    "examples": [
+                        {
+                            "title": "Login",
+                            "description": "Login and retrieve a token",
+                            "request": "[API_URL]/_queries/public/session/login.jq?_method=POST&email=you%40xbrl.io&password=secret",
+                            "response": "{ \"success\" : true, \"token\" : \"2b332b8e-3e90-40d2-8b83-28862ec30ee1\", \"name\" : \"Your Name\" }"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path":"/session/logout.jq",
+            "description" : "Logout",
+            "operations":[
+                {
+                    "method":"POST",
+                    "summary":"Logout the user identified by the given API key.",
+                    "notes":"",
+                    "type":"User",
+                    "nickname":"logout",
+                    "parameters":[
+                        {
+                            "name": "format",
+                            "description": "The result format",
+                            "required": false,
+                            "type": "string",
+                            "enum": [
+                                "json",
+                                "text",
+                                "xml",
+                                "excel"
+                            ],
+                            "paramType": "query"
+                        },
+                        {
+                            "name": "token",
+                            "description": "API token of the current user",
+                            "required": true,
+                            "type": "string",
+                            "paramType":"query"
+                        }
+                    ],
+                    "responseMessages":[
+                        {
+                            "code": 400,
+                            "message": "if a mandatory parameter is missing",
+                            "responseModel": "Error"
+                        }
+
+                    ],
+                    "successMessages" : [
+                        {
+                            "code": 200,
+                            "message": "if the user was logged out successfully",
+                            "responseModel": "Success"
+                        }
+                    ],
+                    "examples": [
+                        {
+                            "title": "Logout",
+                            "description": "Logout the user identified by the given token",
+                            "request": "[API_URL]/_queries/public/session/logout.jq?_method=POST&token=a02516b2-2cdb-4ef3-9e2e-adfaa3660b87",
+                            "response": "{ \"success\" : true }"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path":"/session/token.jq",
+            "description" : "Create a new token",
+            "operations":[
+                {
+                    "method":"POST",
+                    "summary":"Create a token having a custom expiration duration.",
+                    "type":"User",
+                    "nickname":"token",
+                    "parameters":[
+                        {
+                            "name": "format",
+                            "description": "The result format",
+                            "required": false,
+                            "type": "string",
+                            "enum": [
+                                "json",
+                                "text",
+                                "xml",
+                                "excel"
+                            ],
+                            "paramType": "query"
+                        },
+                        {
+                            "name":"email",
+                            "description":"Email of user that creates the token",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"query"
+                        },
+                        {
+                            "name":"password",
+                            "description":"Password of user that creates the token",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"query"
+                        },
+                        {
+                            "name":"expiration",
+                            "description":"Expiration of the token, in ISO format (e.g.: 2014-04-29T14:32:05.0321Z)",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"query"
+                        }
+                    ],
+                    "responseMessages":[
+                        {
+                            "code": 400,
+                            "message": "if a mandatory parameter is missing",
+                            "responseModel": "Error"
+                        },
+                        {
+                            "code" : 403,
+                            "message": "if the user doesn't exist or could not be authenticated",
+                            "responseModel": "Error"
+                        }
+                    ],
+                    "successMessages" : [
+                        {
+                            "code": 200,
+                            "message": "if the token was created successfully",
+                            "responseModel": "ProjectToken"
+                        }
+                    ],
+                    "examples": [
+                        {
+                            "title": "Create a new token",
+                            "description": "Create a token that expires on Jan 1st 2020",
+                            "request": "[API_URL]/_queries/public/session/token.jq?_method=POST&email=you%40xbrl.io&password=secret&expiration=2020-01-01T00:00:00.000000Z",
+                            "response": "{ \"success\" : true, \"token\" : \"2b332b8e-3e90-40d2-8b83-28862ec30ee1\" }"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path":"/session/revoke.jq",
+            "description" : "Revoke a token",
+            "operations":[
+                {
+                    "method":"POST",
+                    "summary":"Revoke a token having a custom expiration duration.",
+                    "notes":"",
+                    "type":"User",
+                    "nickname":"revoke",
+                    "parameters":[
+                        {
+                            "name": "format",
+                            "description": "The result format",
+                            "required": false,
+                            "type": "string",
+                            "enum": [
+                                "json",
+                                "text",
+                                "xml",
+                                "excel"
+                            ],
+                            "paramType": "query"
+                        },
+                        {
+                            "name":"email",
+                            "description":"Email of user that owns the token",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"query"
+                        },
+                        {
+                            "name":"password",
+                            "description":"Password of user that owns the token",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"query"
+                        },
+                        {
+                            "name": "token",
+                            "description": "API token to revoke",
+                            "required": true,
+                            "type": "string",
+                            "paramType":"query"
+                        }
+                    ],
+                    "responseMessages":[
+                        {
+                            "code": 400,
+                            "message": "if a mandatory parameter is missing",
+                            "responseModel": "Error"
+                        },
+                        {
+                            "code" : 403,
+                            "message": "if the user doesn't exist or could not be authenticated",
+                            "responseModel": "Error"
+                        }
+                    ],
+                    "successMessages" : [
+                        {
+                            "code": 200,
+                            "message": "if the token was removed successfully",
+                            "responseModel": "Success"
+                        }
+                    ],
+                    "examples": [
+                        {
+                            "title": "Revoke a token",
+                            "description": "Revoke a token having a custom expiration duration",
+                            "request": "[API_URL]/_queries/public/session/revoke.jq?_method=POST&email=you%40xbrl.io&password=secret&token=a02516b2-2cdb-4ef3-9e2e-adfaa3660b87",
+                            "response": "{ \"success\" : true }"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path":"/session/tokens.jq",
+            "description" : "List Tokens",
+            "operations":[
+                {
+                    "method":"GET",
+                    "summary":"List tokens of a user identified by its token.",
+                    "type":"User",
+                    "nickname":"tokens",
+                    "parameters":[
+                        {
+                            "name": "format",
+                            "description": "The result format",
+                            "required": false,
+                            "type": "string",
+                            "enum": [
+                                "json",
+                                "text",
+                                "xml",
+                                "excel"
+                            ],
+                            "paramType": "query"
+                        },
+                        {
+                            "name": "token",
+                            "description": "A valid API token",
+                            "required": true,
+                            "type": "string",
+                            "paramType":"query"
+                        }
+                    ],
+                    "responseMessages":[
+                        {
+                            "code": 400,
+                            "message": "if a mandatory parameter is missing",
+                            "responseModel": "Error"
+                        }
+                    ],
+                    "successMessages" : [
+                        {
+                            "code": 200,
+                            "message": "if the tokens are listed successfully"
+                        }
+                    ],
+                    "examples": [
+                        {
+                            "title": "List Tokens",
+                            "description": "List tokens of a particular user",
+                            "request": "[API_URL]/_queries/public/session/tokens.jq?_method=POST&token=a02516b2-2cdb-4ef3-9e2e-adfaa3660b87",
+                            "response": "{ \"success\" : true, \"results\": [ { \"token\" : \"2b332b8e-3e90-40d2-8b83-28862ec30ee1\", \"expiration\" : \"2020-01-01T00:00:00.000000Z\" } ] }"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "models": {
+        "ProjectToken": {
+            "id": "ProjectToken",
+            "description": "An object containing the session token, the user id, and the name of the user.",
+            "required" : [
+              "success", "token", "name"
+            ],
+            "properties": {
+                "success": {
+                    "type": "boolean",
+                    "description": "Whether the requests succeeded or failed."
+                },
+                "token": {
+                    "type": "string",
+                    "description": "The session token that can be used for subsequent requests."
+                },
+                "name" : {
+                    "type": "string",
+                    "description" : "The name of the user that was logged in."
+                }
+            }
+        },
+        "Error": {
+            "id": "Error",
+            "description": "Error information",
+            "required": [
+                "success",
+                "description"
+            ],
+            "properties": {
+                "success": {
+                    "type": "boolean",
+                    "description": "Whether the requests succeeded or failed."
+                },
+                "description": {
+                    "type": "string",
+                    "description": "A description of the error."
+                }
+            }
+        },
+        "Success": {
+            "id": "Success",
+            "description": "Information about a successful logout.",
+            "required": [
+                "success"
+            ],
+            "properties": {
+                "success": {
+                    "type": "boolean",
+                    "description": "Whether the requests succeeded or failed."
+                }
+            }
+        }
+    }
+}

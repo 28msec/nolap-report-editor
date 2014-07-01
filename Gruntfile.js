@@ -22,6 +22,7 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        api: grunt.file.readJSON('grunt-api.json'),
         config: config,
         watch: {
             less: {
@@ -114,13 +115,20 @@ module.exports = function (grunt) {
                 apis: [
                     {
                         swagger: 'swagger/reports.json',
-                        moduleName: 'report-api',
-                        className: 'ReportAPI',
-                        fileName: 'report-api.js',
+                        moduleName: 'report-service',
+                        className: 'ReportService',
+                        fileName: 'report-service.js',
+                        angularjs: true
+                    },
+                    {
+                        swagger: 'swagger/session.json',
+                        moduleName: 'session-service',
+                        className: 'SessionService',
+                        fileName: 'session-service.js',
                         angularjs: true
                     }
                 ],
-                dest: '<%= config.app %>/modules'
+                dest: '<%= config.app %>/modules/swagger'
             },
             all: {}
         },
@@ -132,7 +140,13 @@ module.exports = function (grunt) {
             options: {
                 jshintrc: '.jshintrc'
             },
-            src: ['Gruntfile.js', '<%= config.app %>/modules/**/*.js', '<%= config.app %>/report/**/*.js', '<%= config.app %>/reports/**/*.js', 'tasks/**/*.js', 'tests/**/*.js'],
+            src: ['Gruntfile.js',
+                  '<%= config.app %>/modules/**/*.js',
+                  '<%= config.app %>/report/**/*.js',
+                  '<%= config.app %>/reports/**/*.js',
+                  'tasks/**/*.js',
+                  'tests/**/*.js'
+            ]
         },
         karma: {
             options: {
@@ -168,9 +182,58 @@ module.exports = function (grunt) {
             travis: 'tests/e2e/config/protractor-travis-conf.js',
             local: 'tests/e2e/config/protractor-conf.js'
         },
+        ngconstant: {
+            options: {
+                space: '    '
+            },
+            server: {
+                dest: '<%= config.app %>/constants.js',
+                name: 'constants',
+                wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
+                constants: {
+                    'APPNAME': 'report-editor',
+                    'API_URL': '//<%= api.server %>/v1',
+                    'DEBUG': true
+                }
+            },
+            test: {
+                dest: '<%= config.app %>/constants.js',
+                name: 'constants',
+                wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
+                constants: {
+                    'APPNAME': 'report-editor',
+                    'API_URL': '//<%= api.test %>/v1',
+                    'DEBUG': true
+                }
+            },
+            beta: {
+                dest: '<%= config.app %>/constants.js',
+                name: 'constants',
+                wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
+                constants: {
+                    'APPNAME': 'report-editor',
+                    'API_URL': '//<%= api.beta %>/v1',
+                    'DEBUG': false
+                }
+            },
+            prod: {
+                dest: '<%= config.app %>/constants.js',
+                name: 'constants',
+                wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
+                constants: {
+                    'APPNAME': 'report-editor',
+                    'API_URL': '//<%= api.prod %>/v1',
+                    'DEBUG': false
+                }
+            }
+        },
         jsonlint: {
             all: {
-                src: ['package.json', 'swagger/*']
+                src: [
+                    'package.json',
+                    'grunt-api.json',
+                    'swagger/*'
+                ]
             }
         }
     });

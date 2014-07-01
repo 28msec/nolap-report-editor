@@ -93,7 +93,7 @@ angular.module('report-editor')
         $scope.loading = true;
         var promises = [];
         reportIdsToDelete.forEach(function(id){
-            promises.push(api.removeReport({ _id: id, token: ReportEditorConfig.api.token, $method: 'POST' }).then(function(){
+            promises.push(api.removeReport({ _id: id, token: $rootScope.session.getToken(), $method: 'POST' }).then(function(){
                 reports.forEach(function(report, index){
                     if(report._id === id) {
                         reports.splice(index, 1);
@@ -118,7 +118,7 @@ angular.module('report-editor')
         $modalInstance.close();
     };
 })
-.controller('CreateReportCtrl', function($scope, $modalInstance, Report, ReportEditorConfig, ReportAPI){
+.controller('CreateReportCtrl', function($rootScope, $scope, $modalInstance, Report, ReportEditorConfig, ReportAPI){
     $scope.report = {};
     
     $scope.ok = function(){
@@ -129,7 +129,7 @@ angular.module('report-editor')
         api.addOrReplaceOrValidateReport({
             report: report.model,
             $method: 'POST',
-            token: ReportEditorConfig.api.token
+            token: $rootScope.session.getToken()
         })
         .then(function(){
             $scope.loading = false;

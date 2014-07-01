@@ -1,0 +1,6 @@
+{
+    "server": "secxbrld2.beta.28.io",
+    "test": "secxbrl-test.xbrl.io",
+    "beta": "secxbrl-beta.xbrl.io",
+    "prod": "secxbrl.xbrl.io"
+}
