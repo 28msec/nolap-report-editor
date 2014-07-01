@@ -43,7 +43,7 @@ angular
 
             function getUser(){
                 if(user === undefined){
-                    user = this.getCache().get('user');
+                    user = getCache().get('user');
                 }
                 return user;
             }
@@ -85,5 +85,5 @@ angular
                 getUser: getUser,
                 getToken: getToken
             };
-        })()
+        })();
     });

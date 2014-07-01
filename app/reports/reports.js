@@ -20,7 +20,7 @@ angular.module('report-editor')
             // @TODO emit error with status
             $rootScope.$emit('auth');
         }
-    );;
+    );
 
     $scope.toggle = false;
 
@@ -63,8 +63,7 @@ angular.module('report-editor')
             templateUrl: '/reports/create-report.html'
         });
         modal.result.then(function(report){
-            reports.push(report);
-            $scope.reports = reports;
+            $scope.reports.push(report);
             $state.go('report', { id: report._id });
         });
     };
@@ -90,7 +89,7 @@ angular.module('report-editor')
         });
     };
 })
-.controller('DeleteReportsCtrl', function($q, $scope, $modalInstance, ReportEditorConfig, ReportAPI, reports, reportIdsToDelete){
+.controller('DeleteReportsCtrl', function($rootScope, $q, $scope, $modalInstance, ReportEditorConfig, ReportAPI, reports, reportIdsToDelete){
 
     $scope.loading = false;
 
