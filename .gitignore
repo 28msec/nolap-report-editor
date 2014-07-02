@@ -1,6 +1,8 @@
 app/modules/excel-parser.js
 app/modules/formula-parser.js
 app/modules/report-api.js
+app/modules/session-api.js
+app/constants.js
 node_modules
 bower_components
 coverage

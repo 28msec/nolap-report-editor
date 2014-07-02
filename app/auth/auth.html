@@ -1,0 +1,36 @@
+<div id="auth">
+    <div class="content">
+        <div class="row">
+            <div class="col-md-6">
+                <form role="form" class="white-box" name="loginForm" ng-submit="login()" novalidate spellcheck="false" autocomplete="on">
+                    <h2>Sign in</h2>
+                    <div class="form-group">
+                        <input type="email" class="form-control" name="loginEmail" ng-model="loginEmail" placeholder="Email" required autocomplete="on">
+                    <span class="text-danger" ng-show="loginForm.loginEmail.$error.required && loginAttempted">
+                        Email is required.
+                    </span>
+                    <span class="text-danger" ng-show="loginForm.loginEmail.$error.email && loginAttempted">
+                        Email is invalid.
+                    </span>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" name="loginPassword" ng-model="loginPassword" placeholder="Password" required autocomplete="on">
+                    <span class="text-danger" ng-show="loginForm.loginPassword.$error.required && loginAttempted">
+                        Password is required.
+                    </span>
+                    <span class="text-danger" ng-show="loginForm.loginPassword.$error.unauthorized && loginAttempted">
+                        Email and Password do not match our records.
+                    </span>
+                    </div>
+                    <div class="form-group text-right">
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </div>
+                    <div>
+                        No Account? Register and subscribe at least to the PRO plan: <a ng-href="{{registrationURL}}">main page</a>.
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>

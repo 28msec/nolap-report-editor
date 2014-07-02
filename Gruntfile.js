@@ -22,6 +22,8 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        api: grunt.file.readJSON('grunt-api.json'),
+        registration: grunt.file.readJSON('grunt-registration.json'),
         config: config,
         watch: {
             less: {
@@ -118,6 +120,13 @@ module.exports = function (grunt) {
                         className: 'ReportAPI',
                         fileName: 'report-api.js',
                         angularjs: true
+                    },
+                    {
+                        swagger: 'swagger/session.json',
+                        moduleName: 'session-api',
+                        className: 'SessionAPI',
+                        fileName: 'session-api.js',
+                        angularjs: true
                     }
                 ],
                 dest: '<%= config.app %>/modules'
@@ -132,7 +141,14 @@ module.exports = function (grunt) {
             options: {
                 jshintrc: '.jshintrc'
             },
-            src: ['Gruntfile.js', '<%= config.app %>/modules/**/*.js', '<%= config.app %>/report/**/*.js', '<%= config.app %>/reports/**/*.js', 'tasks/**/*.js', 'tests/**/*.js'],
+            src: ['Gruntfile.js',
+                  '<%= config.app %>/modules/**/*.js',
+                  '<%= config.app %>/report/**/*.js',
+                  '<%= config.app %>/reports/**/*.js',
+                  'app/app.js',
+                  'tasks/**/*.js',
+                  'tests/**/*.js'
+            ]
         },
         karma: {
             options: {
@@ -168,9 +184,64 @@ module.exports = function (grunt) {
             travis: 'tests/e2e/config/protractor-travis-conf.js',
             local: 'tests/e2e/config/protractor-conf.js'
         },
+        ngconstant: {
+            options: {
+                space: '    '
+            },
+            server: {
+                dest: '<%= config.app %>/constants.js',
+                name: 'constants',
+                wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
+                constants: {
+                    'APPNAME': 'report-editor',
+                    'API_URL': '//<%= api.server %>/v1',
+                    'REGISTRATION_URL': '<%= registration.server %>',
+                    'DEBUG': true
+                }
+            },
+            test: {
+                dest: '<%= config.app %>/constants.js',
+                name: 'constants',
+                wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
+                constants: {
+                    'APPNAME': 'report-editor',
+                    'API_URL': '//<%= api.test %>/v1',
+                    'REGISTRATION_URL': '<%= registration.test %>',
+                    'DEBUG': true
+                }
+            },
+            beta: {
+                dest: '<%= config.app %>/constants.js',
+                name: 'constants',
+                wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
+                constants: {
+                    'APPNAME': 'report-editor',
+                    'API_URL': '//<%= api.beta %>/v1',
+                    'REGISTRATION_URL': '<%= registration.beta %>',
+                    'DEBUG': false
+                }
+            },
+            prod: {
+                dest: '<%= config.app %>/constants.js',
+                name: 'constants',
+                wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
+                constants: {
+                    'APPNAME': 'report-editor',
+                    'API_URL': '//<%= api.prod %>/v1',
+                    'REGISTRATION_URL': '<%= registration.prod %>',
+                    'DEBUG': false
+                }
+            }
+        },
         jsonlint: {
             all: {
-                src: ['package.json', 'bower.json', 'swagger/*']
+                src: [
+                    'package.json',
+                    'grunt-api.json',
+                    'grunt-registration.json',
+                    'bower.json',
+                    'swagger/*'
+                ]
             }
         }
     });
@@ -191,6 +262,7 @@ module.exports = function (grunt) {
 
         grunt.task.run([
             'peg',
+            'ngconstant:server',
             'swagger-js-codegen',
             'less',
             'connect:livereload',
