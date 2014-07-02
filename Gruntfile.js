@@ -170,7 +170,7 @@ module.exports = function (grunt) {
         },
         jsonlint: {
             all: {
-                src: ['package.json', 'swagger/*']
+                src: ['package.json', 'bower.json', 'swagger/*']
             }
         }
     });
