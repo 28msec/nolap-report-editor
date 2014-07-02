@@ -1,6 +1,6 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('PreviewCtrl', function(){
-    
+.controller('PreviewCtrl', function(report){
+    console.log(report);
 });

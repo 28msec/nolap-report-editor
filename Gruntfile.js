@@ -232,6 +232,7 @@ module.exports = function (grunt) {
                 src: [
                     'package.json',
                     'grunt-api.json',
+                    'bower.json',
                     'swagger/*'
                 ]
             }

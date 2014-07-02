@@ -11,7 +11,7 @@ angular
             resolve: {
                 report: ['$rootScope', '$stateParams', 'ReportAPI', function($rootScope, $stateParams, ReportAPI) {
                     return ReportAPI.listReports({
-                        _id: $stateParams.id,
+                        _id: $stateParams.reportId,
                         token: $rootScope.session.getToken(),
                         $method: 'POST'
                     });

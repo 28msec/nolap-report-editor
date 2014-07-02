@@ -34,7 +34,8 @@
     "angular-sanitize": "~1.2.18",
     "angular-ui-bootstrap-bower": "~0.11.0",
     "angular-cache": "2.3.0",
-    "bootstrap": "~3.1.1"
+    "bootstrap": "~3.1.1",
+    "flexy-layout": "git://github.com/lorenzofox3/flexy-layout.git"
   },
   "resolutions": {
     "angular": "1.2.9"
