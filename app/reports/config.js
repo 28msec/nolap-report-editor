@@ -9,10 +9,10 @@ angular
         templateUrl: '/reports/reports.html',
         controller: 'ReportsCtrl',
         resolve: {
-            reports: ['$rootScope', '$stateParams', 'ReportAPI', function($rootScope, $stateParams, ReportAPI) {
-                return ReportAPI.listReports({
+            reports: [ '$stateParams', 'API', 'Session', function($stateParams, API, Session) {
+                return API.Report.listReports({
                     _id: $stateParams.id,
-                    token: $rootScope.session.getToken(),
+                    token: Session.getToken(),
                     $method: 'POST'
                 });
             }]

@@ -1,14 +1,23 @@
 'use strict';
 
 angular
-    .module('session-model', ['constants', 'session-api'])
-    .factory('Session', function($rootScope, $angularCacheFactory, SessionAPI, APPNAME){
+    .module('session-model', ['constants', 'api'])
+    .factory('Session', function($state, $location, $angularCacheFactory, API, APPNAME){
 
         return (function() {
 
             var cache;
             var token;
             var user;
+
+            function redirectToLoginPage(){
+                var p = $location.url();
+                if (p.substring(0, 5) === '/auth')
+                {
+                    p = p.substring(5);
+                }
+                $state.go('auth', { returnPage: p }, { reload: true });
+            }
 
             function getCache(){
                 if(cache === undefined){
@@ -31,7 +40,7 @@ angular
                     token = getCache().get('token');
                 }
                 if(token === undefined){
-                    $rootScope.$emit('auth');
+                    redirectToLoginPage();
                 }
                 return token;
             }
@@ -54,7 +63,7 @@ angular
             }
 
             function login(email, password, successCallback, errorCallback) {
-                SessionAPI.login({ 'email': email, 'password': password })
+                API.Session.login({ 'email': email, 'password': password })
                     .then(
                         // success
                         function(data) {
@@ -80,6 +89,7 @@ angular
             }
 
             return {
+                redirectToLoginPage: redirectToLoginPage,
                 login: login,
                 logout: logout,
                 getUser: getUser,

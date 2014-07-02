@@ -5856,6 +5856,20 @@ button.close {
   margin: auto;
   padding: 0;
 }
+#auth {
+  margin: auto;
+  width: 100%;
+  height: 100%;
+  vertical-align: baseline;
+}
+#auth .content {
+  height: auto;
+  width: 528px;
+  padding: 0 0 0 0;
+  position: absolute;
+  left: 43%;
+  top: 33%;
+}
 a {
   cursor: pointer;
 }
@@ -5882,18 +5896,4 @@ label {
 }
 .modal-header.modal-header-danger {
   background-color: #d9534f;
-}
-#auth {
-  margin: auto;
-  width: 100%;
-  height: 100%;
-  vertical-align: baseline;
-}
-#auth .content {
-  height: auto;
-  width: 528px;
-  padding: 0 0 0 0;
-  position: absolute;
-  left: 43%;
-  top: 33%;
 }

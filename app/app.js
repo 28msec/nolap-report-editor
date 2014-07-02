@@ -15,26 +15,13 @@ angular.module('report-editor', [
     'forms-ui'
 ])
 
-.constant("HTTP_DEBUG", false)
-
-.factory('ConnectionHandler', function($q, $rootScope, DEBUG, HTTP_DEBUG){
+.factory('ConnectionHandler', function($q, $rootScope, DEBUG){
     return {
-        'request': function(config) {
-            if(HTTP_DEBUG) console.log('HTTP request: ' + JSON.stringify(config));
-            return config;
-        },
-        'requestError': function(rejection) {
-            if(HTTP_DEBUG) console.error('HTTP requestError: ' + JSON.stringify(rejection));
-            return $q.reject(rejection);
-        },
-        'response': function(response) {
-            if(HTTP_DEBUG) console.log('HTTP response: ' + JSON.stringify(response));
-            return response;
-        },
         'responseError': function(rejection){
-            if(HTTP_DEBUG) console.error('HTTP responseError: ' + JSON.stringify(rejection));
             if(rejection.status === 401) {
-                if(DEBUG) console.error('intercepted 401: emitting auth');
+                if(DEBUG) {
+                    console.error('intercepted 401: emitting auth');
+                }
                 $rootScope.$emit('auth');
             }
             return $q.reject(rejection);
@@ -76,9 +63,7 @@ angular.module('report-editor', [
         });
 })
 
-.run(function($rootScope, ngProgressLite, $state, $location, $angularCacheFactory, Session) {
-
-    $rootScope.session = Session;
+.run(function($rootScope, ngProgressLite, $state, $location, API, Session) {
 
     $rootScope.$on('$stateChangeStart', function() {
         ngProgressLite.start();
@@ -93,45 +78,8 @@ angular.module('report-editor', [
         ngProgressLite.done();
     });
 
-    $rootScope.$on('error', function(event, status, error){
-        switch (status)
-        {
-            case 401:
-                $rootScope.$emit('auth');
-                break;
-            /*case 403:
-                $modal.open( {
-                    template: '<div class="modal-header h3"> Subscription required<a class="close" ng-click="cancel()">&times;</a></div><div class="modal-body"><h4>The page you are trying to access displays information about an entity not included in the DOW30.</h4>To view that information you need to subscribe to Pro.<br><br><a href="/account/billing" ng-click="cancel()" class="dotted">Go to Billing</a></div>',
-                    controller: ['$scope', '$modalInstance', function ($scope, $modalInstance) {
-                        $scope.cancel = function () {
-                            $modalInstance.dismiss('cancel');
-                        };
-                    }]
-                });
-                break;*/
-            default:
-                $modal.open( {
-                    template: '<div class="modal-header h3"> Error {{object.status}} <a class="close" ng-click="cancel()">&times;</a></div><div class="modal-body"> {{object.error.description }} <br><a ng-click="details=true" ng-hide="details" class="dotted">Show details</a><pre ng-show="details" class="small">{{object.error | json }}</pre></div>',
-                    controller: ['$scope', '$modalInstance', 'object', function ($scope, $modalInstance, object) {
-                        $scope.object = object;
-                        $scope.cancel = function () {
-                            $modalInstance.dismiss('cancel');
-                        };
-                    }],
-                    resolve: {
-                        object: function() { return { status: status, error: error }; }
-                    }
-                });
-        }
-    });
-
     $rootScope.$on('auth', function() {
-        var p = $location.url();
-        if (p.substring(0, 5) === '/auth')
-        {
-            p = p.substring(5);
-        }
-        $state.go('auth', { returnPage: p }, { reload: true });
+        Session.redirectToLoginPage();
     });
 })
 ;
