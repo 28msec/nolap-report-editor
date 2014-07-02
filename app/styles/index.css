@@ -5930,21 +5930,21 @@ button.close {
   top: 8px;
   left: -1px;
 }
-.preview-style .data i.glyphicon-remove {
+.preview-style .data i.invalid {
   color: white;
   border-radius: 7px;
-  background-color: #ff0000;
+  background-color: #a00000;
   border: 1px solid #303030;
   padding: 2px;
-  padding-right: 13px;
+  padding-right: 2px;
 }
-.preview-style .data i.glyphicon-ok {
+.preview-style .data i.valid {
   color: white;
   border-radius: 7px;
-  background-color: #008000;
+  background-color: #00a000;
   border: 1px solid #303030;
   padding: 2px;
-  padding-right: 13px;
+  padding-right: 2px;
 }
 .preview-style td.NumericValue div.value {
   padding-left: 14px;
@@ -6006,11 +6006,11 @@ button.close {
 .document-style .first-row-header-row .row-header:first-child {
   min-width: 200px;
 }
-.document-style .data i.glyphicon-remove {
-  color: #ff0000;
+.document-style .data i.invalid {
+  color: #a00000;
 }
-.document-style .data i.glyphicon-ok {
-  color: #008000;
+.document-style .data i.valid {
+  color: #00a000;
 }
 .data span.icon {
   position: relative;

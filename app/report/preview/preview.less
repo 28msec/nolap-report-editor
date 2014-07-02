@@ -7,8 +7,8 @@
 @preview-main-header-bg: @brand-primary;
 @preview-second-header-bg: #ddeafa;
 
-@preview-check-ok-fg: green;
-@preview-check-fail-fg: red;
+@preview-check-ok-fg: #00a000;
+@preview-check-fail-fg: #a00000;
 
 
 .preview-style thead { margin-bottom:5px }
@@ -61,8 +61,8 @@
 .preview-style td.isrollup { text-align:right;height:35px;border-bottom: 4px solid @preview-second-header-bg; }
 
 .preview-style .data i { position:absolute; top:8px; left:-1px; }
-.preview-style .data i.glyphicon-remove { color:white;border-radius:7px;background-color:@preview-check-fail-fg;border:1px solid #303030;padding:2px;padding-right:13px; }
-.preview-style .data i.glyphicon-ok { color:white;border-radius:7px;background-color:@preview-check-ok-fg;border:1px solid #303030;padding:2px;padding-right:13px; }
+.preview-style .data i.invalid { color:white;border-radius:7px;background-color:@preview-check-fail-fg;border:1px solid #303030;padding:2px;padding-right:2px; }
+.preview-style .data i.valid { color:white;border-radius:7px;background-color:@preview-check-ok-fg;border:1px solid #303030;padding:2px;padding-right:2px; }
 .preview-style td.NumericValue div.value { padding-left:14px; }
 
 .document-style tr.constraints td {
@@ -90,8 +90,8 @@
 .document-style .first-row-header-row .row-header:first-child { min-width:200px; }
 
 .document-style .data i {  }
-.document-style .data i.glyphicon-remove { color:@preview-check-fail-fg; }
-.document-style .data i.glyphicon-ok { color:@preview-check-ok-fg;  }
+.document-style .data i.invalid { color:@preview-check-fail-fg; }
+.document-style .data i.valid { color:@preview-check-ok-fg;  }
 
 .data span.icon { position:relative; }
 .null span.icon { display:none; }
