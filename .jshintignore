@@ -1,5 +1,5 @@
 app/bower_components
-app/modules/swagger/report-service.js
-app/modules/swagger/session-service.js
+app/modules/report-api.js
+app/modules/session-api.js
 app/modules/formula-parser.js
 app/modules/excel-parser.js

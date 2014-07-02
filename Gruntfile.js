@@ -116,20 +116,20 @@ module.exports = function (grunt) {
                 apis: [
                     {
                         swagger: 'swagger/reports.json',
-                        moduleName: 'report-service',
-                        className: 'ReportService',
-                        fileName: 'report-service.js',
+                        moduleName: 'report-api',
+                        className: 'ReportAPI',
+                        fileName: 'report-api.js',
                         angularjs: true
                     },
                     {
                         swagger: 'swagger/session.json',
-                        moduleName: 'session-service',
-                        className: 'SessionService',
-                        fileName: 'session-service.js',
+                        moduleName: 'session-api',
+                        className: 'SessionAPI',
+                        fileName: 'session-api.js',
                         angularjs: true
                     }
                 ],
-                dest: '<%= config.app %>/modules/swagger'
+                dest: '<%= config.app %>/modules'
             },
             all: {}
         },
@@ -145,6 +145,7 @@ module.exports = function (grunt) {
                   '<%= config.app %>/modules/**/*.js',
                   '<%= config.app %>/report/**/*.js',
                   '<%= config.app %>/reports/**/*.js',
+                  'app/app.js',
                   'tasks/**/*.js',
                   'tests/**/*.js'
             ]
@@ -237,6 +238,7 @@ module.exports = function (grunt) {
                 src: [
                     'package.json',
                     'grunt-api.json',
+                    'grunt-registration.json',
                     'bower.json',
                     'swagger/*'
                 ]
@@ -258,7 +260,6 @@ module.exports = function (grunt) {
             return grunt.task.run(['build', 'open', 'connect:dist:keepalive']);
         }
 
-        grunt.file.mkdir(config.app + '/modules/swagger');
         grunt.task.run([
             'peg',
             'ngconstant:server',
