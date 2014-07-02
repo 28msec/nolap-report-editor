@@ -16,6 +16,33 @@ angular.module('report-editor', [
     'forms-ui'
 ])
 
+.constant("HTTP_DEBUG", false)
+
+.factory('ConnectionHandler', function($q, $rootScope, DEBUG, HTTP_DEBUG){
+    return {
+        'request': function(config) {
+            if(HTTP_DEBUG) console.log('HTTP request: ' + JSON.stringify(config));
+            return config;
+        },
+        'requestError': function(rejection) {
+            if(HTTP_DEBUG) console.error('HTTP requestError: ' + JSON.stringify(rejection));
+            return $q.reject(rejection);
+        },
+        'response': function(response) {
+            if(HTTP_DEBUG) console.log('HTTP response: ' + JSON.stringify(response));
+            return response;
+        },
+        'responseError': function(rejection){
+            if(HTTP_DEBUG) console.error('HTTP responseError: ' + JSON.stringify(rejection));
+            if(rejection.status === 401) {
+                if(DEBUG) console.error('intercepted 401: emitting auth');
+                $rootScope.$emit('auth');
+            }
+            return $q.reject(rejection);
+        }
+    };
+})
+
 .config(function ($urlRouterProvider, $stateProvider, $locationProvider, $httpProvider) {
 
     //Because angularjs default transformResponse is not based on ContentType
@@ -33,6 +60,8 @@ angular.module('report-editor', [
             return response;
         }
     };
+
+    $httpProvider.interceptors.push('ConnectionHandler');
 
     $locationProvider.html5Mode(true);
 

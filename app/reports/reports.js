@@ -1,26 +1,13 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('ReportsCtrl', function($rootScope, $log, $scope, $stateParams, $state, $modal, ReportAPI){
-    $scope.reports = undefined;
+.controller('ReportsCtrl', function($rootScope, $log, $scope, $stateParams, $state, $modal, reports){
+    $scope.reports = reports;
     $scope.selectedReports = {};
 
-    ReportAPI.listReports({
-        _id: $stateParams.id,
-        token: $rootScope.session.getToken(),
-        $method: 'POST'
-    }).then(
-        function(reports){
-            $scope.reports = reports;
-            $scope.reports.forEach(function(report){
-                $scope.selectedReports[report._id] = false;
-            });
-        },
-        function(){
-            // @TODO emit error with status
-            $rootScope.$emit('auth');
-        }
-    );
+    $scope.reports.forEach(function(report){
+        $scope.selectedReports[report._id] = false;
+    });
 
     $scope.toggle = false;
 

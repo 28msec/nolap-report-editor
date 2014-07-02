@@ -1,11 +1,12 @@
 'use strict';
 
 angular.module('report-editor')
-    .controller('AuthCtrl', function($scope, $stateParams, $location, $http, $window, Session) {
+    .controller('AuthCtrl', function($scope, $stateParams, $location, $http, $window, Session, REGISTRATION_URL) {
         $scope.returnPage = $stateParams.returnPage;
         $scope.registerAttempted = false;
         $scope.loginAttempted = false;
         $scope.forgotAttempted = false;
+        $scope.registrationURL = REGISTRATION_URL;
 
         $scope.login = function(){
             $scope.registerAttempted = false;

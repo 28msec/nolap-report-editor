@@ -48,7 +48,7 @@
                         {
                             "name": "token",
                             "description": "The token of the current session",
-                            "required": true,
+                            "required": false,
                             "type": "string",
                             "paramType": "query"
                         },

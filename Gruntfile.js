@@ -23,6 +23,7 @@ module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         api: grunt.file.readJSON('grunt-api.json'),
+        registration: grunt.file.readJSON('grunt-registration.json'),
         config: config,
         watch: {
             less: {
@@ -193,6 +194,7 @@ module.exports = function (grunt) {
                 constants: {
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= api.server %>/v1',
+                    'REGISTRATION_URL': '<%= registration.server %>',
                     'DEBUG': true
                 }
             },
@@ -203,6 +205,7 @@ module.exports = function (grunt) {
                 constants: {
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= api.test %>/v1',
+                    'REGISTRATION_URL': '<%= registration.test %>',
                     'DEBUG': true
                 }
             },
@@ -213,6 +216,7 @@ module.exports = function (grunt) {
                 constants: {
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= api.beta %>/v1',
+                    'REGISTRATION_URL': '<%= registration.beta %>',
                     'DEBUG': false
                 }
             },
@@ -223,6 +227,7 @@ module.exports = function (grunt) {
                 constants: {
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= api.prod %>/v1',
+                    'REGISTRATION_URL': '<%= registration.prod %>',
                     'DEBUG': false
                 }
             }
