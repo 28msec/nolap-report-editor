@@ -1,7 +1,7 @@
 <div id="auth">
-    <div class="content">
+    <div class="container">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-6 col-md-offset-3">
                 <form role="form" class="white-box" name="loginForm" ng-submit="login()" novalidate spellcheck="false" autocomplete="on">
                     <h2>Sign in</h2>
                     <div class="form-group">
@@ -22,11 +22,10 @@
                         Email and Password do not match our records.
                     </span>
                     </div>
+                    <p><a ng-href="{{registrationURL}}">I forgot my password.</a></p>
                     <div class="form-group text-right">
                         <button type="submit" class="btn btn-primary">Login</button>
-                    </div>
-                    <div>
-                        No Account? Register and subscribe at least to the PRO plan: <a ng-href="{{registrationURL}}">main page</a>.
+                        <a ng-href="{{registrationURL}}" class="btn btn-default">Register</a>
                     </div>
                 </form>
             </div>
