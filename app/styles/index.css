@@ -5804,21 +5804,6 @@ button.close {
   margin: auto;
   padding: 0;
 }
-.preview-style thead {
-  margin-bottom: 5px;
-}
-.preview-style tr.constraints td.constraintlabel {
-  background-color: #428bca;
-  border-top: 2px solid #000000;
-  border-left: 2px solid #000000;
-  min-width: 200px;
-}
-.preview-style tr.constraints td.constraintvalue {
-  background-color: #ddeafa;
-  border-top: 2px solid #000000;
-  border-left: 2px solid #000000;
-  min-width: 200px;
-}
 .preview-style table {
   border-spacing: 0px;
   border-collapse: separate;
@@ -5826,45 +5811,76 @@ button.close {
   border-bottom: 2px solid #000000;
   font-size: 80%;
 }
+.preview-style table thead {
+  margin-bottom: 5px;
+}
+.preview-style table tr.constraints td.constraintlabel {
+  background-color: #428bca;
+  border-top: 2px solid #000000;
+  border-left: 2px solid #000000;
+  min-width: 200px;
+}
+.preview-style table tr.constraints td.constraintvalue {
+  background-color: #ddeafa;
+  border-top: 2px solid #000000;
+  border-left: 2px solid #000000;
+  min-width: 200px;
+}
 .preview-style table td {
   padding: 2px;
 }
-.preview-style .data {
+.preview-style table .data {
   border-top: 2px solid #dadcdd;
   border-left: 2px solid #dadcdd;
   background-color: #f0f0f0;
   vertical-align: top;
   padding: 0px;
 }
-.preview-style .data div.value {
+.preview-style table .data i {
+  position: absolute;
+  top: 6px;
+  left: 0px;
+  font-size: 50%;
+  color: white;
+  border-radius: 5px;
+  border: 1px solid #303030;
+  padding: 1px;
+}
+.preview-style table .data i.invalid {
+  background-color: #a00000;
+}
+.preview-style table .data i.valid {
+  background-color: #00a000;
+}
+.preview-style table .data div.value {
   background-color: #ffffff;
   padding: 2px;
 }
-.preview-style .null div.value {
+.preview-style table .null div.value {
   background-color: #f0f0f0;
 }
-.preview-style .title {
+.preview-style table .title {
   border-top: 4px solid #000000;
   border-left: 2px solid #000000;
   vertical-align: bottom;
   text-align: center;
 }
-.preview-style .yrollup {
+.preview-style table .yrollup {
   text-align: right;
 }
-.preview-style td.yrollupdata div.value {
+.preview-style table td.yrollupdata div.value {
   border-bottom: 4px double #000000;
   border-top: 1px solid #000000;
 }
-.preview-style .depth4 td.yrollupdata div.value {
+.preview-style table .depth4 td.yrollupdata div.value {
   border-bottom: 1px solid #000000;
   border-top: 1px solid #000000;
 }
-.preview-style .header {
+.preview-style table .header {
   background-color: #428bca;
   padding: 2px;
 }
-.preview-style .column-header {
+.preview-style table .column-header {
   background-color: #428bca;
   border-top: 1px solid #000000;
   border-left: 1px solid #000000;
@@ -5874,116 +5890,104 @@ button.close {
   padding-left: 10px;
   padding-right: 6px;
 }
-.preview-style .first-column-header-row .column-header {
+.preview-style table .first-column-header-row .column-header {
   border-top: 4px solid #000000;
 }
-.preview-style .last-column-header-row .column-header {
+.preview-style table .last-column-header-row .column-header {
   background-color: #ddeafa;
   border-left: 1px solid #dadcdd;
   font-weight: normal;
 }
-.preview-style .column-header:first-child {
+.preview-style table .column-header:first-child {
   border-left: 2px solid #000000;
 }
-.preview-style tr .xrollup {
+.preview-style table tr .xrollup {
   border-top: none;
   border-left: 1px solid #000000;
 }
-.preview-style .last-column-header-row .xrollup {
+.preview-style table .last-column-header-row .xrollup {
   background-color: #428bca;
   border-left: 1px solid #000000;
 }
-.preview-style .title + .column-header {
+.preview-style table .title + .column-header {
   border-left: 2px solid #000000;
 }
-.preview-style .row-header {
+.preview-style table .row-header {
   background-color: #ddeafa;
   vertical-align: top;
   border-left: 2px solid #000000;
   border-top: 2px solid #dadcdd;
 }
-.preview-style .first-row-header-row .row-header:first-child {
+.preview-style table .first-row-header-row .row-header:first-child {
   min-width: 200px;
 }
-.preview-style .row-header + .data {
+.preview-style table .row-header + .data {
   border-left: 2px solid #000000;
 }
-.preview-style .first-row-header-row .data {
+.preview-style table .first-row-header-row .data {
   border-top: 2px solid #000000;
 }
-.preview-style .first-row-header-row .row-header {
+.preview-style table .first-row-header-row .row-header {
   border-top: 2px solid #000000;
 }
-.preview-style td.depth1 {
+.preview-style table td.depth1 {
   font-weight: bold;
 }
-.preview-style td.depth2 {
+.preview-style table td.depth2 {
   font-weight: bold;
 }
-.preview-style td.isrollup {
+.preview-style table td.isrollup {
   text-align: right;
   height: 35px;
   border-bottom: 4px solid #ddeafa;
 }
-.preview-style .data i {
-  position: absolute;
-  top: 8px;
-  left: -1px;
-}
-.preview-style .data i.invalid {
-  color: white;
-  border-radius: 7px;
-  background-color: #a00000;
-  border: 1px solid #303030;
-  padding: 2px;
-  padding-right: 2px;
-}
-.preview-style .data i.valid {
-  color: white;
-  border-radius: 7px;
-  background-color: #00a000;
-  border: 1px solid #303030;
-  padding: 2px;
-  padding-right: 2px;
-}
-.preview-style td.NumericValue div.value {
+.preview-style table td.NumericValue div.value {
   padding-left: 14px;
-}
-.document-style tr.constraints td {
-  min-width: 250px;
-  vertical-align: top;
 }
 .document-style table {
   border-spacing: 2px;
   border-collapse: separate;
 }
+.document-style table tr.constraints td {
+  min-width: 250px;
+  vertical-align: top;
+}
 .document-style table td {
   padding: 0px;
 }
-.document-style .data {
+.document-style table .data {
   background-color: #ffffff;
   padding: 0px;
   vertical-align: top;
   padding-left: 10px;
 }
-.document-style .title {
+.document-style table .data i {
+  font-size: 75%;
+}
+.document-style table .data i.invalid {
+  color: #a00000;
+}
+.document-style table .data i.valid {
+  color: #00a000;
+}
+.document-style table .title {
   font-size: 18px;
   font-weight: bold;
   vertical-align: bottom;
 }
-.document-style .yrollup {
+.document-style table .yrollup {
   text-align: right;
 }
-.document-style td.yrollupdata {
+.document-style table td.yrollupdata {
   border-bottom: 4px double #000000;
   border-top: 1px solid #000000;
   vertical-align: bottom;
 }
-.document-style .header {
+.document-style table .header {
   background-color: #ffffff;
   padding: 2px;
 }
-.document-style .column-header {
+.document-style table .column-header {
   border-bottom: 1px solid black;
   margin-right: 2px;
   font-weight: bold;
@@ -5991,26 +5995,66 @@ button.close {
   text-align: right;
   padding-left: 10px;
 }
-.document-style .row-header {
+.document-style table .row-header {
   vertical-align: top;
 }
-.document-style td.depth1 {
+.document-style table td.depth1 {
   font-weight: bold;
 }
-.document-style td.isrollup {
+.document-style table td.isrollup {
   text-align: right;
   height: 40px;
   vertical-align: bottom;
   border-bottom: 4px double #ffffff;
 }
-.document-style .first-row-header-row .row-header:first-child {
+.document-style table .first-row-header-row .row-header:first-child {
   min-width: 200px;
 }
-.document-style .data i.invalid {
-  color: #a00000;
+.plain-style table {
+  border-spacing: 0px;
+  border-collapse: separate;
+  border-right: 2px solid white;
+  border-bottom: 2px solid white;
 }
-.document-style .data i.valid {
-  color: #00a000;
+.plain-style table td {
+  padding: 2px;
+  border-top: 2px solid white;
+  border-left: 2px solid white;
+}
+.plain-style table tr.constraints td {
+  background-color: #e0e0e0;
+  padding: 2px;
+  border-top: 2px solid white;
+  border-left: 2px solid white;
+}
+.plain-style table .title {
+  font-weight: bold;
+}
+.plain-style table .xrollup {
+  border-top: none;
+}
+.plain-style table .yrollup {
+  border-left: none;
+}
+.plain-style table .header {
+  background-color: #e0e0e0;
+  padding: 2px;
+  font-weight: bold;
+}
+.plain-style table .data {
+  background-color: #f0f0f0;
+  padding: 2px;
+}
+.plain-style table .data i {
+  position: absolute;
+  top: 8px;
+  left: -1px;
+}
+.plain-style table .data i.glyphicon-remove {
+  color: red;
+}
+.plain-style table .data i.glyphicon-ok {
+  color: green;
 }
 .data span.icon {
   position: relative;
