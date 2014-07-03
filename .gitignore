@@ -11,3 +11,4 @@ coverage
 *.swo
 .grunt
 out
+*.css

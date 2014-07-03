@@ -62,23 +62,12 @@ angular
                 getCache().put('user', user);
             }
 
-            function login(email, password, successCallback, errorCallback) {
-                API.Session.login({ 'email': email, 'password': password })
-                    .then(
-                        // success
-                        function(data) {
-                            setToken(data.token);
-                            setUser(data._id, email, data.firstname, data.lastname);
-                            if(successCallback !== undefined){
-                                successCallback(data);
-                            }
-                        },
-                        // error
-                        function() {
-                            if(errorCallback !== undefined){
-                                errorCallback();
-                            }
-                        });
+            function login(email, password) {
+                return API.Session.login({ 'email': email, 'password': password })
+                .then(function(data) {
+                    setToken(data.token);
+                    setUser(data._id, email, data.firstname, data.lastname);
+                });
             }
 
             function logout() {

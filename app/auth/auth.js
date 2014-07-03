@@ -11,15 +11,15 @@ angular.module('report-editor')
 
             $scope.loginForm.loginPassword.$setValidity('unauthorized', true);
             if(!$scope.loginForm.$invalid) {
-                Session.login(
-                    $scope.loginEmail,
-                    $scope.loginPassword,
-                    function() {
-                        $location.url(decodeURIComponent($scope.returnPage || '/')).replace();
-                    },
-                    function() {
-                        $scope.loginForm.loginPassword.$setValidity('unauthorized', false);
-                    });
+                Session
+                .login($scope.loginEmail, $scope.loginPassword)
+                .then(function() {
+                    $location.url(decodeURIComponent($scope.returnPage || '/')).replace();
+                })
+                .catch(function() {
+                    $scope.loginForm.loginPassword.$setValidity('unauthorized', false);
+                });
             }
         };
     });
+    
