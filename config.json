@@ -1,0 +1,18 @@
+{
+    "server": {
+        "api": "secxbrl-dev.xbrl.io",
+        "registration": "http://localhost:9001/auth"
+    },
+    "test": {
+        "api": "secxbrl-test.xbrl.io",
+        "registration": "http://test.secxbrl.info/auth"
+    },
+    "beta": {
+        "api": "secxbrl-beta.xbrl.io",
+        "registration": "http://beta.secxbrl.info/auth"
+    },
+    "prod": {
+        "api": "secxbrl.xbrl.io",
+        "registration": "https://app.secxbrl.info/auth"
+    }
+}

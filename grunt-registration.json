@@ -1,6 +1,0 @@
-{
-    "server": "http://localhost:9001/auth",
-    "test": "http://test.secxbrl.info/auth",
-    "beta": "http://beta.secxbrl.info/auth",
-    "prod": "https://app.secxbrl.info/auth"
-}
