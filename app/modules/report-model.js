@@ -5,7 +5,7 @@ angular
 .factory('Report', function(){
 
     //Constructor
-    var Report = function(modelOrName, label, description, role, prefix){
+    var Report = function(modelOrName, label, description, role, username, prefix){
         if ( modelOrName === null) {
             throw new Error('new Report creation with null');
         } else if (typeof modelOrName !== 'object' &&
@@ -14,12 +14,19 @@ angular
         } else if (typeof modelOrName === 'object') {
             this.model = modelOrName;
         } else if (typeof modelOrName === 'string'){
+            ensureParameter(label, 'label', 'string', 'Report (Constructor)');
+            ensureParameter(description, 'description', 'string', 'Report (Constructor)');
+            ensureParameter(role, 'role', 'string', 'Report (Constructor)');
+            ensureParameter(username, 'username', 'string', 'Report (Constructor)',
+                /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                'invalid username value passed "' + username + '" (its not a valid Email Address).');
             this.model =
                 {
                     '_id' : modelOrName,
                     'Archive' : null,
                     'Label' : label,
                     'Description': description,
+                    'Owner': username,
                     'Role' : role,
                     'Networks' : [
                         {
@@ -73,6 +80,11 @@ angular
                 };
             if(prefix !== undefined || prefix !== null || typeof prefix === 'string'){
                 this.model.Prefix = prefix;
+            } else {
+                // do a good guess
+                var capitalsRegex = /(?:^|\s*)(?:([A-Z])|[^A-Z])*(?:\s*|$)/g;
+                var match = capitalsRegex.exec(label);
+                console.log(JSON.stringify(match));
             }
         } // if
     };
