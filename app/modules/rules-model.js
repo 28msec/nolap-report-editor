@@ -555,10 +555,10 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         result.push('    let $computed-value := ' + toComputation(body));
                         result.push('    let $audit-trail-message := ');
                         if(this.model.Type === 'xbrl28:formula'){
-                            result.push('	     rules:fact-trail({"Aspects": { "xbrl:Unit" : $_unit, "xbrl:Concept" : "' + computedConcept + '" }, Value: $computed-value }) || " = " || ');
+                            result.push('      rules:fact-trail({"Aspects": { "xbrl:Unit" : $_unit, "xbrl:Concept" : "' + computedConcept + '" }, Value: $computed-value }) || " = " || ');
                         }
-                        result.push('	        ' + toAuditTrail(body));
-                        result.push('	 let $source-facts := (' + auditTrailSourceFacts + ')');
+                        result.push('         ' + toAuditTrail(body));
+                        result.push('  let $source-facts := (' + auditTrailSourceFacts + ')');
                         result.push('    return');
                         result.push('      if(string(number($computed-value)) != "NaN" and not($computed-value instance of xs:boolean) and $computed-value ne xs:integer($computed-value))');
                         result.push('      then');
@@ -1044,5 +1044,3 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
     };
     return Rule;
 }]);
-
-
