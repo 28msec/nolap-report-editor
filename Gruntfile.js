@@ -188,6 +188,7 @@ module.exports = function (grunt) {
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= config.server.api %>/v1',
                     'REGISTRATION_URL': '<%= config.server.registration %>',
+                    'ACCOUNT_URL': '<%= config.server.account %>',
                     'DEBUG': true
                 }
             },
@@ -199,6 +200,7 @@ module.exports = function (grunt) {
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= config.test.api %>/v1',
                     'REGISTRATION_URL': '<%= config.test.registration %>',
+                    'ACCOUNT_URL': '<%= config.test.account %>',
                     'DEBUG': true
                 }
             },
@@ -210,6 +212,7 @@ module.exports = function (grunt) {
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= config.beta.api %>/v1',
                     'REGISTRATION_URL': '<%= config.beta.registration %>',
+                    'ACCOUNT_URL': '<%= config.beta.account %>',
                     'DEBUG': false
                 }
             },
@@ -221,6 +224,7 @@ module.exports = function (grunt) {
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= config.prod.api %>/v1',
                     'REGISTRATION_URL': '<%= config.prod.registration %>',
+                    'ACCOUNT_URL': '<%= config.prod.account %>',
                     'DEBUG': false
                 }
             }
