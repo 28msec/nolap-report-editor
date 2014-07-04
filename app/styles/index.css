@@ -5832,7 +5832,7 @@ button.close {
 .preview-style table .data {
   border-top: 2px solid #dadcdd;
   border-left: 2px solid #dadcdd;
-  background-color: #ff00f0;
+  background-color: #f0f0f0;
   vertical-align: top;
   padding: 0px;
 }
@@ -5857,7 +5857,7 @@ button.close {
   padding: 2px;
 }
 .preview-style table .null div.value {
-  background-color: #ff00f0;
+  background-color: #f0f0f0;
 }
 .preview-style table .title {
   border-top: 4px solid #000000;
