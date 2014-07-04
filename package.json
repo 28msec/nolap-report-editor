@@ -60,7 +60,13 @@
     "request": "~2.36.0",
     "shelljs": "~0.3.0",
     "grunt-swagger-js-codegen": "~0.2.0",
-    "grunt-jsonlint": "~1.0.4"
+    "grunt-jsonlint": "~1.0.4",
+    "grunt-ngmin": "0.0.3",
+    "grunt-usemin": "~2.3.0",
+    "grunt-contrib-cssmin": "~0.10.0",
+    "grunt-rev": "~0.1.0",
+    "grunt-contrib-htmlmin": "~0.3.0",
+    "grunt-contrib-imagemin": "~0.7.1"
   },
   "contributors": [
     {
