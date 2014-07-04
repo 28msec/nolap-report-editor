@@ -6,7 +6,7 @@ angular
     $stateProvider
     .state('report.taxonomy', {
         url: '/taxonomy',
-        templateUrl: 'report/taxonomy/taxonomy.html',
+        templateUrl: '/report/taxonomy/taxonomy.html',
         controller: 'TaxonomyCtrl'
     });
 })

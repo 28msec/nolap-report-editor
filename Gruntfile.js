@@ -1,10 +1,5 @@
 module.exports = function (grunt) {
     'use strict';
-    
-    var config = {
-        app: 'app',
-        dist: 'dist'
-    };
 
     require('load-grunt-tasks')(grunt);
     require('time-grunt')(grunt);
@@ -21,11 +16,10 @@ module.exports = function (grunt) {
 
     // Project configuration.
     grunt.initConfig({
-        pkg: grunt.file.readJSON('package.json'),
-        config: config,
+        config: grunt.file.readJSON('config.json'),
         watch: {
             less: {
-                files:  ['<%= config.app %>/styles/{,*/}*.less'],
+                files:  ['app/styles/{,*/}*.less'],
                 tasks: ['less']
             },
             livereload: {
@@ -33,10 +27,10 @@ module.exports = function (grunt) {
                     livereload: LIVERELOAD_PORT
                 },
                 files: [
-                    '<%= config.app %>/**/*.html',
-                    '{.tmp,<%= config.app %>}/styles/{,*/}*.css',
-                    '{.tmp,<%= config.app %>}/**/*.js',
-                    '<%= config.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
+                    'app/**/*.html',
+                    '{.tmp,app}/styles/{,*/}*.css',
+                    '{.tmp,app}/**/*.js',
+                    'app/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
                 ]
             }
         },
@@ -55,7 +49,7 @@ module.exports = function (grunt) {
                                 '!\\.html|\\.xml|\\images|\\.js|\\.css|\\.png|\\.jpg|\\.woff|\\.ttf|\\.svg|\\.ico /index.html [L]'
                             ]),
                             mountFolder(connect, '.tmp'),
-                            mountFolder(connect, config.app)
+                            mountFolder(connect, 'app')
                         ];
                     }
                 }
@@ -70,7 +64,7 @@ module.exports = function (grunt) {
                                 '!\\.html|\\.xml|\\images|\\.js|\\.css|\\.png|\\.jpg|\\.woff|\\.ttf|\\.svg|\\.ico /index.html [L]'
                             ]),
                             mountFolder(connect, '.tmp'),
-                            mountFolder(connect, config.app)
+                            mountFolder(connect, 'app')
                         ];
                     }
                 }
@@ -86,7 +80,7 @@ module.exports = function (grunt) {
                 options: {
                 },
                 files: {
-                    '<%= config.app %>/styles/index.css': ['<%= config.app %>/styles/index.less']
+                    'app/styles/index.css': ['app/styles/index.less']
                 }
             }
         },
@@ -94,7 +88,7 @@ module.exports = function (grunt) {
             options: { trackLineAndColumn: true },
             excelGrammar : {
                 src: 'pegjs/excelGrammar.pegjs',
-                dest: '<%= config.app %>/modules/excel-parser.js',
+                dest: 'app/modules/excel-parser.js',
                 angular: {
                     module: 'excel-parser',
                     factory: 'ExcelParser'
@@ -102,7 +96,7 @@ module.exports = function (grunt) {
             },
             formulaGrammar : {
                 src: 'pegjs/formulaGrammar.pegjs',
-                dest: '<%= config.app %>/modules/formula-parser.js',
+                dest: 'app/modules/formula-parser.js',
                 angular: {
                     module: 'formula-parser',
                     factory: 'FormulaParser'
@@ -118,9 +112,16 @@ module.exports = function (grunt) {
                         className: 'ReportAPI',
                         fileName: 'report-api.js',
                         angularjs: true
+                    },
+                    {
+                        swagger: 'swagger/session.json',
+                        moduleName: 'session-api',
+                        className: 'SessionAPI',
+                        fileName: 'session-api.js',
+                        angularjs: true
                     }
                 ],
-                dest: '<%= config.app %>/modules'
+                dest: 'app/modules'
             },
             all: {}
         },
@@ -132,7 +133,14 @@ module.exports = function (grunt) {
             options: {
                 jshintrc: '.jshintrc'
             },
-            src: ['Gruntfile.js', '<%= config.app %>/modules/**/*.js', '<%= config.app %>/report/**/*.js', '<%= config.app %>/reports/**/*.js', 'tasks/**/*.js', 'tests/**/*.js'],
+            src: ['Gruntfile.js',
+                  'app/modules/**/*.js',
+                  'app/report/**/*.js',
+                  'app/reports/**/*.js',
+                  'app/app.js',
+                  'tasks/**/*.js',
+                  'tests/**/*.js'
+            ]
         },
         karma: {
             options: {
@@ -146,13 +154,13 @@ module.exports = function (grunt) {
             '1.2.9': {
                 options: {
                     files: [
-                        '<%= config.app %>/bower_components/angular/angular.js',
-                        '<%= config.app %>/bower_components/angular-mocks-1.2.9/angular-mocks.js',
-                        '<%= config.app %>/modules/excel-parser.js',
-                        '<%= config.app %>/modules/formula-parser.js',
-                        '<%= config.app %>/modules/report-api.js',
-                        '<%= config.app %>/modules/report-model.js',
-                        '<%= config.app %>/modules/rules-model.js',
+                        'app/bower_components/angular/angular.js',
+                        'app/bower_components/angular-mocks-1.2.9/angular-mocks.js',
+                        'app/modules/excel-parser.js',
+                        'app/modules/formula-parser.js',
+                        'app/modules/report-api.js',
+                        'app/modules/report-model.js',
+                        'app/modules/rules-model.js',
                         'tests/unit/karma.start.js',
                         'tests/unit/*.js'
                     ]
@@ -168,9 +176,63 @@ module.exports = function (grunt) {
             travis: 'tests/e2e/config/protractor-travis-conf.js',
             local: 'tests/e2e/config/protractor-conf.js'
         },
+        ngconstant: {
+            options: {
+                space: '    '
+            },
+            server: {
+                dest: 'app/constants.js',
+                name: 'constants',
+                wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
+                constants: {
+                    'APPNAME': 'report-editor',
+                    'API_URL': '//<%= config.server.api %>/v1',
+                    'REGISTRATION_URL': '<%= config.server.registration %>',
+                    'DEBUG': true
+                }
+            },
+            test: {
+                dest: 'app/constants.js',
+                name: 'constants',
+                wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
+                constants: {
+                    'APPNAME': 'report-editor',
+                    'API_URL': '//<%= config.test.api %>/v1',
+                    'REGISTRATION_URL': '<%= config.test.registration %>',
+                    'DEBUG': true
+                }
+            },
+            beta: {
+                dest: 'app/constants.js',
+                name: 'constants',
+                wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
+                constants: {
+                    'APPNAME': 'report-editor',
+                    'API_URL': '//<%= config.beta.api %>/v1',
+                    'REGISTRATION_URL': '<%= config.beta.registration %>',
+                    'DEBUG': false
+                }
+            },
+            prod: {
+                dest: 'app/constants.js',
+                name: 'constants',
+                wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
+                constants: {
+                    'APPNAME': 'report-editor',
+                    'API_URL': '//<%= config.prod.api %>/v1',
+                    'REGISTRATION_URL': '<%= config.prod.registration %>',
+                    'DEBUG': false
+                }
+            }
+        },
         jsonlint: {
             all: {
-                src: ['package.json', 'swagger/*']
+                src: [
+                    'package.json',
+                    'config.json',
+                    'bower.json',
+                    'swagger/*'
+                ]
             }
         }
     });
@@ -191,6 +253,7 @@ module.exports = function (grunt) {
 
         grunt.task.run([
             'peg',
+            'ngconstant:server',
             'swagger-js-codegen',
             'less',
             'connect:livereload',

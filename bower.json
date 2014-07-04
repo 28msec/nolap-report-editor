@@ -36,7 +36,8 @@
     "angular-cache": "2.3.0",
     "bootstrap": "~3.1.1",
     "accounting": "~0.3.2",
-    "layoutmodel-renderer-angular" : "https://github.com/28msec/layoutmodel-renderer-angular.git#master"
+    "layoutmodel-renderer-angular" : "https://github.com/28msec/layoutmodel-renderer-angular.git#master",
+    "flexy-layout": "git://github.com/lorenzofox3/flexy-layout.git"
   },
   "resolutions": {
     "angular": "1.2.9"

@@ -1,9 +1,10 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('ReportsCtrl', function($scope, $state, $modal, reports){
+.controller('ReportsCtrl', function($rootScope, $log, $scope, $stateParams, $state, $modal, reports){
     $scope.reports = reports;
     $scope.selectedReports = {};
+
     $scope.reports.forEach(function(report){
         $scope.selectedReports[report._id] = false;
     });
@@ -49,8 +50,7 @@ angular.module('report-editor')
             templateUrl: '/reports/create-report.html'
         });
         modal.result.then(function(report){
-            reports.push(report);
-            $scope.reports = reports;
+            $scope.reports.push(report);
             $state.go('report', { id: report._id });
         });
     };
@@ -76,11 +76,9 @@ angular.module('report-editor')
         });
     };
 })
-.controller('DeleteReportsCtrl', function($q, $scope, $modalInstance, ReportEditorConfig, ReportAPI, reports, reportIdsToDelete){
+.controller('DeleteReportsCtrl', function($q, $scope, $modalInstance, API, Session, reports, reportIdsToDelete){
 
     $scope.loading = false;
-
-    var api = new ReportAPI(ReportEditorConfig.api.endpoint);
 
     $scope.names = [];
     reports.forEach(function(report){
@@ -93,7 +91,7 @@ angular.module('report-editor')
         $scope.loading = true;
         var promises = [];
         reportIdsToDelete.forEach(function(id){
-            promises.push(api.removeReport({ _id: id, token: ReportEditorConfig.api.token, $method: 'POST' }).then(function(){
+            promises.push(API.Report.removeReport({ _id: id, token: Session.getToken(), $method: 'POST' }).then(function(){
                 reports.forEach(function(report, index){
                     if(report._id === id) {
                         reports.splice(index, 1);
@@ -118,18 +116,17 @@ angular.module('report-editor')
         $modalInstance.close();
     };
 })
-.controller('CreateReportCtrl', function($scope, $modalInstance, Report, ReportEditorConfig, ReportAPI){
+.controller('CreateReportCtrl', function($scope, $modalInstance, Report, API, Session){
     $scope.report = {};
     
     $scope.ok = function(){
         $scope.loading = true;
         //TODO: this will change with the new REST API
         var report = new Report($scope.report.name, $scope.report.name, '', 'http://reports.28.io');
-        var api = new ReportAPI(ReportEditorConfig.api.endpoint);
-        api.addOrReplaceOrValidateReport({
+        API.Report.addOrReplaceOrValidateReport({
             report: report.model,
             $method: 'POST',
-            token: ReportEditorConfig.api.token
+            token: Session.getToken()
         })
         .then(function(){
             $scope.loading = false;

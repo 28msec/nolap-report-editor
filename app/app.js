@@ -5,8 +5,9 @@ angular.module('report-editor', [
     'ui.bootstrap',
     'jmdobry.angular-cache',
     'ngProgressLite',
-
-    'report-api',
+    'constants',
+    'api',
+    'session-model',
     'report-model',
     'rules-model',
     'excel-parser',
@@ -14,30 +15,21 @@ angular.module('report-editor', [
     'forms-ui',
     'layoutmodel'
 ])
-.run(function($rootScope, ngProgressLite) {
-  
-    $rootScope.$on('$stateChangeStart', function() {
-        ngProgressLite.start();
-    });
 
-    $rootScope.$on('$stateChangeSuccess', function() {
-        ngProgressLite.done();
-    });
-
-    $rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
-        console.error(error);
-        ngProgressLite.done();
-    });
-})
-//TODO: to be removed by the final version of the REST API
-.factory('ReportEditorConfig', function(){
+.factory('ConnectionHandler', function($q, $rootScope, DEBUG){
     return {
-        api: {
-            endpoint: 'http://secxbrld2.beta.28.io/v1/_queries/public/reports',
-            token: '29143de0-8328-404d-b7f0-591bb871c13f'
+        'responseError': function(rejection){
+            if(rejection.status === 401) {
+                if(DEBUG) {
+                    console.error('intercepted 401: emitting auth');
+                }
+                $rootScope.$emit('auth');
+            }
+            return $q.reject(rejection);
         }
     };
 })
+
 .config(function ($urlRouterProvider, $stateProvider, $locationProvider, $httpProvider) {
 
     //Because angularjs default transformResponse is not based on ContentType
@@ -56,6 +48,39 @@ angular.module('report-editor', [
         }
     };
 
+    $httpProvider.interceptors.push('ConnectionHandler');
+
     $locationProvider.html5Mode(true);
+
+    $stateProvider
+        //Auth
+        .state('auth', {
+            url: '/auth{returnPage:.*}',
+            templateUrl: '/auth/auth.html',
+            controller: 'AuthCtrl',
+            data: {
+                title: 'Login'
+            }
+        });
+})
+
+.run(function($rootScope, ngProgressLite, $state, $location, API, Session) {
+
+    $rootScope.$on('$stateChangeStart', function() {
+        ngProgressLite.start();
+    });
+
+    $rootScope.$on('$stateChangeSuccess', function() {
+        ngProgressLite.done();
+    });
+
+    $rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
+        console.error(error);
+        ngProgressLite.done();
+    });
+
+    $rootScope.$on('auth', function() {
+        Session.redirectToLoginPage();
+    });
 })
 ;
