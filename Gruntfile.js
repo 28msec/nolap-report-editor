@@ -360,9 +360,9 @@ module.exports = function (grunt) {
         ]);
     });
     
-    grunt.registerTask('build', function (target) {
+    grunt.registerTask('build', function () {
         //var env = (target ? target : 'server');
-      
+
         grunt.task.run([
             'clean:pre',
             'peg',
