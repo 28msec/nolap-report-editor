@@ -1,13 +1,9 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('ReportsCtrl', function($rootScope, $log, $scope, $stateParams, $state, $modal, Session, reports, ACCOUNT_URL){
+.controller('ReportsCtrl', function($rootScope, $log, $scope, $stateParams, $state, $modal, reports){
     $scope.reports = reports;
     $scope.selectedReports = {};
-
-    var user = Session.getUser();
-    $scope.name = user.firstname + ' ' + user.lastname;
-    $scope.accountUrl = ACCOUNT_URL;
 
     $scope.reports.forEach(function(report){
         $scope.selectedReports[report._id] = false;
