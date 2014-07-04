@@ -38,7 +38,6 @@ angular
                 if(token === undefined){
                     redirectToLoginPage();
                 }
-                prolong(token);
                 return token;
             }
 
@@ -51,7 +50,6 @@ angular
                 if(user === undefined){
                     redirectToLoginPage();
                 }
-                prolong(undefined, user);
                 return user;
             }
 
@@ -66,11 +64,6 @@ angular
                     setToken(data.token);
                     setUser(data._id, email, data.firstname, data.lastname);
                 });
-            }
-
-            function prolong(token, user) {
-                getCache().put('token', token || getCache().get('token'));
-                getCache().put('user', user || getCache().get('user'));
             }
 
             function logout() {

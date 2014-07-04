@@ -94,7 +94,6 @@ angular
                         startingChars += char.toLowerCase();
                     }
                 });
-                console.log(startingChars);
                 this.model.Prefix = startingChars;
             }
         } // if
