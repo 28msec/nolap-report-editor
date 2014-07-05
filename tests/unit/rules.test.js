@@ -12,7 +12,7 @@ describe('Rules Model API Tests', function () {
         var description = 'This Report is not intended to be used in production';
         var role = 'http://www.28.io/nolap/test';
         var prefix = 'test';
-        report = new Report(name, label, description, role, prefix);
+        report = new Report(name, label, description, role, 'd@28.io', prefix);
 
         var type = 'xbrl28:formula';
         var computableConcept = 'Assets';

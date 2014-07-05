@@ -122,7 +122,8 @@ angular.module('report-editor')
     $scope.ok = function(){
         $scope.loading = true;
         //TODO: this will change with the new REST API
-        var report = new Report($scope.report.name, $scope.report.name, '', 'http://reports.28.io');
+        var user = Session.getUser();
+        var report = new Report(undefined, $scope.report.name, '', 'http://reports.28.io', user.email);
         API.Report.addOrReplaceOrValidateReport({
             report: report.model,
             $method: 'POST',

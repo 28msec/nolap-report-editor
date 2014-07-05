@@ -12,5 +12,5 @@ angular
             $scope.name = user.firstname + ' ' + user.lastname;
             $scope.accountUrl = ACCOUNT_URL;
         }
-    }
+    };
 });

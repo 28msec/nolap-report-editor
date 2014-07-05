@@ -7,8 +7,6 @@ angular
         return (function() {
 
             var cache;
-            var token;
-            var user;
 
             function redirectToLoginPage(){
                 var p = $location.url();
@@ -36,9 +34,7 @@ angular
             }
 
             function getToken(){
-                if(token === undefined){
-                    token = getCache().get('token');
-                }
+                var token = getCache().get('token');
                 if(token === undefined){
                     redirectToLoginPage();
                 }
@@ -46,20 +42,20 @@ angular
             }
 
             function setToken(ltoken){
-                token = ltoken;
                 getCache().put('token', ltoken);
             }
 
             function getUser(){
+                var user = getCache().get('user');
                 if(user === undefined){
-                    user = getCache().get('user');
+                    redirectToLoginPage();
                 }
                 return user;
             }
 
             function setUser(id, email, firstname, lastname){
-                user = { id: id, email: email, firstname: firstname, lastname: lastname };
-                getCache().put('user', user);
+                var luser = { id: id, email: email, firstname: firstname, lastname: lastname };
+                getCache().put('user', luser);
             }
 
             function login(email, password) {
@@ -71,8 +67,6 @@ angular
             }
 
             function logout() {
-                token = undefined;
-                user = undefined;
                 getCache().remove('token');
                 getCache().remove('user');
             }

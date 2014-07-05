@@ -5,21 +5,33 @@ angular
 .factory('Report', function(){
 
     //Constructor
-    var Report = function(modelOrName, label, description, role, prefix){
-        if ( modelOrName === null) {
-            throw new Error('new Report creation with null');
-        } else if (typeof modelOrName !== 'object' &&
-                   typeof modelOrName !== 'string') {
+    var Report = function(modelOrName, label, description, role, username, prefix){
+        if (typeof modelOrName !== 'object' &&
+                   typeof modelOrName !== 'string' &&
+                   modelOrName !== undefined &&
+                   modelOrName !== null) {
             throw new Error('new Report creation with invalid type ' + typeof modelOrName);
         } else if (typeof modelOrName === 'object') {
             this.model = modelOrName;
-        } else if (typeof modelOrName === 'string'){
+        } else if (typeof modelOrName === 'string' ||
+                   modelOrName === undefined ||
+                   modelOrName === null){
+            ensureParameter(label, 'label', 'string', 'Report (Constructor)');
+            ensureParameter(description, 'description', 'string', 'Report (Constructor)');
+            ensureParameter(role, 'role', 'string', 'Report (Constructor)');
+            ensureParameter(username, 'username', 'string', 'Report (Constructor)',
+                /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                'invalid username value passed "' + username + '" (its not a valid Email Address).');
+            if(modelOrName === undefined || modelOrName === null){
+                modelOrName = _uuid();
+            }
             this.model =
                 {
                     '_id' : modelOrName,
                     'Archive' : null,
                     'Label' : label,
                     'Description': description,
+                    'Owner': username,
                     'Role' : role,
                     'Networks' : [
                         {
@@ -71,8 +83,18 @@ angular
                     },
                     'Rules' : []
                 };
-            if(prefix !== undefined || prefix !== null || typeof prefix === 'string'){
+            if(prefix !== undefined && prefix !== null && typeof prefix === 'string'){
                 this.model.Prefix = prefix;
+            } else {
+                // do a good guess
+                var startingChars = '';
+                label.split(/[^A-Za-z0-9]+/).forEach(function(elem){
+                    var char = elem.substr(0,1);
+                    if(/[A-Za-z]/.test(char) && elem.length > 1) {
+                        startingChars += char.toLowerCase();
+                    }
+                });
+                this.model.Prefix = startingChars;
             }
         } // if
     };
