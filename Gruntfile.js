@@ -135,8 +135,13 @@ module.exports = function (grunt) {
             all: {}
         },
         clean: {
-            pre: ['dist/', 'coverage/', 'out/'],
-            post: []
+            dist: {
+                files: [{
+                    dot: true,
+                    src: ['.tmp', 'dist/*', '!/.git*']
+                }]  
+            },  
+            server: '.tmp'
         },
         jshint: {
             options: {
@@ -144,6 +149,7 @@ module.exports = function (grunt) {
             },
             src: ['Gruntfile.js',
                   'app/modules/**/*.js',
+                  'app/auth/**/*.js',
                   'app/report/**/*.js',
                   'app/reports/**/*.js',
                   'app/app.js',
@@ -249,14 +255,14 @@ module.exports = function (grunt) {
             }
         },
         useminPrepare: {
-            html: [ 'app/*.html', 'app/reports/**/*.html', 'app/report/**/*.html'],
+            html: [ 'app/*.html', 'app/auth/**/*.html', 'app/reports/**/*.html', 'app/report/**/*.html'],
             css: 'app/styles/**/*.css',
             options: {
                 dest: 'dist'
             }
         },
         usemin: {
-            html: [ 'dist/*.html', 'dist/reports/**/*.html', 'dist/report/**/*.html' ],
+            html: [ 'dist/*.html', 'app/auth/**/*.html', 'dist/reports/**/*.html', 'dist/report/**/*.html' ],
             css: 'dist/styles/**/*.css',
             options: {
                 dirs: ['dist']
@@ -266,9 +272,9 @@ module.exports = function (grunt) {
             dist: {
                 files: [{
                     expand: true,
-                    cwd: 'dist/scripts',
+                    cwd: '.tmp/concat/scripts',
                     src: '*.js',
-                    dest: 'dist/scripts'
+                    dest: '.tmp/concat/scripts'
                 }]
             }
         },
@@ -288,7 +294,7 @@ module.exports = function (grunt) {
                 files: [{
                     expand: true,
                     cwd: 'app',
-                    src: [ '*.html', 'reports/**/*.html', 'report/**/*.html'],
+                    src: [ '*.html', 'auth/**/*.html', 'reports/**/*.html', 'report/**/*.html'],
                     dest: 'dist'
                 }]
             }
@@ -308,6 +314,11 @@ module.exports = function (grunt) {
                     expand: true,
                     cwd: 'app/bower_components/font-awesome/fonts',
                     dest: 'dist/fonts',
+                    src: ['*']
+                }, {
+                    expand: true,
+                    cwd: '.tmp/concat/scripts',
+                    dest: 'dist/scripts',
                     src: ['*']
                 }]
             }
@@ -332,6 +343,12 @@ module.exports = function (grunt) {
                     ]
                 }
             }
+        },
+        uglify: {
+            options: {
+                //sourceMap: true,
+                //sourceMapIncludeSources: true
+            }
         }
     });
 
@@ -350,10 +367,11 @@ module.exports = function (grunt) {
         }
 
         grunt.task.run([
+            'clean:server',
             'peg',
-            'ngconstant:server',
             'swagger-js-codegen',
             'less',
+            'concurrent:server',
             'connect:livereload',
             'open',
             'watch'
@@ -364,7 +382,7 @@ module.exports = function (grunt) {
         //var env = (target ? target : 'server');
       
         grunt.task.run([
-            'clean:pre',
+            'clean:dist',
             'peg',
             'swagger-js-codegen',
             'useminPrepare',
@@ -379,7 +397,7 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('unit-tests', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post']);
-    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e']);
+    grunt.registerTask('unit-tests', ['less', 'karma:1.2.9']);
+    grunt.registerTask('test', ['less', 'karma:1.2.9', 'e2e']);
     grunt.registerTask('default', ['jsonlint', 'jshint', 'build', 'test']);
 };
