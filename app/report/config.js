@@ -6,7 +6,7 @@ angular
     $stateProvider
         .state('report', {
             url: '/:reportId',
-            templateUrl: 'report/report.html',
+            templateUrl: '/report/report.html',
             controller: 'ReportCtrl',
             resolve: {
                 report: [ '$stateParams', 'API', 'Session', function($stateParams, API, Session) {

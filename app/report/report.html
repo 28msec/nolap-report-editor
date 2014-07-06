@@ -3,7 +3,10 @@
         <a class="pull-left" ui-sref="reports()" id="reports">
             <i class="fa fa-chevron-left"></i>
         </a>
-        <span class="navbar-brand">Report Name</span>
+        <span class="navbar-brand">
+            <a class="fa fa-list" ui-sref="reports"></a>
+            <span ng-bind="report.Label"></span>
+        </span>
     </div>
     <div>
         <ul class="nav navbar-nav">

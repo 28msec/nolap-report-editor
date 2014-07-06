@@ -5,6 +5,7 @@ angular.module('report-editor', [
     'ui.bootstrap',
     'jmdobry.angular-cache',
     'ngProgressLite',
+    'flexyLayout',
     'constants',
     'api',
     'session-model',
