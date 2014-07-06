@@ -5,9 +5,8 @@
     <block-splitter></block-splitter>
     <block-container>
         <ul class="nav nav-pills">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="#">Profile</a></li>
-             <li><a ui-sref="report.taxonomy.businessRules">Business Rules</a></li>
+            <li ui-sref-active="active"><a ui-sref="report.taxonomy.conceptMaps()">Concept Maps</a></li>
+            <li ui-sref-active="active"><a ui-sref="report.taxonomy.businessRules()">Business Rules</a></li>
         </ul>
         <div ui-view></div>
     </block-container>

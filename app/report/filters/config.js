@@ -6,7 +6,7 @@ angular
     $stateProvider
     .state('report.filters', {
         url: '/filters',
-        templateUrl: 'report/filters/filters.html',
+        templateUrl: '/report/filters/filters.html',
         controller: 'FiltersCtrl'
     });
 })

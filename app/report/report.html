@@ -1,19 +1,16 @@
 <header class="navbar navbar-default">
     <div class="navbar-header">
-        <a class="pull-left" ui-sref="reports()" id="reports">
-            <i class="fa fa-chevron-left"></i>
-        </a>
         <span class="navbar-brand">
-            <a class="fa fa-list" ui-sref="reports"></a>
+            <a class="fa fa-list" ui-sref="reports()" id="reports"></a>
             <span ng-bind="report.Label"></span>
         </span>
     </div>
     <div>
         <ul class="nav navbar-nav">
-            <li><a ui-sref="report.taxonomy()">Taxonomy</a></li>
-            <li><a>Filters</a></li>
-            <li><a>Fact table</a></li>
-            <li><a>Preview</a></li>
+            <li ui-sref-active="active"><a ui-sref="report.taxonomy()">Taxonomy</a></li>
+            <li ui-sref-active="active"><a ui-sref="report.filters()">Filters</a></li>
+            <li ui-sref-active="active"><a ui-sref="report.factTable()">Fact table</a></li>
+            <li ui-sref-active="active"><a ui-sref="report.preview()">Preview</a></li>
         </ul>
     </div>
     <account></account>
