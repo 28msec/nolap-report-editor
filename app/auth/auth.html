@@ -24,7 +24,10 @@
                     </div>
                     <p><a ng-href="{{registrationURL}}" target="_blank">I forgot my password.</a></p>
                     <div class="form-group text-right">
-                        <button type="submit" class="btn btn-primary">Login</button>
+                        <button type="submit" class="btn btn-primary" ng-class="{ disabled: loading }">
+                            <span ng-if="!loading">Login</span>
+                            <span ng-if="loading"><i class="fa fa-spin fa-spinner"></i> Logining...</span>
+                        </button>
                         <a ng-href="{{registrationURL}}" class="btn btn-default" target="_blank">Register</a>
                     </div>
                 </form>

@@ -8,9 +8,9 @@ angular.module('report-editor')
 
         $scope.login = function(){
             $scope.loginAttempted = true;
-
             $scope.loginForm.loginPassword.$setValidity('unauthorized', true);
             if(!$scope.loginForm.$invalid) {
+                $scope.loading = true;
                 Session
                 .login($scope.loginEmail, $scope.loginPassword)
                 .then(function() {
@@ -18,6 +18,7 @@ angular.module('report-editor')
                 })
                 .catch(function() {
                     $scope.loginForm.loginPassword.$setValidity('unauthorized', false);
+                    $scope.loading = false;
                 });
             }
         };
