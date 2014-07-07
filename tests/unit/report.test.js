@@ -9,7 +9,7 @@ describe('Concepts Model API Tests', function () {
         var label = 'Report for Testing';
         var description = 'This Report is not intended to be used in production';
         var role = 'http://www.28.io/nolap/test';
-        report = new Report(name, label, description, role);
+        report = new Report(name, label, description, role, 'd@28.io');
         var model = report.getModel();
         expect(model._id).toBeDefined();
         expect(model._id).toEqual(name);

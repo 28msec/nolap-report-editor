@@ -5,6 +5,7 @@ angular.module('report-editor', [
     'ui.bootstrap',
     'jmdobry.angular-cache',
     'ngProgressLite',
+    'flexyLayout',
     'constants',
     'api',
     'session-model',
@@ -51,17 +52,6 @@ angular.module('report-editor', [
     $httpProvider.interceptors.push('ConnectionHandler');
 
     $locationProvider.html5Mode(true);
-
-    $stateProvider
-        //Auth
-        .state('auth', {
-            url: '/auth{returnPage:.*}',
-            templateUrl: '/auth/auth.html',
-            controller: 'AuthCtrl',
-            data: {
-                title: 'Login'
-            }
-        });
 })
 
 .run(function($rootScope, ngProgressLite, $state, $location, API, Session) {

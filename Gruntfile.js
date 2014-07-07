@@ -68,6 +68,15 @@ module.exports = function (grunt) {
                         ];
                     }
                 }
+            },
+            dist: {
+                options: {
+                    middleware: function (connect) {
+                        return [
+                            mountFolder(connect, 'dist')
+                        ];
+                    }
+                }
             }
         },
         open: {
@@ -126,8 +135,13 @@ module.exports = function (grunt) {
             all: {}
         },
         clean: {
-            pre: ['dist/', 'coverage/', 'out/'],
-            post: []
+            dist: {
+                files: [{
+                    dot: true,
+                    src: ['.tmp', 'dist/*', '!/.git*']
+                }]  
+            },  
+            server: '.tmp'
         },
         jshint: {
             options: {
@@ -135,6 +149,7 @@ module.exports = function (grunt) {
             },
             src: ['Gruntfile.js',
                   'app/modules/**/*.js',
+                  'app/auth/**/*.js',
                   'app/report/**/*.js',
                   'app/reports/**/*.js',
                   'app/app.js',
@@ -188,6 +203,7 @@ module.exports = function (grunt) {
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= config.server.api %>/v1',
                     'REGISTRATION_URL': '<%= config.server.registration %>',
+                    'ACCOUNT_URL': '<%= config.server.account %>',
                     'DEBUG': true
                 }
             },
@@ -199,6 +215,7 @@ module.exports = function (grunt) {
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= config.test.api %>/v1',
                     'REGISTRATION_URL': '<%= config.test.registration %>',
+                    'ACCOUNT_URL': '<%= config.test.account %>',
                     'DEBUG': true
                 }
             },
@@ -210,6 +227,7 @@ module.exports = function (grunt) {
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= config.beta.api %>/v1',
                     'REGISTRATION_URL': '<%= config.beta.registration %>',
+                    'ACCOUNT_URL': '<%= config.beta.account %>',
                     'DEBUG': false
                 }
             },
@@ -221,6 +239,7 @@ module.exports = function (grunt) {
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= config.prod.api %>/v1',
                     'REGISTRATION_URL': '<%= config.prod.registration %>',
+                    'ACCOUNT_URL': '<%= config.prod.account %>',
                     'DEBUG': false
                 }
             }
@@ -233,6 +252,102 @@ module.exports = function (grunt) {
                     'bower.json',
                     'swagger/*'
                 ]
+            }
+        },
+        useminPrepare: {
+            html: [ 'app/*.html', 'app/auth/**/*.html', 'app/reports/**/*.html', 'app/report/**/*.html'],
+            css: 'app/styles/**/*.css',
+            options: {
+                dest: 'dist'
+            }
+        },
+        usemin: {
+            html: [ 'dist/*.html', 'app/auth/**/*.html', 'dist/reports/**/*.html', 'dist/report/**/*.html' ],
+            css: 'dist/styles/**/*.css',
+            options: {
+                dirs: ['dist']
+            }
+        },
+        ngmin: {
+            dist: {
+                files: [{
+                    expand: true,
+                    cwd: '.tmp/concat/scripts',
+                    src: '*.js',
+                    dest: '.tmp/concat/scripts'
+                }]
+            }
+        },
+        imagemin: {
+            dist: {
+                files: [{
+                    expand: true,
+                    cwd: 'app/images',
+                    src: '*.{png,jpg,jpeg,svg}',
+                    dest: 'dist/images'
+                }]
+            }
+        },
+        htmlmin: {
+            dist: {
+                options: {},
+                files: [{
+                    expand: true,
+                    cwd: 'app',
+                    src: [ '*.html', 'auth/**/*.html', 'reports/**/*.html', 'report/**/*.html'],
+                    dest: 'dist'
+                }]
+            }
+        },
+        copy: {
+            dist: {
+                files: [{
+                    expand: true,
+                    dot: true,
+                    cwd: 'app',
+                    dest: 'dist',
+                    src: [
+                        '*.{ico,png,txt}',
+                        'images/**/*.{png,jpg,jpeg,gif,webp,svg}',
+                    ]
+                }, {
+                    expand: true,
+                    cwd: 'app/bower_components/font-awesome/fonts',
+                    dest: 'dist/fonts',
+                    src: ['*']
+                }, {
+                    expand: true,
+                    cwd: '.tmp/concat/scripts',
+                    dest: 'dist/scripts',
+                    src: ['*']
+                }]
+            }
+        },
+        concurrent: {
+            server: [],
+            test: [],
+            dist: [
+                'less',
+                'imagemin',
+                'htmlmin'
+            ]
+        },
+        rev: {
+            dist: {
+                files: {
+                    src: [
+                        'dist/scripts/**/*.js',
+                        'dist/styles/**/*.css',
+                        'dist/images/**/*.{png,jpg,jpeg,gif,webp,svg}',
+                        'dist/styles/fonts/*'
+                    ]
+                }
+            }
+        },
+        uglify: {
+            options: {
+                //sourceMap: true,
+                //sourceMapIncludeSources: true
             }
         }
     });
@@ -252,18 +367,37 @@ module.exports = function (grunt) {
         }
 
         grunt.task.run([
+            'clean:server',
             'peg',
-            'ngconstant:server',
             'swagger-js-codegen',
             'less',
+            'concurrent:server',
             'connect:livereload',
             'open',
             'watch'
         ]);
     });
+    
+    grunt.registerTask('build', function () {
+        //var env = (target ? target : 'server');
 
-    grunt.registerTask('unit-tests', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post']);
-    grunt.registerTask('test', ['clean:pre', 'less', 'karma:1.2.9', 'clean:post', 'e2e']);
-    grunt.registerTask('build', ['clean:pre', 'peg', 'swagger-js-codegen']);
+        grunt.task.run([
+            'clean:dist',
+            'peg',
+            'swagger-js-codegen',
+            'useminPrepare',
+            'concurrent:dist',
+            'concat',
+            'copy',
+            'ngmin',
+            'cssmin',
+            'uglify',
+            'rev',
+            'usemin'
+        ]);
+    });
+
+    grunt.registerTask('unit-tests', ['less', 'karma:1.2.9']);
+    grunt.registerTask('test', ['less', 'karma:1.2.9', 'e2e']);
     grunt.registerTask('default', ['jsonlint', 'jshint', 'build', 'test']);
 };

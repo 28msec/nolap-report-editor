@@ -18,6 +18,19 @@ section {
     margin-bottom: 20px;
 }
 
+//std margin & padding
+.std-right-margin {
+    margin-right: 15px;
+}
+
+.std-top-padding {
+    padding-top: 15px;
+}
+
+.std-left-margin {
+    margin-left: 15px;
+}
+
 //Font weigths
 h1, h2, h3, h4, h5 {
     font-weight: 100;
@@ -31,6 +44,14 @@ label {
 .navbar-brand {
     color: white !important;
     font-weight: 100;
+    
+    a {
+        color: white;
+        &:hover {
+            color: white;
+            text-decoration: none;
+        }
+    }
 }
 
 //Modals
@@ -41,4 +62,29 @@ label {
     &.modal-header-danger {
         background-color: @brand-danger;
     }
+}
+
+//Full screen mode
+.scrollable {
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+}
+
+.viewport{
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+html {
+    .viewport;
+
+    body {
+        .viewport();
+    
+        div[ui-view] {
+            .viewport;
+        }   
+    }   
 }
