@@ -1,6 +1,6 @@
 <flexy-layout orientation="horizontal">
     <block-container init="400" class="sidebar">
-        Hello
+        
         <span class="dropdown pull-right">
 	                    <a class="dropdown-toggle btn btn-primary"><i class="fa fa-cloud-download"></i> Export</a>
 	                    <ul class="dropdown-menu">
@@ -19,8 +19,9 @@
 	   </div>
    
     
+       <div ng-show="data.length == 0">Fact Table is empty.</div>
        
-	   <div ng-show="data" class="table-responsive">
+	   <div ng-show="data" class="table-responsive">	       
 	          <table class="table table-condensed table-justcolumns small">
 	              <thead>
 	                <th>#</th>

@@ -6,7 +6,7 @@
 		
 			<div class="form-group">
 			    <label class="control-label" for="css">Style</label>
-				<select class="form-control" ng-model="css">
+				<select class="form-control" ng-model="preview.css">
 					<option value="preview-style">Web Style</option>
 					<option value="document-style">Document Style</option>
 				</select>
@@ -14,7 +14,7 @@
 		
 			<div class="form-group">
 			    <label class="control-label" for="css">Labels</label>
-				<select class="form-control" ng-model="labelidx">
+				<select class="form-control" ng-model="preview.labelidx">
 					<option value="0">Default Labels</option>
 					<option value="1">Alternate Labels</option>
 				</select>
@@ -22,7 +22,7 @@
 		
 			<div class="form-group">		
 				<label class="checkbox-inline"> <input type="checkbox"
-					id="checks" ng-model="checks" value="true" />Show validation checks
+					id="checks" ng-model="preview.checks" value="true" />Show validation checks
 				</label>		
 			</div>
 		
@@ -38,14 +38,14 @@
 	</block-container> 
 	<block-splitter></block-splitter> 
 	<block-container>
-	
+	   {{css}}
 		<div ng-show="error" class="alert alert-danger">
 			<strong>Error {{ error.status }}</strong> {{ error.body.message }}
 		</div>
 		
-		<div ng-class="css">
-			<layoutmodel model="mymodel" labelidx="labelidx" constraints="'true'"
-				checks="checks" headerclick="test(header)" dataclick="test(data)"
+		<div ng-class="preview.css">
+			<layoutmodel model="mymodel" labelidx="preview.labelidx" constraints="'true'"
+				checks="preview.checks" headerclick="test(header)" dataclick="test(data)"
 				template-url="/bower_components/layoutmodel-renderer-angular/app/directive/layoutmodel.html"></layoutmodel>
 		</div>
 		

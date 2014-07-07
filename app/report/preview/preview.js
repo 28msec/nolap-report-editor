@@ -3,11 +3,9 @@
 angular.module('report-editor')
 .controller('PreviewCtrl', function($scope, Session, API, report, API_URL){
 	  $scope.mymodel = null;
+	  $scope.preview = { constraints : false, checks : true, css : 'preview-style', labelidx : 0 };
 	  $scope.error = null;
-	  $scope.labelidx = 0;
-	  $scope.constraints = true;
-	  $scope.checks = true;	  
-	  $scope.css = 'preview-style';
+	  
 	  $scope.loading = true;
 	  		  
 	  $scope.reload = function() {
@@ -15,9 +13,9 @@ angular.module('report-editor')
 		  var id = report[0]["_id"];
 		  console.log("id: "+ id);
 		  var params = { report: id, validate : true, token: Session.getToken(), $method: 'POST' };
-		  //params.cik = "0000021344";
-		  //params.fiscalYear = "2013";
-		  //params.fiscalPeriod = "";
+		  // params.cik = "0000021344";
+		  // params.fiscalYear = "2013";
+		  // params.fiscalPeriod = "FY";
 		  API.Queries.listSpreadsheetForReport(params).then(function(data){		  
 			console.log(data);
 		    $scope.mymodel = data;
