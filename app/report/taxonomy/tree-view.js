@@ -11,18 +11,11 @@ angular
             selected: '=' 
         },  
         link: function($scope) {
-    
-            $rootScope.$on('selectTreeItem', function(e, branch){
-                $scope.selected = branch;
-                branch.onSelect(branch);
-            }); 
-    
-            $scope.select = function(row) {
+
+            $scope.collapse = function(row) {
                 if(row.branch.To) {
-                    row.branch.expanded = !row.branch.expanded;
-                } else {
-                    $scope.$emit('selectTreeItem', row.branch);
-                }   
+                    row.branch.Expanded = !row.branch.Expanded;
+                }
             };  
     
             var setRows = function(branches, level, visible){
