@@ -22,5 +22,20 @@ angular.module('report-editor')
                 });
             }
         };
+    })
+    .directive('checkForPrefilled', function($timeout){
+        return {
+            link: function($scope, element, attr){
+                $timeout(function () {
+                    // fix for: https://github.com/28msec/nolap-report-editor/issues/19
+                    var inputField = element[0];
+                    if(inputField !== undefined && inputField !== null && inputField.value !== '') {
+                        console.log(inputField.name);
+                        // @TODO
+                        //inputField.trigger('input');
+                    }
+                }, 500);
+            }
+        };
     });
     
