@@ -3632,7 +3632,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .navbar {
   position: relative;
   min-height: 50px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   border: 1px solid transparent;
 }
 @media (min-width: 768px) {
@@ -3932,28 +3932,28 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   border-color: #428bca;
 }
 .navbar-default .navbar-brand {
-  color: #777777;
+  color: #f2f2f2;
 }
 .navbar-default .navbar-brand:hover,
 .navbar-default .navbar-brand:focus {
-  color: #5e5e5e;
+  color: #d9d9d9;
   background-color: transparent;
 }
 .navbar-default .navbar-text {
-  color: #777777;
+  color: #ffffff;
 }
 .navbar-default .navbar-nav > li > a {
-  color: #777777;
+  color: #f2f2f2;
 }
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus {
-  color: #333333;
+  color: #ffffff;
   background-color: transparent;
 }
 .navbar-default .navbar-nav > .active > a,
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
-  color: #555555;
+  color: #ffffff;
   background-color: #337ab7;
 }
 .navbar-default .navbar-nav > .disabled > a,
@@ -3980,21 +3980,21 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .navbar-default .navbar-nav > .open > a:hover,
 .navbar-default .navbar-nav > .open > a:focus {
   background-color: #337ab7;
-  color: #555555;
+  color: #ffffff;
 }
 @media (max-width: 767px) {
   .navbar-default .navbar-nav .open .dropdown-menu > li > a {
-    color: #777777;
+    color: #f2f2f2;
   }
   .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,
   .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
-    color: #333333;
+    color: #ffffff;
     background-color: transparent;
   }
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a,
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,
   .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
-    color: #555555;
+    color: #ffffff;
     background-color: #337ab7;
   }
   .navbar-default .navbar-nav .open .dropdown-menu > .disabled > a,
@@ -4005,10 +4005,10 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   }
 }
 .navbar-default .navbar-link {
-  color: #777777;
+  color: #f2f2f2;
 }
 .navbar-default .navbar-link:hover {
-  color: #333333;
+  color: #ffffff;
 }
 .navbar-inverse {
   background-color: #222222;
@@ -5815,21 +5815,22 @@ button.close {
 .flexy-layout.flexy-layout-row > .block {
   width: 100%;
 }
-.block.splitter {
-  position: relative;
-  overflow: visible;
-}
 .flexy-layout.flexy-layout-column > .splitter {
   width: 5px;
-}
-.flexy-layout.flexy-layout-row > .splitter {
-  height: 5px;
+  background: #ecf0f1;
 }
 .flexy-layout.flexy-layout-column > .splitter > .ghost {
   cursor: col-resize;
 }
+.flexy-layout.flexy-layout-row > .splitter {
+  height: 5px;
+}
 .flexy-layout.flexy-layout-row > .splitter > .ghost {
   cursor: row-resize;
+}
+.block.splitter {
+  position: relative;
+  overflow: visible;
 }
 .ghost {
   float: left;
@@ -5838,6 +5839,7 @@ button.close {
   height: 100%;
   width: 100%;
   z-index: 99;
+  background: #ecf0f1;
 }
 .block-content {
   display: inline-block;
@@ -5846,6 +5848,7 @@ button.close {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
+  padding: 15px;
 }
 #api-scheduler-status {
   position: absolute;
@@ -6130,6 +6133,15 @@ a {
 section {
   margin-bottom: 20px;
 }
+.std-right-margin {
+  margin-right: 15px;
+}
+.std-top-padding {
+  padding-top: 15px;
+}
+.std-left-margin {
+  margin-left: 15px;
+}
 h1,
 h2,
 h3,
@@ -6144,10 +6156,42 @@ label {
   color: white !important;
   font-weight: 100;
 }
+.navbar-brand a {
+  color: white;
+}
+.navbar-brand a:hover {
+  color: white;
+  text-decoration: none;
+}
 .modal-header {
   background-color: #428bca;
   color: white;
 }
 .modal-header.modal-header-danger {
   background-color: #d9534f;
+}
+.scrollable {
+  height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+}
+.viewport {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+html {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+html body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+html body div[ui-view] {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }

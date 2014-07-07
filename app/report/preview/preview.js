@@ -1,17 +1,36 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('PreviewCtrl', function($scope){
-	  $scope.mymodel = null;	 
+.controller('PreviewCtrl', function($scope, Session, API, report, API_URL){
+	  $scope.mymodel = null;
+	  $scope.error = null;
 	  $scope.labelidx = 0;
 	  $scope.constraints = true;
 	  $scope.checks = true;	  
 	  $scope.css = 'preview-style';
-	  $scope.loading = false;
+	  $scope.loading = true;
 	  		  
+	  $scope.reload = function() {
+		  API.Queries.listSpreadsheetForReport({ report: report._id, validate : true, token: Session.getToken(), $method: 'POST' }).then(function(data){		  
+			console.log(data);
+		    $scope.mymodel = data;
+		    $scope.error = null;
+		    $scope.loading = false;
+		  })
+		  .catch(function(error){
+            $scope.loading = false;
+            $scope.mymodel = null;
+            $scope.error = error;
+          });
+	  };
 	  
-	  // Example data
-	  $scope.mymodel = 
+	  $scope.getExportURL = function(format) {
+	       return API_URL + '/_queries/public/api/spreadsheet-for-report.jq?_method=POST&format=' + format + '&report=' + encodeURIComponent(report._id) + '&token=' + Session.getToken();
+	  };
+	  
+	  $scope.reload();
+	  
+	  /*
 	  {
 			  'ModelKind' : 'LayoutModel', 
 			  'TableSetLabels' : [ 'Grid' ], 
@@ -846,5 +865,6 @@ angular.module('report-editor')
 			    } ]
 			  }
 			};
+			*/
 	  	  
 });

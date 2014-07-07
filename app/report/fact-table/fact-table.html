@@ -1,25 +1,46 @@
-<div>
-  <h1>Fact Table</h1>
-   <div class="table-responsive">
-          <table class="table table-condensed table-justcolumns small">
-              <thead>
-                <th>#</th>
-                <th ng-repeat="key in columns">{{key}}</th>
-                <th>Value</th>
-                <th>Unit</th>
-                <th>Decimals</th>
-              </thead>
-              <tbody>
-                <tr ng-repeat="item in data | filter : search">
-                  <td>{{$index + 1}}</td>
-                  <td ng-repeat="key in columns" class="nowrap"><span ng-if="$index==entityIndex">{{item.Aspects[key].substring(23)}}</span><span ng-if="$index!=entityIndex">{{item.Aspects[key]}}</span></td>
-                  <td ng-if="(item.Type == 'NumericValue')" style="text-align: right">{{showNumber(item.Value)}}</td>
-                  <td ng-if="(item.Type != 'NumericValue' && !isBlock(item.Value))">{{item.Value}}</td>
-                  <td ng-if="(item.Type != 'NumericValue' && isBlock(item.Value))"><a ng-click="showText(item.Value)">Show Text</a></td>
-                  <td>{{item.Unit=='xbrl:NonNumeric'?"":item.Unit}}</td>
-                  <td>{{item.Decimals}}</td>
-                </tr>
-              </tbody>
-          </table>
-	</div>
-</div>
+<flexy-layout orientation="horizontal">
+    <block-container init="400" class="sidebar">
+        Hello
+        <span class="dropdown pull-right">
+	                    <a class="dropdown-toggle btn btn-primary"><i class="fa fa-cloud-download"></i> Export</a>
+	                    <ul class="dropdown-menu">
+	                        <li><a ng-href="{{getExportURL('json')}}" target="_blank" download="facttable.json">JSON</a></li>
+	                        <li><a ng-href="{{getExportURL('xml')}}" target="_blank" download="facttable.xml">XML</a></li>
+	                        <li><a ng-href="{{getExportURL('csv')}}" target="_blank" download="facttable.csv">CSV</a></li>
+	                        <li><a ng-href="{{getExportURL('excel')}}" target="_blank" download="facttable.csv">Excel</a></li>
+	                    </ul>
+	   </span>
+    </block-container>
+    <block-splitter></block-splitter>
+    <block-container>
+	   <div ng-show="error" class="alert alert-danger">
+	     <strong>Error {{ error.status }}</strong>
+	     {{ error.body.message }}
+	   </div>
+   
+    
+       
+	   <div ng-show="data" class="table-responsive">
+	          <table class="table table-condensed table-justcolumns small">
+	              <thead>
+	                <th>#</th>
+	                <th ng-repeat="key in columns">{{key}}</th>
+	                <th>Value</th>
+	                <th>Unit</th>
+	                <th>Decimals</th>
+	              </thead>
+	              <tbody>
+	                <tr ng-repeat="item in data | filter : search">
+	                  <td>{{$index + 1}}</td>
+	                  <td ng-repeat="key in columns" class="nowrap"><span ng-if="$index==entityIndex">{{item.Aspects[key].substring(23)}}</span><span ng-if="$index!=entityIndex">{{item.Aspects[key]}}</span></td>
+	                  <td ng-if="(item.Type == 'NumericValue')" style="text-align: right">{{showNumber(item.Value)}}</td>
+	                  <td ng-if="(item.Type != 'NumericValue' && !isBlock(item.Value))">{{item.Value}}</td>
+	                  <td ng-if="(item.Type != 'NumericValue' && isBlock(item.Value))"><a ng-click="showText(item.Value)">Show Text</a></td>
+	                  <td>{{item.Unit=='xbrl:NonNumeric'?"":item.Unit}}</td>
+	                  <td>{{item.Decimals}}</td>
+	                </tr>
+	              </tbody>
+	          </table>
+		</div>
+   </block-container>
+ </flexy-layout>

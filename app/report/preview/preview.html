@@ -1,44 +1,57 @@
-
-<div class="container"> 
-<form class="form-inline" role="form">
-
-
- <div class="form-group">
-   <select class="form-control" ng-model="css">
-     <option value="preview-style">Web Style</option>
-     <option value="document-style">Document Style</option>
-   </select>            
- </div>
- 
- <div class="form-group">
-    <select class="form-control" ng-model="labelidx">
-     <option value="0">Default Labels</option>
-     <option value="1">Alternate Labels</option>
-   </select>     
- </div>
- 
- <div class="form-group">
-  
-      <label class="checkbox-inline">      
-        <input type="checkbox" id="checks" ng-model="checks" value="true" />Show validation checks
-      </label>
-  
- </div>
- 
-</form>
-
-<div ng-class="css">
-  <layoutmodel model="mymodel" 
-               labelidx="labelidx" 
-               constraints="'true'"
-               checks="checks" 
-               headerclick="test(header)" 
-               dataclick="test(data)"
-               template-url="/bower_components/layoutmodel-renderer-angular/app/directive/layoutmodel.html"></layoutmodel>
-</div>
-
-<div>
-<p ng-show="loading">Loading...</p>
-</div>
-</div>
+<flexy-layout orientation="horizontal">
+  <block-container
+	init="400" class="sidebar">
+		<form role="form">
+		
+		
+			<div class="form-group">
+			    <label class="control-label" for="css">Style</label>
+				<select class="form-control" ng-model="css">
+					<option value="preview-style">Web Style</option>
+					<option value="document-style">Document Style</option>
+				</select>
+			</div>
+		
+			<div class="form-group">
+			    <label class="control-label" for="css">Labels</label>
+				<select class="form-control" ng-model="labelidx">
+					<option value="0">Default Labels</option>
+					<option value="1">Alternate Labels</option>
+				</select>
+			</div>
+		
+			<div class="form-group">		
+				<label class="checkbox-inline"> <input type="checkbox"
+					id="checks" ng-model="checks" value="true" />Show validation checks
+				</label>		
+			</div>
+		
+		</form>
+		<span class="dropdown pull-right"> <a
+			class="dropdown-toggle btn btn-primary"><i
+				class="fa fa-cloud-download"></i> Export</a>
+			<ul class="dropdown-menu">
+				<li><a ng-href="{{getExportURL('json')}}" target="_blank"
+					download="layoutmodel.json">JSON</a></li>
+			</ul>
+		</span> 
+	</block-container> 
+	<block-splitter></block-splitter> 
+	<block-container>
+	
+		<div ng-show="error" class="alert alert-danger">
+			<strong>Error {{ error.status }}</strong> {{ error.body.message }}
+		</div>
+		
+		<div ng-class="css">
+			<layoutmodel model="mymodel" labelidx="labelidx" constraints="'true'"
+				checks="checks" headerclick="test(header)" dataclick="test(data)"
+				template-url="/bower_components/layoutmodel-renderer-angular/app/directive/layoutmodel.html"></layoutmodel>
+		</div>
+		
+		<div>
+			<p ng-show="loading">Loading...</p>
+		</div>
+   </block-container> 
+</flexy-layout>
 
