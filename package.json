@@ -58,7 +58,7 @@
     "protractor-screenshot-reporter": "0.0.5",
     "request": "~2.36.0",
     "shelljs": "~0.3.0",
-    "grunt-swagger-js-codegen": "~0.2.0",
+    "grunt-swagger-js-codegen": "~0.2.2",
     "grunt-jsonlint": "~1.0.4",
     "grunt-ngmin": "0.0.3",
     "grunt-usemin": "~2.3.0",

@@ -1,0 +1,70 @@
+a.arow {
+    cursor: default;
+    .tree-icon, .query {
+        cursor: pointer;
+    }
+}
+
+ul.tree-view {
+    >li {
+        //padding: 0;
+        //margin: 0;
+        //cursor: pointer;
+        
+        a {
+            padding: 3px 10px;
+            padding-left: 15px;
+            border-radius: 0 !important;
+            border: none !important;
+            
+            &:hover {
+                background-color: transparent !important;
+            }
+        }
+        
+        &.active a {
+            //background-color: blue;
+            //color: white !important;
+            
+            &:hover {
+                //background-color: blue !important;
+            }
+        }
+    }
+
+    i.indented {
+        padding: 2px;
+    }
+
+    .indented {
+        position: relative;
+    }
+
+    .level-1 .indented {
+        left: 0px;
+    }
+    .level-2 .indented {
+        left: 20px;
+    }
+    .level-3 .indented {
+        left: 40px;
+    }
+    .level-4 .indented {
+        left: 60px;
+    }
+    .level-5 .indented {
+        left: 80px;
+    }
+    .level-6 .indented {
+        left: 80px;
+    }
+    .level-7 .indented {
+        left: 100px;
+    }
+    .level-8 .indented {
+        left: 120px;
+    }
+    .level-9 .indented {
+        left: 140px;
+    }
+}
