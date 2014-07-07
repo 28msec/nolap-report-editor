@@ -491,20 +491,20 @@ angular.module('queries-api', [])
                 return deferred.promise;
             };
             /**
- * Retrieve the fact table for a given report. Filters can be overriden. Filters MUST be overriden if the report is not already filtering.
- * @method
- * @name QueriesAPI#listFactTableForReport
- * @param {{string}} format - The result format
- * @param {{string}} cik - The CIK of the entity
- * @param {{string}} ticker - The ticker of the entity
- * @param {{string}} tag - The tag to filter entities
- * @param {{string}} sic - The industry group
- * @param {{string}} fiscalYear - The fiscal year of the fact to retrieve (default: LATEST)
- * @param {{string}} fiscalPeriod - The fiscal period of the fact to retrieve (default: FY)
-
- * @param {{string}} validate - Validate and stamp facts accordingly
- * 
- */
+             * Retrieve the fact table for a given report. Filters can be overriden. Filters MUST be overriden if the report is not already filtering.
+             * @method
+             * @name QueriesAPI#listFactTableForReport
+             * @param {{string}} format - The result format
+             * @param {{string}} cik - The CIK of the entity
+             * @param {{string}} ticker - The ticker of the entity
+             * @param {{string}} tag - The tag to filter entities
+             * @param {{string}} sic - The industry group
+             * @param {{string}} fiscalYear - The fiscal year of the fact to retrieve (default: LATEST)
+             * @param {{string}} fiscalPeriod - The fiscal period of the fact to retrieve (default: FY)
+             * @param {{string}} report - The name of the report to be used (e.g. FundamentalAccountingConcepts)
+             * @param {{string}} validate - Validate and stamp facts accordingly
+             *
+             */
             this.listFactTableForReport = function(parameters) {
                 var deferred = $q.defer();
 
@@ -542,7 +542,9 @@ angular.module('queries-api', [])
                     queryParameters['fiscalPeriod'] = parameters.fiscalPeriod;
                 }
 
-                queryParameters['report'] = 'FundamentalAccountingConcepts <a href="/concept-map/FundamentalAccountingConcepts"><i class="fa fa-question"></i>';
+                if (parameters.report !== undefined) {
+                    queryParameters['report'] = parameters.report;
+                }
 
                 if (parameters.validate !== undefined) {
                     queryParameters['validate'] = parameters.validate;
@@ -574,21 +576,21 @@ angular.module('queries-api', [])
                 return deferred.promise;
             };
             /**
- * Retrieve the business-friendly spreadsheet for a report. Filters can be overriden. Filters MUST be overriden if the report is not already filtering.
- * @method
- * @name QueriesAPI#listSpreadsheetForReport
- * @param {{string}} format - The result format
- * @param {{string}} cik - The CIK of the entity
- * @param {{string}} ticker - The ticker of the entity
- * @param {{string}} tag - The tag to filter entities
- * @param {{string}} sic - The industry group
- * @param {{string}} fiscalYear - The fiscal year of the fact to retrieve (default: LATEST)
- * @param {{string}} fiscalPeriod - The fiscal period of the fact to retrieve (default: FY)
-
- * @param {{string}} eliminate - Wwether to eliminate empty rows/colummns
- * @param {{string}} validate - Validate and stamp facts accordingly
- * 
- */
+             * Retrieve the business-friendly spreadsheet for a report. Filters can be overriden. Filters MUST be overriden if the report is not already filtering.
+             * @method
+             * @name QueriesAPI#listSpreadsheetForReport
+             * @param {{string}} format - The result format
+             * @param {{string}} cik - The CIK of the entity
+             * @param {{string}} ticker - The ticker of the entity
+             * @param {{string}} tag - The tag to filter entities
+             * @param {{string}} sic - The industry group
+             * @param {{string}} fiscalYear - The fiscal year of the fact to retrieve (default: LATEST)
+             * @param {{string}} fiscalPeriod - The fiscal period of the fact to retrieve (default: FY)
+             * @param {{string}} report - The name of the report to be used (e.g. FundamentalAccountingConcepts)
+             * @param {{string}} eliminate - Wwether to eliminate empty rows/colummns
+             * @param {{string}} validate - Validate and stamp facts accordingly
+             *
+             */
             this.listSpreadsheetForReport = function(parameters) {
                 var deferred = $q.defer();
 
@@ -626,7 +628,9 @@ angular.module('queries-api', [])
                     queryParameters['fiscalPeriod'] = parameters.fiscalPeriod;
                 }
 
-                queryParameters['report'] = 'FundamentalAccountingConcepts <a href="/concept-map/FundamentalAccountingConcepts"><i class="fa fa-question"></i>';
+                if (parameters.report !== undefined) {
+                    queryParameters['report'] = parameters.report;
+                }
 
                 if (parameters.eliminate !== undefined) {
                     queryParameters['eliminate'] = parameters.eliminate;

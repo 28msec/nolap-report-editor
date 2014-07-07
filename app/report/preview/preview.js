@@ -11,7 +11,14 @@ angular.module('report-editor')
 	  $scope.loading = true;
 	  		  
 	  $scope.reload = function() {
-		  API.Queries.listSpreadsheetForReport({ report: report._id, validate : true, token: Session.getToken(), $method: 'POST' }).then(function(data){		  
+		  console.log(report);		  
+		  var id = report[0]["_id"];
+		  console.log("id: "+ id);
+		  var params = { report: id, validate : true, token: Session.getToken(), $method: 'POST' };
+		  //params.cik = "0000021344";
+		  //params.fiscalYear = "2013";
+		  //params.fiscalPeriod = "";
+		  API.Queries.listSpreadsheetForReport(params).then(function(data){		  
 			console.log(data);
 		    $scope.mymodel = data;
 		    $scope.error = null;

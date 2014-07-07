@@ -774,10 +774,7 @@
                             "name": "report",
                             "description": "The name of the report to be used (e.g. FundamentalAccountingConcepts)",
                             "required": false,
-                            "type": "string",
-                            "enum": [
-                                "FundamentalAccountingConcepts <a href=\"/concept-map/FundamentalAccountingConcepts\"><i class=\"fa fa-question\"></i>"
-                              ],
+                            "type": "string",                            
                             "paramType": "query"
                         },
                         {
@@ -908,10 +905,7 @@
                             "name": "report",
                             "description": "The name of the report to be used (e.g. FundamentalAccountingConcepts)",
                             "required": false,
-                            "type": "string",
-                            "enum": [
-                                "FundamentalAccountingConcepts <a href=\"/concept-map/FundamentalAccountingConcepts\"><i class=\"fa fa-question\"></i>"
-                              ],
+                            "type": "string",                            
                             "paramType": "query"
                         },
                         {

@@ -10,10 +10,12 @@ angular.module('report-editor')
     $scope.loading = true;
     
 	$scope.reload = function() {
+		  var params = { report: report[0]["_id"], token: Session.getToken(), $method: 'POST' };		  
+		  //params.aik = "0000021344-14-000008";		  
 		  $scope.loading = true;
-		  API.Queries.listFactTableForReport({ report: report._id, token: Session.getToken(), $method: 'POST' }).then(function(data){		  
+		  API.Queries.listFactTableForReport(params).then(function(data){		  
 			console.log(data);
-		    $scope.data = data;	
+		    $scope.data = data.FactTable;	
 		    $scope.error = null;
 		    
 		    if ($scope.data && $scope.data.length > 0)
