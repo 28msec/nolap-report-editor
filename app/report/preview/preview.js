@@ -14,8 +14,7 @@ angular.module('report-editor')
 		  $scope.mymodel = null;
 		  $scope.error = null;
 		  
-		  var id = report[0]["_id"];
-		  console.log("id: "+ id);
+		  var id = report[0]._id;		  
 		  var params = { report: id, validate : true, token: Session.getToken(), $method: 'POST', eliminate : $scope.preview.elimination };
 		  
 		  //params.cik = "0000021344";
@@ -36,7 +35,7 @@ angular.module('report-editor')
 	  };
 	  
 	  $scope.getExportURL = function(format) {
-	       return API_URL + '/_queries/public/api/spreadsheet-for-report.jq?_method=POST&format=' + format + '&report=' + encodeURIComponent(report._id) + '&token=' + Session.getToken();
+	       return API_URL + '/_queries/public/api/spreadsheet-for-report.jq?_method=POST&format=' + format + '&report=' + encodeURIComponent(report[0]._id) + '&token=' + Session.getToken();
 	  };
 	  
 	  // $scope.reload();
