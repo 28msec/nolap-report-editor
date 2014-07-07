@@ -7,12 +7,16 @@ angular.module('report-editor')
     $scope.columns = [];
     $scope.data = null;
     $scope.error = null;
-    $scope.loading = true;
+    $scope.loading = false;
     
 	$scope.reload = function() {
 		  var params = { report: report[0]["_id"], token: Session.getToken(), $method: 'POST' };		  
-		  //params.aik = "0000021344-14-000008";		  
+		  //params.aik = "0000021344-14-000008";	
+		  
 		  $scope.loading = true;
+		  $scope.data = null;
+		  $scope.error = null;
+		  
 		  API.Queries.listFactTableForReport(params).then(function(data){		  
 			console.log(data);
 		    $scope.data = data.FactTable;	
