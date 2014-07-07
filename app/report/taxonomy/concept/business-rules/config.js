@@ -18,7 +18,7 @@ angular
             conceptName: [ 'conceptName', function(conceptName) {
                 return conceptName;
             }],
-            rules: [ '$stateParams', 'report', 'concept', function($stateParams, report, concept) {
+            rules: [ '$stateParams', 'report', 'concept', function($stateParams, report) {
                var rules = report.listRules();
                return rules;
             }]

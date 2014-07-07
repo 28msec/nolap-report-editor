@@ -25,7 +25,7 @@ angular.module('report-editor')
     })
     .directive('checkForPrefilled', function($timeout){
         return {
-            link: function($scope, element, attr){
+            link: function($scope, element){
                 $timeout(function () {
                     // fix for: https://github.com/28msec/nolap-report-editor/issues/19
                     var inputField = element[0];

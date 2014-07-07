@@ -51,7 +51,7 @@ angular.module('report-editor')
                     updateRules($scope.conceptName);
                 }, true);
 
-                $scope.removeRule = function(id){
+                /*$scope.removeRule = function(id){
                     //$rootScope.$emit('removeRule', id);
                 };
 
@@ -61,7 +61,7 @@ angular.module('report-editor')
 
                 $scope.editRule = function(id) {
                     //$rootScope.$emit('editRule', id);
-                };
+                };*/
 
             }
         };
