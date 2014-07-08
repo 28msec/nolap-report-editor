@@ -15,7 +15,7 @@ angular.module('report-editor')
 		  $scope.error = null;
 		  
 		  var id = report[0]._id;		  
-		  var params = { report: id, validate : true, token: Session.getToken(), $method: 'POST', eliminate : $scope.preview.elimination };
+		  var params = { report: id, validate : false, token: Session.getToken(), $method: 'POST', eliminate : $scope.preview.elimination };
 		  
 		  //params.cik = "0000021344";
 		  //params.fiscalYear = "2013";
