@@ -1,10 +1,14 @@
 <ul class="nav nav-list nav-pills nav-stacked tree-view scrollable">
-    <li ng-repeat="row in rows | filter:{visible:true} track by row.branch.Id"
+    <li ng-repeat="row in rowFilter() track by row.branch.Id"
         ng-class="'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')"
-        jqyoui-draggable="{onStart:'start(row)'}"
-        jqyoui-droppable="{}"
+        jqyoui-draggable="{ onStart: 'start()', index: {{$index}}, animate:true }"
+        jqyoui-droppable="{ onOver: 'over', onDrop: 'drop', onOut: 'out', index: {{$index}}, animate:true }"
+        data-jqyoui-options="{revert: 'invalid'}"
+        data-drag="true"
+        data-drop="true"
+        id="{{row.branch.Id}}"
         >
-        <!-- draggable droppable drag-within="parent"-->
+        <!-- , applyFilter: '{visible:true}'-->
         <span class="indented">
             <i ng-click="collapse(row)"
                 ng-class="{ 'fa-caret-right': !row.branch.Expanded && row.branch.To, 'fa-caret-down':  row.branch.Expanded && row.branch.To }"

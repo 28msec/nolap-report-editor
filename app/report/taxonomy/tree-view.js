@@ -2,7 +2,7 @@
 
 angular
 .module('report-editor')
-.directive('treeView', function(){
+.directive('treeView', function($filter){
     return {
         restrict: 'E',
         templateUrl: '/report/taxonomy/tree-view.html',
@@ -56,8 +56,39 @@ angular
             var onChange = function(){
                 $scope.rows = [];
                 setRows($scope.treeData, 1, true);
-
-            };  
+            };
+            
+            $scope.rowFilter = function(){
+                return $filter('filter')($scope.rows, { visible: true });
+            };
+            
+            var currentId;
+            var currentTarget;
+            $scope.start = function(event, item){
+                currentTarget = $(event.target);
+                currentTarget.addClass('primary-background');
+                currentId = $(event.target).attr('id');
+                
+                //console.log(event);
+                //console.log(item);  
+            };
+            
+            $scope.over = function(event, data){
+                $(event.target).after('<li style="background-color: yellow;" class="placeholder-' + currentId +'">hello world</li>');
+                console.log(event);
+                console.log(data);
+                console.log('===');
+            };
+            
+            $scope.drop = function(event, data){
+                currentId = undefined;
+                $('.placeholder-' + currentId).remove();
+                currentTarget.removeClass('primary-background');
+            };
+            
+            $scope.out = function(event){
+                $('.placeholder-' + currentId).remove();
+            }
     
             $scope.$watch('treeData', onChange, true);
         }   
