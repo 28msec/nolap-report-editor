@@ -19,7 +19,7 @@ module.exports = function (grunt) {
         config: grunt.file.readJSON('config.json'),
         watch: {
             less: {
-                files:  ['app/styles/{,*/}*.less'],
+                files:  ['app/**/*.less'],
                 tasks: ['less']
             },
             livereload: {

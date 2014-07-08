@@ -1,8 +1,13 @@
-<ul class="nav nav-list nav-pills nav-stacked tree-view">
-    <li ng-repeat="row in rows | filter:{visible:true} track by row.branch.Id"  ng-class="'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')">
-        <a ng-click="select(row)">
-            <i ng-class="{ 'fa-caret-right': !row.branch.Expanded && row.branch.To, 'fa-caret-down':  row.branch.Expanded && row.branch.To }" class="indented tree-icon fa"></i>
-            <span class="indented tree-label">{{row.branch.Label}}</span>
-        </a>
+<ul class="nav nav-list nav-pills nav-stacked tree-view scrollable">
+    <li ng-repeat="row in rows | filter:{visible:true} track by row.branch.Id"
+        ng-class="'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')"
+        >
+        <!-- draggable droppable drag-within="parent"-->
+        <span class="indented">
+            <i ng-click="collapse(row)"
+                ng-class="{ 'fa-caret-right': !row.branch.Expanded && row.branch.To, 'fa-caret-down':  row.branch.Expanded && row.branch.To }"
+                class="fa"></i>
+            <span class="">{{row.branch.Label}}</span>
+        </span>
     </li>
 </ul>

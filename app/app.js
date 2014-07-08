@@ -3,6 +3,7 @@
 angular.module('report-editor', [
     'ui.router',
     'ui.bootstrap',
+    'ui.drop',
     'jmdobry.angular-cache',
     'ngProgressLite',
     'flexyLayout',
