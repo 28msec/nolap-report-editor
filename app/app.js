@@ -3,6 +3,7 @@
 angular.module('report-editor', [
     'ui.router',
     'ui.bootstrap',
+    'ui.drop',
     'jmdobry.angular-cache',
     'ngProgressLite',
     'flexyLayout',
@@ -52,6 +53,10 @@ angular.module('report-editor', [
     $httpProvider.interceptors.push('ConnectionHandler');
 
     $locationProvider.html5Mode(true);
+    $stateProvider
+    .state('500', {
+        templateUrl: '/500.html'
+    });
 })
 
 .run(function($rootScope, ngProgressLite, $state, $location, API, Session) {

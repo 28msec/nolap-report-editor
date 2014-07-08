@@ -55,28 +55,63 @@ angular
                         }
                     ],
                     'Hypercubes' : {
-                        'xbrl:DefaultHypercube' : {
-                            'Name' : 'xbrl:DefaultHypercube',
-                            'Label' : 'XBRL Implicit non-dimensional Hypercube',
-                            'Aspects' : {
-                                'xbrl:Concept' : {
-                                    'Name' : 'xbrl:Concept',
-                                    'Label' : 'Implicit XBRL Concept Dimension',
-                                    'Domains' : {
-                                        'xbrl:ConceptDomain' : {
-                                            'Name' : 'xbrl:ConceptDomain',
-                                            'Label' : 'Implicit XBRL Concept Domain',
-                                            'Members' : {}
+                        'xbrl:DefaultHypercube': {
+                            'Name': 'xbrl:DefaultHypercube',
+                            'Label': 'XBRL Implicit non-dimensional Hypercube',
+                            'Aspects': {
+                                'xbrl:Concept': {
+                                    'Name': 'xbrl:Concept',
+                                    'Label': 'Concept',
+                                    'Domains': {
+                                        'xbrl:ConceptDomain': {
+                                            'Name': 'xbrl:ConceptDomain',
+                                            'Label': 'Implicit XBRL Concept Domain',
+                                            'Members': {
+                                            }
                                         }
+                                    },
+                                    'xbrl:Period': {
+                                        'Name': 'xbrl:Period',
+                                        'Label': 'Period'
+                                    },
+                                    'xbrl:Entity': {
+                                        'Name': 'xbrl:Entity',
+                                        'Label': 'Reporting Entity'
+                                    },
+                                    'xbrl:Unit': {
+                                        'Name': 'xbrl:Unit',
+                                        'Label': 'Unit',
+                                        'Default': 'xbrl:NonNumeric'
+                                    },
+                                    'sec:Accepted': {
+                                        'Name': 'sec:Accepted',
+                                        'Label': 'Acceptance Date'
+                                    },
+                                    'sec:Archive': {
+                                        'Name': 'sec:Archive',
+                                        'Label': 'Archive ID',
+                                        'Kind': 'TypedDimension',
+                                        'Type': 'string',
+                                        'DomainRestriction': {
+                                            'Name': 'sec:ArchiveDomain',
+                                            'Label': 'sec:Archive Domain',
+                                            // @TODO: remove temp filter
+                                            'Enumeration': [ '0000021344-14-000008', '0000104169-14-000019' ]
+                                        }
+                                    },
+                                    'sec:FiscalYear': {
+                                        'Name': 'sec:FiscalYear',
+                                        'Label': 'Fiscal Year'
+                                    },
+                                    'sec:FiscalPeriod': {
+                                        'Name': 'sec:FiscalPeriod',
+                                        'Label': 'Fiscal Period'
+                                    },
+                                    'dei:LegalEntityAxis': {
+                                        'Name': 'dei:LegalEntityAxis',
+                                        'Label': 'Legal Entity',
+                                        'Default': 'sec:DefaultLegalEntity'
                                     }
-                                },
-                                'xbrl:Period' : {
-                                    'Name' : 'xbrl:Period',
-                                    'Label' : 'Implicit XBRL Period Dimension'
-                                },
-                                'xbrl:Entity' : {
-                                    'Name' : 'xbrl:Entity',
-                                    'Label' : 'Implicit XBRL Entity Dimension'
                                 }
                             }
                         }
