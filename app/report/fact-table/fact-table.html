@@ -1,28 +1,7 @@
-<flexy-layout orientation="horizontal">
-    <block-container init="400" class="sidebar">
-        
-        <span class="dropdown pull-right">
-	                    <a class="dropdown-toggle btn btn-primary"><i class="fa fa-cloud-download"></i> Export</a>
-	                    <ul class="dropdown-menu">
-	                        <li><a ng-href="{{getExportURL('json')}}" target="_blank" download="facttable.json">JSON</a></li>
-	                        <li><a ng-href="{{getExportURL('xml')}}" target="_blank" download="facttable.xml">XML</a></li>
-	                        <li><a ng-href="{{getExportURL('csv')}}" target="_blank" download="facttable.csv">CSV</a></li>
-	                        <li><a ng-href="{{getExportURL('excel')}}" target="_blank" download="facttable.csv">Excel</a></li>
-	                    </ul>
-	   </span>
-    </block-container>
-    <block-splitter></block-splitter>
-    <block-container>
-       <div class="scrollable">
-	   <div ng-show="error" class="alert alert-danger">
-	     <strong>Error {{ error.status }}</strong>
-	     {{ error.body.message }}
-	   </div>
-   
-    
-       <div ng-show="data.length == 0">Fact Table is empty.</div>
+  <div class="scrollable">
        
-	   <div ng-show="data" class="table-responsive">	       
+	   <div ng-show="data" class="table-responsive">	 
+	    	         
 	          <table class="table table-condensed table-justcolumns small">
 	              <thead>
 	                <th>#</th>
@@ -43,13 +22,31 @@
 	                </tr>
 	              </tbody>
 	          </table>
+	          
+	          <div class="content">
+	           <span class="dropdown">
+	                    <a class="dropdown-toggle btn btn-primary"><i class="fa fa-cloud-download"></i> Export</a>
+	                    <ul class="dropdown-menu">
+	                        <li><a ng-href="{{getExportURL('json')}}" target="_blank" download="facttable.json">JSON</a></li>
+	                        <li><a ng-href="{{getExportURL('xml')}}" target="_blank" download="facttable.xml">XML</a></li>
+	                        <li><a ng-href="{{getExportURL('csv')}}" target="_blank" download="facttable.csv">CSV</a></li>
+	                        <li><a ng-href="{{getExportURL('excel')}}" target="_blank" download="facttable.csv">Excel</a></li>
+	                    </ul>
+  	           </span>
+  	          </div>
 		</div>
 		
-		<div>
-			<p ng-show="loading">Loading...</p>
+		<div class="content">
+		   <div ng-show="error" class="alert alert-danger">
+		     <strong>Error {{ error.status }}</strong>
+		     {{ error.body.message }}
+		   </div>
+	       
+	       <div ng-show="data.length == 0">Fact Table is empty.</div>
+		
+		   <p ng-show="loading">Updating fact table...</p>
 		</div>
 		
 		<div style="height:70px">&nbsp;</div>
-	  </div>
-   </block-container>
- </flexy-layout>
+</div>		
+		
