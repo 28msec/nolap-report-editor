@@ -128,6 +128,13 @@ module.exports = function (grunt) {
                         className: 'SessionAPI',
                         fileName: 'session-api.js',
                         angularjs: true
+                    },
+                    {
+                        swagger: 'swagger/queries.json',
+                        moduleName: 'queries-api',
+                        className: 'QueriesAPI',
+                        fileName: 'queries-api.js',
+                        angularjs: true
                     }
                 ],
                 dest: 'app/modules'

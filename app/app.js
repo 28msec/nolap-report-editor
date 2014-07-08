@@ -14,7 +14,8 @@ angular.module('report-editor', [
     'rules-model',
     'excel-parser',
     'formula-parser',
-    'forms-ui'
+    'forms-ui',
+    'layoutmodel'
 ])
 
 .factory('ConnectionHandler', function($q, $rootScope, DEBUG){
