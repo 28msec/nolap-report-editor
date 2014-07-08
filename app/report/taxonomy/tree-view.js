@@ -2,7 +2,7 @@
 
 angular
 .module('report-editor')
-.directive('treeView', function($drag){
+.directive('treeView', function(){
     return {
         restrict: 'E',
         templateUrl: '/report/taxonomy/tree-view.html',
@@ -56,11 +56,7 @@ angular
             var onChange = function(){
                 $scope.rows = [];
                 setRows($scope.treeData, 1, true);
-                angular.forEach(element.find('li'), function(li){
-                    $drag.draggable(li, {
-                        keepSize: true
-                    });
-                });
+
             };  
     
             $scope.$watch('treeData', onChange, true);

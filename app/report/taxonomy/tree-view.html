@@ -1,6 +1,8 @@
 <ul class="nav nav-list nav-pills nav-stacked tree-view scrollable">
     <li ng-repeat="row in rows | filter:{visible:true} track by row.branch.Id"
         ng-class="'level-' + {{ row.level }} + (selected.Id === row.branch.Id ? ' active':'')"
+        jqyoui-draggable="{onStart:'start(row)'}"
+        jqyoui-droppable="{}"
         >
         <!-- draggable droppable drag-within="parent"-->
         <span class="indented">
