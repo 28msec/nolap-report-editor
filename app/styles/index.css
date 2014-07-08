@@ -5859,6 +5859,41 @@ button.close {
   margin: auto;
   padding: 0;
 }
+ul.tree-view .indented {
+  position: relative;
+  cursor: default;
+}
+ul.tree-view .indented > i {
+  cursor: pointer;
+  padding: 5px;
+}
+ul.tree-view .level-1 .indented {
+  left: 0px;
+}
+ul.tree-view .level-2 .indented {
+  left: 20px;
+}
+ul.tree-view .level-3 .indented {
+  left: 40px;
+}
+ul.tree-view .level-4 .indented {
+  left: 60px;
+}
+ul.tree-view .level-5 .indented {
+  left: 80px;
+}
+ul.tree-view .level-6 .indented {
+  left: 80px;
+}
+ul.tree-view .level-7 .indented {
+  left: 100px;
+}
+ul.tree-view .level-8 .indented {
+  left: 120px;
+}
+ul.tree-view .level-9 .indented {
+  left: 140px;
+}
 .preview-style table {
   border-spacing: 0px;
   border-collapse: separate;

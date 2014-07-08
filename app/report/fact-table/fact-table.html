@@ -13,6 +13,7 @@
     </block-container>
     <block-splitter></block-splitter>
     <block-container>
+       <div class="scrollable">
 	   <div ng-show="error" class="alert alert-danger">
 	     <strong>Error {{ error.status }}</strong>
 	     {{ error.body.message }}
@@ -47,5 +48,8 @@
 		<div>
 			<p ng-show="loading">Loading...</p>
 		</div>
+		
+		<div style="height:70px">&nbsp;</div>
+	  </div>
    </block-container>
  </flexy-layout>

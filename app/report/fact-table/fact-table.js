@@ -10,7 +10,8 @@ angular.module('report-editor')
     $scope.loading = false;
     
 	$scope.reload = function() {
-		  var params = { report: report[0]._id, token: Session.getToken(), $method: 'POST' };		  
+		console.log(report);
+		  var params = { report: report.model._id, token: Session.getToken(), $method: 'POST' };		  
 		  //params.aik = "0000021344-14-000008";	
 		  
 		  $scope.loading = true;
@@ -79,7 +80,7 @@ angular.module('report-editor')
     };
     
     $scope.getExportURL = function(format) {
-        return API_URL + '/_queries/public/api/facttable-for-report.jq?_method=POST&format=' + format + '&report=' + encodeURIComponent(report[0]._id) + '&token=' + Session.getToken();
+        return API_URL + '/_queries/public/api/facttable-for-report.jq?_method=POST&format=' + format + '&report=' + encodeURIComponent(report.model._id) + '&token=' + Session.getToken();
     };
        
 });

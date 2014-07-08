@@ -1,6 +1,6 @@
 <flexy-layout orientation="horizontal">
   <block-container
-	init="400" class="sidebar">
+	init="400" class="sidebar">	
 		<form role="form">
 		
 		
@@ -44,19 +44,23 @@
 	</block-container> 
 	<block-splitter></block-splitter> 
 	<block-container>
-	   {{css}}
-		<div ng-show="error" class="alert alert-danger">
-			<strong>Error {{ error.status }}</strong> {{ error.body.message }}
-		</div>
-		
-		<div ng-class="preview.css">
-			<layoutmodel model="mymodel" labelidx="preview.labelidx" constraints="'true'"
-				checks="preview.checks" headerclick="test(header)" dataclick="test(data)"
-				template-url="/bower_components/layoutmodel-renderer-angular/app/directive/layoutmodel.html"></layoutmodel>
-		</div>
-		
-		<div>
-			<p ng-show="loading">Loading...</p>
+	   <div class="scrollable">
+	   
+			<div ng-show="error" class="alert alert-danger">
+				<strong>Error {{ error.status }}</strong> {{ error.body.message }}
+			</div>
+			
+			<div ng-class="preview.css">
+				<layoutmodel model="mymodel" labelidx="preview.labelidx" constraints="'true'"
+					checks="preview.checks" headerclick="test(header)" dataclick="test(data)"
+					template-url="/bower_components/layoutmodel-renderer-angular/app/directive/layoutmodel.html"></layoutmodel>
+			</div>
+			
+			<div>
+				<p ng-show="loading">Loading...</p>
+			</div>
+			
+			<div style="height:70px">&nbsp;</div>
 		</div>
    </block-container> 
 </flexy-layout>
