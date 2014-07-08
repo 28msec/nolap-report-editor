@@ -36,7 +36,7 @@
     "angular-cache": "2.3.0",
     "bootstrap": "~3.1.1",
     "flexy-layout": "git://github.com/lorenzofox3/flexy-layout.git",
-    "angular-drop": "~0.0.1"
+    "angular-ui-tree": "~2.1.4"
   },
   "resolutions": {
     "angular": "1.2.9"
