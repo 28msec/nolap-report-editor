@@ -7,7 +7,8 @@ angular
     $scope.presentationTree = [];
     
     $scope.treeOptions = {
-        dropped: function(){//event
+        dropped: function(event){
+            console.log(event);
             var tmpNetwork = {};
             setPresentationNetwork($scope.presentationTree, tmpNetwork);
             $scope.presentationNetwork = tmpNetwork;
@@ -51,13 +52,18 @@ angular
             return 0;
         }).forEach(function(key){
             var child = element[key];
+            var concept = $scope.report.getConcept(child.Name);
+            if(concept === null) {
+                console.error('This is a serious bug!');
+                return;
+            }
             current.push(child);
-            if(child.To) {
+            if(concept.IsAbstract === true) {
                 child.children = [];
-                setPresentationTree(child.To, child.children);
+                setPresentationTree(child.To ? child.To : {}, child.children);
             }
         });
     };
-    
+    console.log($scope.presentationNetwork);
     setPresentationTree(angular.copy($scope.presentationNetwork), $scope.presentationTree);
 });
