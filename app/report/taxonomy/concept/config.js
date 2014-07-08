@@ -5,20 +5,21 @@ angular
 .config(function ($stateProvider) {
     $stateProvider
     .state('report.taxonomy.concept', {
-        url: '/:conceptId',
-        Controller: 'ConceptCtrl',
+        url: '/:elementId',
         templateUrl: '/report/taxonomy/concept/concept.html',
+        controller: 'ConceptCtrl',
         resolve: {
-            report: [ 'report', function(report) {
-                return report;
+            element: [ '$stateParams', 'report', function($stateParams, report) {
+                var elementId = $stateParams.elementId;
+                if(elementId !== undefined && elementId !== null && elementId !== '') {
+                    return report.getElementFromTree('Presentation', elementId);
+                } else {
+                    return undefined;
+                }
             }],
-            concept: [ '$stateParams', 'report', function($stateParams, report) {
-                var conceptId = $stateParams.conceptId;
-                if(conceptId !== undefined && conceptId !== null && conceptId !== '') {
-                    var element = report.getElementFromTree('Presentation', conceptId);
-                    if(element !== undefined && element !== null){
-                        return report.getConcept(element.Name);
-                    }
+            concept: [ '$stateParams', 'report', 'element', function($stateParams, report, element) {
+                if(element !== undefined && element !== null){
+                    return report.getConcept(element.Name);
                 } else {
                     return undefined;
                 }

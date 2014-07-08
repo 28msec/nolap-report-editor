@@ -6,6 +6,7 @@
 @import "../auth/auth.less";
 @import "../report/report.less";
 @import "../report/taxonomy/taxonomy.less";
+@import "../report/taxonomy/concept/business-rules/business-rules.less";
 @import "../report/preview/preview.less";
 @import "../report/fact-table/fact-table.less";
 @import "../report/filters/filters.less";
@@ -62,6 +63,18 @@ label {
     &.modal-header-danger {
         background-color: @brand-danger;
     }
+}
+
+.modal-small {
+  > .modal-dialog {
+    width: 420px;
+  }
+}
+
+.modal-big {
+  > .modal-dialog {
+    width: 1200px;
+  }
 }
 
 //Full screen mode
