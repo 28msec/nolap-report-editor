@@ -1,7 +1,7 @@
 <div ui-tree-handle>
-    <a data-nodrag ng-click="toggle(this)" ng-if="element.children"><span class="fa" ng-class="{'fa-chevron-right': collapsed, 'fa-chevron-down': !collapsed}"></span></a>
+    <a data-nodrag ng-click="toggle(this)" ng-if="element.children"><span class="fa" ng-class="{ 'fa-chevron-right': collapsed, 'fa-chevron-down': !collapsed }"></span></a>
     <span ng-bind="element.Label"></span>
 </div>
-<ol ui-tree-nodes="" ng-model="element.children" ng-class="{hidden: collapsed}">
+<ol ui-tree-nodes="" ng-model="element.children" ng-class="{ hidden: collapsed }">
     <li ng-repeat="element in element.children" ui-tree-node ng-include="'/report/taxonomy/presentation-node.html'"></li>
 </ol>
