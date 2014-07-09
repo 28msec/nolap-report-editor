@@ -5,7 +5,7 @@ angular
 .config(function ($stateProvider) {
     $stateProvider
     .state('report.taxonomy.concept', {
-        url: '/:conceptId',
+        url: '/concept/:conceptId',
         Controller: 'ConceptCtrl',
         templateUrl: '/report/taxonomy/concept/concept.html',
         resolve: {

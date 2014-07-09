@@ -1,5 +1,4 @@
 'use strict';
-
 angular
 .module('report-editor')
 .controller('TaxonomyCtrl', function($scope, $state){
@@ -18,6 +17,10 @@ angular
         removed: function(node){
             $scope.report.removeTreeBranch('Presentation', node.$modelValue.Id);
         }
+    };
+
+    $scope.selectConcept = function(){
+        console.log('selectConcept');
     };
 
     var setPresentationTree = function(element, current){
@@ -57,6 +60,6 @@ angular
             }
         });
     };
-    console.log($scope.presentationNetwork);
+
     setPresentationTree(angular.copy($scope.presentationNetwork), $scope.presentationTree);
 });
