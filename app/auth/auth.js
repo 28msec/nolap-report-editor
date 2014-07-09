@@ -10,6 +10,7 @@ angular.module('report-editor')
         $scope.login = function(){
             $scope.$broadcast('autofill:update');
 
+            // we need a timeout (>=0) here to ensure the broadcast is handled first
             $timeout(function(){
                 $scope.loginAttempted = true;
                 $scope.loginForm.loginPassword.$setValidity('unauthorized', true);
@@ -25,7 +26,7 @@ angular.module('report-editor')
                         $scope.loading = false;
                     });
                 }
-            }, 100);
+            }, 28);
         };
     })
     .directive('autofillCheck', function(){
