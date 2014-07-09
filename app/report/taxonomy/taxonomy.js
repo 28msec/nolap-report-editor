@@ -54,7 +54,7 @@ angular
             var child = element[key];
             var concept = $scope.report.getConcept(child.Name);
             if(concept === null) {
-                console.error('This is a serious bug!');
+                console.error('Invalid report detected. This is a serious bug!');
                 return;
             }
             current.push(child);
