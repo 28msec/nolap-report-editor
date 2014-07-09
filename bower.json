@@ -38,7 +38,7 @@
     "accounting": "~0.3.2",
     "layoutmodel-renderer-angular" : "https://github.com/28msec/layoutmodel-renderer-angular.git#master",
     "flexy-layout": "git://github.com/lorenzofox3/flexy-layout.git",
-    "angular-ui-tree": "~2.1.4"
+    "angular-ui-tree": "git://github.com/wcandillon/angular-ui-tree.git#master"
   },
   "resolutions": {
     "angular": "1.2.9"

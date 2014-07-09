@@ -10,6 +10,9 @@ angular
     $scope.treeOptions = {
         dropped: function(event){
             $scope.report.moveTreeBranch('Presentation', event.source.nodeScope.$modelValue.Id, event.dest.nodesScope.$nodeScope.$modelValue.Id, event.dest.index);
+        },
+        removed: function(node){
+            $scope.report.removeTreeBranch('Presentation', node.$modelValue.Id);
         }
     };
 
