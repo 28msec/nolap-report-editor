@@ -81,12 +81,12 @@
 <tabset ng-if="formula.model.OriginalLanguage === 'SpreadsheetFormula'">
     <tab ng-repeat="alt in formula.model.Formulae track by $index" active="alt.active">
         <tab-heading>
-            <span ng-class="{'text-danger': alt.valid===false}"><i class="glyphicon glyphicon-bell" style="color: #a94442" ng-show="alt.valid===false"></i> Alternative {{$index +1}}</span>
+            <span ng-class="{'text-danger': alt.valid===false}"><i class="fa fa-bell-o" style="color: #a94442" ng-show="alt.valid===false"></i> Alternative {{$index +1}}</span>
                     <span class="btn-group" dropdown is-open="status.isopen" style="margin-left: 10px; margin-right: 10px;">
                         <button type="button" class="btn btn-default dropdown-toggle btn-xs" ng-disabled="disabled"><span class="caret"></span></button>
                         <ul class="dropdown-menu" role="menu">
-                            <li ng-if="formula.model.Formulae.length > 1"><a href="#" ng-click="formula.removeAlternative($index)" class="text-danger"><i class="glyphicon glyphicon-trash"></i> Delete</a></li>
-                            <li><a href="#" ng-click="formula.copyAlternative($index)"><i class="glyphicon glyphicon-share"></i> Duplicate</a></li>
+                            <li ng-if="formula.model.Formulae.length > 1"><a href="#" ng-click="formula.removeAlternative($index)" class="text-danger"><i class="fa fa-trash-o"></i> Delete</a></li>
+                            <li><a href="#" ng-click="formula.copyAlternative($index)"><i class="fa fa-copy"></i> Duplicate</a></li>
                         </ul>
                     </span>
         </tab-heading>
@@ -121,7 +121,7 @@
     <tab select="formula.addAlternative()">
         <tab-heading>
                     <span tooltip-trigger="mouseenter" tooltip-placement="{{tooltipPlacement}}"
-                          tooltip="Add an alternative that will get executed if the precondition of the previous alternative fails."><i class="glyphicon glyphicon-plus"></i> Add An Alternative</span>
+                          tooltip="Add an alternative that will get executed if the precondition of the previous alternative fails."><i class="fa fa-plus-square-o"></i> Add An Alternative</span>
         </tab-heading>
     </tab>
 </tabset>
