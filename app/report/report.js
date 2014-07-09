@@ -14,11 +14,10 @@ angular.module('report-editor')
             token: Session.getToken()
         })
         .then(function(){  
-            $rootScope.$emit('apiStatus', {});
-            console.log('new model saved');
+            $rootScope.$emit('apiStatus', { message: 'Report saved', code: 'success', expires: 500 });
         })
         .catch(function(){
-            $rootScope.$emit('apiStatus', { message: 'Error while saving the report', code: 'error'});
+            $rootScope.$emit('apiStatus', { message: 'Error while saving', code: 'error', expires: 4000 });
             $scope.report = new Report(oldVal);
         });
     }, true);

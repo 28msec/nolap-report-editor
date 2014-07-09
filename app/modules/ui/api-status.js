@@ -2,7 +2,7 @@
 
 angular
 .module('report-editor')
-.directive('apiStatus', function($rootScope){
+.directive('apiStatus', function($rootScope, $timeout){
     return {
         restrict: 'A',
         templateUrl: '/modules/ui/api-status.html',
@@ -11,6 +11,11 @@ angular
                 if(data.message) {
                     $scope.message = data.message;
                     $scope.code = data.code;
+                    if(data.expires) {
+                        $timeout(function(){
+                            $scope.message = undefined;
+                        }, data.expires);
+                    }
                 } else {
                     $scope.message = undefined;
                 }
