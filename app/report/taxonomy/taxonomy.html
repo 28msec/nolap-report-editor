@@ -1,8 +1,11 @@
 <flexy-layout orientation="horizontal">
     <block-container init="400" class="sidebar">
-        <h2>Presentation</h2>
-        <!--  selected="treeSelection" -->
-        <tree-view tree-data="presentationNetwork"></tree-view>
+        <h2 class="no-margin">Presentation</h2>
+        <div ui-tree="treeOptions" class="scrollable">
+            <ol ui-tree-nodes="" ng-model="presentationTree">
+                <li ng-repeat="element in presentationTree" ui-tree-node ng-include="'/report/taxonomy/presentation-node.html'"></li>
+            </ol>
+        </div>
     </block-container>
     <block-splitter></block-splitter>
     <block-container>

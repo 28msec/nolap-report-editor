@@ -32,6 +32,10 @@ section {
     margin-left: 15px;
 }
 
+.no-margin {
+    margin: 0;
+}
+
 //Font weigths
 h1, h2, h3, h4, h5 {
     font-weight: 100;
@@ -90,6 +94,9 @@ label {
     overflow: hidden;
 }
 
+.content { padding:15px }
+
+
 html {
     .viewport;
 
@@ -100,4 +107,17 @@ html {
             .viewport;
         }   
     }   
+}
+
+//API Status
+#api-status {
+    position: fixed;
+    padding: 5px;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    z-index: 90000;
+    left: 50%;
+    margin-left: -100px;
+    width: 100px;
+    text-align: center;
 }
