@@ -19,9 +19,7 @@ angular
         if($item.newConcept === true) {
             
         } else {
-            $state.go('report.taxonomy.concept', { conceptId: $item.Name });
+            $state.go('report.taxonomy.concept.overview', { conceptId: $item.Name });
         }
     };
-    
-    console.log($scope.concepts[0]);
 });

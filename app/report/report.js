@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('ReportCtrl', function($rootScope, $scope, $state, Session, API, Report, report){
+.controller('ReportCtrl', function($rootScope, $scope, Session, API, Report, report){
     $scope.report = report;
 
     $scope.$watch('report.model', function(newVal, oldVal){
@@ -21,9 +21,5 @@ angular.module('report-editor')
             $scope.report = new Report(oldVal);
         });
     }, true);
-
-    if($state.current.name === 'report') {
-        $state.go('report.taxonomy');
-    }
 })
 ;

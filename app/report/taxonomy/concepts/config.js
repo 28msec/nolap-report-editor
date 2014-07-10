@@ -5,7 +5,7 @@ angular
 .config(function ($stateProvider) {
     $stateProvider
         .state('report.taxonomy.concepts', {
-            url: '/concepts',
+            url: '',
             templateUrl: '/report/taxonomy/concepts/concepts.html',
             controller: 'ConceptsCtrl'
         });

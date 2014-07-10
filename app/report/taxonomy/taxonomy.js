@@ -1,11 +1,7 @@
 'use strict';
 angular
 .module('report-editor')
-.controller('TaxonomyCtrl', function($scope, $state){
-
-    if($state.current.name === 'report.taxonomy') {
-        $state.go('report.taxonomy.concepts');
-    }
+.controller('TaxonomyCtrl', function($scope){
 
     $scope.presentationNetwork = $scope.report.getNetwork('Presentation').Trees;
     $scope.presentationTree = [];

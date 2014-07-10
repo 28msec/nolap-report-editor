@@ -5,7 +5,8 @@ angular
 .config(function ($stateProvider) {
     $stateProvider
     .state('report.taxonomy', {
-        url: '/taxonomy',
+        url: '',
+        abstract: true,
         templateUrl: '/report/taxonomy/taxonomy.html',
         controller: 'TaxonomyCtrl'
     });
