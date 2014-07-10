@@ -1,30 +1,22 @@
 'use strict';
-
 angular
 .module('report-editor')
 .controller('TaxonomyCtrl', function($scope){
+
     $scope.presentationNetwork = $scope.report.getNetwork('Presentation').Trees;
     $scope.presentationTree = [];
     
     $scope.treeOptions = {
         dropped: function(event){
-            console.log(event);
-            var tmpNetwork = {};
-            setPresentationNetwork($scope.presentationTree, tmpNetwork);
-            $scope.presentationNetwork = tmpNetwork;
+            $scope.report.moveTreeBranch('Presentation', event.source.nodeScope.$modelValue.Id, event.dest.nodesScope.$nodeScope.$modelValue.Id, event.dest.index);
+        },
+        removed: function(node){
+            $scope.report.removeTreeBranch('Presentation', node.$modelValue.Id);
         }
     };
-    
-    var setPresentationNetwork = function(element, current){
-        element.forEach(function(child){
-            child = angular.copy(child);
-            current[child.name] = child;
-            if(child.children) {
-                child.To = {};
-                setPresentationNetwork(child.children, child.To);
-                delete child.children;
-            }
-        });
+
+    $scope.selectConcept = function(){
+        console.log('selectConcept');
     };
 
     var setPresentationTree = function(element, current){
@@ -64,6 +56,6 @@ angular
             }
         });
     };
-    console.log($scope.presentationNetwork);
+
     setPresentationTree(angular.copy($scope.presentationNetwork), $scope.presentationTree);
 });

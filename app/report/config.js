@@ -8,6 +8,7 @@ angular
             url: '/:reportId',
             templateUrl: '/report/report.html',
             controller: 'ReportCtrl',
+            abstract: true,
             resolve: {
                 report: [ '$stateParams', 'API', 'Session', 'Report', function($stateParams, API, Session, Report) {
                     return API.Report.listReports({
@@ -22,6 +23,5 @@ angular
                 }]
             }
         });
-
 })
 ;
