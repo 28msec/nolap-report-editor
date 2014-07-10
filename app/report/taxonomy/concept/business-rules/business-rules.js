@@ -1,10 +1,8 @@
 'use strict';
 
 angular.module('report-editor')
-    .controller('BusinessRulesCtrl', function($scope, $state, $log, report, concept, conceptName){
-        $scope.report = report;
-        $scope.concept = concept;
-        $scope.conceptName = conceptName;
+    .controller('BusinessRulesCtrl', function($scope, $state, $log){
+        $scope.conceptName = $scope.concept.Name;
 
         //$log.log($state.current);
     })
@@ -37,7 +35,6 @@ angular.module('report-editor')
         }
 
         $scope.ok = function(){
-            //ReportPersistance.save(report, function() {
                 if ($scope.action === 'Create') {
                     try {
                         $scope.error = undefined;
@@ -63,7 +60,6 @@ angular.module('report-editor')
                     $scope.formula = undefined;
                     $modalInstance.close();
                 }
-            //});
         };
 
         $scope.cancel = function(){
@@ -116,7 +112,6 @@ angular.module('report-editor')
                 }, true);
 
                 $scope.removeRule = function(id){
-                    //ReportPersistance.save($scope.report, function(){
                         var rule = $scope.report.getRule(id);
                         var concept = rule.ComputableConcepts[0];
                         if(rule.Type === 'xbrl28:validation' && rule.OriginalLanguage === 'SpreadsheetFormula' &&
@@ -128,7 +123,6 @@ angular.module('report-editor')
                             }
                         }
                         $scope.report.removeRule(id);
-                    //});
                 };
 
                 $scope.addRule = function(concept, ruleType, ruleLanguage){
