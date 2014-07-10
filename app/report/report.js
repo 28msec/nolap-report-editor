@@ -9,8 +9,8 @@ angular.module('report-editor')
     var saveCanceler;
 
     $scope.$watch('report.model', function(newVal, oldVal){
-        //TODO: JSON stringify is too slow
-        if(oldVal === undefined || JSON.stringify(newVal) === lastKnowSavedModelAsString) {
+        var reportAsString = JSON.stringify(newVal);
+        if(oldVal === undefined || reportAsString === lastKnowSavedModelAsString) {
             return;
         }
         $rootScope.$emit('apiStatus', { message: 'Saving Report...', code: 'warning' });
@@ -19,7 +19,7 @@ angular.module('report-editor')
         }
         saveCanceler = $q.defer();
         API.Report.addOrReplaceOrValidateReport({
-            report: JSON.stringify($scope.report.model),
+            report: reportAsString,
             token: Session.getToken(),
             $timeout: saveCanceler.promise
         })

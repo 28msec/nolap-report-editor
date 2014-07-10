@@ -1,22 +1,27 @@
 'use strict';
 angular
 .module('report-editor')
-.controller('TaxonomyCtrl', function($scope){
+.controller('TaxonomyCtrl', function($scope, $state){
 
     $scope.presentationNetwork = $scope.report.getNetwork('Presentation').Trees;
     $scope.presentationTree = [];
     
     $scope.treeOptions = {
         dropped: function(event){
-            $scope.report.moveTreeBranch('Presentation', event.source.nodeScope.$modelValue.Id, event.dest.nodesScope.$nodeScope.$modelValue.Id, event.dest.index);
+            if(event.dest.nodesScope.$nodeScope !== null) {
+                $scope.report.moveTreeBranch('Presentation', event.source.nodeScope.$modelValue.Id, event.dest.nodesScope.$nodeScope.$modelValue.Id, event.dest.index);
+            } else {
+                console.log('the element has been dropped in place.');
+            }
         },
         removed: function(node){
             $scope.report.removeTreeBranch('Presentation', node.$modelValue.Id);
         }
     };
 
-    $scope.selectConcept = function(){
-        console.log('selectConcept');
+    $scope.goToConcept = function(nodeScope){
+        var conceptName = nodeScope.$nodeScope.$modelValue.Name;
+        $state.go('report.taxonomy.concept.overview', { conceptId: conceptName });
     };
 
     var setPresentationTree = function(element, current){

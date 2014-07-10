@@ -7,5 +7,18 @@
     </label>
 </div>
 <hr>
+<h3>Presentation</h3>
+<p>You can drop the element below in presentation tree.</p>
+<div ui-tree="elementOptions">
+    <ol ui-tree-nodes="" ng-model="element">
+        <li ng-repeat="element in element" ui-tree-node>
+            <div ui-tree-handle>
+                <i class="fa fa-reply"></i>
+                <span ng-bind="element.Label"></span>
+            </div>
+        </li>
+    </ol>
+</div>
+<hr>
 <h3>Management</h3>
 <button class="btn btn-danger" ng-click="deleteConcept()">Delete concept</button>
