@@ -6,6 +6,7 @@
 @import "../auth/auth.less";
 @import "../report/report.less";
 @import "../report/taxonomy/taxonomy.less";
+@import "../report/taxonomy/concept/overview/overview.less";
 @import "../report/taxonomy/concept/business-rules/business-rules.less";
 @import "../report/preview/preview.less";
 @import "../report/fact-table/fact-table.less";
@@ -19,7 +20,7 @@ section {
     margin-bottom: 20px;
 }
 
-//std margin & padding
+//std margin, padding, bg
 .std-right-margin {
     margin-right: 15px;
 }
@@ -30,6 +31,20 @@ section {
 
 .std-left-margin {
     margin-left: 15px;
+}
+
+.bg-primary {
+    background-color: @brand-primary;
+    &:hover {
+        background-color: @brand-primary !important;
+    }
+}
+
+.bg-danger {
+    background-color: @brand-danger;
+    &:hover {
+        background-color: @brand-danger !important;
+    }
 }
 
 //Font weigths

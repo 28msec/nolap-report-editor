@@ -1,3 +1,4 @@
+<div class="scrollable">
 <h3>Metadata</h3>
 <input class="form-control" type="text" ng-model="concept.Label" placeholder="Concept label">
 <div class="checkbox">
@@ -12,8 +13,8 @@
 <div ui-tree="elementOptions">
     <ol ui-tree-nodes="" ng-model="element">
         <li ng-repeat="element in element" ui-tree-node>
-            <div ui-tree-handle>
-                <i class="fa fa-reply"></i>
+            <div class="element-to-drop" ui-tree-handle>
+                <span class="fa fa-reply btn-element bg-primary"></span>
                 <span ng-bind="element.Label"></span>
             </div>
         </li>
@@ -22,3 +23,4 @@
 <hr>
 <h3>Management</h3>
 <button class="btn btn-danger" ng-click="deleteConcept()">Delete concept</button>
+</div>

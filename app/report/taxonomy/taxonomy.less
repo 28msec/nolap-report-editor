@@ -1,9 +1,17 @@
 .btn-element {
     display: none;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    color: white !important;
+    &:hover {
+        color: white !important;
+    }
 }
 
 .angular-ui-tree-handle:hover .btn-element {
-    display: inline;
+    display: inline-block;
 }
 
 //Angular UI Tree
@@ -48,14 +56,18 @@
     cursor: move;
     text-decoration: none;
     //font-weight: bold;
+    background-color: @clouds;
+    margin-top: 5px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    min-height: 20px;
-    line-height: 20px;
-    background-color: @clouds;
-    padding: 5px;
-    margin-top: 5px;
+    min-height: 30px;
+    line-height: 30px;
+    padding-left: 5px;
+    
+    .element-name {
+        padding: 5px;
+    }
 }
 
 .angular-ui-tree-drag {
