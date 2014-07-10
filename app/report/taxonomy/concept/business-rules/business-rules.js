@@ -1,10 +1,10 @@
 'use strict';
 
 angular.module('report-editor')
-    .controller('BusinessRulesCtrl', function($scope, $state, $log, report, concept, conceptName){
+    .controller('BusinessRulesCtrl', function($scope, $state, $log, report, concept){
         $scope.report = report;
         $scope.concept = concept;
-        $scope.conceptName = conceptName;
+        $scope.conceptName = concept.Name;
 
         //$log.log($state.current);
     })
@@ -71,7 +71,7 @@ angular.module('report-editor')
             $modalInstance.close();
         };
     })
-    .directive('businessRules', function($modal){
+    .directive('businessRules', function($modal, $log){
         return {
             restrict: 'E',
             scope: {
@@ -79,7 +79,7 @@ angular.module('report-editor')
                 'report': '='
             },
             templateUrl: '/report/taxonomy/concept/business-rules/list-rules.html',
-            link: function($scope, $log) {
+            link: function($scope) {
 
                 $scope.hasComputingRule = false;
                 $scope.hasValidatingRules = false;
@@ -124,7 +124,7 @@ angular.module('report-editor')
                             try {
                                 $scope.report.removeConcept(concept);
                             } catch(e){
-                                $log.log(e.name + ': ' + e.message);
+                                $log.log('Info: automatic removal of validation concept '+ concept + ' failed. Reason: ' + e.name + ': ' + e.message);
                             }
                         }
                         $scope.report.removeRule(id);
@@ -196,7 +196,6 @@ angular.module('report-editor')
             },
             templateUrl: '/report/taxonomy/concept/business-rules/rules-editor.html',
             link: function($scope) {
-                $scope.colspan1 = 2;
                 $scope.tooltipPlacement = 'top';
                 $scope.availableConceptNames = $scope.formula.listAvailableConceptNames();
                 $scope.onSelectTypeAhead = function(updateDependencies){

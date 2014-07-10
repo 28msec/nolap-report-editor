@@ -23,13 +23,6 @@ angular
                 } else {
                     return undefined;
                 }
-            }],
-            conceptName: [ 'concept' , function(concept){
-                if(concept !== undefined && concept !== null) {
-                    return concept.Name;
-                } else {
-                    return undefined;
-                }
             }]
         }
     });
