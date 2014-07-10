@@ -32,10 +32,6 @@ section {
     margin-left: 15px;
 }
 
-.no-margin {
-    margin: 0;
-}
-
 //Font weigths
 h1, h2, h3, h4, h5 {
     font-weight: 100;
@@ -109,6 +105,16 @@ html {
     }   
 }
 
+//Header
+.std-header {
+    font-size: 20px;
+    padding-bottom: 15px;
+    padding-top: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid @clouds;
+    font-weight: 300;
+}
+
 //API Status
 #api-status {
     position: fixed;
@@ -123,6 +129,25 @@ html {
 }
 
 //Nav-pills
-.nav-pills li {
-    border: 1px solid @clouds;
+.nav-pills {
+    li {
+        border: 1px solid @clouds;
+        
+        &.active {
+            border: 1px solid @brand-primary;
+        }
+        
+        >a {
+            color: @text-color;
+            
+            &:hover {
+                background-color: lighten(@clouds, 3%);
+            }
+        }
+    }
+
+    >li + li {
+        margin-left: 0;
+        border-left: 0;
+    }
 }
