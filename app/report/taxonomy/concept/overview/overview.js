@@ -19,7 +19,7 @@ angular
             }
         }
     };
-    
+
     $scope.deleteConcept = function(){
         try {
             $scope.report.removeConcept($scope.concept.Name);
