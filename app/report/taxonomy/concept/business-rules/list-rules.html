@@ -15,8 +15,8 @@
             <td ng-bind="rule.Label"></td>
             <td ng-bind="rule.Type"></td>
             <td>
-                <button type="button" class="btn btn-primary" ng-click="editRule(rule.Id)">Edit Rule</button>
-                <button type="button" class="btn btn-danger" ng-click="removeRule(rule.Id)">Delete Rule</button>
+              <button type="button" class="btn btn-default" ng-click="editRule(rule.Id)"><i class="fa fa-edit"></i> Edit Rule</button>
+                <button type="button" class="btn btn-default" ng-click="removeRule(rule.Id)"><i class="fa fa-trash-o"></i> Delete Rule</button>
             </td>
         </tr>
         </tbody>
@@ -24,28 +24,21 @@
 </div>
 <div ng-if="!hasComputingRule">
     <h2>Compute {{conceptName}}</h2>
-    <div>
-        <br/>
-        <nav class="navbar navbar-default" role="navigation">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                </div>
-                <div class="collapse navbar-collapse">
-                    <form class="navbar-form navbar-left" role="navigation">
-                        <button type="submit" class="btn btn-primary" tooltip-trigger="mouseenter" tooltip-placement="top"
-                                tooltip="Create a simple rule to compute concept {{conceptName}} using spreadsheet formula syntax."
-                                ng-click="addRule(conceptName, 'xbrl28:formula', 'SpreadsheetFormula')">Add Simple Rule</button>
-                        <button type="submit" class="btn btn-default" tooltip-trigger="mouseenter" tooltip-placement="top"
-                                tooltip="Create an advanced rule to compute concept {{conceptName}} using JSONiq syntax (Advanced Users only)."
-                                ng-click="addRule(conceptName, 'xbrl28:formula', undefined)">Add Advanced Rule</button>
-                    </form>
-                </div>
-            </div>
-        </nav>
+    <p>There is no rule to compute a fact for concept "{{conceptName}}" in case the fact is not reported and cannot be mapped. Use one of the following buttons to create a computation rule:</p>
+    <div class="button-bar">
+        <form>
+            <button type="submit" class="btn btn-primary" tooltip-trigger="mouseenter" tooltip-placement="top"
+                    tooltip="Create a simple rule to compute concept {{conceptName}} using spreadsheet formula syntax."
+                    ng-click="addRule(conceptName, 'xbrl28:formula', 'SpreadsheetFormula')">Add Simple Computation Rule</button>
+            <button type="submit" class="btn btn-default" tooltip-trigger="mouseenter" tooltip-placement="top"
+                    tooltip="Create an advanced rule to compute concept {{conceptName}} using JSONiq syntax (Advanced Users only)."
+                    ng-click="addRule(conceptName, 'xbrl28:formula', undefined)">Add Advanced Computation Rule</button>
+        </form>
     </div>
 </div>
 <div ng-if="allRules[0].Type !== 'xbrl28:validation'">
     <h2>Validate "{{conceptName}}"</h2>
+    <p ng-if="!hasValidatingRules">No validation rules for concept "{{conceptName}}" exist, yet. Use the following buttons to create a validation rule:</p>
     <table class="table table-hover" ng-if="hasValidatingRules">
         <thead>
         <tr>
@@ -61,29 +54,20 @@
             <td ng-bind="rule.Label"></td>
             <td ng-bind="rule.Type"></td>
             <td>
-                <button type="button" class="btn btn-primary" ng-click="editRule(rule.Id)">Edit Rule</button>
-                <button type="button" class="btn btn-danger" ng-click="removeRule(rule.Id)">Delete Rule</button>
+              <button type="button" class="btn btn-default" ng-click="editRule(rule.Id)"><i class="fa fa-edit"></i> Edit Rule</button>
+              <button type="button" class="btn btn-default" ng-click="removeRule(rule.Id)"><i class="fa fa-trash-o"></i> Delete Rule</button>
             </td>
         </tr>
         </tbody>
     </table>
-    <div>
-        <br/>
-        <nav class="navbar navbar-default" role="navigation">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                </div>
-                <div class="collapse navbar-collapse">
-                    <form class="navbar-form navbar-left" role="navigation">
-                        <button type="submit" class="btn btn-primary navbar-btn" tooltip-trigger="mouseenter" tooltip-placement="top"
-                                tooltip="Create a simple validation rule for concept {{conceptName}} using spreadsheet formula syntax."
-                                ng-click="addRule(conceptName, 'xbrl28:validation', 'SpreadsheetFormula')">Add Simple Validation Rule</button>
-                        <button type="submit" class="btn btn-default navbar-btn" tooltip-trigger="mouseenter" tooltip-placement="top"
-                                tooltip="Create an advanced validation rule for concept {{conceptName}} using JSONiq syntax (Advanced Users only)."
-                                ng-click="addRule(conceptName, 'xbrl28:validation', undefined)">Add Advanced Validation Rule</button>
-                    </form>
-                </div>
-            </div>
-        </nav>
+    <div class="button-bar">
+        <form>
+            <button type="submit" class="btn btn-primary navbar-btn" tooltip-trigger="mouseenter" tooltip-placement="top"
+                    tooltip="Create a simple validation rule for concept {{conceptName}} using spreadsheet formula syntax."
+                    ng-click="addRule(conceptName, 'xbrl28:validation', 'SpreadsheetFormula')">Add Simple Validation Rule</button>
+            <button type="submit" class="btn btn-default navbar-btn" tooltip-trigger="mouseenter" tooltip-placement="top"
+                    tooltip="Create an advanced validation rule for concept {{conceptName}} using JSONiq syntax (Advanced Users only)."
+                    ng-click="addRule(conceptName, 'xbrl28:validation', undefined)">Add Advanced Validation Rule</button>
+        </form>
     </div>
 </div>
