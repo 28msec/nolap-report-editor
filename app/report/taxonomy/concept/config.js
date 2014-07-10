@@ -7,7 +7,7 @@ angular
     .state('report.taxonomy.concept', {
         url: '/concept/:conceptId',
         abstract: true,
-        Controller: 'ConceptCtrl',
+        controller: 'ConceptCtrl',
         templateUrl: '/report/taxonomy/concept/concept.html'
     });
 })

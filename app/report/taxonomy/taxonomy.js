@@ -46,6 +46,7 @@ angular
             var child = element[key];
             var concept = $scope.report.getConcept(child.Name);
             if(concept === null) {
+                console.error('Concept ' + child.Name + ' not found in report.');
                 console.error('Invalid report detected. This is a serious bug!');
                 return;
             }
