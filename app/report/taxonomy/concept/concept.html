@@ -1,7 +1,8 @@
 <h2 ng-bind="concept.Name" class="no-margin"></h2>
 <ul class="nav nav-pills">
     <li ui-sref-active="active"><a ui-sref="report.taxonomy.concept.overview()">Overview</a></li>
-    <li ui-sref-active="active"><a ui-sref="report.taxonomy.concept.conceptMaps()">Concept Maps</a></li>
-    <li ui-sref-active="active"><a ui-sref="report.taxonomy.concept.businessRules()">Business Rules</a></li>
+    <li ui-sref-active="active"><a ui-sref="report.taxonomy.concept.conceptMaps()">Concept Map</a></li>
+    <li ui-sref-active="active"><a ui-sref="report.taxonomy.concept.formula.computation.list()">Computation Formula ({{computationFormulasCount}})</a></li>
+    <li ui-sref-active="active"><a ui-sref="report.taxonomy.concept.formula.validations.list()">Validation Formulas ({{validationFormulasCount}})</a></li>
 </ul>
-<div ui-view></div>
+<div ui-view class="concept-view"></div>
