@@ -1,1 +1,26 @@
-<h1>Overview</h1>
+<div class="scrollable lg-bottom-padding">
+<h3>Metadata</h3>
+<input class="form-control" type="text" ng-model="concept.Label" placeholder="Concept label">
+<div class="checkbox">
+    <label>
+        <input type="checkbox" ng-model="concept.IsAbstract">
+        Abstract concept
+    </label>
+</div>
+<hr>
+<h3>Presentation</h3>
+<p>You can drop the element below in presentation tree.</p>
+<div ui-tree="elementOptions">
+    <ol ui-tree-nodes="" ng-model="element">
+        <li ng-repeat="element in element" ui-tree-node>
+            <div class="element-to-drop" ui-tree-handle>
+                <span class="fa fa-reply btn-element bg-primary"></span>
+                <span ng-bind="element.Name"></span>
+            </div>
+        </li>
+    </ol>
+</div>
+<hr>
+<h3>Management</h3>
+<button class="btn btn-danger" ng-click="deleteConcept()">Delete concept</button>
+</div>

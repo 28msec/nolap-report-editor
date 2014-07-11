@@ -572,7 +572,7 @@ angular
         return false;
     };
 
-    var createNewElement = function(concept, order) {
+    Report.prototype.createNewElement = function(concept, order) {
         ensureParameter(concept, 'concept', 'object', 'createNewElement');
         var _order = 1;
         if(order !== undefined) {
@@ -604,13 +604,13 @@ angular
         }
         return count;
     };
-
-    Report.prototype.addTreeChild = function(networkShortName, parentElementID, oconceptName, offset) {
-        ensureNetworkShortName(networkShortName, 'networkShortName', 'addTreeChild');
-        var conceptName = this.alignConceptPrefix(oconceptName);
-        ensureConceptName(conceptName, 'oconceptName', 'addTreeChild');
+    
+    Report.prototype.addElement = function(networkShortName, parentElementID, element, offset){
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'addElement');
+        var conceptName = element.Name;
+        ensureConceptName(conceptName, 'element', 'addElement');
         var concept = this.getConcept(conceptName);
-        ensureExists(concept, 'object', 'addTreeChild', 'concept with name "' + conceptName + '" doesn\'t exist.');
+        ensureExists(concept, 'object', 'addElement', 'concept with name "' + conceptName + '" doesn\'t exist.');
 
         var order = 1;
         var maxOrder = getMaxOrder(this, networkShortName, parentElementID);
@@ -628,7 +628,7 @@ angular
         if(parentElementID === undefined || parentElementID === null) {
             // add a root element
             var network = this.getNetwork(networkShortName);
-            var rootElement = createNewElement(concept, order);
+            var rootElement = this.createNewElement(concept, order);
             network.Trees[conceptName] = rootElement;
             return rootElement;
 
@@ -644,7 +644,6 @@ angular
                     '". Reason: Parent concept "' + parent.Name  + '" is not abstract.');
             }
 
-            var element = createNewElement(concept, order);
             if(parent.To === undefined || parent.To === null) {
                 parent.To = {};
             }
@@ -653,6 +652,11 @@ angular
             return element;
         }
     };
+
+    //Report.prototype.addTreeChild = function(networkShortName, parentElementID, oconceptName, offset) {
+    //    var element = this.createNewElement(concept, order);
+    //    return this.addElement(network, parentElementID, element, offset);
+    //};
 
     Report.prototype.moveTreeBranch = function(networkShortName, subtreeRootElementID, newParentElementID, newOffset) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'moveTreeBranch');

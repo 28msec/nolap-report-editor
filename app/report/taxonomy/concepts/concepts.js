@@ -11,15 +11,14 @@ angular
                 results.push(concept);
             }
         });
-        results.push({ Name: 'Create ' + $viewValue + ' concept.', newConcept: true });
+        results.push({ Name: 'Create ' + $viewValue + ' concept.', newConcept: true, viewValue: $viewValue });
         return results;
     };
     
     $scope.onSelect = function($item, $model, $label){
         if($item.newConcept === true) {
-            
-        } else {
-            $state.go('report.taxonomy.concept.overview', { conceptId: $item.Name });
+            $scope.report.addConcept($item.viewValue, 'Concept Label', false);
         }
+        $state.go('report.taxonomy.concept.overview', { conceptId: $item.newConcept ? $item.viewValue : $item.Name });
     };
 });

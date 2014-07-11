@@ -1,9 +1,17 @@
-.delete-element {
+.btn-element {
     display: none;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    color: white !important;
+    &:hover {
+        color: white !important;
+    }
 }
 
-.angular-ui-tree-handle:hover .delete-element {
-    display: block;
+.angular-ui-tree-handle:hover .btn-element {
+    display: inline-block;
 }
 
 //Angular UI Tree
@@ -12,14 +20,6 @@
 }
 
 .angular-ui-tree-empty {
-    border: 1px dashed #bbb;
-    min-height: 100px;
-    background-color: #e5e5e5;
-    background-image: -webkit-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff), -webkit-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
-    background-image: -moz-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff), -moz-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
-    background-image: linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff), linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
-    background-size: 60px 60px;
-    background-position: 0 0, 30px 30px;
 }
 
 .angular-ui-tree-nodes {
@@ -53,17 +53,21 @@
 }
 
 .angular-ui-tree-handle {
-    cursor: default;
+    cursor: move;
     text-decoration: none;
     //font-weight: bold;
+    background-color: @clouds;
+    margin-top: 5px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    min-height: 20px;
-    line-height: 20px;
-    background-color: @clouds;
-    padding: 5px;
-    margin-top: 5px;
+    min-height: 30px;
+    line-height: 30px;
+    padding-left: 5px;
+    
+    .element-name {
+        padding: 5px;
+    }
 }
 
 .angular-ui-tree-drag {
