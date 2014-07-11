@@ -475,7 +475,7 @@ angular
         return element;
     };
 
-    var sortTreeChildren = function(children){
+    Report.prototype.sortTreeChildren = function(children){
         ensureParameter(children, 'children', 'object', 'sortTreeChildren');
         children.sort(function(elem1, elem2){
             var order1 = elem1.Order;
@@ -522,7 +522,7 @@ angular
                 ordered.push(children[child]);
             }
         }
-        sortTreeChildren(ordered);
+        report.sortTreeChildren(ordered);
         for (var i = 0; i < ordered.length; i++) {
             if(shiftOffset !== -1 && i >= shiftOffset){
                 ordered[i].Order = i + 2;
@@ -768,7 +768,7 @@ angular
                 ordered.push(children[child]);
             }
         }
-        sortTreeChildren(ordered);
+        this.sortTreeChildren(ordered);
 
         for(var synonym in ordered){
             if(ordered.hasOwnProperty(synonym)) {
