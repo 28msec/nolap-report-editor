@@ -85,7 +85,7 @@ angular
 
                 var redirectToParent = function(){
                     var current = $state.current.name;
-                    if(current.indexOf(".computation.") > -1){
+                    if(current.indexOf('.computation.') > -1){
                         $state.go('report.taxonomy.concept.formula.computation.list');
                     } else {
                         $state.go('report.taxonomy.concept.formula.validations.list');
@@ -161,7 +161,7 @@ angular
                     $scope.formula.validate($scope.action, updateDependencies);
                 };
 
-                $scope.createConcept = function(concept){
+                $scope.createConcept = function(){//concept
                     //$rootScope.$emit('createConcept', false, concept);
                 };
 

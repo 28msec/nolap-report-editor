@@ -15,7 +15,7 @@ angular
         return results;
     };
     
-    $scope.onSelect = function($item, $model, $label){
+    $scope.onSelect = function($item){
         if($item.newConcept === true) {
             $scope.report.addConcept($item.viewValue, 'Concept Label', false);
         }

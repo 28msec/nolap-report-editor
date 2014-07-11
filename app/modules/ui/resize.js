@@ -10,6 +10,6 @@ angular
                 $scope.$apply();
             });
         }    
-    }
+    };
 })
 ;
