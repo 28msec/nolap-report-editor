@@ -12,8 +12,16 @@
 @import "../report/fact-table/fact-table.less";
 @import "../report/filters/filters.less";
 
+.disabled {
+    cursor: not-allowed;
+}
+
 a {
     cursor: pointer;
+    
+    &[disabled] {
+        pointer-events: none;
+    }
 }
 
 section {
@@ -21,16 +29,37 @@ section {
 }
 
 //std margin, padding, bg
-.std-right-margin {
-    margin-right: 15px;
+.std-padding {
+    padding: 20px;    
 }
 
+.no-top-padding {
+    padding-top: 0;   
+}
 .std-top-padding {
-    padding-top: 15px;
+    padding-top: 20px;
+}
+
+.std-right-margin {
+    margin-right: 20px;
+}
+
+.std-top-margin {
+    margin-top: 20px;
 }
 
 .std-left-margin {
-    margin-left: 15px;
+    margin-left: 20px;
+}
+
+//Header
+.std-header {
+    font-size: 20px;
+    padding-bottom: 20px;
+    padding-top: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid @clouds;
+    font-weight: 300;
 }
 
 .bg-primary {
@@ -118,16 +147,6 @@ html {
             .viewport;
         }   
     }   
-}
-
-//Header
-.std-header {
-    font-size: 20px;
-    padding-bottom: 20px;
-    padding-top: 20px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid @clouds;
-    font-weight: 300;
 }
 
 //API Status

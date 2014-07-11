@@ -4,8 +4,14 @@
     <span ng-bind="concept.Name"></span>
 </header>
 <ul class="nav nav-pills">
-    <li ui-sref-active="active"><a ui-sref="report.taxonomy.concept.overview()">Overview</a></li>
-    <li ui-sref-active="active"><a ui-sref="report.taxonomy.concept.conceptMaps()">Concept Maps</a></li>
-    <li ui-sref-active="active"><a ui-sref="report.taxonomy.concept.businessRules()">Business Rules</a></li>
+    <li ui-sref-active="active">
+        <a ui-sref="report.taxonomy.concept.overview()">Overview</a>
+    </li>
+    <li ui-sref-active="active" ng-class="{ disabled: concept.IsAbstract === true }">
+        <a ui-sref="report.taxonomy.concept.synonyms()" ng-disabled="concept.IsAbstract === true">Synonyms</a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="report.taxonomy.concept.businessRules()">Business Rules</a>
+    </li>
 </ul>
 <div ui-view></div>
