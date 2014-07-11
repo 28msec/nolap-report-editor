@@ -1,0 +1,50 @@
+<div>
+    <p ng-if="!hasComputingRule && type === 'computation'">
+        There is no formula to compute a fact for concept "{{conceptName}}" in case the fact is not reported and cannot be mapped.
+        You have the following options to create a computation formula:</p>
+    <p ng-if="!hasValidatingRules && type === 'validation'">
+        No validation formulas exist for facts with concept "{{conceptName}}", yet.
+        You have the following options to create a validation formula:</p>
+    <table class="table table-hover" ng-if="hasComputingRule || hasValidatingRules">
+        <thead>
+        <tr class="row">
+            <th ng-if="type === 'validation'">Id</th>
+            <th>Label</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr  class="row" ng-repeat="(key, rule) in rulesList">
+            <td ng-if="type === 'validation'" ng-bind="rule.Id" class="col-md-1"></td>
+            <td ng-bind="rule.Label" ng-class="{'col-md-8': type === 'computation', 'col-md-7': type === 'validation'}"></td>
+            <td class="col-md-4">
+                <button ng-if="type === 'computation'" type="button" class="btn btn-default"
+                        ui-sref="report.taxonomy.concept.formula.computation.edit({'ruleId':rule.Id})"><i class="fa fa-edit"></i> Edit Rule</button>
+                <button ng-if="type === 'validation'" type="button" class="btn btn-default"
+                        ui-sref="report.taxonomy.concept.formula.validations.edit({'ruleId':rule.Id})"><i class="fa fa-edit"></i> Edit Rule</button>
+                <button type="button" class="btn btn-default" ng-click="removeRule(rule.Id)"><i class="fa fa-trash-o"></i> Delete Rule</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="button-bar" ng-if="!hasComputingRule && type === 'computation'">
+        <form>
+            <button type="submit" class="btn btn-primary" tooltip-trigger="mouseenter" tooltip-placement="right"
+                    tooltip="Create a simple rule to compute concept {{conceptName}} using spreadsheet formula syntax."
+                    ui-sref="report.taxonomy.concept.formula.computation.create({'languageType':'SpreadsheetFormula'})">Add Simple Computation Rule</button>
+            <button type="submit" class="btn btn-default" tooltip-trigger="mouseenter" tooltip-placement="right"
+                    tooltip="Create an advanced rule to compute concept {{conceptName}} using JSONiq syntax (Advanced Users only)."
+                    ui-sref="report.taxonomy.concept.formula.computation.create()">Add Advanced Computation Rule</button>
+        </form>
+    </div>
+    <div class="button-bar" ng-if="type === 'validation'">
+        <form>
+            <button type="submit" class="btn btn-primary navbar-btn" tooltip-trigger="mouseenter" tooltip-placement="right"
+                    tooltip="Create a simple validation rule for concept {{conceptName}} using spreadsheet formula syntax."
+                    ui-sref="report.taxonomy.concept.formula.validations.create({'languageType':'SpreadsheetFormula'})">Add Simple Validation Rule</button>
+            <button type="submit" class="btn btn-default navbar-btn" tooltip-trigger="mouseenter" tooltip-placement="right"
+                    tooltip="Create an advanced validation rule for concept {{conceptName}} using JSONiq syntax (Advanced Users only)."
+                    ui-sref="report.taxonomy.concept.formula.validations.create()">Add Advanced Validation Rule</button>
+        </form>
+    </div>
+</div>

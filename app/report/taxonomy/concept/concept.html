@@ -8,10 +8,13 @@
         <a ui-sref="report.taxonomy.concept.overview()">Overview</a>
     </li>
     <li ui-sref-active="active" ng-class="{ disabled: concept.IsAbstract === true }">
-        <a ui-sref="report.taxonomy.concept.synonyms()" ng-disabled="concept.IsAbstract === true">Synonyms</a>
+        <a ui-sref="report.taxonomy.concept.synonyms()" ng-disabled="concept.IsAbstract === true">Synonyms ({{synonymsCount}})</a>
     </li>
-    <li ui-sref-active="active">
-        <a ui-sref="report.taxonomy.concept.businessRules()">Business Rules</a>
+    <li ui-sref-active="active" ng-class="{ disabled: concept.IsAbstract === true }">
+        <a ui-sref="report.taxonomy.concept.formula.computation.list()">Computation Formula ({{computationFormulasCount}})</a>
+    </li>
+    <li ui-sref-active="active" ng-class="{ disabled: concept.IsAbstract === true }">
+        <a ui-sref="report.taxonomy.concept.formula.validations.list()">Validation Formulas ({{validationFormulasCount}})</a>
     </li>
 </ul>
-<div ui-view></div>
+<div ui-view class="concept-view"></div>

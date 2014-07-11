@@ -475,6 +475,32 @@ angular
         return element;
     };
 
+    var sortTreeChildren = function(children){
+        ensureParameter(children, 'children', 'object', 'sortTreeChildren');
+        children.sort(function(elem1, elem2){
+            var order1 = elem1.Order;
+            if(order1 === undefined || order1 === null){
+                order1 = 1;
+            } else if(typeof order1 !== 'number'){
+                order1 = parseInt(order1, 10);
+            }
+            var order2 = elem2.Order;
+            if(order2 === undefined || order2 === null){
+                order2 = 1;
+            } else if(typeof order2 !== 'number'){
+                order2 = parseInt(order2, 10);
+            }
+            if (order1 < order2){
+                return -1;
+            }
+            if (order1 > order2){
+                return 1;
+            }
+            return 0;
+        });
+        return children;
+    };
+
     var enforceStrictChildOrderAndShift = function(report, networkShortName, parentID, shiftOffset) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'enforceStrictChildOrder');
 
@@ -496,27 +522,7 @@ angular
                 ordered.push(children[child]);
             }
         }
-        ordered.sort(function(elem1, elem2){
-            var order1 = elem1.Order;
-            if(order1 === undefined || order1 === null){
-                order1 = 1;
-            } else if(typeof order1 !== 'number'){
-                order1 = parseInt(order1, 10);
-            }
-            var order2 = elem2.Order;
-            if(order2 === undefined || order2 === null){
-                order2 = 1;
-            } else if(typeof order2 !== 'number'){
-                order2 = parseInt(order2, 10);
-            }
-            if (order1 < order2){
-                return -1;
-            }
-            if (order1 > order2){
-                return 1;
-            }
-            return 0;
-        });
+        sortTreeChildren(ordered);
         for (var i = 0; i < ordered.length; i++) {
             if(shiftOffset !== -1 && i >= shiftOffset){
                 ordered[i].Order = i + 2;
@@ -744,6 +750,34 @@ angular
         }
     };
 
+    Report.prototype.listConceptMapSynonyms = function(oconceptName) {
+        var conceptName = this.alignConceptPrefix(oconceptName);
+        ensureConceptName(conceptName, 'oconceptName', 'listConceptMapSynonyms');
+
+        var synonyms = [];
+        var conceptMap = this.getConceptMap(conceptName);
+        if (conceptMap === undefined || conceptMap === null){
+            return synonyms;
+        }
+
+        // sort
+        var ordered = [];
+        var children = conceptMap.To;
+        for(var child in children){
+            if(children.hasOwnProperty(child)) {
+                ordered.push(children[child]);
+            }
+        }
+        sortTreeChildren(ordered);
+
+        for(var synonym in ordered){
+            if(ordered.hasOwnProperty(synonym)) {
+                synonyms.push(ordered[synonym].Name);
+            }
+        }
+        return synonyms;
+    };
+
     Report.prototype.listConceptMaps = function() {
 
         var result = [];
@@ -770,61 +804,45 @@ angular
         return true;
     };
 
-    Report.prototype.addConceptMap = function(ofromConceptName, toConceptNamesArray) {
+    Report.prototype.updateConceptMap = function(ofromConceptName, toConceptNamesArray) {
         var fromConceptName = this.alignConceptPrefix(ofromConceptName);
-        ensureConceptName(fromConceptName, 'ofromConceptName', 'addConceptMap');
+        ensureConceptName(fromConceptName, 'ofromConceptName', 'updateConceptMap');
         var fromConcept = this.getConcept(fromConceptName);
-        ensureExists(fromConcept, 'object', 'addConceptMap', 'concept with name "' + fromConceptName + '" doesn\'t exist.');
+        ensureExists(fromConcept, 'object', 'updateConceptMap', 'concept with name "' + fromConceptName + '" doesn\'t exist.');
         if(fromConcept.IsAbstract) {
-            throw new Error('addConceptMap: cannot add a concept map for concept "' + fromConceptName +
+            throw new Error('updateConceptMap: cannot update concept map for concept "' + fromConceptName +
                 '". Reason: Concept is abstract.');
         }
 
+        // ensure Concept map exists
+        var conceptMap = this.getConceptMap(fromConceptName);
         var toObj = {};
+        if(conceptMap === undefined || conceptMap === null){
+            conceptMap = {
+                'Id': _uuid(),
+                'Name': fromConcept.Name,
+                'To': toObj
+            };
+        }
+
+        // add synomyms
         for(var i in toConceptNamesArray) {
             var name = this.alignConceptPrefix(toConceptNamesArray[i]);
-            ensureConceptName(name, 'toConceptNamesArray', 'addConceptMap');
+            ensureConceptName(name, 'toConceptNamesArray', 'updateConceptMap');
             toObj[name] = {
                 'Id': _uuid(),
                 'Name': name,
                 'Order': parseInt(i, 10) + 1
             };
         }
-        var conceptMap = {
-            'Id': _uuid(),
-            'Name': fromConcept.Name,
-            'To': toObj
-        };
-        
+        conceptMap.To = toObj;
+
+        // add concept map to network
         var network = this.getNetwork('ConceptMap');
         if(network.Trees === null || network.Trees === undefined) {
             network.Trees = {};
         }
-        if(network.Trees[fromConceptName] !== null && typeof network.Trees[fromConceptName] === 'object'){
-            throw new Error('addConceptMap: concept map for concept "' + fromConceptName + '" already exists');
-        }
         network.Trees[fromConceptName] = conceptMap;
-    };
-
-    Report.prototype.updateConceptMap = function(ofromConceptName, toConceptNamesArray) {
-        var fromConceptName = this.alignConceptPrefix(ofromConceptName);
-        ensureConceptName(fromConceptName, 'ofromConceptName', 'updateConceptMap');
-        var fromConcept = this.getConcept(fromConceptName);
-        ensureExists(fromConcept, 'object', 'updateConceptMap', 'concept with name "' + fromConceptName + '" doesn\'t exist.');
-
-        var conceptMap = this.getConceptMap(fromConceptName);
-        ensureExists(conceptMap, 'object', 'updateConceptMap', 'No concept map exists for concept with name "' + fromConceptName + '".');
-
-        var toObj = {};
-        for(var i in toConceptNamesArray) {
-            var name = this.alignConceptPrefix(toConceptNamesArray[i]);
-            ensureConceptName(name, 'toConceptNamesArray', 'updateConceptMap');
-            toObj[name] = {
-                'Name': name,
-                'Order': parseInt(i, 10) + 1
-            };
-        }
-        conceptMap.To = toObj;
     };
 
     Report.prototype.findInConceptMap = function(oconceptName) {
