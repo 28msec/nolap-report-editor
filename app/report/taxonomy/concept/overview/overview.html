@@ -9,6 +9,15 @@
 </div>
 <hr>
 <h3>Presentation</h3>
+<p ng-if="ref.length === 0">
+    There are no elements for this concept in the presentation tree.
+</p>
+<p ng-if="refs.length === 1">
+    There is one element for this concept in the presentation tree.
+</p>
+<p ng-if="refs.length > 1">
+    There are <span ng-bind="refs.length"></span> for this concept in the presentation tree.
+</p>
 <p>You can drop the element below in presentation tree.</p>
 <div ui-tree="elementOptions">
     <ol ui-tree-nodes="" ng-model="element">

@@ -23,6 +23,8 @@ angular
         }
     };
 
+    $scope.refs = $scope.report.findInTree('Presentation', $scope.concept.Name);
+
     $scope.deleteConcept = function(){
         try {
             $scope.report.deleteConcept($scope.concept.Name);
