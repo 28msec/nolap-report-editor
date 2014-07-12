@@ -10,10 +10,7 @@ angular.module('report-editor')
 
     $scope.$watch('concept.IsAbstract', function(newVal, oldVal){
         if(newVal !== oldVal) {
-            $scope.loadPresentationTree(
-                $scope.report.getNetwork('Presentation').Trees,
-                $scope.presentationTree
-            );
+            $scope.loadPresentationTree();
         }
     });
 });

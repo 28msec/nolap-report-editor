@@ -60,16 +60,11 @@ angular
             }
         });
     };
-    
-    $scope.presentationTree = [];
-    
-    $scope.loadPresentationTree = function(network, tree){
-        tree.splice(0, tree.length);
-        setPresentationTree(network, tree);
+
+    $scope.loadPresentationTree = function(){
+        $scope.presentationTree = [];
+        setPresentationTree($scope.report.getNetwork('Presentation').Trees, $scope.presentationTree);
     };
 
-    $scope.loadPresentationTree(
-        $scope.report.getNetwork('Presentation').Trees,
-        $scope.presentationTree
-    );
+    $scope.loadPresentationTree();
 });
