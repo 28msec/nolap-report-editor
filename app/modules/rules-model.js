@@ -880,8 +880,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
             if(notExistingConcepts.length === 1) {
                 alternative.SourceFactErr =
                     $sce.trustAsHtml(
-                            'The source concept <a href="#" tooltip-trigger="mouseenter" tooltip-placement="top" ' +
-                            'tooltip="Create this Concept." ng-click="createConcept(\'' + notExistingConcepts[0] + '\')">"' + notExistingConcepts[0] + '"</a> does not exist.');
+                            'The source concept "' + notExistingConcepts[0] + '" does not exist.');
                 alternative.valid = false;
             } else if(notExistingConcepts.length > 1) {
                 alternative.SourceFactErr = $sce.trustAsHtml('The following source concepts do not exist: "' + notExistingConcepts.join('", "') + '".');
