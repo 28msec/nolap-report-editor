@@ -400,7 +400,8 @@ describe('Concepts Model API Tests', function () {
             if (ex !== null && ex !== undefined && ex.name === 'ConceptIsStillReferencedError') {
                 expect(ex.message.match(/"fac:Leaf2".*is still referenced in the report/g)).not.toBeNull();
                 var refs = ex.references;
-                expect(refs.Presentation.length).toBe(1);
+                expect(refs.References).toBe(4);
+                expect(refs.Trees.Presentation.length).toBe(1);
                 expect(refs.ConceptMaps.SynonymOf.length).toBe(0);
                 expect(refs.ConceptMaps.Maps.length).toBe(1);
                 expect(refs.Rules.Computing.length).toBe(1);

@@ -3,14 +3,10 @@
 angular
 .module('report-model', [])
 .factory('ConceptIsStillReferencedError', function(){
-    var ConceptIsStillReferencedError = function(message, referencesInConceptMapsObject, referencesInPresentationArray, referencesInRulesObject) {
+    var ConceptIsStillReferencedError = function(message, references) {
         this.name = 'ConceptIsStillReferencedError';
         this.message = (message || '');
-        this.references = {
-            'Presentation': referencesInPresentationArray,
-            'ConceptMaps' : referencesInConceptMapsObject,
-            'Rules': referencesInRulesObject
-        };
+        this.references = references;
     };
     ConceptIsStillReferencedError.prototype = new Error();
     return ConceptIsStillReferencedError;
@@ -306,6 +302,33 @@ angular
         concept.IsAbstract = abstract;
     };
 
+    Report.prototype.findConceptReferences = function(oConceptName) {
+        var conceptName = this.alignConceptPrefix(oConceptName);
+        ensureConceptName(conceptName, 'oConceptName', 'findConceptReferences');
+
+        var references = {
+            'Trees': this.findInTrees(conceptName),
+            'ConceptMaps' : this.findInConceptMap(conceptName),
+            'Rules': this.findInRules(conceptName)
+        };
+        var refCount = 0;
+        for(var i in references){
+            if(references.hasOwnProperty(i)){
+                var subRefCats = references[i];
+                for (var j in subRefCats){
+                    if(subRefCats.hasOwnProperty(j)){
+                        var subRefCat = subRefCats[j];
+                        if(subRefCat !== undefined && subRefCat !== null && subRefCat.length !== undefined){
+                            refCount += subRefCat.length;
+                        }
+                    }
+                }
+            }
+        }
+        references.References = refCount;
+        return references;
+    };
+
     Report.prototype.removeConcept = function(oname, force) {
         var name = this.alignConceptPrefix(oname);
         ensureConceptName(name, 'oname', 'removeConcept');
@@ -316,49 +339,46 @@ angular
             throw new Error('removeConcept: cannot remove concept with name "' + name + '" from model because it doesn\'t exist.');
         }
 
-        var referencesInConceptMapsObject = this.findInConceptMap(name);
-        var referencesInPresentationArray = this.findInTree('Presentation', name);
-        var referencesInRulesObject = this.findInRules(name);
-        if(!force && (referencesInConceptMapsObject.Maps.length > 0 || referencesInConceptMapsObject.SynonymOf.length > 0 || referencesInPresentationArray.length > 0 ||
-            referencesInRulesObject.Computing.length > 0 || referencesInRulesObject.Validating.length > 0 || referencesInRulesObject.Dependent.length > 0)){
-            throw new ConceptIsStillReferencedError('removeConcept: cannot remove concept with name "' + name + '" from model because it is still referenced in the report.',
-                referencesInConceptMapsObject, referencesInPresentationArray, referencesInRulesObject);
+        var references = this.findConceptReferences(name);
+        if(!force && references.References > 0 ){
+            throw new ConceptIsStillReferencedError('removeConcept: cannot remove concept with name "' + name +
+                    '" from model because it is still referenced in the report.', references);
         } else if(force) {
             var that = this;
-            if(referencesInRulesObject){
-                if(referencesInRulesObject.Dependent !== undefined && referencesInRulesObject.Dependent !== null && referencesInRulesObject.Dependent.length > 0){
-                    throw new Error('removeConcept: cannot force removing concept with name "' + name + '" from model because the following ' + referencesInRulesObject.Dependent.length +
+            if(references.Rules){
+                if(references.Rules.Dependent !== undefined && references.Rules.Dependent !== null && references.Rules.Dependent.length > 0){
+                    throw new Error('removeConcept: cannot force removing concept with name "' + name + '" from model because the following ' + references.Rules.Dependent.length +
                         ' rules still depend on this concept.');
                 }
-                if(referencesInRulesObject.Computing !== undefined && referencesInRulesObject.Computing !== null && referencesInRulesObject.Computing.length > 0){
-                    referencesInRulesObject.Computing.forEach(function(id){
+                if(references.Rules.Computing !== undefined && references.Rules.Computing !== null && references.Rules.Computing.length > 0){
+                    references.Rules.Computing.forEach(function(id){
                         $log.log('removing ' + name + ' computing rule ' + id);
                         that.removeRule(id);
                     });
                 }
-                if(referencesInRulesObject.Validating !== undefined && referencesInRulesObject.Validating !== null && referencesInRulesObject.Validating.length > 0){
-                    referencesInRulesObject.Validating.forEach(function(id){
+                if(references.Rules.Validating !== undefined && references.Rules.Validating !== null && references.Rules.Validating.length > 0){
+                    references.Rules.Validating.forEach(function(id){
                         $log.log('removing ' + name + ' validating rule ' + id);
                         that.removeRule(id);
                     });
                 }
             }
-            if(referencesInConceptMapsObject) {
-                if(referencesInConceptMapsObject.Maps.length > 0) {
-                    referencesInConceptMapsObject.Maps.forEach(function(id){
+            if(references.ConceptMaps) {
+                if(references.ConceptMaps.Maps.length > 0) {
+                    references.ConceptMaps.Maps.forEach(function(id){
                         $log.log('removing synonyms map for ' + id);
                         that.removeConceptMap(id);
                     });
                 }
-                if(referencesInConceptMapsObject.SynonymOf.length > 0) {
-                    referencesInConceptMapsObject.SynonymOf.forEach(function(id){
+                if(references.ConceptMaps.SynonymOf.length > 0) {
+                    references.ConceptMaps.SynonymOf.forEach(function(id){
                         $log.log('removing ' + name + ' as synonym of ' + id);
                         that.removeSynonym(id, name);
                     });
                 }
             }
-            if(referencesInPresentationArray) {
-                referencesInPresentationArray.forEach(function(id){
+            if(references.Trees.Presentation) {
+                references.Trees.Presentation.forEach(function(id){
                     $log.log('removing presentation element ' + name + ' (' + id + ')');
                     that.removeTreeBranch('Presentation', id);
                 });
@@ -483,7 +503,17 @@ angular
         }
         return result;
     };
-    
+
+    Report.prototype.findInTrees = function(oconceptName) {
+        var conceptName = this.alignConceptPrefix(oconceptName);
+        ensureConceptName(conceptName, 'oconceptName', 'findInTrees');
+
+        var result = {
+            Presentation: this.findInTree('Presentation', conceptName)
+        };
+        return result;
+    };
+
     Report.prototype.findInTree = function(networkShortName, conceptName) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'findInTree');
         

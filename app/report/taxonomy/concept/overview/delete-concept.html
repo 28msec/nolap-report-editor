@@ -19,13 +19,13 @@
     </div>
     <div ng-if="references.Rules.Dependent.length === 0">
         <p>
-        By deleting this concept the following references will be deleted as well:
+        By deleting this concept the following {{references.References}} references will be deleted as well:
             <ul>
-                <li ng-if="references.Presentation.length > 0">{{references.Presentation.length}} appearance{{references.Presentation.length>1?'s':''}} in Presentation</li>
+                <li ng-if="references.Trees.Presentation.length > 0">{{references.Trees.Presentation.length}} appearance{{references.Trees.Presentation.length>1?'s':''}} in Presentation</li>
                 <li ng-if="references.ConceptMaps.Maps.length > 0">{{references.ConceptMaps.Maps.length}} Synonym Mapping{{references.ConceptMaps.Maps.length>1?'s':''}}</li>
                 <li ng-if="references.ConceptMaps.SynonymOf.length > 0">{{references.ConceptMaps.SynonymOf.length}} Synonym{{references.ConceptMaps.SynonymOf.length>1?'s':''}}</li>
-                <li ng-if="references.Rules.Computing.length > 0">{{references.Rules.Computing.length}} computation formula{{references.Rules.Computing.length>1?'s':''}}</li>
-                <li ng-if="references.Rules.Validating.length > 0">{{references.Rules.Validating.length}} validation formula{{references.Rules.Validating.length>1?'s':''}}</li>
+                <li ng-if="references.Rules.Computing.length > 0">{{references.Rules.Computing.length}} Computation Formula{{references.Rules.Computing.length>1?'s':''}}</li>
+                <li ng-if="references.Rules.Validating.length > 0">{{references.Rules.Validating.length}} Validation Formula{{references.Rules.Validating.length>1?'s':''}}</li>
             </ul>
         </p>
     </div>
