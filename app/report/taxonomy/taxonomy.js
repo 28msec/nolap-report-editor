@@ -3,9 +3,6 @@ angular
 .module('report-editor')
 .controller('TaxonomyCtrl', function($scope, $state){
 
-    $scope.presentationNetwork = $scope.report.getNetwork('Presentation').Trees;
-    $scope.presentationTree = [];
-    
     $scope.treeOptions = {
         dropped: function(event){
             if(event.dest.nodesScope.$nodeScope !== null) {
@@ -57,11 +54,17 @@ angular
             }
             current.push(child);
             if(concept.IsAbstract === true) {
+                child.IsAbstract = true;
                 child.children = [];
                 setPresentationTree(child.To ? child.To : {}, child.children);
             }
         });
     };
 
-    setPresentationTree(angular.copy($scope.presentationNetwork), $scope.presentationTree);
+    $scope.loadPresentationTree = function(){
+        $scope.presentationTree = [];
+        setPresentationTree($scope.report.getNetwork('Presentation').Trees, $scope.presentationTree);
+    };
+
+    $scope.loadPresentationTree();
 });

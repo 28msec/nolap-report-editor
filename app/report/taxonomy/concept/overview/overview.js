@@ -12,6 +12,9 @@ angular
 
     initElement();
     $scope.elementOptions = {
+        accept: function(){
+            return false;
+        },
         dropped: function(event){
             if(event.source.nodesScope !== event.dest.nodesScope) {
                 $scope.report.addElement('Presentation', event.dest.nodesScope.$nodeScope.$modelValue.Id, element, event.dest.index);

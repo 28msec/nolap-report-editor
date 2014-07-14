@@ -23,7 +23,7 @@ angular.module('report-editor')
             token: Session.getToken(),
             $timeout: saveCanceler.promise
         })
-        .then(function(response){
+        .then(function(){
             lastKnowSavedModel = newVal;
             lastKnowSavedModelAsString = JSON.stringify(lastKnowSavedModel);
             $rootScope.$emit('apiStatus', { message: 'Report saved', code: 'success', expires: 500 });

@@ -59,7 +59,7 @@ angular.module('report-editor')
             $scope.loading = false;
             $scope.data = null;
             $scope.error = error;
-          });;
+      });
 	  };
 	  
 	$scope.reload();
