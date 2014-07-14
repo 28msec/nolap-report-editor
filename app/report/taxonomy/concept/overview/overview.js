@@ -27,7 +27,7 @@ angular
 
     $scope.deleteConcept = function(){
         try {
-            $scope.report.deleteConcept($scope.concept.Name);
+            $scope.report.removeConcept($scope.concept.Name);
             $state.go('report.taxonomy.concepts');
         } catch(e) {
             if(e instanceof ConceptIsStillReferencedError) {
@@ -65,7 +65,7 @@ angular
                     }
                 }).result.then(function(result){
                     if(result) {
-                        $scope.report.deleteConcept($scope.concept.Name, true /*force*/);
+                        $scope.report.removeConcept($scope.concept.Name, true /*force*/);
                         $state.go('report.taxonomy.concepts');
                     }
                 });

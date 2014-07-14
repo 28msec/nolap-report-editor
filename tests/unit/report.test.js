@@ -105,6 +105,7 @@ describe('Concepts Model API Tests', function () {
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
         expect(element.Id).toBeDefined();
+        expect(element.Id).toBe(newElement.Id);
         expect(report.existsElementInTree('Presentation',element.Id)).toBe(true);
     });
 
@@ -400,8 +401,11 @@ describe('Concepts Model API Tests', function () {
                 expect(ex.message.match(/"fac:Leaf2".*is still referenced in the report/g)).not.toBeNull();
                 var refs = ex.references;
                 expect(refs.Presentation.length).toBe(1);
-                expect(refs.ConceptMaps.length).toBe(1);
-                expect(refs.Rules.length).toBe(2);
+                expect(refs.ConceptMaps.SynonymOf.length).toBe(0);
+                expect(refs.ConceptMaps.Maps.length).toBe(1);
+                expect(refs.Rules.Computing.length).toBe(1);
+                expect(refs.Rules.Validating.length).toBe(1);
+                expect(refs.Rules.Dependent.length).toBe(0);
             }else{
                 throw ex;
             }

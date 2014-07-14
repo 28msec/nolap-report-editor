@@ -306,60 +306,60 @@ angular
         concept.IsAbstract = abstract;
     };
 
-    Report.prototype.deleteConcept = function(oname, force) {
+    Report.prototype.removeConcept = function(oname, force) {
         var name = this.alignConceptPrefix(oname);
-        ensureConceptName(name, 'oname', 'deleteConcept');
+        ensureConceptName(name, 'oname', 'removeConcept');
 
         force = force === true;
 
         if(!this.existsConcept(name)){
-            throw new Error('deleteConcept: cannot remove concept with name "' + name + '" from model because it doesn\'t exist.');
+            throw new Error('removeConcept: cannot remove concept with name "' + name + '" from model because it doesn\'t exist.');
         }
 
         var referencesInConceptMapsObject = this.findInConceptMap(name);
         var referencesInPresentationArray = this.findInTree('Presentation', name);
         var referencesInRulesObject = this.findInRules(name);
-        if(!force && (referencesInConceptMapsObject.Maps.length > 0 || referencesInConceptMapsObject.SynonymOf.length > 0 || referencesInPresentationArray.length > 0
-            || referencesInRulesObject.Computing.length > 0 || referencesInRulesObject.Validating.length > 0 || referencesInRulesObject.Dependent.length > 0)){
-            throw new ConceptIsStillReferencedError('deleteConcept: cannot remove concept with name "' + name + '" from model because it is still referenced in the report.',
+        if(!force && (referencesInConceptMapsObject.Maps.length > 0 || referencesInConceptMapsObject.SynonymOf.length > 0 || referencesInPresentationArray.length > 0 ||
+            referencesInRulesObject.Computing.length > 0 || referencesInRulesObject.Validating.length > 0 || referencesInRulesObject.Dependent.length > 0)){
+            throw new ConceptIsStillReferencedError('removeConcept: cannot remove concept with name "' + name + '" from model because it is still referenced in the report.',
                 referencesInConceptMapsObject, referencesInPresentationArray, referencesInRulesObject);
         } else if(force) {
             var that = this;
             if(referencesInRulesObject){
                 if(referencesInRulesObject.Dependent !== undefined && referencesInRulesObject.Dependent !== null && referencesInRulesObject.Dependent.length > 0){
-                    throw new Error('deleteConcept: cannot force removing concept with name "' + name + '" from model because the following ' + referencesInRulesObject.Dependent.length
-                        + ' rules still depend on this concept.')
+                    throw new Error('removeConcept: cannot force removing concept with name "' + name + '" from model because the following ' + referencesInRulesObject.Dependent.length +
+                        ' rules still depend on this concept.');
                 }
                 if(referencesInRulesObject.Computing !== undefined && referencesInRulesObject.Computing !== null && referencesInRulesObject.Computing.length > 0){
                     referencesInRulesObject.Computing.forEach(function(id){
-                        $log.log("removing " + name + " computing rule " + id);
+                        $log.log('removing ' + name + ' computing rule ' + id);
                         that.removeRule(id);
-                    })
+                    });
                 }
                 if(referencesInRulesObject.Validating !== undefined && referencesInRulesObject.Validating !== null && referencesInRulesObject.Validating.length > 0){
                     referencesInRulesObject.Validating.forEach(function(id){
-                        $log.log("removing " + name + " validating rule " + id);
+                        $log.log('removing ' + name + ' validating rule ' + id);
                         that.removeRule(id);
-                    })
+                    });
                 }
             }
             if(referencesInConceptMapsObject) {
                 if(referencesInConceptMapsObject.Maps.length > 0) {
                     referencesInConceptMapsObject.Maps.forEach(function(id){
-                        $log.log("removing synonyms map for " + id);
+                        $log.log('removing synonyms map for ' + id);
                         that.removeConceptMap(id);
-                    })
+                    });
                 }
                 if(referencesInConceptMapsObject.SynonymOf.length > 0) {
                     referencesInConceptMapsObject.SynonymOf.forEach(function(id){
-                        $log.log("removing " + name + " as synonym of " + id);
+                        $log.log('removing ' + name + ' as synonym of ' + id);
                         that.removeSynonym(id, name);
-                    })
+                    });
                 }
             }
             if(referencesInPresentationArray) {
                 referencesInPresentationArray.forEach(function(id){
-                    $log.log("removing presentation element " + name + " (" + id + ")");
+                    $log.log('removing presentation element ' + name + ' (' + id + ')');
                     that.removeTreeBranch('Presentation', id);
                 });
             }
@@ -637,13 +637,14 @@ angular
     };
 
     Report.prototype.createNewElement = function(conceptOrConceptName, order) {
+        var concept;
         if(typeof conceptOrConceptName === 'string'){
             var conceptName = this.alignConceptPrefix(conceptOrConceptName);
             ensureConceptName(conceptName, 'conceptOrConceptName', 'createNewElement');
-            var concept = this.getConcept(conceptName);
+            concept = this.getConcept(conceptName);
             ensureExists(concept, 'object', 'createNewElement', 'concept with name "' + conceptName + '" doesn\'t exist.');
         } else {
-            var concept = conceptOrConceptName;
+            concept = conceptOrConceptName;
             ensureParameter(concept, 'conceptOrConceptName', 'object', 'createNewElement');
         }
         var _order = 1;
@@ -1100,9 +1101,9 @@ angular
             if(!found && rule.DependsOn !== null && typeof rule.DependsOn === 'object') {
                 for(var x in rule.DependsOn){
                     if(rule.DependsOn[x] === conceptName &&
-                        (( rule.Type === 'xbrl28:formula' && rule.ComputableConcepts.length === 1 && rule.ComputableConcepts[0] !== conceptName)
-                        ||
-                        ( rule.Type === 'xbrl28:validation' && rule.ValidatedConcepts.length === 1 && rule.ValidatedConcepts[0] !== conceptName)
+                        (
+                           ( rule.Type === 'xbrl28:formula' && rule.ComputableConcepts.length === 1 && rule.ComputableConcepts[0] !== conceptName) ||
+                           ( rule.Type === 'xbrl28:validation' && rule.ValidatedConcepts.length === 1 && rule.ValidatedConcepts[0] !== conceptName)
                         )) {
                         result.Dependent.push(rule.Id);
                         found = true;
