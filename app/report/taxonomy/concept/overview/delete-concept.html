@@ -2,21 +2,35 @@
     <h4 class="modal-title">Delete <span ng-bind="concept.Name"></span></h4>
 </div>
 <div class="modal-body">
-    <div ng-if="references.Rules.length > 0">
-        This concept cannot be deleted. The following rules depends on it:
-        <ul>
-            <li ng-repeat="rule in references.Rules">
-                <a ng-bind="rule"></a>
+    <div ng-if="references.Rules.Dependent.length > 0">
+        This concept cannot be deleted. The following rules depend on {{concept.Name}}:
+        <h2 ng-if="dependentRules.Computing">Computing:</h2>
+        <ul ng-if="dependentRules.Computing">
+            <li ng-repeat="(key, rule) in dependentRules.Computing">
+                <a ui-sref="report.taxonomy.concept.formula.computation.edit({'conceptId': rule.ComputableConcepts[0],'ruleId':rule.Id})" ng-bind="rule.Label" target="_blank"></a>
+            </li>
+        </ul>
+        <h2 ng-if="dependentRules.Validating">Validating:</h2>
+        <ul ng-if="dependentRules.Validating">
+            <li ng-repeat="(key, rule) in dependentRules.Validating">
+                <a ui-sref="report.taxonomy.concept.formula.validations.edit({'conceptId': rule.ValidatedConcepts[0],'ruleId':rule.Id})" ng-bind="rule.Label" target="_blank"></a>
             </li>
         </ul>
     </div>
-    <div ng-if="references.Rules.length === 0">
+    <div ng-if="references.Rules.Dependent.length === 0">
         <p>
-        By deleting this concept, all its presentation elements and synonyms will be deleted as well.
+        By deleting this concept the following references will be deleted as well:
+            <ul>
+                <li ng-if="references.Presentation.length > 0">{{references.Presentation.length}} appearance{{references.Presentation.length>1?'s':''}} in Presentation</li>
+                <li ng-if="references.ConceptMaps.Maps.length > 0">{{references.ConceptMaps.Maps.length}} Synonym Mapping{{references.ConceptMaps.Maps.length>1?'s':''}}</li>
+                <li ng-if="references.ConceptMaps.SynonymOf.length > 0">{{references.ConceptMaps.SynonymOf.length}} Synonym{{references.ConceptMaps.SynonymOf.length>1?'s':''}}</li>
+                <li ng-if="references.Rules.Computing.length > 0">{{references.Rules.Computing.length}} computation formula{{references.Rules.Computing.length>1?'s':''}}</li>
+                <li ng-if="references.Rules.Validating.length > 0">{{references.Rules.Validating.length}} validation formula{{references.Rules.Validating.length>1?'s':''}}</li>
+            </ul>
         </p>
     </div>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-danger" id="confirm-delete-concept" ng-click="confirm()" ng-class="{ disabled: references.Rules.length > 0 }">Confirm</button>
+    <button class="btn btn-danger" id="confirm-delete-concept" ng-click="confirm()" ng-class="{ disabled: references.Rules.Dependent.length > 0 }">Confirm</button>
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
 </div>

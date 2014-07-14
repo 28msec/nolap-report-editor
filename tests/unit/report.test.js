@@ -190,8 +190,8 @@ describe('Concepts Model API Tests', function () {
         report.updateConceptMap(from, to);
 
         expect(report.existsConceptMap(from)).toBe(true);
-        expect(report.findInConceptMap('us-gaap:Assets')[0]).toBe('fac:Leaf');
-        expect(report.findInConceptMap('us-gaap:Something')[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Assets').SynonymOf[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Something').SynonymOf[0]).toBe('fac:Leaf');
         expect(report.listConceptMaps().length).toBe(1);
     });
 
@@ -206,10 +206,10 @@ describe('Concepts Model API Tests', function () {
         report.updateConceptMap(from, to);
 
         expect(report.existsConceptMap(from)).toBe(true);
-        expect(report.findInConceptMap('us-gaap:Assets')[0]).toBe('fac:Leaf');
-        expect(report.findInConceptMap('us-gaap:Something')[0]).toBe('fac:Leaf');
-        expect(report.findInConceptMap('us-gaap:Revenues')[0]).toBe('fac:Leaf2');
-        expect(report.findInConceptMap('us-gaap:Liabilities')[0]).toBe('fac:Leaf2');
+        expect(report.findInConceptMap('us-gaap:Assets').SynonymOf[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Something').SynonymOf[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Revenues').SynonymOf[0]).toBe('fac:Leaf2');
+        expect(report.findInConceptMap('us-gaap:Liabilities').SynonymOf[0]).toBe('fac:Leaf2');
         expect(report.listConceptMaps().length).toBe(2);
     });
 
@@ -220,12 +220,12 @@ describe('Concepts Model API Tests', function () {
         report.updateConceptMap(from, to);
 
         expect(report.existsConceptMap(from)).toBe(true);
-        expect(report.findInConceptMap('us-gaap:Assets')[0]).not.toBeDefined();
-        expect(report.findInConceptMap('us-gaap:Something')[0]).not.toBeDefined();
-        expect(report.findInConceptMap('us-gaap:CurrentAssets')[0]).toBe('fac:Leaf');
-        expect(report.findInConceptMap('us-gaap:Something2')[0]).toBe('fac:Leaf');
-        expect(report.findInConceptMap('us-gaap:Revenues')[0]).toBe('fac:Leaf2');
-        expect(report.findInConceptMap('us-gaap:Liabilities')[0]).toBe('fac:Leaf2');
+        expect(report.findInConceptMap('us-gaap:Assets').SynonymOf[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:Something').SynonymOf[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:CurrentAssets').SynonymOf[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Something2').SynonymOf[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Revenues').SynonymOf[0]).toBe('fac:Leaf2');
+        expect(report.findInConceptMap('us-gaap:Liabilities').SynonymOf[0]).toBe('fac:Leaf2');
         expect(report.listConceptMaps().length).toBe(2);
     });
 
@@ -235,12 +235,12 @@ describe('Concepts Model API Tests', function () {
         report.removeConceptMap(name);
 
         expect(report.existsConceptMap(name)).toBe(false);
-        expect(report.findInConceptMap('us-gaap:Assets')[0]).not.toBeDefined();
-        expect(report.findInConceptMap('us-gaap:Something')[0]).not.toBeDefined();
-        expect(report.findInConceptMap('us-gaap:CurrentAssets')[0]).not.toBeDefined();
-        expect(report.findInConceptMap('us-gaap:Something2')[0]).not.toBeDefined();
-        expect(report.findInConceptMap('us-gaap:Revenues')[0]).toBe('fac:Leaf2');
-        expect(report.findInConceptMap('us-gaap:Liabilities')[0]).toBe('fac:Leaf2');
+        expect(report.findInConceptMap('us-gaap:Assets').SynonymOf[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:Something').SynonymOf[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:CurrentAssets').SynonymOf[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:Something2').SynonymOf[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:Revenues').SynonymOf[0]).toBe('fac:Leaf2');
+        expect(report.findInConceptMap('us-gaap:Liabilities').SynonymOf[0]).toBe('fac:Leaf2');
         expect(report.listConceptMaps().length).toBe(1);
     });
 

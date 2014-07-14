@@ -8,7 +8,7 @@ angular
         url: '/formula',
         abstract: true,
         controller: 'FormulaCtrl',
-        template: '<div ui-view class="formula-view"></div>'
+        template: '<div ui-view></div>'
     });
 })
 ;

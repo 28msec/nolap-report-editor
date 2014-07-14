@@ -43,11 +43,29 @@ angular
                         },
                         references: function() {
                             return e.references;
+                        },
+                        dependentRules: function() {
+                            var rules = {
+                                Computing: [],
+                                Validating: []
+                            };
+                            for (var i in e.references.Rules.Dependent){
+                                if(e.references.Rules.Dependent.hasOwnProperty(i)){
+                                    var id = e.references.Rules.Dependent[i];
+                                    var rule = $scope.report.getRule(id);
+                                    if(rule.Type === 'xbrl28:validation'){
+                                        rules.Validating.push(rule);
+                                    } else {
+                                        rules.Computing.push(rule);
+                                    }
+                                }
+                            }
+                            return rules;
                         }
                     }
                 }).result.then(function(result){
                     if(result) {
-                        $scope.report.deleteConcept($scope.concept.Name, true);
+                        $scope.report.deleteConcept($scope.concept.Name, true /*force*/);
                         $state.go('report.taxonomy.concepts');
                     }
                 });
@@ -55,9 +73,10 @@ angular
         }
     };
 })
-.controller('DeleteConceptCtrl', function($scope, $modalInstance, report, concept, references){
+.controller('DeleteConceptCtrl', function($scope, $modalInstance, report, concept, references, dependentRules){
     $scope.concept = concept;
     $scope.references = references;
+    $scope.dependentRules = dependentRules;
     
     $scope.confirm = function(){
         $modalInstance.close(true);

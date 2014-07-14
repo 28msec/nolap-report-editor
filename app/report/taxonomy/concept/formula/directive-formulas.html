@@ -14,9 +14,9 @@
         </tr>
         </thead>
         <tbody>
-        <tr  class="row" ng-repeat="(key, rule) in rulesList">
-            <td ng-if="type === 'validation'" ng-bind="rule.Id" class="col-md-1"></td>
-            <td ng-bind="rule.Label" ng-class="{'col-md-8': type === 'computation', 'col-md-7': type === 'validation'}"></td>
+        <tr  class="row" ng-repeat="(key, rule) in rulesList track by $index">
+            <td ng-if="type === 'validation'" ng-bind="rule.Id" class="col-md-3"></td>
+            <td ng-bind="rule.Label" ng-class="{'col-md-8': type === 'computation', 'col-md-5': type === 'validation'}"></td>
             <td class="col-md-4">
                 <button ng-if="type === 'computation'" type="button" class="btn btn-default"
                         ui-sref="report.taxonomy.concept.formula.computation.edit({'ruleId':rule.Id})"><i class="fa fa-edit"></i> Edit Rule</button>
