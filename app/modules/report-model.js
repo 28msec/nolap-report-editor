@@ -578,8 +578,16 @@ angular
         return false;
     };
 
-    Report.prototype.createNewElement = function(concept, order) {
-        ensureParameter(concept, 'concept', 'object', 'createNewElement');
+    Report.prototype.createNewElement = function(conceptOrConceptName, order) {
+        if(typeof conceptOrConceptName === 'string'){
+            var conceptName = this.alignConceptPrefix(conceptOrConceptName);
+            ensureConceptName(conceptName, 'conceptOrConceptName', 'createNewElement');
+            var concept = this.getConcept(conceptName);
+            ensureExists(concept, 'object', 'createNewElement', 'concept with name "' + conceptName + '" doesn\'t exist.');
+        } else {
+            var concept = conceptOrConceptName;
+            ensureParameter(concept, 'conceptOrConceptName', 'object', 'createNewElement');
+        }
         var _order = 1;
         if(order !== undefined) {
             ensureParameter(order, 'order', 'number', 'createNewElement');
@@ -611,13 +619,10 @@ angular
         return count;
     };
     
-    Report.prototype.addElement = function(networkShortName, parentElementID, element, offset){
+    Report.prototype.addElement = function(networkShortName, parentElementID, elementOrConceptName, offset){
         ensureNetworkShortName(networkShortName, 'networkShortName', 'addElement');
-        var conceptName = element.Name;
-        ensureConceptName(conceptName, 'element', 'addElement');
-        var concept = this.getConcept(conceptName);
-        ensureExists(concept, 'object', 'addElement', 'concept with name "' + conceptName + '" doesn\'t exist.');
 
+        // determine order
         var order = 1;
         var maxOrder = getMaxOrder(this, networkShortName, parentElementID);
         if(offset !== undefined && offset !== null){
@@ -631,13 +636,27 @@ angular
                 ' (Max offset is ' + maxOrder + ' for parent ' + parentElementID  + '.');
         }
         enforceStrictChildOrderAndShift(this, networkShortName, parentElementID, offset);
+
+        // determine element
+        var element;
+        var conceptName;
+        if(typeof elementOrConceptName === 'string'){
+            conceptName = elementOrConceptName;
+            ensureConceptName(conceptName, 'elementOrConceptName', 'addElement');
+            var concept = this.getConcept(conceptName);
+            ensureExists(concept, 'object', 'addElement', 'concept with name "' + conceptName + '" doesn\'t exist.');
+            element = this.createNewElement(concept);
+        } else {
+            element = elementOrConceptName;
+            ensureParameter(element, 'elementOrConceptName', 'object', 'addElement');
+            conceptName = element.Name;
+        }
+        element.Order = order;
+
         if(parentElementID === undefined || parentElementID === null) {
             // add a root element
             var network = this.getNetwork(networkShortName);
-            var rootElement = this.createNewElement(concept, order);
-            network.Trees[conceptName] = rootElement;
-            return rootElement;
-
+            network.Trees[conceptName] = element;
         } else {
             // add child to existing tree
             ensureParameter(parentElementID, 'parentElementID', 'string', 'addTreeChild');
@@ -654,9 +673,8 @@ angular
                 parent.To = {};
             }
             parent.To[conceptName] = element;
-
-            return element;
         }
+        return element;
     };
 
     //Report.prototype.addTreeChild = function(networkShortName, parentElementID, oconceptName, offset) {
