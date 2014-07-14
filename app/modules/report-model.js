@@ -288,6 +288,18 @@ angular
         }
        
         var concept = this.getConcept(name);
+        if(concept.IsAbstract !== abstract && !abstract){
+            // a concept can only be non-abstract if it has no children in presentation
+            var elementIds = this.findInTree('Presentation',name);
+            for(var i in elementIds) {
+                if(elementIds.hasOwnProperty(i)){
+                    var element = this.getElementFromTree('Presentation',i);
+                    if(typeof element.To === 'object' && element.To !== null && Object.keys(element.To).length > 0){
+                        throw new Error('updateConcept: cannot make concept with name "' + name + '" non-abstract because it exists with children in the presentation tree.');
+                    }
+                }
+            }
+        }
         concept.Label = label;
         concept.IsAbstract = abstract;
     };
@@ -626,13 +638,13 @@ angular
         var order = 1;
         var maxOrder = getMaxOrder(this, networkShortName, parentElementID);
         if(offset !== undefined && offset !== null){
-            ensureParameter(offset, 'offset', 'number', 'addTreeChild');
+            ensureParameter(offset, 'offset', 'number', 'addElement');
             order = offset + 1;
         } else {
             offset = 0; // default
         }
         if(offset > (maxOrder)){
-            throw new Error('addTreeChild: offset out of bounds: ' + offset +
+            throw new Error('addElement: offset out of bounds: ' + offset +
                 ' (Max offset is ' + maxOrder + ' for parent ' + parentElementID  + '.');
         }
         enforceStrictChildOrderAndShift(this, networkShortName, parentElementID, offset);
@@ -659,13 +671,13 @@ angular
             network.Trees[conceptName] = element;
         } else {
             // add child to existing tree
-            ensureParameter(parentElementID, 'parentElementID', 'string', 'addTreeChild');
+            ensureParameter(parentElementID, 'parentElementID', 'string', 'addElement');
         
             var parent = this.getElementFromTree(networkShortName, parentElementID);
-            ensureExists(parent, 'object', 'addTreeChild', 'cannot add child to tree. Parent with id "' + parentElementID + '" doesn\'t exist.');
+            ensureExists(parent, 'object', 'addElement', 'cannot add child to tree. Parent with id "' + parentElementID + '" doesn\'t exist.');
             var parentConcept = this.getConcept(parent.Name);
             if(!parentConcept.IsAbstract) {
-                throw new Error('addTreeChild: cannot add child to parent "' + parentElementID +
+                throw new Error('addElement: cannot add child to parent "' + parentElementID +
                     '". Reason: Parent concept "' + parent.Name  + '" is not abstract.');
             }
 
