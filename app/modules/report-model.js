@@ -2,7 +2,20 @@
 
 angular
 .module('report-model', [])
-.factory('Report', function(){
+.factory('ConceptIsStillReferencedError', function(){
+    var ConceptIsStillReferencedError = function(message, referencesInConceptMapsArray, referencesInPresentationArray, referencesInRulesArray) {
+        this.name = 'ConceptIsStillReferencedError';
+        this.message = (message || '');
+        this.references = {
+            'Presentation': referencesInPresentationArray,
+            'ConceptMaps' : referencesInConceptMapsArray,
+            'Rules': referencesInRulesArray
+        };
+    };
+    ConceptIsStillReferencedError.prototype = new Error();
+    return ConceptIsStillReferencedError;
+})
+.factory('Report', function(ConceptIsStillReferencedError){
 
     //Constructor
     var Report = function(modelOrName, label, description, role, username, prefix){
@@ -133,17 +146,6 @@ angular
             }
         } // if
     };
-
-    var ConceptIsStillReferencedError = function(message, referencesInConceptMapsArray, referencesInPresentationArray, referencesInRulesArray) {
-        this.name = 'ConceptIsStillReferencedError';
-        this.message = (message || '');
-        this.references = {
-            'Presentation': referencesInPresentationArray,
-            'ConceptMaps' : referencesInConceptMapsArray,
-            'Rules': referencesInRulesArray
-        };
-    };
-    ConceptIsStillReferencedError.prototype = new Error();
 
     // helper function to check parameters
     var ensureNetworkShortName = function(networkShortName, paramName, functionName) {
@@ -304,19 +306,31 @@ angular
         concept.IsAbstract = abstract;
     };
 
-    Report.prototype.removeConcept = function(oname) {
+    Report.prototype.deleteConcept = function(oname, force) {
         var name = this.alignConceptPrefix(oname);
-        ensureConceptName(name, 'oname', 'removeConcept');
+        ensureConceptName(name, 'oname', 'deleteConcept');
+
+        force = force === true;
 
         if(!this.existsConcept(name)){
-            throw new Error('removeConcept: cannot remove concept with name "' + name + '" from model because it doesn\'t exist.');
+            throw new Error('deleteConcept: cannot remove concept with name "' + name + '" from model because it doesn\'t exist.');
         }
 
         var referencesInConceptMapsArray = this.findInConceptMap(name);
         var referencesInPresentationArray = this.findInTree('Presentation', name);
         var referencesInRulesArray = this.findInRules(name);
-        if(referencesInConceptMapsArray.length > 0 || referencesInPresentationArray.length > 0 || referencesInRulesArray.length > 0){
-            throw new ConceptIsStillReferencedError('removeConcept: cannot remove concept with name "' + name + '" from model because it is still referenced in the report.', referencesInConceptMapsArray, referencesInPresentationArray, referencesInRulesArray);
+        if(!force && (referencesInConceptMapsArray.length > 0 || referencesInPresentationArray.length > 0 || referencesInRulesArray.length > 0)){
+            throw new ConceptIsStillReferencedError('deleteConcept: cannot remove concept with name "' + name + '" from model because it is still referenced in the report.', referencesInConceptMapsArray, referencesInPresentationArray, referencesInRulesArray);
+        } else if(force) {
+            if(referencesInConceptMapsArray) {
+                this.updateConceptMap(name, []);
+            }
+            if(referencesInPresentationArray) {
+                var that = this;
+                referencesInPresentationArray.forEach(function(id){
+                    that.removeTreeBranch('Presentation', id);
+                });
+            }
         }
 
         var model = this.getModel();

@@ -1,0 +1,22 @@
+<div class="modal-header modal-header-danger">
+    <h4 class="modal-title">Delete <span ng-bind="concept.Name"></span></h4>
+</div>
+<div class="modal-body">
+    <div ng-if="references.Rules.length > 0">
+        This concept cannot be deleted. The following rules depends on it:
+        <ul>
+            <li ng-repeat="rule in references.Rules">
+                <a ng-bind="rule"></a>
+            </li>
+        </ul>
+    </div>
+    <div ng-if="references.Rules.length === 0">
+        <p>
+        By deleting this concept, all its presentation elements and synonyms will be deleted as well.
+        </p>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-danger" id="confirm-delete-concept" ng-click="confirm()" ng-class="{ disabled: references.Rules.length > 0 }">Confirm</button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+</div>
