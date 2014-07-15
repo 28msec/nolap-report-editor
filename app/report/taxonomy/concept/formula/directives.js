@@ -161,10 +161,6 @@ angular
                     $scope.formula.validate($scope.action, updateDependencies);
                 };
 
-                $scope.createConcept = function(){//concept
-                    //$rootScope.$emit('createConcept', false, concept);
-                };
-
                 initFormula();
 
                 $scope.tooltipPlacement = 'top';

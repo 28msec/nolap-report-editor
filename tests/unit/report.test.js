@@ -84,11 +84,13 @@ describe('Concepts Model API Tests', function () {
         expect(report).not.toBeNull();
         var name = 'fac:Test';
         var offset = 0;
-        var element = report.addTreeChild('Presentation', null, name, offset);
+        var element = report.createNewElement(name);
+        var newElement = report.addElement('Presentation', null, element, offset);
                       
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
         expect(element.Id).toBeDefined();
+        expect(element.Id).toBe(newElement.Id);
         expect(report.existsElementInTree('Presentation',element.Id)).toBe(true);
     });
 
@@ -97,11 +99,13 @@ describe('Concepts Model API Tests', function () {
         var name = 'fac:Leaf';
         var parentID = report.findInTree('Presentation','fac:Test');
         var offset = 0;
-        var element = report.addTreeChild('Presentation', parentID[0], name, offset);
+        var element = report.createNewElement(report.getConcept(name));
+        var newElement = report.addElement('Presentation', parentID[0], element, offset);
                       
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
         expect(element.Id).toBeDefined();
+        expect(element.Id).toBe(newElement.Id);
         expect(report.existsElementInTree('Presentation',element.Id)).toBe(true);
     });
 
@@ -109,7 +113,7 @@ describe('Concepts Model API Tests', function () {
         expect(report).not.toBeNull();
         var name = 'fac:Test';
         var parentID = report.findInTree('Presentation','fac:Test');
-        var element = report.addTreeChild('Presentation', parentID[0], name, 1);
+        var element = report.addElement('Presentation', parentID[0], name, 1);
                       
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
@@ -123,7 +127,7 @@ describe('Concepts Model API Tests', function () {
         var label = 'Another root';
         report.addConcept(name, label, true);
 
-        var element = report.addTreeChild('Presentation', null, name);
+        var element = report.addElement('Presentation', null, name);
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
         expect(element.Id).toBeDefined();
@@ -136,7 +140,7 @@ describe('Concepts Model API Tests', function () {
         var name = 'fac:Test';
         var parentID = report.findInTree('Presentation','fac:Leaf');
         try {
-            report.addTreeChild('Presentation', parentID[0], name);
+            report.addElement('Presentation', parentID[0], name);
         } catch (ex) {
             expect(ex.message.match(/"fac:Leaf" is not abstract/g)).not.toBeNull();
         }
@@ -184,11 +188,11 @@ describe('Concepts Model API Tests', function () {
         expect(report).not.toBeNull();
         var from = 'fac:Leaf';
         var to = [ 'us-gaap:Assets', 'us-gaap:Something' ];
-        report.addConceptMap(from, to);
+        report.updateConceptMap(from, to);
 
         expect(report.existsConceptMap(from)).toBe(true);
-        expect(report.findInConceptMap('us-gaap:Assets')[0]).toBe('fac:Leaf');
-        expect(report.findInConceptMap('us-gaap:Something')[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Assets').SynonymOf[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Something').SynonymOf[0]).toBe('fac:Leaf');
         expect(report.listConceptMaps().length).toBe(1);
     });
 
@@ -199,14 +203,14 @@ describe('Concepts Model API Tests', function () {
         var to = [ 'us-gaap:Revenues', 'us-gaap:Liabilities' ];
         report.addConcept(from, label, false);
         var root2ID = report.findInTree('Presentation','fac:Root2')[0];
-        report.addTreeChild('Presentation', root2ID, from);
-        report.addConceptMap(from, to);
+        report.addElement('Presentation', root2ID, from);
+        report.updateConceptMap(from, to);
 
         expect(report.existsConceptMap(from)).toBe(true);
-        expect(report.findInConceptMap('us-gaap:Assets')[0]).toBe('fac:Leaf');
-        expect(report.findInConceptMap('us-gaap:Something')[0]).toBe('fac:Leaf');
-        expect(report.findInConceptMap('us-gaap:Revenues')[0]).toBe('fac:Leaf2');
-        expect(report.findInConceptMap('us-gaap:Liabilities')[0]).toBe('fac:Leaf2');
+        expect(report.findInConceptMap('us-gaap:Assets').SynonymOf[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Something').SynonymOf[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Revenues').SynonymOf[0]).toBe('fac:Leaf2');
+        expect(report.findInConceptMap('us-gaap:Liabilities').SynonymOf[0]).toBe('fac:Leaf2');
         expect(report.listConceptMaps().length).toBe(2);
     });
 
@@ -217,12 +221,12 @@ describe('Concepts Model API Tests', function () {
         report.updateConceptMap(from, to);
 
         expect(report.existsConceptMap(from)).toBe(true);
-        expect(report.findInConceptMap('us-gaap:Assets')[0]).not.toBeDefined();
-        expect(report.findInConceptMap('us-gaap:Something')[0]).not.toBeDefined();
-        expect(report.findInConceptMap('us-gaap:CurrentAssets')[0]).toBe('fac:Leaf');
-        expect(report.findInConceptMap('us-gaap:Something2')[0]).toBe('fac:Leaf');
-        expect(report.findInConceptMap('us-gaap:Revenues')[0]).toBe('fac:Leaf2');
-        expect(report.findInConceptMap('us-gaap:Liabilities')[0]).toBe('fac:Leaf2');
+        expect(report.findInConceptMap('us-gaap:Assets').SynonymOf[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:Something').SynonymOf[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:CurrentAssets').SynonymOf[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Something2').SynonymOf[0]).toBe('fac:Leaf');
+        expect(report.findInConceptMap('us-gaap:Revenues').SynonymOf[0]).toBe('fac:Leaf2');
+        expect(report.findInConceptMap('us-gaap:Liabilities').SynonymOf[0]).toBe('fac:Leaf2');
         expect(report.listConceptMaps().length).toBe(2);
     });
 
@@ -232,12 +236,12 @@ describe('Concepts Model API Tests', function () {
         report.removeConceptMap(name);
 
         expect(report.existsConceptMap(name)).toBe(false);
-        expect(report.findInConceptMap('us-gaap:Assets')[0]).not.toBeDefined();
-        expect(report.findInConceptMap('us-gaap:Something')[0]).not.toBeDefined();
-        expect(report.findInConceptMap('us-gaap:CurrentAssets')[0]).not.toBeDefined();
-        expect(report.findInConceptMap('us-gaap:Something2')[0]).not.toBeDefined();
-        expect(report.findInConceptMap('us-gaap:Revenues')[0]).toBe('fac:Leaf2');
-        expect(report.findInConceptMap('us-gaap:Liabilities')[0]).toBe('fac:Leaf2');
+        expect(report.findInConceptMap('us-gaap:Assets').SynonymOf[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:Something').SynonymOf[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:CurrentAssets').SynonymOf[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:Something2').SynonymOf[0]).not.toBeDefined();
+        expect(report.findInConceptMap('us-gaap:Revenues').SynonymOf[0]).toBe('fac:Leaf2');
+        expect(report.findInConceptMap('us-gaap:Liabilities').SynonymOf[0]).toBe('fac:Leaf2');
         expect(report.listConceptMaps().length).toBe(1);
     });
 
@@ -396,9 +400,13 @@ describe('Concepts Model API Tests', function () {
             if (ex !== null && ex !== undefined && ex.name === 'ConceptIsStillReferencedError') {
                 expect(ex.message.match(/"fac:Leaf2".*is still referenced in the report/g)).not.toBeNull();
                 var refs = ex.references;
-                expect(refs.Presentation.length).toBe(1);
-                expect(refs.ConceptMaps.length).toBe(1);
-                expect(refs.Rules.length).toBe(2);
+                expect(refs.References).toBe(4);
+                expect(refs.Trees.Presentation.length).toBe(1);
+                expect(refs.ConceptMaps.SynonymOf.length).toBe(0);
+                expect(refs.ConceptMaps.Maps.length).toBe(1);
+                expect(refs.Rules.Computing.length).toBe(1);
+                expect(refs.Rules.Validating.length).toBe(1);
+                expect(refs.Rules.Dependent.length).toBe(0);
             }else{
                 throw ex;
             }
