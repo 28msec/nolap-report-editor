@@ -1,4 +1,4 @@
-<div class="clearfix" ng-click="selectElement(this)" ng-dblclick="goToConcept(this)" ng-class="{ active: selectedElementId === element.Id }" ui-tree-handle>
+<div class="clearfix" sglclick="selectElement(this)" ng-dblclick="goToConcept(this)" ng-class="{ active: selectedElementId === element.Id }" ui-tree-handle>
     <a class="btn btn-success btn-xs pull-left" ng-click="toggle(this)" ng-if="element.IsAbstract" data-nodrag>
         <span class="fa fa-chevron-down" ng-class="{'fa-chevron-right': collapsed, 'fa-chevron-down': !collapsed}"></span>
     </a>
