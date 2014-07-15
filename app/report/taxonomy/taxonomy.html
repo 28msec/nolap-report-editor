@@ -1,7 +1,7 @@
 <flexy-layout orientation="horizontal">
     <block-container init="450" class="sidebar">
         <header class="std-header">Presentation</header>
-        <div ui-tree="treeOptions" class="scrollable lg-bottom-padding">
+        <div ui-tree="treeOptions" class="scrollable lg-bottom-padding" data-drag-delay="200">
             <ol ui-tree-nodes="" ng-model="presentationTree">
                 <li ng-repeat="element in presentationTree" ui-tree-node ng-include="'/report/taxonomy/presentation-node.html'"></li>
             </ol>
