@@ -8,6 +8,19 @@ angular.module('report-editor')
     $scope.computationFormulasCount = $scope.report.listRules($scope.concept.Name).length;
     $scope.validationFormulasCount = $scope.report.listValidatingRules($scope.concept.Name).length;
 
+    $scope.$watchCollection(function () {
+        return $scope.report.listRules();
+    }, function () {
+        $scope.computationFormulasCount = $scope.report.listRules($scope.concept.Name).length;
+        $scope.validationFormulasCount = $scope.report.listValidatingRules($scope.concept.Name).length;
+    });
+
+    $scope.$watchCollection(function () {
+        return $scope.report.getConceptMap($scope.concept.Name).To;
+    }, function () {
+        $scope.synonymsCount = $scope.report.listConceptMapSynonyms($scope.concept.Name).length;
+    });
+
     $scope.$watch('concept.IsAbstract', function(newVal, oldVal){
         if(newVal !== oldVal) {
             $scope.loadPresentationTree();
