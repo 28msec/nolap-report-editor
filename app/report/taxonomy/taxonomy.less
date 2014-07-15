@@ -3,14 +3,8 @@
 }
 
 .angular-ui-tree-empty {
-    border: 1px dashed #bbb;
+    border: 2px dashed @clouds;
     min-height: 100px;
-    background-color: #e5e5e5;
-    background-image: -webkit-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff), -webkit-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
-    background-image: -moz-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff), -moz-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
-    background-image: linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff), linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
-    background-size: 60px 60px;
-    background-position: 0 0, 30px 30px;
 }
 
 .angular-ui-tree-nodes {
@@ -24,6 +18,7 @@
 .angular-ui-tree-nodes .angular-ui-tree-nodes {
     padding-left: 20px;
 }
+
 .angular-ui-tree-node, .angular-ui-tree-placeholder {
 	display: block;
 	position: relative;
@@ -49,9 +44,8 @@
 }
 
 .angular-ui-tree-handle {
-    cursor: move;
+    cursor: default;
     text-decoration: none;
-    font-weight: bold;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -61,25 +55,20 @@
     background: #f8faff;
     border: 1px solid #dae2ea;
     color: #7c9eb2;
-    padding: 10px 10px;
+    
+    padding: 5px;
     
     .btn {
-        margin-right: 8px;
         height: 22px;
         width: 22px;
+        margin-right: 5px;
     }
     
-    &:hover {
+    &.active {
         color: #438eb9;
         background: #f4f6f7;
         border-color: #dce2e8;
-    }
-    
-    >span {
-        display: inline-block;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: calc(~"100% - 105px");
+        cursor: move;
     }
 }
 
@@ -87,7 +76,7 @@
     position: absolute;
     pointer-events: none;
     z-index: 999;
-    opacity: .8;    
+    opacity: .8;
 }
 
 

@@ -5,15 +5,21 @@ angular
 
     $scope.treeOptions = {
         dropped: function(event){
+            //If the element hasn't be dropped in place
             if(event.dest.nodesScope.$nodeScope !== null) {
                 $scope.report.moveTreeBranch('Presentation', event.source.nodeScope.$modelValue.Id, event.dest.nodesScope.$nodeScope.$modelValue.Id, event.dest.index);
-            } else {
-                console.log('the element has been dropped in place.');
             }
         },
         removed: function(node){
             $scope.report.removeTreeBranch('Presentation', node.$modelValue.Id);
+        },
+        beforeDrag: function(nodeScope){
+            return nodeScope.$modelValue.Id === $scope.selectedElementId;
         }
+    };
+    
+    $scope.selectElement = function(nodeScope){
+        $scope.selectedElementId = nodeScope.$nodeScope.$modelValue.Id;
     };
 
     $scope.goToConcept = function(nodeScope){
