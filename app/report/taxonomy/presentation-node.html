@@ -1,10 +1,14 @@
 <div ui-tree-handle>
-    <a data-nodrag ng-click="toggle(this)" ng-if="element.IsAbstract">
-        <span class="fa" ng-class="{ 'fa-chevron-right': collapsed, 'fa-chevron-down': !collapsed }"></span>
+    <a class="btn btn-success btn-xs" ng-click="toggle(this)" ng-if="element.IsAbstract" data-nodrag>
+        <span class="fa fa-chevron-down" ng-class="{'fa-chevron-right': collapsed, 'fa-chevron-down': !collapsed}"></span>
     </a>
-    <span ng-bind="element.Name" class="element-name"></span>
-    <a class="pull-right btn-element bg-danger" data-nodrag="" ng-click="removeNode(this)"><span class="fa fa-times"></span></a>
-    <a class="pull-right btn-element bg-primary" data-nodrag="" ng-click="goToConcept(this)"><span class="fa fa-folder-open-o"></span></a>
+    <span ng-bind="element.Name"></span>
+    <a class="pull-right btn btn-danger btn-xs" ng-click="removeNode(this)" data-nodrag>
+        <span class="fa fa-times"></span>
+    </a>
+    <a class="pull-right btn btn-primary btn-xs" ng-click="goToConcept(this)" data-nodrag>
+        <span class="fa fa-external-link"></span>
+    </a>
 </div>
 <ol ui-tree-nodes="" ng-model="element.children" ng-class="{ hidden: collapsed }">
     <li ng-repeat="element in element.children" ui-tree-node ng-include="'/report/taxonomy/presentation-node.html'"></li>
