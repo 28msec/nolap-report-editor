@@ -1,6 +1,20 @@
 'use strict';
 angular
 .module('report-editor')
+.directive('dynNodrag', function(){
+    return {
+        restrict: 'A',
+        link: function($scope, element, attributes) {
+            $scope.$watch('selectedElementId', function(id){
+                if(id === $scope.$nodeScope.$modelValue.Id) {
+                    element.removeAttr('data-nodrag');
+                } else {
+                    element.attr('data-nodrag', 'data-nodrag');
+                }
+            });
+        }
+    };
+})
 .controller('TaxonomyCtrl', function($scope, $state){
 
     $scope.treeOptions = {
@@ -12,9 +26,6 @@ angular
         },
         removed: function(node){
             $scope.report.removeTreeBranch('Presentation', node.$modelValue.Id);
-        },
-        beforeDrag: function(nodeScope){
-            return nodeScope.$modelValue.Id === $scope.selectedElementId;
         }
     };
     
