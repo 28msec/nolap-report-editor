@@ -2,11 +2,11 @@
     <a class="btn btn-success btn-xs pull-left" ng-click="toggle(this)" ng-if="element.IsAbstract" data-nodrag>
         <span class="fa fa-chevron-down" ng-class="{'fa-chevron-right': collapsed, 'fa-chevron-down': !collapsed}"></span>
     </a>
-    <span ng-bind="element.Name" class="pull-left element-name" ng-class="{ 'element-name-lg': !element.IsAbstract && selectedElementId !== element.Id,  'element-name': (element.IsAbstract || selectedElementId === element.Id) && (!element.IsAbstract || selectedElementId !== element.Id), 'element-name-xs': element.IsAbstract && selectedElementId === element.Id }"></span>
+    <span ng-bind="element.Name" class="pull-left" ng-class="{ 'element-name-lg': !element.IsAbstract && selectedElementId !== element.Id,  'element-name': (element.IsAbstract || selectedElementId === element.Id) && (!element.IsAbstract || selectedElementId !== element.Id), 'element-name-xs': element.IsAbstract && selectedElementId === element.Id }"></span>
     <a class="btn btn-danger btn-xs pull-right" ng-click="removeNode(this)" ng-if="selectedElementId === element.Id" data-nodrag>
         <span class="fa fa-times"></span>
     </a>
 </div>
 <ol ui-tree-nodes="" ng-model="element.children" ng-class="{ hidden: collapsed }">
-    <li ng-repeat="element in element.children" ui-tree-node ng-include="'/report/taxonomy/presentation-node.html'"></li>
+    <li ng-repeat="element in element.children track by element.Id" ui-tree-node ng-include="'/report/taxonomy/presentation-node.html'"></li>
 </ol>
