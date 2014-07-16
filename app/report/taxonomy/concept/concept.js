@@ -8,11 +8,16 @@ angular.module('report-editor')
     $scope.computationFormulasCount = $scope.report.listRules($scope.concept.Name).length;
     $scope.validationFormulasCount = $scope.report.listValidatingRules($scope.concept.Name).length;
 
-    $scope.$watchCollection(function () {
-        return $scope.report.listRules();
-    }, function () {
-        $scope.computationFormulasCount = $scope.report.listRules($scope.concept.Name).length;
-        $scope.validationFormulasCount = $scope.report.listValidatingRules($scope.concept.Name).length;
+    $scope.$watch(function () {
+        return $scope.report.listValidatingRules($scope.concept.Name).length;
+    }, function (newLength) {
+        $scope.validationFormulasCount = newLength;
+    });
+
+    $scope.$watch(function () {
+        return $scope.report.listRules($scope.concept.Name).length;
+    }, function (newLength) {
+        $scope.computationFormulasCount = newLength;
     });
 
     $scope.$watchCollection(function () {
