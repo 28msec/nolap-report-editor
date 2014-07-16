@@ -61,7 +61,6 @@
     .btn {
         height: 22px;
         width: 22px;
-        margin-right: 5px;
     }
     
     &.active {
@@ -70,6 +69,24 @@
         border-color: #dce2e8;
         cursor: move;
     }
+    
+    >span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .element-name-lg {
+        width: 100%;
+    }
+    
+    .element-name {
+        width: calc(~"100% - 33px");
+    }
+    
+    .element-name-xs {
+        width: calc(~"100% - 66px");
+    }
+    
 }
 
 .angular-ui-tree-drag {
