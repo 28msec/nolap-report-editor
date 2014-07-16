@@ -1,22 +1,40 @@
 'use strict';
 angular
 .module('report-editor')
+.directive('dynNodrag', function(){
+    return {
+        restrict: 'A',
+        link: function($scope, element, attributes) {
+            $scope.$watch('selectedElementId', function(id){
+                if(id === $scope.$nodeScope.$modelValue.Id) {
+                    element.removeAttr('data-nodrag');
+                } else {
+                    element.attr('data-nodrag', 'data-nodrag');
+                }
+            });
+        }
+    };
+})
 .controller('TaxonomyCtrl', function($scope, $state){
 
     $scope.treeOptions = {
         dropped: function(event){
+            //If the element hasn't be dropped in place
             if(event.dest.nodesScope.$nodeScope !== null) {
                 $scope.report.moveTreeBranch('Presentation', event.source.nodeScope.$modelValue.Id, event.dest.nodesScope.$nodeScope.$modelValue.Id, event.dest.index);
-            } else {
-                console.log('the element has been dropped in place.');
             }
         },
         removed: function(node){
             $scope.report.removeTreeBranch('Presentation', node.$modelValue.Id);
         }
     };
+    
+    $scope.selectElement = function(nodeScope){
+        $scope.selectedElementId = nodeScope.$nodeScope.$modelValue.Id;
+    };
 
     $scope.goToConcept = function(nodeScope){
+        $scope.selectElement(nodeScope);
         var conceptName = nodeScope.$nodeScope.$modelValue.Name;
         $state.go('report.taxonomy.concept.overview', { conceptId: conceptName });
     };

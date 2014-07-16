@@ -1,13 +1,10 @@
-<div ui-tree-handle>
-    <a class="btn btn-success btn-xs" ng-click="toggle(this)" ng-if="element.IsAbstract" data-nodrag>
+<div class="clearfix" ng-click="goToConcept(this)" ng-class="{ active: selectedElementId === element.Id }" dyn-nodrag ui-tree-handle>
+    <a class="btn btn-success btn-xs pull-left" ng-click="toggle(this)" ng-if="element.IsAbstract" data-nodrag>
         <span class="fa fa-chevron-down" ng-class="{'fa-chevron-right': collapsed, 'fa-chevron-down': !collapsed}"></span>
     </a>
-    <span ng-bind="element.Name"></span>
-    <a class="pull-right btn btn-danger btn-xs" ng-click="removeNode(this)" data-nodrag>
+    <span ng-bind="element.Name" class="pull-left"></span>
+    <a class="btn btn-danger btn-xs pull-right" ng-click="removeNode(this)" ng-if="selectedElementId === element.Id" data-nodrag>
         <span class="fa fa-times"></span>
-    </a>
-    <a class="pull-right btn btn-primary btn-xs" ng-click="goToConcept(this)" data-nodrag>
-        <span class="fa fa-external-link"></span>
     </a>
 </div>
 <ol ui-tree-nodes="" ng-model="element.children" ng-class="{ hidden: collapsed }">
