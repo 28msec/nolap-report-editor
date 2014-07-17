@@ -22,9 +22,9 @@
 <div ui-tree="elementOptions">
     <ol ui-tree-nodes="" ng-model="element">
         <li ng-repeat="element in element" ui-tree-node>
-            <div class="element-to-drop" ui-tree-handle>
-                <span class="fa fa-reply btn btn-success btn-xs"></span>
-                <span ng-bind="element.Name"></span>
+            <div class="element-to-drop clearfix" ui-tree-handle>
+                <span class="fa fa-arrows btn btn-success btn-xs pull-left" style="cursor: move;"></span>
+                <span ng-bind="element.Name" class="pull-left"></span>
             </div>
         </li>
     </ol>

@@ -64,6 +64,21 @@ module.exports = function (grunt) {
                                 '!\\.html|\\.xml|\\images|\\.js|\\.css|\\.png|\\.jpg|\\.woff|\\.ttf|\\.svg|\\.ico /index.html [L]'
                             ]),
                             mountFolder(connect, '.tmp'),
+                            mountFolder(connect, 'dist')
+                        ];
+                    }
+                }
+            },
+            'test-dev': {
+                options: {
+                    keepalive: false,
+                    middleware: function (connect) {
+                        return [
+                            lrSnippet,
+                            modRewrite([
+                                '!\\.html|\\.xml|\\images|\\.js|\\.css|\\.png|\\.jpg|\\.woff|\\.ttf|\\.svg|\\.ico /index.html [L]'
+                            ]),
+                            mountFolder(connect, '.tmp'),
                             mountFolder(connect, 'app')
                         ];
                     }
@@ -195,7 +210,7 @@ module.exports = function (grunt) {
             }
         },
         protractor: {
-            travis: 'tests/e2e/config/protractor-travis-conf.js',
+            travis: 'tests/e2e/config/protractor-travis-conf.js',//travis: 'tests/e2e/config/protractor-travis-nosaucelabs-conf.js',
             local: 'tests/e2e/config/protractor-conf.js'
         },
         ngconstant: {
@@ -249,6 +264,24 @@ module.exports = function (grunt) {
                     'ACCOUNT_URL': '<%= config.prod.account %>',
                     'DEBUG': false
                 }
+            }
+        },
+        s3: {
+            options: {
+                key: 'process.env.AWS_KEY',
+                secret: 'process.env.AWS_SECRET',
+                access: 'public-read',
+                maxOperations: 5,
+                gzip: true,
+                gzipExclude: ['.jpg', '.jpeg', '.png', '.xml', '.json', '.pdf', '.txt', '.ico']
+            },
+            prod: {
+                bucket: 'reports.secxbrl.info',
+                upload: [{
+                    src: 'dist/**/*',
+                    dest: '',
+                    rel: 'dist/',
+                }]
             }
         },
         jsonlint: {
@@ -356,16 +389,30 @@ module.exports = function (grunt) {
                 //sourceMap: true,
                 //sourceMapIncludeSources: true
             }
+        },
+        'branch_run': {
+            options: {
+                master: ['s3:prod']
+            },
+            dist: {}
         }
     });
-
     grunt.registerTask('e2e', function(){
         var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
         grunt.task.run([
             'webdriver',
             'connect:test',
             'protractor:' + target
-        ]); 
+        ]);
+    });
+
+    grunt.registerTask('e2e-dev', function(){
+        var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
+        grunt.task.run([
+            'webdriver',
+            'connect:test-dev',
+            'protractor:' + target
+        ]);
     });
 
     grunt.registerTask('server', function (target) {
@@ -384,12 +431,14 @@ module.exports = function (grunt) {
             'watch'
         ]);
     });
-    
+
     grunt.registerTask('build', function () {
         //var env = (target ? target : 'server');
 
         grunt.task.run([
+            'ngconstant:server',
             'clean:dist',
+            'less',
             'peg',
             'swagger-js-codegen',
             'useminPrepare',
@@ -404,7 +453,6 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('unit-tests', ['less', 'karma:1.2.9']);
-    grunt.registerTask('test', ['less', 'karma:1.2.9', 'e2e']);
-    grunt.registerTask('default', ['jsonlint', 'jshint', 'build', 'test']);
+    grunt.registerTask('test', ['build', 'karma:1.2.9', 'e2e']);
+    grunt.registerTask('default', ['jsonlint', 'jshint', 'test', 'branch_run']);
 };

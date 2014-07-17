@@ -8,7 +8,7 @@
         <a ui-sref="report.taxonomy.concept.overview()">Overview</a>
     </li>
     <li ui-sref-active="active" ng-class="{ disabled: concept.IsAbstract === true }">
-        <a ui-sref="report.taxonomy.concept.synonyms()" ng-disabled="concept.IsAbstract === true">Synonyms ({{synonymsCount}})</a>
+        <a ui-sref="report.taxonomy.concept.synonyms()">Synonyms ({{synonymsCount}})</a>
     </li>
     <li ui-sref-active="active" ng-class="{ disabled: concept.IsAbstract === true }">
         <a ui-sref="report.taxonomy.concept.formula.computation.list()">Computation Formula ({{computationFormulasCount}})</a>
