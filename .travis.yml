@@ -3,7 +3,7 @@ node_js:
 - '0.11'
 addons:
   sauce_connect: true
-  firefox: '28.0'
+#  firefox: '28.0'
 env:
   global:
   - secure: JjP7KN5VfGxzpPQTk0Qh+5axkJN8Tcoenu5vNvZTocH3MhH3/jOUvV3cu+e09F6Uat90WLciqs8JhGELAzfmHBnMMHSbLjMucD4XNhJNv5nVc86FrWEeJZUSBnPu08qmPZLacaRlIEdHsK4G0rZTAidsuUGNAfdSdfe8yWNHRTA=
