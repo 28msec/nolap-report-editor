@@ -4,7 +4,7 @@ angular
 .directive('dynNodrag', function(){
     return {
         restrict: 'A',
-        link: function($scope, element, attributes) {
+        link: function($scope, element) {
             $scope.$watch('selectedElementId', function(id){
                 if(id === $scope.$nodeScope.$modelValue.Id) {
                     element.removeAttr('data-nodrag');

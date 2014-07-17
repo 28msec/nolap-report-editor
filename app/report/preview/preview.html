@@ -56,10 +56,15 @@
 					template-url="/bower_components/layoutmodel-renderer-angular/app/directive/layoutmodel.html"></layoutmodel>
 			</div>
 			
-			<div>
+			<div ng-if="report.hasSufficientFilters()">
 				<p ng-show="loading">Updating preview...</p>
 			</div>
-			
+
+           <div class="alert alert-danger" ng-if="!report.hasSufficientFilters()">
+               <strong>Too generic Filter</strong><br/>
+               Cannot Load preview because the filters are too generic. Please, go back to the <a ui-sref="report.filters()">Filters</a> page and refine your Filtering.
+           </div>
+
 			<div style="height:70px">&nbsp;</div>
 		</div>
    </block-container> 

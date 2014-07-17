@@ -1,0 +1,102 @@
+<flexy-layout orientation="horizontal">
+    <block-container init="450" class="sidebar">
+        <header class="std-header">Set Filters</header>
+        <div ng-if="!report.hasSufficientFilters()" class="content">
+            <div class="alert alert-warning">
+                <strong>Too generic Filter</strong><br/>
+                It won't be possible to retrieve a fact-table or preview page because the filters are too generic.
+                Either, you haven't got enough filters selected or your selection is too broad.
+                Please, refine your Filtering.
+            </div>
+        </div>
+        <div>
+            <h6>ADD ENTITY</h6>
+            <input class="form-control" type="text" ng-model="entityName" typeahead-on-select="selectEntity($item)"
+                   placeholder="Search for an entity..."
+                   typeahead-template-url="typeahead_entity.html"
+                   typeahead="entity.name for entity in entities | filter:$viewValue | limitTo:8">
+            <script type="text/ng-template" id="typeahead_entity.html">
+                <a tabindex="-1" class="multicol">
+                    <div ng-bind-html='match.model.name | typeaheadHighlight:query'></div>
+                    <small ng-bind-html='"CIK: " + match.model.cik + (match.model.tickers[0] ? ", Ticker: " + match.model.tickers[0] : "") | typeaheadHighlight:query'></small>
+                </a>
+            </script>
+            <h6 class="nowrap">ADD AN ENTITY GROUP</h6>
+                        <span ng-repeat="t in tags">
+                            <a class="highlight3" ng-click="(selection.tag.indexOf(t) >= 0 ? null : selection.tag.push(t))">{{t}}</a>&nbsp;
+                        </span>
+            <h6 class="nowrap">ADD A INDUSTRY GROUP</h6>
+            <input class="form-control" type="text" ng-model="sicCode" typeahead-on-select="selectSic($item)"
+                   placeholder="Search for a industry group..."
+                   typeahead-template-url="typeahead_sic.html"
+                   typeahead="sic.Description for sic in sics | filter:$viewValue | limitTo:8">
+            <script type="text/ng-template" id="typeahead_sic.html">
+                <a tabindex="-1" class="multicol">
+                    <div ng-bind-html='match.model.Description | typeaheadHighlight:query'></div>
+                    <small ng-bind-html='"ID: " + match.model.ID + " Sector: " + match.model.Sector | typeaheadHighlight:query'></small>
+                </a>
+            </script>
+        </div>
+        <div class="row">
+            <div class="col-xs-6">
+                <h6 class="nowrap">ADD FISCAL YEARS</h6>
+                <ul class="selector" style="height: 97px">
+                    <li ng-repeat="y in years" ng-class="{ selected: (selection.fiscalYear.indexOf(y) >= 0) }"
+                        ng-click="(selection.fiscalYear.indexOf(y) >= 0 ? selection.fiscalYear.splice(selection.fiscalYear.indexOf(y), 1) : selection.fiscalYear.push(y))">{{y}}</li>
+                </ul>
+            </div>
+            <div class="col-xs-6">
+                <h6 class="nowrap">ADD FISCAL PERIODS</h6>
+                <ul class="selector" style="height: 97px">
+                    <li ng-repeat="p in periods" ng-class="{ selected: (selection.fiscalPeriod.indexOf(p) >= 0) }"
+                        ng-click="(selection.fiscalPeriod.indexOf(p) >= 0 ? selection.fiscalPeriod.splice(selection.fiscalPeriod.indexOf(p), 1) : selection.fiscalPeriod.push(p))">{{p}}</li>
+                </ul>
+            </div>
+        </div>
+    </block-container>
+    <block-splitter></block-splitter>
+    <block-container id="comparison-filter">
+        <header class="std-header">Selected Filters</header>
+        <a class="pull-right" ng-click="reset()">RESET</a>
+        <div ng-if="selection.cik.length + selection.tag.length">
+            <div>
+                <h6>ENTITIES OR ENTITY GROUPS</h6>
+                <div class="alert alert-success" ng-repeat="tag in selection.tag">
+                    <a class="close" ng-click="selection.tag.splice($index, 1)">&times;</a>
+                    {{tag}}
+                </div>
+                <div class="alert alert-info" ng-repeat="c in selection.cik">
+                    <a class="close" ng-click="selection.cik.splice($index, 1)">&times;</a>
+                    {{getEntity(c).name}}
+                </div>
+            </div>
+        </div>
+        <div ng-if="selection.sic.length">
+            <div>
+                <h6>INDUSTRY GROUP</h6>
+                <div class="alert alert-danger" ng-repeat="s in selection.sic">
+                    <a class="close" ng-click="selection.sic.splice($index, 1)">&times;</a>
+                    {{getSic(s).Description}}
+                </div>
+            </div>
+        </div>
+        <div ng-if="selection.fiscalYear.length">
+            <div>
+                <h6>FISCAL YEARS</h6>
+                <div class="alert alert-warning" ng-repeat="y in selection.fiscalYear">
+                    <a class="close" ng-click="selection.fiscalYear.splice($index, 1)">&times;</a>
+                    {{y}}
+                </div>
+            </div>
+        </div>
+        <div ng-if="selection.fiscalPeriod.length">
+            <div>
+                <h6>FISCAL PERIODS</h6>
+                <div class="alert alert-warning" ng-repeat="p in selection.fiscalPeriod">
+                    <a class="close" ng-click="selection.fiscalPeriod.splice($index, 1)">&times;</a>
+                    {{p}}
+                </div>
+            </div>
+        </div>
+    </block-container>
+</flexy-layout>

@@ -11,7 +11,7 @@ angular
     ConceptIsStillReferencedError.prototype = new Error();
     return ConceptIsStillReferencedError;
 })
-.factory('Report', function($log, ConceptIsStillReferencedError){
+.factory('Report', function($log, $q, ConceptIsStillReferencedError){
 
     //Constructor
     var Report = function(modelOrName, label, description, role, username, prefix){
@@ -1462,6 +1462,170 @@ angular
             }
         }
         return result;
+    };
+
+    /**********************
+     ** Filters API
+     **********************/
+    Report.prototype.resetFilters = function(){
+        var model = this.getModel();
+        model.Filters = {
+            'cik': [],
+            'tag': [ 'DOW30' ],
+            'fiscalYear': [],
+            'fiscalPeriod': [],
+            'sic': []
+        };
+        return model.Filters;
+    };
+
+    Report.prototype.getFilters = function(){
+        var model = this.getModel();
+        return model.Filters;
+    };
+
+    var getAspectEnumeration = function(report, aspectName){
+        var model = report.getModel();
+        var result = [];
+        var aspect =
+            model.Hypercubes['xbrl:DefaultHypercube']
+                .Aspects[aspectName];
+        if(aspectName === 'xbrl:Concept' && aspect.Domains && aspect.Domains['xbrl:ConceptDomain'] && aspect.Domains['xbrl:ConceptDomain'].Members ){
+            return Object.keys(aspect.Domains['xbrl:ConceptDomain'].Members);
+        }
+        if(aspect === undefined || aspect.DomainRestriction === undefined || aspect.DomainRestriction.Enumeration === undefined){
+            return result;
+        }
+        return aspect.DomainRestriction.Enumeration;
+    };
+
+    var setAspect = function(report, aspectName, aspect){
+        var model = report.getModel();
+        model.Hypercubes['xbrl:DefaultHypercube']
+            .Aspects[aspectName] = aspect;
+    };
+
+    Report.prototype.hasSufficientFilters = function(){
+        var result = false;
+        var countAspectRestrictions = this.countAspectsRestrictions(['xbrl:Entity','sec:Archives']);
+        if(countAspectRestrictions > 0 && countAspectRestrictions < 500){
+            result = true;
+        }
+        return result;
+    };
+
+    Report.prototype.countAspectsRestrictions = function(arrayOfAspectNames){
+        ensureParameter(arrayOfAspectNames, 'arrayOfAspectNames', 'object', 'countAspectsRestrictions');
+
+        var count = 0;
+        var that = this;
+        angular.forEach(arrayOfAspectNames, function(aspectName){
+            var aspects = getAspectEnumeration(that, aspectName);
+            count += aspects.length;
+        });
+        return count;
+    };
+
+    Report.prototype.updateAspects = function(aspects){
+        ensureParameter(aspects, 'aspects', 'object', 'updateAspects');
+
+        // xbrl:Entity
+        if(aspects['xbrl:Entity'] && aspects['xbrl:Entity'].length > 0){
+            var entities = [];
+            aspects['xbrl:Entity'].forEach(
+                function(cik){
+                    if(cik.indexOf('http://www.sec.gov/CIK ') === 0){
+                        entities.push(cik);
+                    } else {
+                        entities.push('http://www.sec.gov/CIK ' + cik);
+                    }
+                });
+            setAspect(this, 'xbrl:Entity',
+                {
+                    'Name': 'xbrl:Entity',
+                    'Label': 'Reporting Entity',
+                    'Kind': 'TypedDimension',
+                    'Type': 'string',
+                    'DomainRestriction': {
+                        'Name': 'xbrl:EntityDomain',
+                        'Label': 'Entity Domain',
+                        'Enumeration': entities
+                    }
+                });
+        } else {
+            setAspect(this, 'xbrl:Entity',
+                {
+                    'Name': 'xbrl:Entity',
+                    'Label': 'Reporting Entity'
+                });
+        }
+
+        // sec:Archive
+        if(aspects['sec:Archive'] && aspects['sec:Archive'].length > 0){
+            setAspect(this, 'sec:Archive',
+                {
+                    'Name': 'sec:Archive',
+                    'Label': 'Archive ID',
+                    'Kind': 'TypedDimension',
+                    'Type': 'string',
+                    'DomainRestriction': {
+                        'Name': 'sec:ArchiveDomain',
+                        'Label': 'Archive Domain',
+                        'Enumeration': aspects['sec:Archive']
+                    }
+                });
+        } else {
+            setAspect(this, 'sec:Archive',
+                {
+                    'Name': 'sec:Archive',
+                    'Label': 'Archive ID'
+                });
+        }
+
+        // sec:FiscalYear
+        if(aspects['sec:FiscalYear'] && aspects['sec:FiscalYear'].length > 0){
+            setAspect(this, 'sec:FiscalYear',
+                {
+                    'Name': 'sec:FiscalYear',
+                    'Label': 'Fiscal Year',
+                    'Kind': 'TypedDimension',
+                    'Type': 'integer',
+                    'DomainRestriction': {
+                        'Name': 'sec:FiscalYearDomain',
+                        'Label': 'Fiscal Year Domain',
+                        'Enumeration': aspects['sec:FiscalYear']
+                    }
+                });
+        } else {
+            setAspect(this, 'sec:FiscalYear',
+                {
+                    'Name': 'sec:FiscalYear',
+                    'Label': 'Fiscal Year'
+                });
+        }
+
+        // sec:FiscalPeriod
+        if(aspects['sec:FiscalPeriod'] && aspects['sec:FiscalPeriod'].length > 0){
+            setAspect(this, 'sec:FiscalPeriod',
+                {
+                    'Name': 'sec:FiscalPeriod',
+                    'Label': 'Fiscal Period',
+                    'Kind': 'TypedDimension',
+                    'Type': 'string',
+                    'DomainRestriction': {
+                        'Name': 'sec:FiscalPeriodDomain',
+                        'Label': 'Fiscal Period Domain',
+                        'Enumeration': aspects['sec:FiscalPeriod']
+                    }
+                });
+        } else {
+            setAspect(this, 'sec:FiscalPeriod',
+                {
+                    'Name': 'sec:FiscalPeriod',
+                    'Label': 'Fiscal Period'
+                });
+        }
+
     };
 
     return Report;
