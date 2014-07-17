@@ -390,7 +390,7 @@ module.exports = function (grunt) {
                 //sourceMapIncludeSources: true
             }
         },
-        branch_run: {
+        'branch_run': {
             options: {
                 master: ['s3:prod']
             },
