@@ -377,8 +377,6 @@ module.exports = function (grunt) {
     grunt.registerTask('e2e', function(){
         var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
         grunt.task.run([
-            'ngconstant:server',
-            'build',
             'webdriver',
             'connect:test',
             'protractor:' + target
@@ -416,8 +414,10 @@ module.exports = function (grunt) {
 
         grunt.task.run([
             'clean:dist',
+            'ngconstant:server',
             'peg',
             'swagger-js-codegen',
+            'less',
             'useminPrepare',
             'concurrent:dist',
             'concat',
@@ -430,7 +430,6 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('unit-tests', ['less', 'karma:1.2.9']);
-    grunt.registerTask('test', ['less', 'karma:1.2.9', 'e2e']);
+    grunt.registerTask('test', ['build', 'karma:1.2.9', 'e2e']);
     grunt.registerTask('default', ['jsonlint', 'jshint', 'test']);
 };
