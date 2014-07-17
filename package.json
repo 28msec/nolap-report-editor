@@ -67,7 +67,8 @@
     "grunt-contrib-htmlmin": "~0.3.0",
     "grunt-contrib-imagemin": "~0.7.1",
     "grunt-contrib-uglify": "~0.5.0",
-    "grunt-s3": "~0.2.0-alpha.3"
+    "grunt-s3": "~0.2.0-alpha.3",
+    "grunt-branch-run": "~0.2.0"
   },
   "contributors": [
     {

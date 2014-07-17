@@ -389,6 +389,12 @@ module.exports = function (grunt) {
                 //sourceMap: true,
                 //sourceMapIncludeSources: true
             }
+        },
+        branch_run: {
+            options: {
+                master: ['s3:prod']
+            },
+            dist: {}
         }
     });
 
@@ -450,5 +456,5 @@ module.exports = function (grunt) {
 
     grunt.registerTask('unit-tests', ['less', 'karma:1.2.9']);
     grunt.registerTask('test', ['less', 'karma:1.2.9', 'e2e']);
-    grunt.registerTask('default', ['jsonlint', 'jshint', 'test']);
+    grunt.registerTask('default', ['jsonlint', 'jshint', 'test', 'branch_run']);
 };
