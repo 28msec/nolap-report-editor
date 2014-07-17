@@ -268,8 +268,8 @@ module.exports = function (grunt) {
         },
         s3: {
             options: {
-                key: 'process.env.AWS_KEY',
-                secret: 'process.env.AWS_SECRET',
+                key: process.env.AWS_KEY,
+                secret: process.env.AWS_SECRET,
                 access: 'public-read',
                 maxOperations: 5,
                 gzip: true,
