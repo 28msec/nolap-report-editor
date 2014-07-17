@@ -1,4 +1,4 @@
-/*global browser:false */
+/*global browser:false, element:false, by:false */
 'use strict';
 
 //https://github.com/angular/protractor/blob/master/docs/api.md
