@@ -210,7 +210,7 @@ module.exports = function (grunt) {
             }
         },
         protractor: {
-            travis: 'tests/e2e/config/protractor-travis-nosaucelabs-conf.js',
+            travis: 'tests/e2e/config/protractor-travis-conf.js',//travis: 'tests/e2e/config/protractor-travis-nosaucelabs-conf.js',
             local: 'tests/e2e/config/protractor-conf.js'
         },
         ngconstant: {
@@ -400,7 +400,7 @@ module.exports = function (grunt) {
     grunt.registerTask('e2e', function(){
         var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
         grunt.task.run([
-            //'webdriver',
+            'webdriver',
             'connect:test',
             'protractor:' + target
         ]);
