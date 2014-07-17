@@ -397,16 +397,13 @@ module.exports = function (grunt) {
             dist: {}
         }
     });
-
     grunt.registerTask('e2e', function(){
         var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
         grunt.task.run([
-            'ngconstant:server',
-            'build',
             'webdriver',
             'connect:test',
             'protractor:' + target
-        ]); 
+        ]);
     });
 
     grunt.registerTask('e2e-dev', function(){
@@ -415,7 +412,7 @@ module.exports = function (grunt) {
             'webdriver',
             'connect:test-dev',
             'protractor:' + target
-        ]); 
+        ]);
     });
 
     grunt.registerTask('server', function (target) {
@@ -434,12 +431,14 @@ module.exports = function (grunt) {
             'watch'
         ]);
     });
-    
+
     grunt.registerTask('build', function () {
         //var env = (target ? target : 'server');
 
         grunt.task.run([
+            'ngconstant:server',
             'clean:dist',
+            'less',
             'peg',
             'swagger-js-codegen',
             'useminPrepare',
@@ -454,7 +453,6 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('unit-tests', ['less', 'karma:1.2.9']);
-    grunt.registerTask('test', ['less', 'karma:1.2.9', 'e2e']);
+    grunt.registerTask('test', ['build', 'karma:1.2.9', 'e2e']);
     grunt.registerTask('default', ['jsonlint', 'jshint', 'test', 'branch_run']);
 };
