@@ -3,13 +3,12 @@ node_js:
 - '0.11'
 addons:
   sauce_connect: true
-#  firefox: '28.0'
 env:
   global:
   - secure: JjP7KN5VfGxzpPQTk0Qh+5axkJN8Tcoenu5vNvZTocH3MhH3/jOUvV3cu+e09F6Uat90WLciqs8JhGELAzfmHBnMMHSbLjMucD4XNhJNv5nVc86FrWEeJZUSBnPu08qmPZLacaRlIEdHsK4G0rZTAidsuUGNAfdSdfe8yWNHRTA=
   - secure: ACzjKTIglg+W5I0Jhgf4n2RtUKTGth9Hkle9iTpt952ctXvB0BbsfoNVqFdQkYhPGhjsb3iJZwu5iFCzAXjmbS572/RMiuIb59UUpgGuSgxBylmfgRndb5uxGB6zwXWlcSJzdITv9Aj8y9iemT+2HtkAnYbNR4r0hICJlo/fyEo=
   - secure: qkjAyle8KMB6BaHAWwFvgckEgsylmwWY4iM24HsFoRtG2tFT9knoSbysp0BYEF1BTsyDMUHVE9Hvf66BzqMgz0L7rDzrz+n1MRe5Z/i3G4ksjubJGBaf0F8pNguaHpjmbMldtxw4Pv+QwY9RfGc6f6zG840Unrt51xGUYEmviOE=
-  - secure: AcYIZXMhlVss9M2PZNtdIqG6LxiDIkUxixc13bRIyCZlr5xPmTAGuJcw3HIxXWgPkswNxzmUmuRi1MvqZ1TqCcMZOFVz+Sr8Y49OTH/TjkJC0AU+2zMZkaqtiCddQa11OoMi6YtWyE6liEOQytTnEyIW/GSIwnhJwCc9igYC2aU=
+  - secure: cSa6qHoVwiV6HyJ6e5Fy5QFQ9Vj9Jn30pxfat4kU+t7d8aoCU/Nsxokxt3ZX2Ef8xf0gIbZkt5Lva2XavWy0czJBWg9OFdh4Sf0uJsswGNQ8CmlAlCTEQexWOKH6Yxsl4iK3l6S8l4rqWDdBkLIHlgT4bfgTqHGOQxp2f9zcq+A=
 before_script:
 - npm install -g bower
 - bower install
