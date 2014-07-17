@@ -64,6 +64,21 @@ module.exports = function (grunt) {
                                 '!\\.html|\\.xml|\\images|\\.js|\\.css|\\.png|\\.jpg|\\.woff|\\.ttf|\\.svg|\\.ico /index.html [L]'
                             ]),
                             mountFolder(connect, '.tmp'),
+                            mountFolder(connect, 'dist')
+                        ];
+                    }
+                }
+            },
+            'test-dev': {
+                options: {
+                    keepalive: false,
+                    middleware: function (connect) {
+                        return [
+                            lrSnippet,
+                            modRewrite([
+                                '!\\.html|\\.xml|\\images|\\.js|\\.css|\\.png|\\.jpg|\\.woff|\\.ttf|\\.svg|\\.ico /index.html [L]'
+                            ]),
+                            mountFolder(connect, '.tmp'),
                             mountFolder(connect, 'app')
                         ];
                     }
@@ -362,8 +377,19 @@ module.exports = function (grunt) {
     grunt.registerTask('e2e', function(){
         var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
         grunt.task.run([
+            'ngconstant:server',
+            'build',
             'webdriver',
             'connect:test',
+            'protractor:' + target
+        ]); 
+    });
+
+    grunt.registerTask('e2e-dev', function(){
+        var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
+        grunt.task.run([
+            'webdriver',
+            'connect:test-dev',
             'protractor:' + target
         ]); 
     });
@@ -406,5 +432,5 @@ module.exports = function (grunt) {
 
     grunt.registerTask('unit-tests', ['less', 'karma:1.2.9']);
     grunt.registerTask('test', ['less', 'karma:1.2.9', 'e2e']);
-    grunt.registerTask('default', ['jsonlint', 'jshint', 'build', 'test']);
+    grunt.registerTask('default', ['jsonlint', 'jshint', 'test']);
 };
