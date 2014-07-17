@@ -18,7 +18,11 @@
 
   
   function createFun(name, params) {
-    return {Type: "function", Name: name.toLowerCase(), Children: [params]};
+    if(typeof params === 'object' && params.length !== undefined){
+      return {Type: "function", Name: name.toLowerCase(), Children: params};
+    } else {
+      return {Type: "function", Name: name.toLowerCase(), Children: [params]};
+    }
   }
 
 }
@@ -121,8 +125,8 @@ fun_not
 fun_isblank
   = _ name:"isblank" _ "(" _ param:parameter _ ")" _ { return createFun(name, param); }
 
-parameter 
-  = comma? param:comparison { return param; }
+parameter
+  = _ comma? _ param:comparison _ { return param; }
 
 ws
   = [ \t\r\n]
@@ -132,4 +136,4 @@ _
 
 comma 
   = _ "," _
-  
+

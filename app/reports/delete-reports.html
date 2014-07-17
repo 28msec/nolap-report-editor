@@ -1,0 +1,16 @@
+<div class="modal-header modal-header-danger">
+    <h4 class="modal-title">Delete Reports?</h4>
+</div>
+<div class="modal-body">
+    <p>Do you really want to delete the following reports? There is no going back.</p>
+    <ul>
+        <li ng-repeat="name in names" ng-bind="name"></li>
+    </ul>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-danger" id="confirm-delete-reports" ng-click="ok()" ng-class="{ disabled: loading === true }">
+        <span ng-show="!loading">Confirm</span>
+        <span ng-show="loading"><i class="fa fa-spin fa-spinner"></i> Deleting...</span>
+    </button>
+    <button class="btn btn-default" ng-click="cancel()">cancel</button>
+</div>

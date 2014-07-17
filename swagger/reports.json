@@ -19,9 +19,30 @@
                     "parameters": [
                         {
                             "name": "_id",
-                            "description": "A report id (e.g. FundamentalAccountingConcepts)",
+                            "description": "A report id (e.g. 1fueA5hrxIHxvRf7Btr_J6efDJ3qp-s9KV731wDc4OOc)",
                             "required": false,
                             "type": "string",
+                            "paramType": "query"
+                        },
+                        {
+                            "name": "user",
+                            "description": "A user's email address to filter reports owned by this user (i.e. all reports if user = authorized user or only public-read reports of user)",
+                            "required": false,
+                            "type": "string",
+                            "paramType": "query"
+                        },
+                        {
+                            "name": "public-read",
+                            "description": "Filter listed reports to return only those that are publicly readable.",
+                            "required": false,
+                            "type": "boolean",
+                            "paramType": "query"
+                        },
+                        {
+                            "name": "private",
+                            "description": "Filter listed reports to return only those that are private.",
+                            "required": false,
+                            "type": "boolean",
                             "paramType": "query"
                         },
                         {
@@ -30,6 +51,14 @@
                             "required": false,
                             "type": "string",
                             "paramType": "query"
+                        },
+                        {
+                            "name": "_method",
+                            "type": "string",
+                            "paramType": "query",
+                            "enum": [
+                                "POST"
+                            ]
                         }
                     ],
                     "responseMessages": [
@@ -64,7 +93,7 @@
                         {
                             "title": "Retrieve a specific report",
                             "description": "Retrieve the schema for a specific report identified by its id. Return the result as JSON.",
-                            "request": "[API_URL]/_queries/public/reports/reports.jq?_id=FundamentalAccountingConcepts&token=00000-00-000-00000",
+                            "request": "[API_URL]/_queries/public/reports/reports.jq?_id=1fueA5hrxIHxvRf7Btr_J6efDJ3qp-s9KV731wDc4OOc&token=00000-00-000-00000",
                             "response": ""
                         },
                         {
@@ -92,6 +121,13 @@
                             "required": true,
                             "type": "object",
                             "paramType": "body"
+                        },
+                        {
+                            "name": "public-read",
+                            "description": "Shortcut to make a report publicly readable.",
+                            "required": false,
+                            "type": "boolean",
+                            "paramType": "query"
                         },
                         {
                             "name": "validation-only",
@@ -125,6 +161,11 @@
                             "responseModel": "Error"
                         },
                         {
+                            "code": 409,
+                            "message": "Conflict: The remotely stored report contains changes that are newer than your local copy of the report. Saving failed.",
+                            "responseModel": "Error"
+                        },
+                        {
                             "code": 500,
                             "message": "An internal error occurred during the processing of the request.",
                             "responseModel": "Error"
@@ -140,25 +181,13 @@
                         {
                             "title": "Add or replace a report",
                             "description": "Add a new report or replace an existing one. Return the stored report as JSON.",
-                            "request": "[API_URL]/_queries/public/reports/add-report.jq?report=%7B%27_id%27%3A%20%27FundamentalAccountingConcepts%27%7D&token=00000-00-000-00000",
+                            "request": "[API_URL]/_queries/public/reports/add-report.jq?token=00000-00-000-00000",
                             "response": "{Name: 'FundamentalAccountingConcepts'}"
                         },
                         {
                             "title": "Validate a report",
                             "description": "Validate the structure of a report JSON object. Return warnings and errors in a JSON Array.",
-                            "request": "[API_URL]/_queries/public/reports/add-report.jq?validation-only&report=%7B%27_id%27%3A%20%27FundamentalAccountingConcepts%27%7D&token=00000-00-000-00000",
-                            "response": "[
-                            {
-                              'type' : 'ERROR', 
-                              'context' : 'Presentation', 
-                              'identifier' : 'fac:Root', 
-                              'message' : 'Concept is not in the hypercube value space: fac:Root2'
-                            }, {
-                              'type' : 'INFO', 
-                              'context' : 'Presentation', 
-                              'identifier' : 'fac:Test', 
-                              'message' : 'Duplicate concept: fac:Test'
-                            }]"
+                            "request": "[API_URL]/_queries/public/reports/add-report.jq?validation-only&token=00000-00-000-00000"
                         }
                     ]
                 }

@@ -1,0 +1,14 @@
+<flexy-layout orientation="horizontal">
+    <block-container init="450" class="sidebar">
+        <header class="std-header">Presentation</header>
+        <div ui-tree="treeOptions" class="scrollable lg-bottom-padding">
+            <ol ui-tree-nodes="" ng-model="presentationTree">
+                <li ng-repeat="element in presentationTree" ui-tree-node ng-include="'/report/taxonomy/presentation-node.html'"></li>
+            </ol>
+        </div>
+    </block-container>
+    <block-splitter></block-splitter>
+    <block-container>
+        <div ui-view></div>
+    </block-container>
+</flexy-layout>

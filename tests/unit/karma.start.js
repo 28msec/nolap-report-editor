@@ -1,0 +1,12 @@
+'use strict';
+
+var Report;
+var Rule;
+beforeEach(module('report-model', 'rules-model'));
+
+beforeEach(inject(function (_Report_, _Rule_) {
+    Report = _Report_;
+    Rule = _Rule_;
+}));
+
+afterEach(function () {});

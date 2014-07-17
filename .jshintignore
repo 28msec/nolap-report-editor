@@ -1,4 +1,6 @@
-src/tpl.js
-src/swagger/ReportAPI.js
-src/pegjs/formulaParser.js
-src/pegjs/excelParser.js
+app/bower_components
+app/modules/queries-api.js
+app/modules/report-api.js
+app/modules/session-api.js
+app/modules/formula-parser.js
+app/modules/excel-parser.js

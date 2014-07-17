@@ -1,0 +1,129 @@
+<!doctype html>
+<html ng-app="report-editor" resize>
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Report Editor</title>
+        <meta name="viewport" content="width=device-width">
+        <!-- build:css({.tmp,app}) styles/main.css -->
+        <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.css">
+        <link rel="stylesheet" href="/styles/index.css">
+        <!-- endbuild -->
+    </head>
+
+    <body class="ng-cloak">
+        <div api-status></div>
+        <div ui-view></div>
+
+        <!-- build:js({.tmp,app}) scripts/scripts.js -->
+        <script src="/bower_components/angular/angular.js"></script>
+        <script src="/bower_components/ngprogress-lite/ngprogress-lite.js"></script>
+        <script src="/bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+        <script src="/bower_components/angular-sanitize/angular-sanitize.js"></script>
+        <script src="/bower_components/angular-ui-bootstrap-bower/ui-bootstrap.js"></script>
+        <script src="/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js"></script>
+        <script src="/bower_components/angular-cache/dist/angular-cache.js"></script>
+        <script src="/bower_components/accounting/accounting.js"></script>
+        <script src="/bower_components/layoutmodel-renderer-angular/app/directive/layoutmodel.js"></script>
+        <script src="/bower_components/flexy-layout/flexy-layout.debug.js"></script>
+        <script src="/bower_components/angular-ui-tree/dist/angular-ui-tree.js"></script>
+
+        <script src="/app.js"></script>
+
+        <!-- Constants -->
+        <script src="/constants.js"></script>
+
+        <!-- Swagger Modules -->
+        <script src="/modules/report-api.js"></script>
+        <script src="/modules/session-api.js"></script>
+        <script src="/modules/queries-api.js"></script>
+
+        <!-- Modules -->
+        <script src="/modules/api.js"></script>
+        <script src="/modules/excel-parser.js"></script>
+        <script src="/modules/formula-parser.js"></script>
+        <script src="/modules/session-model.js"></script>
+        <script src="/modules/report-model.js"></script>
+        <script src="/modules/rules-model.js"></script>
+
+        <!-- UI Modules -->
+        <script src="/modules/ui/api-status.js"></script>
+        <script src="/modules/ui/forms.js"></script>
+        <script src="/modules/ui/account.js"></script>
+        <script src="/modules/ui/resize.js"></script>
+
+        <!-- Auth -->
+        <script src="/auth/config.js"></script>
+        <script src="/auth/auth.js"></script>
+
+        <!-- Reports -->
+        <script src="/reports/config.js"></script>
+        <script src="/reports/reports.js"></script>
+        
+        <!-- Report -->
+        <script src="/report/config.js"></script>
+        <script src="/report/report.js"></script>
+
+        <!-- Preview -->
+        <script src="/report/preview/config.js"></script>
+        <script src="/report/preview/preview.js"></script>
+
+        <!-- Fact Table -->
+        <script src="/report/fact-table/config.js"></script>
+        <script src="/report/fact-table/fact-table.js"></script>
+
+        <!-- Taxonomy -->
+        <script src="/report/taxonomy/config.js"></script>
+        <script src="/report/taxonomy/taxonomy.js"></script>
+        
+        <!-- Concepts -->
+        <script src="/report/taxonomy/concepts/config.js"></script>
+        <script src="/report/taxonomy/concepts/concepts.js"></script>
+
+        <!-- Concept -->
+        <script src="/report/taxonomy/concept/config.js"></script>
+        <script src="/report/taxonomy/concept/concept.js"></script>
+        <script src="/report/taxonomy/concept/overview/config.js"></script>
+        <script src="/report/taxonomy/concept/overview/overview.js"></script>
+
+        <!-- Synonyms -->
+        <script src="/report/taxonomy/concept/synonyms/config.js"></script>
+        <script src="/report/taxonomy/concept/synonyms/synonyms.js"></script>
+
+        <!-- Formulas -->
+        <script src="/report/taxonomy/concept/formula/config.js"></script>
+        <script src="/report/taxonomy/concept/formula/formula.js"></script>
+        <script src="/report/taxonomy/concept/formula/directives.js"></script>
+        <script src="/report/taxonomy/concept/formula/computation/config.js"></script>
+        <script src="/report/taxonomy/concept/formula/computation/computation.js"></script>
+        <script src="/report/taxonomy/concept/formula/computation/list/config.js"></script>
+        <script src="/report/taxonomy/concept/formula/computation/list/list.js"></script>
+        <script src="/report/taxonomy/concept/formula/computation/create/config.js"></script>
+        <script src="/report/taxonomy/concept/formula/computation/create/create.js"></script>
+        <script src="/report/taxonomy/concept/formula/computation/edit/config.js"></script>
+        <script src="/report/taxonomy/concept/formula/computation/edit/edit.js"></script>
+        <script src="/report/taxonomy/concept/formula/validations/config.js"></script>
+        <script src="/report/taxonomy/concept/formula/validations/validations.js"></script>
+        <script src="/report/taxonomy/concept/formula/validations/list/config.js"></script>
+        <script src="/report/taxonomy/concept/formula/validations/list/list.js"></script>
+        <script src="/report/taxonomy/concept/formula/validations/create/config.js"></script>
+        <script src="/report/taxonomy/concept/formula/validations/create/create.js"></script>
+        <script src="/report/taxonomy/concept/formula/validations/edit/config.js"></script>
+        <script src="/report/taxonomy/concept/formula/validations/edit/edit.js"></script>
+
+
+        <!-- Filters -->
+        <script src="/report/filters/config.js"></script>
+        <script src="/report/filters/filters.js"></script>
+        
+        <!-- 400 -->
+        <script src="/400.js"></script>
+        
+        <!-- endbuild -->
+
+        <!-- Typekit -->
+        <script type="text/javascript" src="//use.typekit.net/put7est.js"></script>
+        <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+    </body>
+</html>

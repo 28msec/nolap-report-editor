@@ -1,0 +1,5 @@
+<h2>Concepts</h2>
+<input class="form-control input-lg" type="text" placeholder="Find or create a concept..."
+        ng-model="conceptName" typeahead="result.Name for result in getResults($viewValue)"
+        typeahead-on-select="onSelect($item, $model, $label)"
+        typeahead-template-url="/report/taxonomy/concepts/concept-typeahead.html">

@@ -4,11 +4,6 @@ module.exports = function (config) {
         frameworks: ['jasmine'],
         browsers: ['Firefox', 'PhantomJS'],
         files: [
-            'bower_components/angular-1.2.0/angular.min.js',
-            'bower_components/angular-mocks-1.2.0/angular-mocks.js',
-            'dist/nolap-report-editor.js',
-            'test/karma.start.js',
-            'test/*.js'
         ],
         captureTimeout: 60000,
         colors: true,
@@ -30,7 +25,6 @@ module.exports = function (config) {
             dir: 'coverage/'
         },
         preprocessors: {
-            'src/nolap-report-editor.js': ['coverage']
         },
         reporters: ['progress', 'coverage']
     });
