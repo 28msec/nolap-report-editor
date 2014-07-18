@@ -308,60 +308,60 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
             var value = ast.Value;
             var name = ast.Name;
             switch(type){
-                // comparisons
-                case 'eq':
-                case 'ne':
-                case 'gt':
-                case 'ge':
-                case 'lt':
-                case 'le': return toComputation(children[0]) + ' ' + type + ' ' + toComputation(children[1]);
+            // comparisons
+            case 'eq':
+            case 'ne':
+            case 'gt':
+            case 'ge':
+            case 'lt':
+            case 'le': return toComputation(children[0]) + ' ' + type + ' ' + toComputation(children[1]);
 
-                // arithmetics
-                case 'add': return toComputation(children[0]) + ' + ' + toComputation(children[1]);
-                case 'mul': return toComputation(children[0]) + ' * ' + toComputation(children[1]);
-                case 'div': return toComputation(children[0]) + ' div ' + toComputation(children[1]);
-                case 'sub': return toComputation(children[0]) + ' - ' + toComputation(children[1]);
+            // arithmetics
+            case 'add': return toComputation(children[0]) + ' + ' + toComputation(children[1]);
+            case 'mul': return toComputation(children[0]) + ' * ' + toComputation(children[1]);
+            case 'div': return toComputation(children[0]) + ' div ' + toComputation(children[1]);
+            case 'sub': return toComputation(children[0]) + ' - ' + toComputation(children[1]);
 
-                // primaries
-                case 'block':
-                    var inner = [];
-                    for(var i in children) {
-                        var child = children[i];
-                        inner.push(toComputation(child));
-                    }
-                    return '(' + inner.join(',') + ')';
-                case 'variable': return 'rules:decimal-value($' + name + ')';
+            // primaries
+            case 'block':
+                var inner = [];
+                for(var i in children) {
+                    var child = children[i];
+                    inner.push(toComputation(child));
+                }
+                return '(' + inner.join(',') + ')';
+            case 'variable': return 'rules:decimal-value($' + name + ')';
 
-                // atomics
-                case 'numeric': return value;
-                case 'boolean': return value;
-                case 'string': return '\"' + value + '\"';
+            // atomics
+            case 'numeric': return value;
+            case 'boolean': return value;
+            case 'string': return '\"' + value + '\"';
 
-                // functions
-                case 'function':
-                    var innerparams = [];
-                    for(var j in children) {
-                        var param = children[j];
-                        innerparams.push(toComputation(param));
-                    }
-                    switch(name){
-                        case 'isblank':
-                            var innerparams2 = [];
-                            for(var h in children) {
-                                if(children.hasOwnProperty(h)) {
-                                    var p = children[j];
-                                    if(p.Type === 'variable'){
-                                        innerparams2.push('$' + p.Name);
-                                    } else {
-                                        innerparams2.push(toComputation(p));
-                                    }
-                                }
+            // functions
+            case 'function':
+                var innerparams = [];
+                for(var j in children) {
+                    var param = children[j];
+                    innerparams.push(toComputation(param));
+                }
+                switch(name){
+                case 'isblank':
+                    var innerparams2 = [];
+                    for(var h in children) {
+                        if(children.hasOwnProperty(h)) {
+                            var p = children[j];
+                            if(p.Type === 'variable'){
+                                innerparams2.push('$' + p.Name);
+                            } else {
+                                innerparams2.push(toComputation(p));
                             }
-                            return 'not(exists(' + innerparams2.join(', ') + '))';
-                        case 'not': return 'not((' + innerparams.join(', ') + '))';
-                        case 'and': return '(' + innerparams.join(' and ') + ')';
-                        case 'or': return '(' + innerparams.join(' or ') + ')';
+                        }
                     }
+                    return 'not(exists(' + innerparams2.join(', ') + '))';
+                case 'not': return 'not((' + innerparams.join(', ') + '))';
+                case 'and': return '(' + innerparams.join(' and ') + ')';
+                case 'or': return '(' + innerparams.join(' or ') + ')';
+                }
             }
         }
     };
@@ -376,50 +376,50 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
             var name = ast.Name;
             var result = [];
             switch(type){
-                // comparisons
-                case 'eq': result.push(toAuditTrail(children[0]) + ' || " = " || ' + toAuditTrail(children[1])); break;
-                case 'ne': result.push(toAuditTrail(children[0]) + ' || " <> " || ' + toAuditTrail(children[1])); break;
-                case 'gt': result.push(toAuditTrail(children[0]) + ' || " > " || ' + toAuditTrail(children[1])); break;
-                case 'ge': result.push(toAuditTrail(children[0]) + ' || " >= " || ' + toAuditTrail(children[1])); break;
-                case 'lt': result.push(toAuditTrail(children[0]) + ' || " < " || ' + toAuditTrail(children[1])); break;
-                case 'le': result.push(toAuditTrail(children[0]) + ' || " <= " || ' + toAuditTrail(children[1])); break;
+            // comparisons
+            case 'eq': result.push(toAuditTrail(children[0]) + ' || " = " || ' + toAuditTrail(children[1])); break;
+            case 'ne': result.push(toAuditTrail(children[0]) + ' || " <> " || ' + toAuditTrail(children[1])); break;
+            case 'gt': result.push(toAuditTrail(children[0]) + ' || " > " || ' + toAuditTrail(children[1])); break;
+            case 'ge': result.push(toAuditTrail(children[0]) + ' || " >= " || ' + toAuditTrail(children[1])); break;
+            case 'lt': result.push(toAuditTrail(children[0]) + ' || " < " || ' + toAuditTrail(children[1])); break;
+            case 'le': result.push(toAuditTrail(children[0]) + ' || " <= " || ' + toAuditTrail(children[1])); break;
 
-                // arithmetics
-                case 'add': result.push(toAuditTrail(children[0]) + ' || " + " || ' + toAuditTrail(children[1])); break;
-                case 'mul': result.push(toAuditTrail(children[0]) + ' || " * " || ' + toAuditTrail(children[1])); break;
-                case 'div': result.push(toAuditTrail(children[0]) + ' || " div " || ' + toAuditTrail(children[1])); break;
-                case 'sub': result.push(toAuditTrail(children[0]) + ' || " - " || ' + toAuditTrail(children[1])); break;
+            // arithmetics
+            case 'add': result.push(toAuditTrail(children[0]) + ' || " + " || ' + toAuditTrail(children[1])); break;
+            case 'mul': result.push(toAuditTrail(children[0]) + ' || " * " || ' + toAuditTrail(children[1])); break;
+            case 'div': result.push(toAuditTrail(children[0]) + ' || " div " || ' + toAuditTrail(children[1])); break;
+            case 'sub': result.push(toAuditTrail(children[0]) + ' || " - " || ' + toAuditTrail(children[1])); break;
 
-                // primaries
-                case 'block':
-                    var inner = [];
-                    for(var i in children) {
-                        var child = children[i];
-                        inner.push(toAuditTrail(child));
-                    }
-                    result.push('" ( " || ' + inner.join(' || ", "') + ' || " )"');
-                    break;
-                case 'variable': result.push('rules:fact-trail($' + name + ', "' + name + '")'); break;
+            // primaries
+            case 'block':
+                var inner = [];
+                for(var i in children) {
+                    var child = children[i];
+                    inner.push(toAuditTrail(child));
+                }
+                result.push('" ( " || ' + inner.join(' || ", "') + ' || " )"');
+                break;
+            case 'variable': result.push('rules:fact-trail($' + name + ', "' + name + '")'); break;
 
-                // atomics
-                case 'numeric':
-                case 'boolean':
-                case 'string': result.push('"' + value + '"');  break;
+            // atomics
+            case 'numeric':
+            case 'boolean':
+            case 'string': result.push('"' + value + '"');  break;
 
-                // functions
-                case 'function':
-                    var innerparams = [];
-                    for(var j in children) {
-                        var param = children[j];
-                        innerparams.push(toAuditTrail(param));
-                    }
-                    switch(name){
-                        case 'isblank': result.push('"not(exists( " || ' + innerparams.join(' || ", "') + ' || "))"'); break;
-                        case 'not': result.push('not((' + innerparams.join(' || ", "') + ' || "))"'); break;
-                        case 'and': result.push('(' + innerparams.join(' || " and "') + ' || ")"'); break;
-                        case 'or': result.push('(' + innerparams.join(' || " or "') + ' || ")"'); break;
-                    }
-                    break;
+            // functions
+            case 'function':
+                var innerparams = [];
+                for(var j in children) {
+                    var param = children[j];
+                    innerparams.push(toAuditTrail(param));
+                }
+                switch(name){
+                case 'isblank': result.push('"not(exists( " || ' + innerparams.join(' || ", "') + ' || "))"'); break;
+                case 'not': result.push('not((' + innerparams.join(' || ", "') + ' || "))"'); break;
+                case 'and': result.push('(' + innerparams.join(' || " and "') + ' || ")"'); break;
+                case 'or': result.push('(' + innerparams.join(' || " or "') + ' || ")"'); break;
+                }
+                break;
             }
             return result.join(' || ');
         }
@@ -898,6 +898,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
 
     var validateAlternatives = function(rule, report){
         var formulae = rule.Formulae;
+        var hasActive = false;
         if(formulae === undefined || formulae === null || formulae[0] === '' || formulae.length === 0){
             rule.FormulaeErr = 'At least one alternative code section is mandatory.';
             rule.valid = false;
@@ -906,10 +907,16 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                 if(formulae.hasOwnProperty(i)) {
                     var alternative = formulae[i];
                     validateAlternative(rule, alternative, report);
+                    if(alternative.active){
+                        hasActive = true;
+                    }
                     if (!alternative.valid) {
                         rule.valid = false;
                     }
                 }
+            }
+            if(!hasActive){
+                formulae[0].active = true;
             }
         }
     };
@@ -1018,7 +1025,19 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
             rule.ValidatedConcepts = report.alignConceptPrefixes(model.ValidatedConcepts);
         }
         if(model.Formulae !== undefined && model.Formulae !== null && typeof model.Formulae === 'object') {
-            rule.Formulae = model.Formulae;
+            var formulae = [];
+            angular.forEach(model.Formulae,
+                function (formula) {
+                    formulae.push(
+                        {
+                            'PrereqSrc': formula.PrereqSrc,
+                            'SourceFact': formula.SourceFact,
+                            'BodySrc': formula.BodySrc
+                        }
+                    );
+                }
+            );
+            rule.Formulae = formulae;
         }
         rule.AllowCrossPeriod = model.AllowCrossPeriod;
         rule.AllowCrossBalance = model.AllowCrossBalance;

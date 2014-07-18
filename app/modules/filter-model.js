@@ -349,6 +349,14 @@ angular
                     .then(function(periods){selection.fiscalPeriod = [periods[0]];});
                 $q.all([years, periods])
                     .then(function(){
+                        getAspects()
+                            .then(
+                                function (aspects) {
+                                    if (report !== undefined && typeof report === 'object') {
+                                        report.updateAspects(aspects);
+                                    }
+                                }
+                            );
                         deferred.resolve(selection);
                     });
 

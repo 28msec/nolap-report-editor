@@ -178,6 +178,12 @@ angular
         }
     };
 
+    var ensureOptionalParameter = function(paramValue, paramName, paramType, functionName, regex, regexErrorMessage) {
+        if(paramValue !== undefined && paramValue !== null){
+            ensureParameter(paramValue, paramName, paramType, functionName, regex, regexErrorMessage);
+        }
+    };
+
     var ensureExists = function(value, valueType, functionName, errorMessage) {
         if(value === null || value === undefined || value === '') {
             throw new Error(functionName + ': ' + errorMessage);
@@ -212,7 +218,7 @@ angular
         var model = this.getModel();
         ensureExists(model, 'object', 'getPrefix', 'Report doesn\'t have a model.');
         if(model.Prefix !== undefined && model.Prefix !== null && typeof model.Prefix === 'string'){
-           return model.Prefix;
+            return model.Prefix;
         }
 
         // try to guess the prefix
@@ -707,40 +713,51 @@ angular
         }
         return count;
     };
-    
-    Report.prototype.addElement = function(networkShortName, parentElementID, elementOrConceptName, offset){
-        ensureNetworkShortName(networkShortName, 'networkShortName', 'addElement');
 
+    var determineOrder = function(report, networkShortName, parentElementID, offset, doEnforceStrictChildOrder){
         // determine order
         var order = 1;
-        var maxOrder = getMaxOrder(this, networkShortName, parentElementID);
+        var maxOrder = getMaxOrder(report, networkShortName, parentElementID);
         if(offset !== undefined && offset !== null){
-            ensureParameter(offset, 'offset', 'number', 'addElement');
             order = offset + 1;
         } else {
             offset = 0; // default
         }
         if(offset > (maxOrder)){
-            throw new Error('addElement: offset out of bounds: ' + offset +
+            throw new Error('determineOrder: offset out of bounds: ' + offset +
                 ' (Max offset is ' + maxOrder + ' for parent ' + parentElementID  + '.');
         }
-        enforceStrictChildOrderAndShift(this, networkShortName, parentElementID, offset);
+        if(doEnforceStrictChildOrder) {
+            enforceStrictChildOrderAndShift(report, networkShortName, parentElementID, offset);
+        }
+        return order;
+    };
 
-        // determine element
+    var determineElement = function(report, elementOrConceptName, order){
         var element;
-        var conceptName;
         if(typeof elementOrConceptName === 'string'){
-            conceptName = elementOrConceptName;
-            ensureConceptName(conceptName, 'elementOrConceptName', 'addElement');
-            var concept = this.getConcept(conceptName);
-            ensureExists(concept, 'object', 'addElement', 'concept with name "' + conceptName + '" doesn\'t exist.');
+            ensureConceptName(elementOrConceptName, 'elementOrConceptName', 'addElement');
+            var concept = this.getConcept(elementOrConceptName);
+            ensureExists(concept, 'object', 'addElement', 'concept with name "' + elementOrConceptName + '" doesn\'t exist.');
             element = this.createNewElement(concept);
         } else {
             element = elementOrConceptName;
             ensureParameter(element, 'elementOrConceptName', 'object', 'addElement');
-            conceptName = element.Name;
         }
         element.Order = order;
+        return element;
+    };
+
+    Report.prototype.addElement = function(networkShortName, parentElementID, elementOrConceptName, offset){
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'addElement');
+        ensureOptionalParameter(offset, 'offset', 'number', 'addElement');
+
+        // determine order
+        var order = determineOrder(this,networkShortName, parentElementID, offset, true);
+
+        // determine element
+        var element = determineElement(this, elementOrConceptName, order);
+        var conceptName = element.Name;
 
         if(parentElementID === undefined || parentElementID === null) {
             // add a root element
@@ -775,23 +792,14 @@ angular
         ensureNetworkShortName(networkShortName, 'networkShortName', 'moveTreeBranch');
         ensureParameter(subtreeRootElementID, 'subtreeRootElementID', 'string', 'moveTreeBranch');
 
-        var newOrder = 1;
-        var maxOrder = getMaxOrder(this, networkShortName, newParentElementID);
-        if(newOffset !== undefined && newOffset !== null){
-            ensureParameter(newOffset, 'newOffset', 'number', 'moveTreeBranch');
-            newOrder = newOffset + 1;
-        } else {
-            newOffset = 0; // default
-        }
-        if(newOffset > (maxOrder)){
-            throw new Error('moveTreeBranch: offset out of bounds: ' + newOffset +
-                ' (Max offset is ' + maxOrder + ' for parent ' + newParentElementID  + '.');
-        }
+        var newOrder = determineOrder(this,networkShortName, newParentElementID, newOffset, false);
+
         if(newParentElementID !== undefined && newParentElementID !== null){
             ensureParameter(newParentElementID, 'newParentElementID', 'string', 'moveTreeBranch');
 
             var newParent = this.getElementFromTree(networkShortName, newParentElementID);
-            ensureExists(newParent, 'object', 'moveTreeBranch', 'Cannot move element with id "' + subtreeRootElementID + '" to new parent element with id "' + newParentElementID + '": Parent element doesn\'t exist.');
+            ensureExists(newParent, 'object', 'moveTreeBranch', 'Cannot move element with id "' + subtreeRootElementID + '" to new parent element with id "' +
+                newParentElementID + '": Parent element doesn\'t exist.');
             var parentConcept = this.getConcept(newParent.Name);
             if(networkShortName !== 'ConceptMap' && !parentConcept.IsAbstract) {
                 throw new Error('moveTreeBranch: cannot move element to target parent "' + newParentElementID +
@@ -802,7 +810,7 @@ angular
             }
 
             var element = this.removeTreeBranch(networkShortName, subtreeRootElementID);
-            enforceStrictChildOrderAndShift(this, networkShortName, newParentElementID, newOffset);
+            enforceStrictChildOrderAndShift(this, networkShortName, newParentElementID, (newOffset || 0));
             element.Order = newOrder;
             if(newParent.To === undefined || newParent.To === null) {
                 newParent.To = {};
@@ -812,7 +820,7 @@ angular
             // no new parent given -> make it a root element
             var network = this.getNetwork(networkShortName);
             var element2 = this.removeTreeBranch(networkShortName, subtreeRootElementID);
-            enforceStrictChildOrderAndShift(this, networkShortName, newParentElementID, newOffset);
+            enforceStrictChildOrderAndShift(this, networkShortName, newParentElementID, (newOffset || 0));
             element2.Order = newOrder;
             if(network.Trees === undefined || network.Trees === null) {
                 network.Trees = [];
@@ -1077,9 +1085,9 @@ angular
         return result;
     };
 
-     Report.prototype.computableByRules = function(oconceptName) {
-         var conceptName = this.alignConceptPrefix(oconceptName);
-         ensureConceptName(conceptName, 'oconceptName', 'computableByRules');
+    Report.prototype.computableByRules = function(oconceptName) {
+        var conceptName = this.alignConceptPrefix(oconceptName);
+        ensureConceptName(conceptName, 'oconceptName', 'computableByRules');
 
         var result = [];
         var model = this.getModel();
@@ -1161,26 +1169,10 @@ angular
         ensureParameter(formula, 'formula', 'string', 'createNewRule');
         ensureExists(computableConceptsArray, 'object', 'createNewRule', 'function called without computableConceptsArray.');
 
-        for(var i in computableConceptsArray) {
-            var cname = report.alignConceptPrefix(computableConceptsArray[i]);
-            ensureConceptName(cname, 'computableConceptsArray', 'createNewRule');
-            var rulesComputableConcepts = report.computableByRules(cname);
-            if(rulesComputableConcepts.lenght > 0 && rulesComputableConcepts[0].Id !== id) {
-                throw new Error('createNewRule: A rule which can compute facts of concept "' + cname + '" exists already: "' + rulesComputableConcepts[0] + '. Currently, only one rule must be able to compute a fact for a certain concept.');
-            }
-        }
-        if(dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
-            for(var j in dependingConceptsArray) {
-                var dname = report.alignConceptPrefix(dependingConceptsArray[j]);
-                ensureConceptName(dname, 'dependingConceptsArray', 'createNewRule');
-            }
-        }
-        if(validatedConceptsArray !== null && typeof validatedConceptsArray === 'object') {
-            for(var x in validatedConceptsArray) {
-                var vname = report.alignConceptPrefix(validatedConceptsArray[x]);
-                ensureConceptName(vname, 'validatedConceptsArray', 'createNewRule');
-            }
-        }
+        validateComputableConcepts(report, 'createNewRule', computableConceptsArray, id);
+        validateDependingConceptsArray(report, 'createNewRule', dependingConceptsArray);
+        validateValidatedConceptsArray(report, 'createNewRule', validatedConceptsArray);
+
         if(computableConceptsArray.length === 0) {
             throw new Error('createNewRule: rule of type "' + type + '" must have at least one computable concept. Function createNewRule was called with empty computableConceptsArray.');
         }
@@ -1198,11 +1190,66 @@ angular
         if(type === 'xbrl28:validation') {
             ensureExists(validatedConceptsArray, 'object', 'createNewRule', 'function called without validatedConceptsArray.');
             if(validatedConceptsArray.length === 0) {
-                throw new Error('validatedConceptsArray: rule of type "' + type + '" must have at least one validateble concept. Function createNewRule was called with empty validatedConceptsArray.');
+                throw new Error('validatedConceptsArray: rule of type "' + type +
+                    '" must have at least one validateble concept. Function createNewRule was called with empty validatedConceptsArray.');
             }
             rule.ValidatedConcepts = validatedConceptsArray;
         }
         return rule;
+    };
+
+    var validateComputableConcepts = function(report, errorMsgPrefix, computableConceptsArray, ruleId) {
+        ensureExists(computableConceptsArray[0], 'string', errorMsgPrefix, 'Mandatory computable concept missing.');
+        for(var i in computableConceptsArray) {
+            if(computableConceptsArray.hasOwnProperty(i)) {
+                var cname = report.alignConceptPrefix(computableConceptsArray[i]);
+                ensureConceptName(cname, 'computableConceptsArray', errorMsgPrefix, 'The computable concept name ' + cname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
+                var cconcept = report.getConcept(cname);
+                if (cconcept === undefined || cconcept === null) {
+                    throw new Error(errorMsgPrefix + ': the computable concept with name "' + cname +
+                        '" does not exist. You need to create this concept or adapt it to an existing one before you can create the rule.');
+                }
+                var rulesComputableConcepts = report.computableByRules(cname);
+                if (rulesComputableConcepts.length > 0 && rulesComputableConcepts[0].Id !== ruleId) {
+                    throw new Error(errorMsgPrefix + ': A rule which can compute facts for concept "' + cname + '" exists already: "' + rulesComputableConcepts[0].Id +
+                        '". Currently, only one rule must be able to compute a fact for a certain concept.');
+                }
+            }
+        }
+    };
+
+    var validateDependingConceptsArray = function(report, errorMsgPrefix, dependingConceptsArray) {
+        if(dependingConceptsArray !== undefined && dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
+            for (var j in dependingConceptsArray) {
+                if(dependingConceptsArray.hasOwnProperty(j)) {
+                    var dname = report.alignConceptPrefix(dependingConceptsArray[j]);
+                    ensureConceptName(dname, 'dependingConceptsArray', errorMsgPrefix, 'The dependency concept name ' + dname +
+                        ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
+                    var dconcept = report.getConcept(dname);
+                    if (dconcept === undefined || dconcept === null) {
+                        throw new Error(errorMsgPrefix + ': A concept with name "' + dname +
+                            '" does not exist (as used in the dependencies). You need to create this concept or remove it from the dependencies before you can create the rule.');
+                    }
+                }
+            }
+        }
+    };
+
+    var validateValidatedConceptsArray = function(report, errorMsgPrefix, validatedConceptsArray) {
+        if(validatedConceptsArray !== undefined && validatedConceptsArray !== null && typeof validatedConceptsArray === 'object') {
+            for(var x in validatedConceptsArray) {
+                if(validatedConceptsArray.hasOwnProperty(x)) {
+                    var vname = report.alignConceptPrefix(validatedConceptsArray[x]);
+                    ensureConceptName(vname, 'validatedConceptsArray', errorMsgPrefix, 'The validated concept name ' + vname +
+                        ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
+                    var vconcept = report.getConcept(vname);
+                    if (vconcept === undefined || vconcept === null) {
+                        throw new Error(errorMsgPrefix + ': The validated concept with name "' + vname +
+                            '" does not exist. You need to create this concept or adapt it to an existing one before you can create the rule.');
+                    }
+                }
+            }
+        }
     };
 
     var validate = function(report, errorMsgPrefix, action, id, label, type, description, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray){
@@ -1217,45 +1264,9 @@ angular
         }
         ensureExists(label, 'string', errorMsgPrefix, 'Mandatory Label missing.');
         ensureExists(formula, 'string', errorMsgPrefix, 'Cannot store rule with empty source code.');
-        ensureExists(computableConceptsArray[0], 'string', errorMsgPrefix, 'Mandatory computable concept missing.');
-        for(var i in computableConceptsArray) {
-            if(computableConceptsArray.hasOwnProperty(i)) {
-                var cname = report.alignConceptPrefix(computableConceptsArray[i]);
-                ensureConceptName(cname, 'computableConceptsArray', errorMsgPrefix, 'The computable concept name ' + cname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
-                var cconcept = report.getConcept(cname);
-                if (cconcept === undefined || cconcept === null) {
-                    throw new Error(errorMsgPrefix + ': the computable concept with name "' + cname + '" does not exist. You need to <b>create this concept</b> or adapt it to an existing one before you can create the rule.');
-                }
-                var rulesComputableConcepts = report.computableByRules(cname);
-                if (rulesComputableConcepts.lenght > 0 && rulesComputableConcepts[0].Id !== id) {
-                    throw new Error(errorMsgPrefix + ': A rule which can compute facts for concept "' + cname + '" exists already: "' + rulesComputableConcepts[0].Id + '. Currently, only one rule must be able to compute a fact for a certain concept.');
-                }
-            }
-        }
-        if(dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
-            for (var j in dependingConceptsArray) {
-                if(dependingConceptsArray.hasOwnProperty(j)) {
-                    var dname = report.alignConceptPrefix(dependingConceptsArray[j]);
-                    ensureConceptName(dname, 'dependingConceptsArray', errorMsgPrefix, 'The dependency concept name ' + dname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
-                    var dconcept = report.getConcept(dname);
-                    if (dconcept === undefined || dconcept === null) {
-                        throw new Error(errorMsgPrefix + ': A concept with name "' + dname + '" does not exist (as used in the dependencies). You need to create this concept or remove it from the dependencies before you can create the rule.');
-                    }
-                }
-            }
-        }
-        if(validatedConceptsArray !== null && typeof validatedConceptsArray === 'object') {
-            for(var x in validatedConceptsArray) {
-                if(validatedConceptsArray.hasOwnProperty(x)) {
-                    var vname = report.alignConceptPrefix(validatedConceptsArray[x]);
-                    ensureConceptName(vname, 'validatedConceptsArray', errorMsgPrefix, 'The validated concept name ' + vname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
-                    var vconcept = report.getConcept(vname);
-                    if (vconcept === undefined || vconcept === null) {
-                        throw new Error(errorMsgPrefix + ': The validated concept with name "' + vname + '" does not exist. You need to create this concept or adapt it to an existing one before you can create the rule.');
-                    }
-                }
-            }
-        }
+        validateComputableConcepts(report, errorMsgPrefix, computableConceptsArray, id);
+        validateDependingConceptsArray(report, errorMsgPrefix, dependingConceptsArray);
+        validateValidatedConceptsArray(report, errorMsgPrefix, validatedConceptsArray);
     };
 
     Report.prototype.updateRule = function(rule){

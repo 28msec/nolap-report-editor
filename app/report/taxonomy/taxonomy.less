@@ -67,7 +67,12 @@
         background: @clouds;
         cursor: move;
     }
-    
+
+    &.notactive:hover {
+        background-color: #f5f5f5;
+        cursor:pointer;
+    }
+
     >span {
         overflow: hidden;
         text-overflow: ellipsis;
@@ -94,5 +99,3 @@
     z-index: 999;
     opacity: .8;
 }
-
-
