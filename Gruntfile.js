@@ -49,34 +49,6 @@ module.exports = function (grunt) {
                         return [
                             lrSnippet,
                             modRewrite(rewriteRules),
-                            //mountFolder(connect, '.tmp'),
-                            mountFolder(connect, 'app'),
-                            mountFolder(connect, '')
-                        ];
-                    }
-                }
-            },
-            test: {
-                options: {
-                    keepalive: false,
-                    middleware: function (connect) {
-                        return [
-                            lrSnippet,
-                            modRewrite(rewriteRules),
-                            //mountFolder(connect, '.tmp'),
-                            mountFolder(connect, 'dist')
-                        ];
-                    }
-                }
-            },
-            'test-dev': {
-                options: {
-                    keepalive: false,
-                    middleware: function (connect) {
-                        return [
-                            lrSnippet,
-                            modRewrite(rewriteRules),
-                            //mountFolder(connect, '.tmp'),
                             mountFolder(connect, 'app'),
                             mountFolder(connect, '')
                         ];
@@ -85,9 +57,25 @@ module.exports = function (grunt) {
             },
             dist: {
                 options: {
+                    keepalive: false,
                     middleware: function (connect) {
                         return [
+                            lrSnippet,
+                            modRewrite(rewriteRules),
                             mountFolder(connect, 'dist')
+                        ];
+                    }
+                }
+            },
+            'dist-dev': {
+                options: {
+                    keepalive: false,
+                    middleware: function (connect) {
+                        return [
+                            lrSnippet,
+                            modRewrite(rewriteRules),
+                            mountFolder(connect, 'app'),
+                            mountFolder(connect, '')
                         ];
                     }
                 }
@@ -395,7 +383,7 @@ module.exports = function (grunt) {
         var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
         grunt.task.run([
             'webdriver',
-            'connect:test',
+            'connect:dist',
             'protractor:' + target
         ]);
     });
@@ -404,7 +392,7 @@ module.exports = function (grunt) {
         var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
         grunt.task.run([
             'webdriver',
-            'connect:test-dev',
+            'connect:dist-dev',
             'protractor:' + target
         ]);
     });
