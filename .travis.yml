@@ -3,12 +3,6 @@ node_js:
 - '0.11'
 addons:
   sauce_connect: true
-env:
-  global:
-  - secure: qkjAyle8KMB6BaHAWwFvgckEgsylmwWY4iM24HsFoRtG2tFT9knoSbysp0BYEF1BTsyDMUHVE9Hvf66BzqMgz0L7rDzrz+n1MRe5Z/i3G4ksjubJGBaf0F8pNguaHpjmbMldtxw4Pv+QwY9RfGc6f6zG840Unrt51xGUYEmviOE=
-  - secure: cSa6qHoVwiV6HyJ6e5Fy5QFQ9Vj9Jn30pxfat4kU+t7d8aoCU/Nsxokxt3ZX2Ef8xf0gIbZkt5Lva2XavWy0czJBWg9OFdh4Sf0uJsswGNQ8CmlAlCTEQexWOKH6Yxsl4iK3l6S8l4rqWDdBkLIHlgT4bfgTqHGOQxp2f9zcq+A=
-  - secure: M1nY/CpAX0GFXfgDUy3wT4ZGAnacPslvEpnscgS8shz4CFD0Ri7u67TRAmMVz39n/5C0Zs0u7es902g29ykL/eNZvIdK2A/J+rp+aFCNuUzMHtu0VR3TwUTSrxt4760RZ2OHz9IS7Ba6PxnHQ63I1ryhd7DnwmiKEIyADqLdJPE=
-  - secure: L9F+hlFZXNNSkSQN4/MfY+P6/Zgo7BaWq4EleTweZRR+Y6oH0A0vlJipeP/GbOnsBxRSJVMv+sCMFwKdDvIB5YlhKDQNhF+Jkl3dAytfTQ/Wnb+9TKhPzqi3g+8Z0HU1eVPTyo2Ra2KIC6rb3+0+ednWX+Smt+uwdY9jnZ799MI=
 before_script:
 - npm install -g bower
 - bower install
@@ -17,3 +11,9 @@ before_script:
 - sh -e /etc/init.d/xvfb start
 script:
 - grunt
+env:
+  global:
+  - secure: USgTTaw/Vn69/M8X4ZJHEOZO9II18PQdaztoRgp9o71gQYvq7J/F+cYIfnyF1rwnlY6bbl/IJWQF6vmw338pXO20H8Ppk33SMom2uTasNTrq64Fb6Yd7wIvbZdj11yhGGd9OYpB+/ONU+0ArOBWGu2po/yCvbgAESpA5hcGOegc=
+  - secure: b8O5l0rlwvjo2R/QjfGIgD6GOEHpDPkVygv0FixZrywlM18ZThiaWn5tp8liY7DQsi7AB6m2Q/bXKd39uAxJnWAgOBLUwXB1NN6jG1qZxzDCF7hEPs25/WYLD6vIW9o0j5e3rmMgDU6dtLH141njOLhWG93oy0+h6jzRnH2niWo=
+  - secure: Anp6iY7L5E6PBR1yBwZw3arxUfMQeikJt5AQ9YPUtDfv95imt1QLfzk+KrtXnpRETTvPCYSLfSECBBnBTFS/d2u/Sq0I7dK5/ooBHUjhu9MSxwsO8lNiw83hH5d9LTkQ6Faxz2LZ3vLXsDIQZBjYW6nuRgLaoCPkcx3SMxdOCL8=
+  - secure: Pgh2rWa+D7UfFjycLI1RIdLOT3ukrs9pum0gEhLzCSkWk9EvOHCIIRVvm4aXHk/dik4CZ8WgOqej9e0vsFxApEXubZr7cx/VX66fdC9B8juuiCCrZf8sMhTKCSIgrrlM/dLPy8xlt0sYtVpfKNCogKMDSWuB1XP32gESpnJfjeQ=
