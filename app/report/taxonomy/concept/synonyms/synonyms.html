@@ -1,4 +1,4 @@
-<div class="scrollable lg-bottom-padding">
+<div class="scrollable">
     <ul class="list-group std-top-margin">
         <li class="list-group-item clearfix" ng-repeat="key in synonyms">
             <span ng-bind="key"></span>
@@ -11,15 +11,11 @@
     </ul>
     <form class="form-inline" role="form" ng-submit="addSynonym(form.newSynonym)" ui-keypress="{ 13:'addnewSynonym(form.newConceptValue)' }">
         <div class="form-group">
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="synonymValue" placeholder="Add synonym..." ng-model="form.newSynonym">
-                        <span class="input-group-btn">
-                            <button type="submit" class="btn btn-primary">Add</button>
-                        </span>
-                    </div>
-                </div>
+            <div class="input-group">
+                <input type="text" class="form-control" id="synonymValue" placeholder="Add synonym..." ng-model="form.newSynonym">
+                <span class="input-group-btn">
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </span>
             </div>
         </div>
     </form>
