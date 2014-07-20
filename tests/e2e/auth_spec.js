@@ -1,9 +1,10 @@
-/*global browser:false, element:false, by:false */
+/*global browser:false */
 'use strict';
 
 //https://github.com/angular/protractor/blob/master/docs/api.md
 //GetAttribute() returns "boolean" values and will return either "true" or null
-browser.get('/');
+var AuthPage = require('./pages/auth');
+var auth = new AuthPage();
 
 describe('Authentication', function(){
 
@@ -12,18 +13,18 @@ describe('Authentication', function(){
             expect(url.substring(url.length - '/auth/'.length)).toBe('/auth/');
         });
     });
+
+    it('shouldn\'t login', function(){
+        auth.login('w@28.io', 'hello').then(function(){
+            expect(auth.wrongCombinasionMessage().isDisplayed()).toBe(true);
+        });
+    });
     
     it('should login', function(){
-        var form = element(by.name('loginForm'));
-        var loginEmail = element(by.model('loginEmail'));
-        var password = element(by.model('loginPassword'));
-        loginEmail.sendKeys('w@28.io');
-        password.sendKeys('foobar');
-        form.submit().then(function(){
+        auth.login('w@28.io', 'foobar').then(function(){
             browser.getCurrentUrl().then(function(url) {
                 expect(url.substring(url.length - 1)).toBe('/');
             });
         });
     });
-    
 });
