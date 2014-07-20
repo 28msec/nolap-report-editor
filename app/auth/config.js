@@ -9,6 +9,10 @@ angular
         url: '/auth{returnPage:.*}',
         templateUrl: '/auth/auth.html',
         controller: 'AuthCtrl'
+    })
+    .state('logout', {
+        url: '/logout',
+        controller: 'LogoutCtrl'
     });
 })
 ;

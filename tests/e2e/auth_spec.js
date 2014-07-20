@@ -3,14 +3,16 @@
 
 //https://github.com/angular/protractor/blob/master/docs/api.md
 //GetAttribute() returns "boolean" values and will return either "true" or null
-var AuthPage = require('./pages/auth');
-var auth = new AuthPage();
 
 describe('Authentication', function(){
 
+    var AuthPage = require('./pages/auth');
+    var auth = new AuthPage();
+
     it('should have been redirected to the auth page', function() {
+        auth.logout(); 
         browser.getCurrentUrl().then(function(url){
-            expect(url.substring(url.length - '/auth/'.length)).toBe('/auth/');
+            expect(url.substring(url.length - '/auth'.length)).toBe('/auth');
         });
     });
 
