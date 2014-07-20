@@ -15,5 +15,10 @@ describe('Report', function(){
         it('should have 93 elements', function(){
             expect(report.elementCount()).toBe(93);
         });
+        
+        it('last element should be scrollable to', function(){
+            var last = report.elements.last();
+            last.click();
+        });
     });
 });
