@@ -1,4 +1,5 @@
 @import "bootstrap.less";
+@import "flexbox.less";
 @import "ng-progress-lite.less";
 @import "flexy-layout.less";
 @import "api-scheduler-status.less";
@@ -55,10 +56,6 @@ section {
 
 .std-left-margin {
     margin-left: 20px;
-}
-
-.lg-bottom-padding {
-    padding-bottom: 200px;
 }
 
 //Header
@@ -132,15 +129,16 @@ label {
 
 //Full screen mode
 .scrollable {
-    height: 100% !important;
-    overflow-y: auto !important;
-    overflow-x: hidden;
+    .flex-grow(1);
+    overflow: auto;
 }
 
 .viewport{
     height: 100%;
     width: 100%;
     overflow: hidden;
+    .flex-display;
+    .flex-grow(1);
 }
 
 .content { padding:15px }
@@ -194,4 +192,10 @@ html {
         margin-left: 0;
         border-left: 0;
     }
+}
+
+//Forms
+.form-horizontal .form-group {
+    margin-left: 0;
+    margin-right: 0;
 }

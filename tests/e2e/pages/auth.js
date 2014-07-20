@@ -2,10 +2,13 @@
 'use strict';
 
 var AuthPage = function(){
-    browser.get('/');
     this.form = element(by.name('loginForm'));
     this.loginEmail = element(by.model('loginEmail'));
     this.password = element(by.model('loginPassword'));
+};
+
+AuthPage.prototype.get = function(){
+    return browser.get('/');
 };
 
 AuthPage.prototype.login = function(email, password){
@@ -14,6 +17,10 @@ AuthPage.prototype.login = function(email, password){
     this.password.clear();
     this.password.sendKeys(password);
     return this.form.submit();
+};
+
+AuthPage.prototype.logout = function(){
+    browser.get('/logout');
 };
 
 AuthPage.prototype.wrongCombinasionMessage = function(){
