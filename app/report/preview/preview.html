@@ -1,45 +1,46 @@
-
 <div class="scrollable content">
 	<form style="margin-bottom: 5px" class="form-inline preview-form"
 		role="form">
 
-
-		<div class="form-group">
-			<label class="sr-only" for="css">Style</label> <select
-				class="form-control" id="css" ng-model="preview.css">
-				<option value="preview-style">Web Style</option>
-				<option value="document-style">Document Style</option>
-			</select>
-		</div>
-
-		<div class="form-group">
-			<label class="sr-only" for="labels">Labels</label> <select
-				class="form-control" id="labels" ng-model="preview.labelidx">
-				<option value="0">Prefer Labels</option>
-				<option value="1">Prefer Names</option>
-			</select>
-		</div>
-
-		<div class="form-group">
-			<label class="checkbox-inline"> <input type="checkbox"
-				id="checks" ng-model="preview.checks" value="true" />Show
-				validation checks
-			</label>
-		</div>
-
-		<div class="form-group">
-			<label class="checkbox-inline"> <input type="checkbox"
-				id="elimination" ng-model="preview.elimination" value="true" />Elimination
-			</label>
-		</div>
-		<span class="dropdown pull-right"> <a
+			<div class="form-group">
+				<label class="sr-only" for="css">Style</label> <select
+					class="form-control" id="css" ng-model="preview.css">
+					<option value="preview-style">Web Style</option>
+					<option value="document-style">Document Style</option>
+				</select>
+			</div>
+	
+			<div class="form-group">
+				<label class="sr-only" for="labels">Labels</label> <select
+					class="form-control" id="labels" ng-model="preview.labelidx">
+					<option value="0">Prefer Labels</option>
+					<option value="1">Prefer Names</option>
+				</select>
+			</div>
+	
+			<div class="form-group">
+				<label class="checkbox-inline"> <input type="checkbox"
+					id="checks" ng-model="preview.checks" value="true" />Show
+					validation checks
+				</label>
+			</div>
+	
+			<div class="form-group">
+				<label class="checkbox-inline"> <input type="checkbox"
+					id="elimination" ng-model="preview.elimination" value="true" />Elimination
+				</label>
+			</div>
+			
+			<span class="dropdown pull-right"> <a
 			class="dropdown-toggle btn btn-primary"><i
 				class="fa fa-cloud-download"></i> Export</a>
-			<ul class="dropdown-menu">
-				<li><a ng-href="{{getExportURL('json')}}" target="_blank"
-					download="layoutmodel.json">JSON</a></li>
-			</ul>
-		</span>
+			   <ul class="dropdown-menu">
+				    <li><a ng-href="{{getExportURL('json')}}" target="_blank"
+					       download="layoutmodel.json">JSON</a></li>
+			   </ul>
+
+	     	</span>
+
 	</form>
 
 	<div ng-show="error" class="alert alert-danger">
@@ -58,5 +59,4 @@
 		<p ng-show="loading">Updating preview...</p>
 	</div>
 
-	<div style="height: 70px">&nbsp;</div>
 </div>

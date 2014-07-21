@@ -36,9 +36,10 @@
     "angular-cache": "2.3.0",
     "bootstrap": "~3.1.1",
     "accounting": "~0.3.2",
-    "layoutmodel-renderer-angular" : "https://github.com/28msec/layoutmodel-renderer-angular.git#c704f79d002d7fd292def3a0c1368805f7e1e518",
+    "layoutmodel-renderer-angular" : "https://github.com/28msec/layoutmodel-renderer-angular.git#af81f198adb3498a0182dd989a7c798be8c49ddb",
     "flexy-layout": "git://github.com/lorenzofox3/flexy-layout.git",
-    "angular-ui-tree": "git://github.com/wcandillon/angular-ui-tree.git#master"
+    "angular-ui-tree": "git://github.com/wcandillon/angular-ui-tree.git#master",
+    "moment": "~2.7.0"
   },
   "resolutions": {
     "angular": "1.2.9"

@@ -29,6 +29,10 @@ angular.module('report-editor')
             }, 28);
         };
     })
+    .controller('LogoutCtrl', function($state, Session){
+        Session.logout();
+        $state.go('auth');
+    })
     .directive('autofillCheck', function(){
         return {
             require: 'ngModel',

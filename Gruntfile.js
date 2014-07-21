@@ -49,34 +49,6 @@ module.exports = function (grunt) {
                         return [
                             lrSnippet,
                             modRewrite(rewriteRules),
-                            //mountFolder(connect, '.tmp'),
-                            mountFolder(connect, 'app'),
-                            mountFolder(connect, '')
-                        ];
-                    }
-                }
-            },
-            test: {
-                options: {
-                    keepalive: false,
-                    middleware: function (connect) {
-                        return [
-                            lrSnippet,
-                            modRewrite(rewriteRules),
-                            //mountFolder(connect, '.tmp'),
-                            mountFolder(connect, 'dist')
-                        ];
-                    }
-                }
-            },
-            'test-dev': {
-                options: {
-                    keepalive: false,
-                    middleware: function (connect) {
-                        return [
-                            lrSnippet,
-                            modRewrite(rewriteRules),
-                            //mountFolder(connect, '.tmp'),
                             mountFolder(connect, 'app'),
                             mountFolder(connect, '')
                         ];
@@ -85,9 +57,25 @@ module.exports = function (grunt) {
             },
             dist: {
                 options: {
+                    keepalive: false,
                     middleware: function (connect) {
                         return [
+                            lrSnippet,
+                            modRewrite(rewriteRules),
                             mountFolder(connect, 'dist')
+                        ];
+                    }
+                }
+            },
+            'dist-dev': {
+                options: {
+                    keepalive: false,
+                    middleware: function (connect) {
+                        return [
+                            lrSnippet,
+                            modRewrite(rewriteRules),
+                            mountFolder(connect, 'app'),
+                            mountFolder(connect, '')
                         ];
                     }
                 }
@@ -205,7 +193,7 @@ module.exports = function (grunt) {
             }
         },
         protractor: {
-            travis: 'tests/e2e/config/protractor-travis-conf.js',
+            travis: 'tests/e2e/config/protractor-conf.js',
             local: 'tests/e2e/config/protractor-conf.js'
         },
         ngconstant: {
@@ -383,19 +371,20 @@ module.exports = function (grunt) {
                 //sourceMap: true,
                 //sourceMapIncludeSources: true
             }
-        },
-        'branch_run': {
-            options: {
-                master: ['s3:prod']
-            },
-            dist: {}
         }
     });
+    
+    grunt.registerTask('deploy', function() {
+        if(process.env.TRAVIS_BRANCH === 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
+            grunt.task.run(['s3:prod']);
+        }
+    });
+    
     grunt.registerTask('e2e', function(){
         var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
         grunt.task.run([
             'webdriver',
-            'connect:test',
+            'connect:dist',
             'protractor:' + target
         ]);
     });
@@ -404,7 +393,7 @@ module.exports = function (grunt) {
         var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
         grunt.task.run([
             'webdriver',
-            'connect:test-dev',
+            'connect:dist-dev',
             'protractor:' + target
         ]);
     });
@@ -448,5 +437,5 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('test', ['build', 'karma:1.2.9', 'e2e']);
-    grunt.registerTask('default', ['jsonlint', 'jshint', 'test', 'branch_run']);
+    grunt.registerTask('default', ['jsonlint', 'jshint', 'test', 'deploy']);
 };

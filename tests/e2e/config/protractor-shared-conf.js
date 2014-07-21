@@ -8,7 +8,7 @@ exports.config = {
 
     framework: 'jasmine',
 
-    specs: ['../*_spec.js'],
+    specs: ['../*_spec.js'], 
 
     onPrepare: function() {
         // Disable animations so e2e tests run more quickly
@@ -24,6 +24,13 @@ exports.config = {
         browser.getCapabilities().then(function(caps) {
             browser.params.browser = caps.get('browserName');
         });
+        
+        //Login
+        var Auth = require('../pages/auth');
+        var auth = new Auth();
+        auth.get();
+        auth.login('w@28.io', 'foobar');
+        browser.waitForAngular();
     },
 
     jasmineNodeOpts: {

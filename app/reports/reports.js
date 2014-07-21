@@ -1,3 +1,4 @@
+/*global moment:false */
 'use strict';
 
 angular.module('report-editor')
@@ -8,6 +9,10 @@ angular.module('report-editor')
     $scope.reports.forEach(function(report){
         $scope.selectedReports[report._id] = false;
     });
+    
+    $scope.formatDateTime = function(date){
+        return moment(date).fromNow();
+    };
 
     $scope.toggle = false;
 
