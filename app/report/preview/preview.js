@@ -26,7 +26,7 @@ angular.module('report-editor')
 		  API.Queries.listSpreadsheetForReport(params).then(function(data){		  
 			console.log(data);
 		    $scope.mymodel = data;
-		    $scope.myheaders = [ { label:"", value:data.TableSetLabels[0] }];
+		    $scope.myheaders = [ { label:'', value:data.TableSetLabels[0] }];
 		    $scope.error = null;
 		    $scope.loading = false;
 		  })
