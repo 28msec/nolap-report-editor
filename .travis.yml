@@ -2,7 +2,8 @@ language: node_js
 node_js:
 - 0.10
 addons:
-  firefox: '28.0'
+  - firefox: '28.0'
+  - sauce_connect: true
 before_script:
 - npm install -g bower
 - bower install
