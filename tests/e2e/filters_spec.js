@@ -7,9 +7,9 @@
 describe('Filters', function(){
 
     var FiltersPage = require('./pages/filters');
-    var filters = new FiltersPage();
+    var filters = new FiltersPage('1fueA5hrxIHxvRf7Btr_J6efDJ3qp-s9KV731wDc4OOaw');
 
-    it('it should select COCA Cola', function() {
+    it('should select COCA Cola', function() {
         filters.get();
         filters.setEntity('Coca Cola');
         
