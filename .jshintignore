@@ -1,5 +1,4 @@
 bower_components/**
-app/bower_components/**
 app/modules/queries-api.js
 app/modules/report-api.js
 app/modules/session-api.js
