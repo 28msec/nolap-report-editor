@@ -737,9 +737,9 @@ angular
         var element;
         if(typeof elementOrConceptName === 'string'){
             ensureConceptName(elementOrConceptName, 'elementOrConceptName', 'addElement');
-            var concept = this.getConcept(elementOrConceptName);
+            var concept = report.getConcept(elementOrConceptName);
             ensureExists(concept, 'object', 'addElement', 'concept with name "' + elementOrConceptName + '" doesn\'t exist.');
-            element = this.createNewElement(concept);
+            element = report.createNewElement(concept);
         } else {
             element = elementOrConceptName;
             ensureParameter(element, 'elementOrConceptName', 'object', 'addElement');
