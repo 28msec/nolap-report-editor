@@ -269,7 +269,22 @@
                     "method": "POST",
                     "summary": "Retrieve a list of all Report Parameters",
                     "nickname": "getParameters",
-                    "parameters": [],
+                    "parameters": [
+                        {
+                            "name": "parameter",
+                            "description": "Only retrieve values for this parameter",
+                            "required": false,
+                            "type": "string",
+                            "enum": [
+                                "years",
+                                "periods",
+                                "sics",
+                                "tags",
+                                "entities"
+                            ],
+                            "paramType": "query"
+                        }
+                    ],
                     "responseMessages": [
                         {
                             "code": 500,

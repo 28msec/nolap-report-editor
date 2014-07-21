@@ -24,47 +24,20 @@ angular
                 return cache;
             }
 
-            var promise;
             var selection;
-
-            function init(){
-                if(promise === undefined) {
-                    var deferred = $q.defer();
-
-                    API.Report.getParameters({$method: 'POST'})
-                        .then(
-                        function (data) {
-                            setSics(data.sics);
-                            setEntities(data.entities);
-                            setYears(data.years);
-                            setPeriods(data.periods);
-                            setTags(data.tags);
-                            promise = undefined;
-                            deferred.resolve(data);
-                        },
-                        function (e) {
-                            promise = undefined;
-                            deferred.reject(e);
-                        }
-                    );
-
-                    promise = deferred.promise;
-                }
-                return promise;
-            }
 
             function getSics(){
                 var deferred = $q.defer();
 
                 var sics = getCache().get('sics');
                 if(sics === undefined){
-                    init()
+                    API.Report.getParameters({'parameter': 'sics', $method: 'POST'})
                         .then(
-                            function(){
-                                sics = getCache().get('sics');
-                                deferred.resolve(sics);
+                            function (data) {
+                                setSics(data.sics);
+                                deferred.resolve(data.sics);
                             },
-                            function(e){
+                            function (e) {
                                 deferred.reject(e);
                             }
                         );
@@ -80,13 +53,13 @@ angular
 
                 var entities = getCache().get('entities');
                 if(entities === undefined){
-                    init()
+                    API.Report.getParameters({'parameter': 'entities', $method: 'POST'})
                         .then(
-                            function(){
-                                entities = getCache().get('entities');
-                                deferred.resolve(entities);
+                            function (data) {
+                                setEntities(data.entities);
+                                deferred.resolve(data.entities);
                             },
-                            function(e){
+                            function (e) {
                                 deferred.reject(e);
                             }
                         );
@@ -102,13 +75,13 @@ angular
 
                 var years = getCache().get('years');
                 if(years === undefined){
-                    init()
+                    API.Report.getParameters({'parameter': 'years', $method: 'POST'})
                         .then(
-                            function(){
-                                years = getCache().get('years');
-                                deferred.resolve(years);
+                            function (data) {
+                                setYears(data.years);
+                                deferred.resolve(data.years);
                             },
-                            function(e){
+                            function (e) {
                                 deferred.reject(e);
                             }
                         );
@@ -124,13 +97,13 @@ angular
 
                 var periods = getCache().get('periods');
                 if(periods === undefined){
-                    init()
+                    API.Report.getParameters({'parameter': 'periods', $method: 'POST'})
                         .then(
-                            function(){
-                                periods = getCache().get('periods');
-                                deferred.resolve(periods);
+                            function (data) {
+                                setPeriods(data.periods);
+                                deferred.resolve(data.periods);
                             },
-                            function(e){
+                            function (e) {
                                 deferred.reject(e);
                             }
                         );
@@ -146,13 +119,13 @@ angular
 
                 var tags = getCache().get('tags');
                 if(tags === undefined){
-                    init()
+                    API.Report.getParameters({'parameter': 'tags', $method: 'POST'})
                         .then(
-                            function(){
-                                tags = getCache().get('tags');
-                                deferred.resolve(tags);
+                            function (data) {
+                                setTags(data.tags);
+                                deferred.resolve(data.tags);
                             },
-                            function(e){
+                            function (e) {
                                 deferred.reject(e);
                             }
                         );
