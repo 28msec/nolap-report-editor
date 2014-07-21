@@ -6,7 +6,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>Report Editor</title>
         <meta name="viewport" content="width=device-width">
-        <!-- build:css({.tmp,app}) styles/main.css -->
+        <!-- build:css({.tmp,app,.}) styles/main.css -->
         <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.css">
         <link rel="stylesheet" href="/styles/index.css">
         <!-- endbuild -->
@@ -16,7 +16,7 @@
         <div api-status></div>
         <div ui-view></div>
 
-        <!-- build:js({.tmp,app}) scripts/scripts.js -->
+        <!-- build:js({.tmp,app,.}) scripts/scripts.js -->
         <script src="/bower_components/angular/angular.js"></script>
         <script src="/bower_components/ngprogress-lite/ngprogress-lite.js"></script>
         <script src="/bower_components/angular-ui-router/release/angular-ui-router.js"></script>
@@ -46,6 +46,7 @@
         <script src="/modules/session-model.js"></script>
         <script src="/modules/report-model.js"></script>
         <script src="/modules/rules-model.js"></script>
+        <script src="/modules/filter-model.js"></script>
 
         <!-- UI Modules -->
         <script src="/modules/ui/api-status.js"></script>

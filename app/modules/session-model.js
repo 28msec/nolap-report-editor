@@ -24,7 +24,7 @@ angular
                 if(cache === undefined){
                     // default settings
                     cache = $angularCacheFactory(APPNAME, {
-                        maxAge: 60 * 60 * 1000,
+                        maxAge: null, // no max age
                         recycleFreq: 60 * 1000,
                         deleteOnExpire: 'aggressive',
                         storageMode: 'localStorage'

@@ -20,18 +20,20 @@ angular.module('report-editor')
 		  //params.cik = "0000021344";
 		  //params.fiscalYear = "2013";
 		  //params.fiscalPeriod = "FY";
-		  
-		  API.Queries.listSpreadsheetForReport(params).then(function(data){		  
-			console.log(data);
-		    $scope.mymodel = data;
-		    $scope.error = null;
-		    $scope.loading = false;
-		  })
-		  .catch(function(error){
-            $scope.loading = false;
-            $scope.mymodel = null;
-            $scope.error = error;
-          });
+
+          if(report.hasSufficientFilters()) { // prevent execution of too heavy weight queries
+              API.Queries.listSpreadsheetForReport(params).then(function (data) {
+                  console.log(data);
+                  $scope.mymodel = data;
+                  $scope.error = null;
+                  $scope.loading = false;
+              })
+              .catch(function (error) {
+                  $scope.loading = false;
+                  $scope.mymodel = null;
+                  $scope.error = error;
+              });
+          }
 	  };
 	  
 	  $scope.getExportURL = function(format) {

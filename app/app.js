@@ -11,11 +11,13 @@ angular.module('report-editor', [
     'api',
     'session-model',
     'report-model',
+    'filter-model',
     'rules-model',
     'excel-parser',
     'formula-parser',
     'forms-ui',
-    'layoutmodel'
+    'layoutmodel',
+    'ngSanitize'
 ])
 
 .factory('ConnectionHandler', function($q, $rootScope, DEBUG){

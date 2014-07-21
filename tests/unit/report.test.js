@@ -253,7 +253,11 @@ describe('Concepts Model API Tests', function () {
         var description = 'If equity wasn\'t reported by the filer this rule will impute the value automatically.';
         var formula = 'upps';
         var computableConcepts = ['fac:Equity'];
-        var dependingOn = ['fac:EquityAttributableToNoncontrollingInterest','fac:EquityAttributableToParent'];
+        report.addConcept(computableConcepts[0], 'Equity', false);
+        var dependingOn = ['fac:EquityAttributableToNoncontrollingInterest',
+                           'fac:EquityAttributableToParent'];
+        report.addConcept(dependingOn[0], 'EquityAttributableToNoncontrollingInterest', false);
+        report.addConcept(dependingOn[1], 'EquityAttributableToParent', false);
 
         expect(report.existsRule(id)).toBe(false);
         report.setFormulaRule(id, label, description, formula, computableConcepts, dependingOn);
@@ -279,7 +283,16 @@ describe('Concepts Model API Tests', function () {
         var description = 'If assets were not reported by the filer this rule will impute the value automatically.';
         var formula = 'for $facts in facts:facts-for-internal(( "fac:Assets", "fac:CurrentAssets", "fac:NoncurrentAssets", "fac:Liabilities", "fac:LiabilitiesAndEquity", "fac:Equity"), $hypercube, $aligned-filter, $concept-maps, $rules, $cache, $options) group by $canonical-filter-string := facts:canonically-serialize-object($facts, ($facts:CONCEPT, "_id", "IsInDefaultHypercube", "Type", "Value", "Decimals", "AuditTrails", "xbrl28:Type", "Balance")) let $Assets as object? := $facts[$$.$facts:ASPECTS.$facts:CONCEPT eq "fac:Assets"] let $CurrentAssets as object? := $facts[$$.$facts:ASPECTS.$facts:CONCEPT eq "fac:CurrentAssets"] let $NoncurrentAssets as object? := $facts[$$.$facts:ASPECTS.$facts:CONCEPT eq "fac:NoncurrentAssets"] let $Liabilities as object? := $facts[$$.$facts:ASPECTS.$facts:CONCEPT eq "fac:Liabilities"] let $LiabilitiesAndEquity as object? := $facts[$$.$facts:ASPECTS.$facts:CONCEPT eq "fac:LiabilitiesAndEquity"] let $Equity as object? := $facts[$$.$facts:ASPECTS.$facts:CONCEPT eq "fac:Equity"] let $unit := ($facts.$facts:ASPECTS.$facts:UNIT)[1] return switch (true) case exists($Assets) return $Assets case (exists($LiabilitiesAndEquity)) and (rules:decimal-value ($CurrentAssets) eq rules:decimal-value($LiabilitiesAndEquity)) return let $computed-value := rules:decimal-value($CurrentAssets) let $audit-trail-message := rules:fact-trail({ "Aspects" : { "xbrl:Unit" : $unit, "xbrl:Concept" : "fac:Assets" }, Value: $computed-value }) || " = " || rules:fact-trail($CurrentAssets, "CurrentAssets") let $source-facts := $CurrentAssets return rules:create-computed-fact( $LiabilitiesAndEquity, "fac:Assets", $computed-value, $rule, $audit-trail-message, $source-facts, $options) case (empty($NoncurrentAssets)) and (exists($LiabilitiesAndEquity)) and (rules:decimal-value($LiabilitiesAndEquity) eq (rules:decimal-value($Equity) + rules:decimal-value($Liabilities))) return let $computed-value := rules:decimal-value($CurrentAssets) let $audit-trail-message := rules:fact-trail({ "Aspects" : { "xbrl:Unit" : $unit, "xbrl:Concept" : "fac:Assets" }, Value: $computed-value }) || " = " || rules:fact-trail($CurrentAssets, "CurrentAssets") let $source-facts := $CurrentAssets return rules:create-computed-fact( $LiabilitiesAndEquity, "fac:Assets", $computed-value, $rule, $audit-trail-message, $source-facts, $options) default return ()';
         var computableConcepts = ['fac:Assets'];
-        var dependingOn = ['fac:CurrentAssets','fac:NoncurrentAssets','fac:Liabilities','fac:LiabilitiesAndEquity','fac:Equity'];
+        report.addConcept(computableConcepts[0], 'Assets', false);
+        var dependingOn = ['fac:CurrentAssets',
+                           'fac:NoncurrentAssets',
+                           'fac:Liabilities',
+                           'fac:LiabilitiesAndEquity',
+                           'fac:Equity'];
+        report.addConcept(dependingOn[0], 'CurrentAssets', false);
+        report.addConcept(dependingOn[1], 'NoncurrentAssets', false);
+        report.addConcept(dependingOn[2], 'Liabilities', false);
+        report.addConcept(dependingOn[3], 'LiabilitiesAndEquity', false);
 
         expect(report.existsRule(id)).toBe(false);
         report.setFormulaRule(id, label, description, formula, computableConcepts, dependingOn);
@@ -344,6 +357,7 @@ describe('Concepts Model API Tests', function () {
         var description = 'Equity validation';
         var formula = 'upps';
         var computableConcepts = ['fac:EquityValidation'];
+        report.addConcept(computableConcepts[0], 'computableConcepts', false);
         var dependingOn = ['fac:EquityAttributableToNoncontrollingInterest','fac:EquityAttributableToParent'];
         var validatedConcepts = ['fac:Equity'];
 
