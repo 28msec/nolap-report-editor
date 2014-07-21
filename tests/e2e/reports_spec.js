@@ -1,4 +1,4 @@
-/*global browser:false */
+/*global browser:false, by:false */
 'use strict';
 
 //https://github.com/angular/protractor/blob/master/docs/api.md
@@ -17,6 +17,13 @@ describe('Reports', function(){
         it('Should show have at least one report', function() {
             reports.list.then(function(reportList){
                 expect(reportList.length).toBeGreaterThan(0);
+                reportList.forEach(function(report, index){
+                    if(index > 0) {
+                        var previousLastModified = report.element(by.css('td[data-last-modified]')).getAttribute('data-last-modified');
+                        var lastModified = reportList[index - 1].element(by.css('td[data-last-modified]')).getAttribute('data-last-modified');
+                        expect(previousLastModified).toBeLessThan(lastModified);
+                    }
+                });
             });
         });
     });
