@@ -242,7 +242,6 @@ angular
                     'xbrl:Entity': [],
                     'sec:Archive':[]
                 };
-                var entities = getCache().get('entities');
 
                 // fiscal year
                 if((selection.fiscalYear.length || 0) > 0){

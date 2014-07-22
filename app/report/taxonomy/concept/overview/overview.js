@@ -17,7 +17,11 @@ angular
         },
         dropped: function(event){
             if(event.source.nodesScope !== event.dest.nodesScope) {
-                $scope.report.addElement('Presentation', event.dest.nodesScope.$nodeScope.$modelValue.Id, element, event.dest.index);
+                if(event.dest.nodesScope.$nodeScope !== undefined && event.dest.nodesScope.$nodeScope !== null) {
+                    $scope.report.addElement('Presentation', event.dest.nodesScope.$nodeScope.$modelValue.Id, element, event.dest.index);
+                }else {
+                    $scope.report.addElement('Presentation', undefined, element, event.dest.index);
+                }
                 initElement();
             }
         }
