@@ -2,9 +2,10 @@
 'use strict';
 
 var FiltersPage = function(id){
-    //browser.waitForAngular();
+    browser.waitForAngular();
     this.id = id;
     this.entity = element(by.model('entityName'));
+    this.entities = element.all(by.repeater('entity in entities'));
     this.selectedCIK = element.all(by.repeater('c in selection.cik'));
 };
 

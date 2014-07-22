@@ -9,6 +9,12 @@ describe('Filters', function(){
     var FiltersPage = require('./pages/filters');
     var filters = new FiltersPage('1fueA5hrxIHxvRf7Btr_J6efDJ3qp-s9KV731wDc4OOaw');
 
+    it('should have entities to select', function() {
+        filters.entities.then(function(entities){
+            expect(entities.length).toBeGreaterThan(0);
+        });
+    });
+
     it('should select COCA Cola', function() {
         filters.get();
         filters.setEntity('Coca Cola');
