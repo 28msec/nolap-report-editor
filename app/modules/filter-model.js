@@ -210,7 +210,7 @@ angular
             }
 
             function getEntity(cik){
-                var result = undefined;
+                var result;
                 if(entities !== undefined) {
                     entities.forEach(function (entity) {
                         if (entity.cik === cik) {
@@ -222,7 +222,7 @@ angular
             }
 
             function getSic(sicCode){
-                var result = undefined;
+                var result;
                 if(sics !== undefined) {
                     sics.forEach(function (sic) {
                         if (sic.ID === sicCode) {

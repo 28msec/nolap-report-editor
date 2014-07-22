@@ -809,7 +809,7 @@ angular
 
     var ensureDefinitionModelRootConcept = function(report, conceptName){
         var model = report.getModel();
-        if(model.DefinitionModels[0] != undefined && model.DefinitionModels[0] !== null) {
+        if(model.DefinitionModels[0] !== undefined && model.DefinitionModels[0] !== null) {
             model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].RelationshipSource = conceptName;
         }
     };

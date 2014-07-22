@@ -34,15 +34,15 @@ angular.module('report-editor')
                     $scope.mymodel = null;
                     $scope.error = error;
                 });
-            };
-	    }
+        }
+    };
 	  
-	  $scope.getExportURL = function(format) {
-	       return API_URL + '/_queries/public/api/spreadsheet-for-report.jq?_method=POST&format=' + format + '&report=' + encodeURIComponent(report.model._id) + '&token=' + Session.getToken();
-	  };
+	$scope.getExportURL = function(format) {
+	     return API_URL + '/_queries/public/api/spreadsheet-for-report.jq?_method=POST&format=' + format + '&report=' + encodeURIComponent(report.model._id) + '&token=' + Session.getToken();
+	};
 	  
-	  // $scope.reload();
+	// $scope.reload();
 	  
-	  $scope.$watch('preview.elimination', $scope.reload);
+	$scope.$watch('preview.elimination', $scope.reload);
 	  	  
 });
