@@ -13,6 +13,9 @@ module.exports = function (grunt) {
         return connect.static(require('path').resolve(dir));
     };
     var modRewrite = require('connect-modrewrite');
+    var rewriteRules = [
+        '!\\.html|\\.xml|\\images|\\.js|\\.css|\\.png|\\.jpg|\\.woff|\\.ttf|\\.svg|\\.ico /index.html [L]'
+    ];
 
     // Project configuration.
     grunt.initConfig({
@@ -37,7 +40,7 @@ module.exports = function (grunt) {
         //Connect
         connect: {
             options: {
-                port: 9000,
+                port: grunt.option('port') || 9000,
                 hostname: '0.0.0.0'
             },
             livereload: {
@@ -45,50 +48,34 @@ module.exports = function (grunt) {
                     middleware: function (connect) {
                         return [
                             lrSnippet,
-                            modRewrite([
-                                '!\\.html|\\.xml|\\images|\\.js|\\.css|\\.png|\\.jpg|\\.woff|\\.ttf|\\.svg|\\.ico /index.html [L]'
-                            ]),
-                            mountFolder(connect, '.tmp'),
-                            mountFolder(connect, 'app')
-                        ];
-                    }
-                }
-            },
-            test: {
-                options: {
-                    keepalive: false,
-                    middleware: function (connect) {
-                        return [
-                            lrSnippet,
-                            modRewrite([
-                                '!\\.html|\\.xml|\\images|\\.js|\\.css|\\.png|\\.jpg|\\.woff|\\.ttf|\\.svg|\\.ico /index.html [L]'
-                            ]),
-                            mountFolder(connect, '.tmp'),
-                            mountFolder(connect, 'dist')
-                        ];
-                    }
-                }
-            },
-            'test-dev': {
-                options: {
-                    keepalive: false,
-                    middleware: function (connect) {
-                        return [
-                            lrSnippet,
-                            modRewrite([
-                                '!\\.html|\\.xml|\\images|\\.js|\\.css|\\.png|\\.jpg|\\.woff|\\.ttf|\\.svg|\\.ico /index.html [L]'
-                            ]),
-                            mountFolder(connect, '.tmp'),
-                            mountFolder(connect, 'app')
+                            modRewrite(rewriteRules),
+                            mountFolder(connect, 'app'),
+                            mountFolder(connect, '')
                         ];
                     }
                 }
             },
             dist: {
                 options: {
+                    keepalive: false,
                     middleware: function (connect) {
                         return [
+                            lrSnippet,
+                            modRewrite(rewriteRules),
                             mountFolder(connect, 'dist')
+                        ];
+                    }
+                }
+            },
+            'dist-dev': {
+                options: {
+                    keepalive: false,
+                    middleware: function (connect) {
+                        return [
+                            lrSnippet,
+                            modRewrite(rewriteRules),
+                            mountFolder(connect, 'app'),
+                            mountFolder(connect, '')
                         ];
                     }
                 }
@@ -170,11 +157,7 @@ module.exports = function (grunt) {
                 jshintrc: '.jshintrc'
             },
             src: ['Gruntfile.js',
-                  'app/modules/**/*.js',
-                  'app/auth/**/*.js',
-                  'app/report/**/*.js',
-                  'app/reports/**/*.js',
-                  'app/app.js',
+                  'app/**/*.js',
                   'tasks/**/*.js',
                   'tests/**/*.js'
             ]
@@ -191,8 +174,8 @@ module.exports = function (grunt) {
             '1.2.9': {
                 options: {
                     files: [
-                        'app/bower_components/angular/angular.js',
-                        'app/bower_components/angular-mocks-1.2.9/angular-mocks.js',
+                        'bower_components/angular/angular.js',
+                        'bower_components/angular-mocks-1.2.9/angular-mocks.js',
                         'app/modules/excel-parser.js',
                         'app/modules/formula-parser.js',
                         'app/modules/report-api.js',
@@ -210,7 +193,7 @@ module.exports = function (grunt) {
             }
         },
         protractor: {
-            travis: 'tests/e2e/config/protractor-travis-conf.js',//travis: 'tests/e2e/config/protractor-travis-nosaucelabs-conf.js',
+            travis: 'tests/e2e/config/protractor-conf.js',
             local: 'tests/e2e/config/protractor-conf.js'
         },
         ngconstant: {
@@ -268,8 +251,6 @@ module.exports = function (grunt) {
         },
         s3: {
             options: {
-                key: 'process.env.AWS_KEY',
-                secret: 'process.env.AWS_SECRET',
                 access: 'public-read',
                 maxOperations: 5,
                 gzip: true,
@@ -290,19 +271,20 @@ module.exports = function (grunt) {
                     'package.json',
                     'config.json',
                     'bower.json',
+                    '.bowerrc',
                     'swagger/*'
                 ]
             }
         },
         useminPrepare: {
-            html: [ 'app/*.html', 'app/auth/**/*.html', 'app/reports/**/*.html', 'app/report/**/*.html'],
+            html: [ 'app/**/*.html' ],
             css: 'app/styles/**/*.css',
             options: {
                 dest: 'dist'
             }
         },
         usemin: {
-            html: [ 'dist/*.html', 'app/auth/**/*.html', 'dist/reports/**/*.html', 'dist/report/**/*.html' ],
+            html: [ 'dist/*.html' ],
             css: 'dist/styles/**/*.css',
             options: {
                 dirs: ['dist']
@@ -334,7 +316,7 @@ module.exports = function (grunt) {
                 files: [{
                     expand: true,
                     cwd: 'app',
-                    src: [ '*.html', 'auth/**/*.html', 'reports/**/*.html', 'report/**/*.html'],
+                    src: [ '**/*.html'],
                     dest: 'dist'
                 }]
             }
@@ -352,7 +334,7 @@ module.exports = function (grunt) {
                     ]
                 }, {
                     expand: true,
-                    cwd: 'app/bower_components/font-awesome/fonts',
+                    cwd: 'bower_components/font-awesome/fonts',
                     dest: 'dist/fonts',
                     src: ['*']
                 }, {
@@ -389,19 +371,20 @@ module.exports = function (grunt) {
                 //sourceMap: true,
                 //sourceMapIncludeSources: true
             }
-        },
-        'branch_run': {
-            options: {
-                master: ['s3:prod']
-            },
-            dist: {}
         }
     });
+    
+    grunt.registerTask('deploy', function() {
+        if(process.env.TRAVIS_BRANCH === 'master' && process.env.TRAVIS_PULL_REQUEST === 'false') {
+            grunt.task.run(['s3:prod']);
+        }
+    });
+    
     grunt.registerTask('e2e', function(){
         var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
         grunt.task.run([
             'webdriver',
-            'connect:test',
+            'connect:dist',
             'protractor:' + target
         ]);
     });
@@ -410,13 +393,13 @@ module.exports = function (grunt) {
         var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
         grunt.task.run([
             'webdriver',
-            'connect:test-dev',
+            'connect:dist-dev',
             'protractor:' + target
         ]);
     });
 
     grunt.registerTask('server', function (target) {
-        if(target === 'dist'){
+        if(target === 'dist') {
             return grunt.task.run(['build', 'open', 'connect:dist:keepalive']);
         }
 
@@ -454,5 +437,5 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('test', ['build', 'karma:1.2.9', 'e2e']);
-    grunt.registerTask('default', ['jsonlint', 'jshint', 'test', 'branch_run']);
+    grunt.registerTask('default', ['jsonlint', 'jshint', 'test', 'deploy']);
 };

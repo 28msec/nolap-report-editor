@@ -1,15 +1,8 @@
 language: node_js
 node_js:
-- '0.11'
+- 0.10
 addons:
-  sauce_connect: true
-#  firefox: '28.0'
-env:
-  global:
-  - secure: JjP7KN5VfGxzpPQTk0Qh+5axkJN8Tcoenu5vNvZTocH3MhH3/jOUvV3cu+e09F6Uat90WLciqs8JhGELAzfmHBnMMHSbLjMucD4XNhJNv5nVc86FrWEeJZUSBnPu08qmPZLacaRlIEdHsK4G0rZTAidsuUGNAfdSdfe8yWNHRTA=
-  - secure: ACzjKTIglg+W5I0Jhgf4n2RtUKTGth9Hkle9iTpt952ctXvB0BbsfoNVqFdQkYhPGhjsb3iJZwu5iFCzAXjmbS572/RMiuIb59UUpgGuSgxBylmfgRndb5uxGB6zwXWlcSJzdITv9Aj8y9iemT+2HtkAnYbNR4r0hICJlo/fyEo=
-  - secure: qkjAyle8KMB6BaHAWwFvgckEgsylmwWY4iM24HsFoRtG2tFT9knoSbysp0BYEF1BTsyDMUHVE9Hvf66BzqMgz0L7rDzrz+n1MRe5Z/i3G4ksjubJGBaf0F8pNguaHpjmbMldtxw4Pv+QwY9RfGc6f6zG840Unrt51xGUYEmviOE=
-  - secure: AcYIZXMhlVss9M2PZNtdIqG6LxiDIkUxixc13bRIyCZlr5xPmTAGuJcw3HIxXWgPkswNxzmUmuRi1MvqZ1TqCcMZOFVz+Sr8Y49OTH/TjkJC0AU+2zMZkaqtiCddQa11OoMi6YtWyE6liEOQytTnEyIW/GSIwnhJwCc9igYC2aU=
+  firefox: '28.0'
 before_script:
 - npm install -g bower
 - bower install
@@ -18,3 +11,9 @@ before_script:
 - sh -e /etc/init.d/xvfb start
 script:
 - grunt
+env:
+  global:
+  - secure: USgTTaw/Vn69/M8X4ZJHEOZO9II18PQdaztoRgp9o71gQYvq7J/F+cYIfnyF1rwnlY6bbl/IJWQF6vmw338pXO20H8Ppk33SMom2uTasNTrq64Fb6Yd7wIvbZdj11yhGGd9OYpB+/ONU+0ArOBWGu2po/yCvbgAESpA5hcGOegc=
+  - secure: b8O5l0rlwvjo2R/QjfGIgD6GOEHpDPkVygv0FixZrywlM18ZThiaWn5tp8liY7DQsi7AB6m2Q/bXKd39uAxJnWAgOBLUwXB1NN6jG1qZxzDCF7hEPs25/WYLD6vIW9o0j5e3rmMgDU6dtLH141njOLhWG93oy0+h6jzRnH2niWo=
+  - secure: Anp6iY7L5E6PBR1yBwZw3arxUfMQeikJt5AQ9YPUtDfv95imt1QLfzk+KrtXnpRETTvPCYSLfSECBBnBTFS/d2u/Sq0I7dK5/ooBHUjhu9MSxwsO8lNiw83hH5d9LTkQ6Faxz2LZ3vLXsDIQZBjYW6nuRgLaoCPkcx3SMxdOCL8=
+  - secure: Pgh2rWa+D7UfFjycLI1RIdLOT3ukrs9pum0gEhLzCSkWk9EvOHCIIRVvm4aXHk/dik4CZ8WgOqej9e0vsFxApEXubZr7cx/VX66fdC9B8juuiCCrZf8sMhTKCSIgrrlM/dLPy8xlt0sYtVpfKNCogKMDSWuB1XP32gESpnJfjeQ=

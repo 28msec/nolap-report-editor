@@ -57,8 +57,8 @@ module.exports = {
         if (process.env.TRAVIS) {
             // Skip the webdriver-manager update on Travis, since the browsers will
             // be provided remotely.
-            done();
-            return;
+        //    done();
+        //    return;
         }
         var p = spawn('node', ['node_modules/protractor/bin/webdriver-manager', 'update']);
         p.stdout.pipe(process.stdout);

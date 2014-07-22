@@ -1,0 +1,49 @@
+.comparison-filter {
+  .alert {
+    display: inline-block;
+    padding: 5px;
+    margin-right: 5px;
+    .close {
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+  }
+}
+
+.filters {
+  margin: 20px;
+}
+
+//Selector
+ul.selector {
+  padding: 3px 0px;
+  margin: 0;
+  list-style: none;
+  border: 1px solid @clouds;
+  background: white;
+  border-radius: 3px;
+  .box-sizing(border-box);
+  overflow-x: hidden;
+
+  li {
+    display: block;
+    cursor: pointer;
+    padding: 1px 5px;
+
+    &.selected {
+      background: @brand-primary;
+      color: white;
+    }
+
+    &.disabled {
+      color: @silver;
+
+      &:after {
+        float: right;
+        font-size: smaller;
+        padding: 1px;
+        content : "N/A";
+      }
+    }
+  }
+}

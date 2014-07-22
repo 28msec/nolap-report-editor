@@ -1,6 +1,17 @@
   <div class="scrollable">
        
 	   <div ng-show="data" class="table-responsive">	 
+	          <div class="content">
+	           <span class="dropdown pull-right">
+	                    <a class="dropdown-toggle btn btn-primary"><i class="fa fa-cloud-download"></i> Export</a>
+	                    <ul class="dropdown-menu">
+	                        <li><a ng-href="{{getExportURL('json')}}" target="_blank" download="facttable.json">JSON</a></li>
+	                        <li><a ng-href="{{getExportURL('xml')}}" target="_blank" download="facttable.xml">XML</a></li>
+	                        <li><a ng-href="{{getExportURL('csv')}}" target="_blank" download="facttable.csv">CSV</a></li>
+	                        <li><a ng-href="{{getExportURL('excel')}}" target="_blank" download="facttable.csv">Excel</a></li>
+	                    </ul>
+  	           </span>
+  	          </div>
 	    	         
 	          <table class="table table-condensed table-justcolumns small">
 	              <thead>
@@ -23,30 +34,24 @@
 	              </tbody>
 	          </table>
 	          
-	          <div class="content">
-	           <span class="dropdown">
-	                    <a class="dropdown-toggle btn btn-primary"><i class="fa fa-cloud-download"></i> Export</a>
-	                    <ul class="dropdown-menu">
-	                        <li><a ng-href="{{getExportURL('json')}}" target="_blank" download="facttable.json">JSON</a></li>
-	                        <li><a ng-href="{{getExportURL('xml')}}" target="_blank" download="facttable.xml">XML</a></li>
-	                        <li><a ng-href="{{getExportURL('csv')}}" target="_blank" download="facttable.csv">CSV</a></li>
-	                        <li><a ng-href="{{getExportURL('excel')}}" target="_blank" download="facttable.csv">Excel</a></li>
-	                    </ul>
-  	           </span>
-  	          </div>
 		</div>
-		
-		<div class="content">
-		   <div ng-show="error" class="alert alert-danger">
-		     <strong>Error {{ error.status }}</strong>
-		     {{ error.body.message }}
-		   </div>
-	       
-	       <div ng-show="data.length == 0">Fact Table is empty.</div>
-		
-		   <p ng-show="loading">Updating fact table...</p>
-		</div>
-		
-		<div style="height:70px">&nbsp;</div>
+
+       <div ng-if="report.hasSufficientFilters()" class="content">
+           <div ng-show="error" class="alert alert-danger">
+             <strong>Error {{ error.status }}</strong>
+             {{ error.body.message }}
+           </div>
+
+           <div ng-show="data.length == 0">Fact Table is empty.</div>
+
+           <p ng-show="loading">Updating fact table...</p>
+           <!--<div class="progress"><progressbar ng-show="loading" max="max" value="dynamic"></progressbar></div>-->
+       </div>
+
+       <div ng-if="!report.hasSufficientFilters()" class="content">
+           <div class="alert alert-danger">
+              <strong>Too generic Filter</strong><br/>
+              Cannot Load fact table because the filters are too generic. Please, go back to the <a ui-sref="report.filters()">Filters</a> page and refine your Filtering.
+           </div>
+       </div>
 </div>		
-		

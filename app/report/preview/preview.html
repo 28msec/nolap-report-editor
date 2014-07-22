@@ -1,67 +1,66 @@
-<flexy-layout orientation="horizontal">
-  <block-container
-	init="400" class="sidebar">	
-		<form role="form">
-		
-		
+<div class="scrollable content">
+	<form ng-if="report.hasSufficientFilters()" style="margin-bottom: 5px" class="form-inline preview-form"
+		role="form">
+
 			<div class="form-group">
-			    <label class="control-label" for="css">Style</label>
-				<select class="form-control" ng-model="preview.css">
+				<label class="sr-only" for="css">Style</label> <select
+					class="form-control" id="css" ng-model="preview.css">
 					<option value="preview-style">Web Style</option>
 					<option value="document-style">Document Style</option>
 				</select>
 			</div>
-		
+	
 			<div class="form-group">
-			    <label class="control-label" for="css">Labels</label>
-				<select class="form-control" ng-model="preview.labelidx">
-					<option value="0">Default Labels</option>
-					<option value="1">Alternate Labels</option>
+				<label class="sr-only" for="labels">Labels</label> <select
+					class="form-control" id="labels" ng-model="preview.labelidx">
+					<option value="0">Prefer Labels</option>
+					<option value="1">Prefer Names</option>
 				</select>
 			</div>
-		
-			<div class="form-group">		
+	
+			<div class="form-group">
 				<label class="checkbox-inline"> <input type="checkbox"
-					id="checks" ng-model="preview.checks" value="true" />Show validation checks
-				</label>		
+					id="checks" ng-model="preview.checks" value="true" />Show
+					validation checks
+				</label>
 			</div>
-			
-		    <div class="form-group">		
+	
+			<div class="form-group">
 				<label class="checkbox-inline"> <input type="checkbox"
 					id="elimination" ng-model="preview.elimination" value="true" />Elimination
-				</label>		
+				</label>
 			</div>
-		
-		</form>
-		<span class="dropdown pull-right"> <a
+			
+			<span class="dropdown pull-right"> <a
 			class="dropdown-toggle btn btn-primary"><i
 				class="fa fa-cloud-download"></i> Export</a>
-			<ul class="dropdown-menu">
-				<li><a ng-href="{{getExportURL('json')}}" target="_blank"
-					download="layoutmodel.json">JSON</a></li>
-			</ul>
-		</span> 
-	</block-container> 
-	<block-splitter></block-splitter> 
-	<block-container>
-	   <div class="scrollable">
-	   
-			<div ng-show="error" class="alert alert-danger">
-				<strong>Error {{ error.status }}</strong> {{ error.body.message }}
-			</div>
-			
-			<div ng-class="preview.css">
-				<layoutmodel model="mymodel" labelidx="preview.labelidx" constraints="'true'"
-					checks="preview.checks" headerclick="test(header)" dataclick="test(data)"
-					template-url="/bower_components/layoutmodel-renderer-angular/app/directive/layoutmodel.html"></layoutmodel>
-			</div>
-			
-			<div>
-				<p ng-show="loading">Updating preview...</p>
-			</div>
-			
-			<div style="height:70px">&nbsp;</div>
-		</div>
-   </block-container> 
-</flexy-layout>
+			   <ul class="dropdown-menu">
+				    <li><a ng-href="{{getExportURL('json')}}" target="_blank"
+					       download="layoutmodel.json">JSON</a></li>
+			   </ul>
 
+	     	</span>
+
+	</form>
+
+	<div ng-show="error" class="alert alert-danger">
+		<strong>Error {{ error.status }}</strong> {{ error.body.message }}
+	</div>
+
+	<div ng-class="preview.css">
+		<layoutmodel model="mymodel" headers="myheaders"
+			labelidx="preview.labelidx" constraints="'true'"
+			checks="preview.checks" headerclick="test(header)"
+			dataclick="test(data)"></layoutmodel>
+	</div>
+
+	<div ng-if="report.hasSufficientFilters()">
+		<p ng-show="loading">Updating preview...</p>
+	</div>
+
+    <div class="alert alert-danger" ng-if="!report.hasSufficientFilters()">
+        <strong>Too generic Filter</strong><br/>
+        Cannot Load preview because the filters are too generic. Please, go back to the <a ui-sref="report.filters()">Filters</a> page and refine your Filtering.
+    </div>
+
+</div>
