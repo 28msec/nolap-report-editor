@@ -28,9 +28,21 @@ angular
             $scope.report.removeTreeBranch('Presentation', node.$modelValue.Id);
         }
     };
-    
+
+    $scope.selectConcept = function(concept){
+        if(!$scope.selectedElementId && concept) {
+            $scope.selectedConceptName = concept.Name;
+        }
+    };
+
     $scope.selectElement = function(nodeScope){
         $scope.selectedElementId = nodeScope.$nodeScope.$modelValue.Id;
+        $scope.selectedConceptName = nodeScope.$nodeScope.$modelValue.Name;
+    };
+
+    $scope.unselectElement = function(){
+        $scope.selectedElementId = undefined;
+        $scope.selectedConceptName = undefined;
     };
 
     $scope.goToConcept = function(nodeScope){
