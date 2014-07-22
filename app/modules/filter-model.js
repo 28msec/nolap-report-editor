@@ -6,32 +6,41 @@ angular
 
         return (function() {
 
-            var cache;
-
-            function getCache(){
-                if(cache === undefined){
-                    cache = $angularCacheFactory.get(APPNAME);
-                }
-                if(cache === undefined){
-                    // default settings
-                    cache = $angularCacheFactory(APPNAME, {
-                        maxAge: null, // no max age
-                        recycleFreq: 60 * 1000,
-                        deleteOnExpire: 'aggressive',
-                        storageMode: 'localStorage'
-                    });
-                }
-                return cache;
-            }
-
+            var promise;
             var selection;
+            var sics, years, periods, entities, tags;
+
+            function init(){
+                if(promise === undefined) {
+                    var deferred = $q.defer();
+
+                    API.Report.getParameters({$method: 'POST'})
+                        .then(
+                            function (data) {
+                                setSics(data.sics);
+                                setEntities(data.entities);
+                                setYears(data.years);
+                                setPeriods(data.periods);
+                                setTags(data.tags);
+                                promise = undefined;
+                                deferred.resolve(data);
+                            },
+                            function (e) {
+                                promise = undefined;
+                                deferred.reject(e);
+                            }
+                        );
+
+                    promise = deferred.promise;
+                }
+                return promise;
+            }
 
             function getSics(){
                 var deferred = $q.defer();
 
-                var sics = getCache().get('sics');
                 if(sics === undefined){
-                    API.Report.getParameters({'parameter': 'sics', $method: 'POST'})
+                    init()
                         .then(
                             function (data) {
                                 setSics(data.sics);
@@ -51,9 +60,8 @@ angular
             function getEntities(){
                 var deferred = $q.defer();
 
-                var entities = getCache().get('entities');
                 if(entities === undefined){
-                    API.Report.getParameters({'parameter': 'entities', $method: 'POST'})
+                    init()
                         .then(
                             function (data) {
                                 setEntities(data.entities);
@@ -73,9 +81,8 @@ angular
             function getYears(){
                 var deferred = $q.defer();
 
-                var years = getCache().get('years');
                 if(years === undefined){
-                    API.Report.getParameters({'parameter': 'years', $method: 'POST'})
+                    init()
                         .then(
                             function (data) {
                                 setYears(data.years);
@@ -95,9 +102,8 @@ angular
             function getPeriods(){
                 var deferred = $q.defer();
 
-                var periods = getCache().get('periods');
                 if(periods === undefined){
-                    API.Report.getParameters({'parameter': 'periods', $method: 'POST'})
+                    init()
                         .then(
                             function (data) {
                                 setPeriods(data.periods);
@@ -117,9 +123,8 @@ angular
             function getTags(){
                 var deferred = $q.defer();
 
-                var tags = getCache().get('tags');
                 if(tags === undefined){
-                    API.Report.getParameters({'parameter': 'tags', $method: 'POST'})
+                    init()
                         .then(
                             function (data) {
                                 setTags(data.tags);
@@ -136,33 +141,33 @@ angular
                 return deferred.promise;
             }
 
-            function setSics(sics){
-                if(sics !== undefined && sics !== null && typeof sics === 'object' && sics.length !== undefined) {
-                    getCache().put('sics', sics);
+            function setSics(lSics){
+                if(lSics !== undefined && lSics !== null && typeof lSics === 'object' && lSics.length !== undefined) {
+                    sics = lSics;
                 }
             }
 
-            function setEntities(entities){
-                if(entities !== undefined && entities !== null && typeof entities === 'object' && entities.length !== undefined) {
-                    getCache().put('entities', entities);
+            function setEntities(lEntities){
+                if(lEntities !== undefined && lEntities !== null && typeof lEntities === 'object' && lEntities.length !== undefined) {
+                    entities = lEntities;
                 }
             }
 
-            function setYears(years){
-                if(years !== undefined && years !== null && typeof years === 'object' && years.length !== undefined) {
-                    getCache().put('years', years);
+            function setYears(lYears){
+                if(lYears !== undefined && lYears !== null && typeof lYears === 'object' && lYears.length !== undefined) {
+                    years = lYears;
                 }
             }
 
-            function setPeriods(periods){
-                if(periods !== undefined && periods !== null && typeof periods === 'object' && periods.length !== undefined) {
-                    getCache().put('periods', periods);
+            function setPeriods(lPeriods){
+                if(lPeriods !== undefined && lPeriods !== null && typeof lPeriods === 'object' && lPeriods.length !== undefined) {
+                    periods = lPeriods;
                 }
             }
 
-            function setTags(tags){
-                if(tags !== undefined && tags !== null && typeof tags === 'object' && tags.length !== undefined) {
-                    getCache().put('tags', tags);
+            function setTags(lTags){
+                if(lTags !== undefined && lTags !== null && typeof lTags === 'object' && lTags.length !== undefined) {
+                    tags = lTags;
                 }
             }
 
@@ -205,24 +210,26 @@ angular
             }
 
             function getEntity(cik){
-                var entities = getCache().get('entities');
-                var result;
-                entities.forEach(function(entity){
-                    if(entity.cik === cik){
-                        result = entity;
-                    }
-                });
+                var result = undefined;
+                if(entities !== undefined) {
+                    entities.forEach(function (entity) {
+                        if (entity.cik === cik) {
+                            result = entity;
+                        }
+                    });
+                }
                 return result;
             }
 
             function getSic(sicCode){
-                var sics = getCache().get('sics');
-                var result;
-                sics.forEach(function(sic){
-                    if(sic.ID === sicCode){
-                        result = sic;
-                    }
-                });
+                var result = undefined;
+                if(sics !== undefined) {
+                    sics.forEach(function (sic) {
+                        if (sic.ID === sicCode) {
+                            result = sic;
+                        }
+                    });
+                }
                 return result;
             }
 
@@ -316,11 +323,11 @@ angular
 
                 selection = report.resetFilters();
 
-                var years = getYears()
+                var yearsPromise = getYears()
                     .then(function(years){selection.fiscalYear = [years[1]];});
-                var periods = getPeriods()
+                var periodsPromise = getPeriods()
                     .then(function(periods){selection.fiscalPeriod = [periods[0]];});
-                $q.all([years, periods])
+                $q.all([yearsPromise, periodsPromise])
                     .then(function(){
                         getAspects()
                             .then(
