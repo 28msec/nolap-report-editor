@@ -125,7 +125,66 @@ angular
                             }
                         }
                     },
-                    'Rules' : []
+                    'Rules' : [],
+                    'DefinitionModels' : [ {
+                        'ModelKind' : 'DefinitionModel',
+                        'Labels' : [ label ],
+                        'Parameters' : {
+
+                        },
+                        'Breakdowns' : {
+                            'x' : [ {
+                                'BreakdownLabels' : [ 'Reporting Entity Breakdown' ],
+                                'BreakdownTrees' : [ {
+                                    'Kind' : 'Rule',
+                                    'Abstract' : true,
+                                    'Labels' : [ 'Reporting Entity [Axis]' ],
+                                    'Children' : [ {
+                                        'Kind' : 'Aspect',
+                                        'Aspect' : 'xbrl:Entity'
+                                    } ]
+                                } ]
+                            }, {
+                                'BreakdownLabels' : [ 'Fiscal Year Breakdown' ],
+                                'BreakdownTrees' : [ {
+                                    'Kind' : 'Rule',
+                                    'Abstract' : true,
+                                    'Labels' : [ 'Fiscal Year [Axis]' ],
+                                    'Children' : [ {
+                                        'Kind' : 'Aspect',
+                                        'Aspect' : 'sec:FiscalYear'
+                                    } ]
+                                } ]
+                            }, {
+                                'BreakdownLabels' : [ 'Fiscal Period Breakdown' ],
+                                'BreakdownTrees' : [ {
+                                    'Kind' : 'Rule',
+                                    'Abstract' : true,
+                                    'Labels' : [ 'Fiscal Period [Axis]' ],
+                                    'Children' : [ {
+                                        'Kind' : 'Aspect',
+                                        'Aspect' : 'sec:FiscalPeriod'
+                                    } ]
+                                } ]
+                            } ],
+                            'y' : [ {
+                                'BreakdownLabels' : [ 'Breakdown on concepts' ],
+                                'BreakdownTrees' : [ {
+                                    'Kind' : 'ConceptRelationship',
+                                    'LinkName' : 'link:presentationLink',
+                                    'LinkRole' : 'http://xbrl.io/fundamental-accounting-concepts',
+                                    'ArcName' : 'link:presentationArc',
+                                    'ArcRole' : 'http://www.xbrl.org/2003/arcrole/parent-child',
+                                    'RelationshipSource' : '',
+                                    'FormulaAxis' : 'descendant',
+                                    'Generations' : 0
+                                } ]
+                            } ]
+                        },
+                        'TableFilters' : {
+
+                        }
+                    } ]
                 };
             if(prefix !== undefined && prefix !== null && typeof prefix === 'string'){
                 this.model.Prefix = prefix;
@@ -748,6 +807,13 @@ angular
         return element;
     };
 
+    var ensureDefinitionModelRootConcept = function(report, conceptName){
+        var model = report.getModel();
+        if(model.DefinitionModels[0] != undefined && model.DefinitionModels[0] !== null) {
+            model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].RelationshipSource = conceptName;
+        }
+    };
+
     Report.prototype.addElement = function(networkShortName, parentElementID, elementOrConceptName, offset){
         ensureNetworkShortName(networkShortName, 'networkShortName', 'addElement');
         ensureOptionalParameter(offset, 'offset', 'number', 'addElement');
@@ -762,6 +828,7 @@ angular
         if(parentElementID === undefined || parentElementID === null) {
             // add a root element
             var network = this.getNetwork(networkShortName);
+            ensureDefinitionModelRootConcept(this, conceptName);
             network.Trees[conceptName] = element;
         } else {
             // add child to existing tree
@@ -825,6 +892,7 @@ angular
             if(network.Trees === undefined || network.Trees === null) {
                 network.Trees = [];
             }
+            ensureDefinitionModelRootConcept(this, element2.Name);
             network.Trees[element2.Name] = element2;
         }
     };

@@ -1,5 +1,5 @@
 <div class="scrollable content">
-	<form style="margin-bottom: 5px" class="form-inline preview-form"
+	<form ng-if="report.hasSufficientFilters()" style="margin-bottom: 5px" class="form-inline preview-form"
 		role="form">
 
 			<div class="form-group">
@@ -54,7 +54,7 @@
 			dataclick="test(data)"></layoutmodel>
 	</div>
 
-	<div>
+	<div ng-if="report.hasSufficientFilters()">
 		<p ng-show="loading">Updating preview...</p>
 	</div>
 
