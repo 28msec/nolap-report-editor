@@ -1600,7 +1600,9 @@ angular
         var that = this;
         angular.forEach(arrayOfAspectNames, function(aspectName){
             var aspects = getAspectEnumeration(that, aspectName);
-            count += aspects.length;
+            if(aspects !== undefined && aspects.length !== undefined) {
+                count += aspects.length;
+            }
         });
         return count;
     };
