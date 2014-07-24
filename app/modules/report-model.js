@@ -78,113 +78,46 @@ angular
                                             'Members': {
                                             }
                                         }
-                                    },
-                                    'xbrl:Period': {
-                                        'Name': 'xbrl:Period',
-                                        'Label': 'Period'
-                                    },
-                                    'xbrl:Entity': {
-                                        'Name': 'xbrl:Entity',
-                                        'Label': 'Reporting Entity'
-                                    },
-                                    'xbrl:Unit': {
-                                        'Name': 'xbrl:Unit',
-                                        'Label': 'Unit',
-                                        'Default': 'xbrl:NonNumeric'
-                                    },
-                                    'sec:Accepted': {
-                                        'Name': 'sec:Accepted',
-                                        'Label': 'Acceptance Date'
-                                    },
-                                    'sec:Archive': {
-                                        'Name': 'sec:Archive',
-                                        'Label': 'Archive ID',
-                                        'Kind': 'TypedDimension',
-                                        'Type': 'string',
-                                        'DomainRestriction': {
-                                            'Name': 'sec:ArchiveDomain',
-                                            'Label': 'sec:Archive Domain',
-                                            // @TODO: remove temp filter
-                                            'Enumeration': [ '0000021344-14-000008', '0000104169-14-000019' ]
-                                        }
-                                    },
-                                    'sec:FiscalYear': {
-                                        'Name': 'sec:FiscalYear',
-                                        'Label': 'Fiscal Year'
-                                    },
-                                    'sec:FiscalPeriod': {
-                                        'Name': 'sec:FiscalPeriod',
-                                        'Label': 'Fiscal Period'
-                                    },
-                                    'dei:LegalEntityAxis': {
-                                        'Name': 'dei:LegalEntityAxis',
-                                        'Label': 'Legal Entity',
-                                        'Default': 'sec:DefaultLegalEntity'
                                     }
+                                },
+                                'xbrl:Period': {
+                                    'Name': 'xbrl:Period',
+                                    'Label': 'Period'
+                                },
+                                'xbrl:Entity': {
+                                    'Name': 'xbrl:Entity',
+                                    'Label': 'Reporting Entity'
+                                },
+                                'xbrl:Unit': {
+                                    'Name': 'xbrl:Unit',
+                                    'Label': 'Unit',
+                                    'Default': 'xbrl:NonNumeric'
+                                },
+                                'sec:Accepted': {
+                                    'Name': 'sec:Accepted',
+                                    'Label': 'Acceptance Date'
+                                },
+                                'sec:Archive': {
+                                    'Name': 'sec:Archive',
+                                    'Label': 'Archive ID'
+                                },
+                                'sec:FiscalYear': {
+                                    'Name': 'sec:FiscalYear',
+                                    'Label': 'Fiscal Year'
+                                },
+                                'sec:FiscalPeriod': {
+                                    'Name': 'sec:FiscalPeriod',
+                                    'Label': 'Fiscal Period'
+                                },
+                                'dei:LegalEntityAxis': {
+                                    'Name': 'dei:LegalEntityAxis',
+                                    'Label': 'Legal Entity',
+                                    'Default': 'sec:DefaultLegalEntity'
                                 }
                             }
                         }
                     },
-                    'Rules' : [],
-                    'DefinitionModels' : [ {
-                        'ModelKind' : 'DefinitionModel',
-                        'Labels' : [ label ],
-                        'Parameters' : {
-
-                        },
-                        'Breakdowns' : {
-                            'x' : [ {
-                                'BreakdownLabels' : [ 'Reporting Entity Breakdown' ],
-                                'BreakdownTrees' : [ {
-                                    'Kind' : 'Rule',
-                                    'Abstract' : true,
-                                    'Labels' : [ 'Reporting Entity [Axis]' ],
-                                    'Children' : [ {
-                                        'Kind' : 'Aspect',
-                                        'Aspect' : 'xbrl:Entity'
-                                    } ]
-                                } ]
-                            }, {
-                                'BreakdownLabels' : [ 'Fiscal Year Breakdown' ],
-                                'BreakdownTrees' : [ {
-                                    'Kind' : 'Rule',
-                                    'Abstract' : true,
-                                    'Labels' : [ 'Fiscal Year [Axis]' ],
-                                    'Children' : [ {
-                                        'Kind' : 'Aspect',
-                                        'Aspect' : 'sec:FiscalYear'
-                                    } ]
-                                } ]
-                            }, {
-                                'BreakdownLabels' : [ 'Fiscal Period Breakdown' ],
-                                'BreakdownTrees' : [ {
-                                    'Kind' : 'Rule',
-                                    'Abstract' : true,
-                                    'Labels' : [ 'Fiscal Period [Axis]' ],
-                                    'Children' : [ {
-                                        'Kind' : 'Aspect',
-                                        'Aspect' : 'sec:FiscalPeriod'
-                                    } ]
-                                } ]
-                            } ],
-                            'y' : [ {
-                                'BreakdownLabels' : [ 'Breakdown on concepts' ],
-                                'BreakdownTrees' : [ {
-                                    'Kind' : 'ConceptRelationship',
-                                    'LinkName' : 'link:presentationLink',
-                                    'LinkRole' : 'http://xbrl.io/fundamental-accounting-concepts',
-                                    'ArcName' : 'link:presentationArc',
-                                    'ArcRole' : 'http://www.xbrl.org/2003/arcrole/parent-child',
-                                    'RelationshipSource' : '',
-                                    'FormulaAxis' : 'descendant',
-                                    'Generations' : 0
-                                } ]
-                            } ]
-                        },
-                        'TableFilters' : {
-
-                        }
-                    } ]
+                    'Rules' : []
                 };
             if(prefix !== undefined && prefix !== null && typeof prefix === 'string'){
                 this.model.Prefix = prefix;
@@ -200,6 +133,7 @@ angular
                 this.model.Prefix = startingChars;
             }
         } // if
+        ensureDefinitionModel(this);
     };
 
     // helper function to check parameters
@@ -356,7 +290,8 @@ angular
             var elementIds = this.findInTree('Presentation',name);
             for(var i in elementIds) {
                 if(elementIds.hasOwnProperty(i)){
-                    var element = this.getElementFromTree('Presentation',i);
+                    var id = elementIds[i];
+                    var element = this.getElementFromTree('Presentation',id);
                     if(typeof element.To === 'object' && element.To !== null && Object.keys(element.To).length > 0){
                         throw new Error('updateConcept: cannot make concept with name "' + name + '" non-abstract because it exists with children in the presentation tree.');
                     }
@@ -807,9 +742,87 @@ angular
         return element;
     };
 
+    var ensureDefinitionModel = function(report){
+        var model = report.getModel();
+        if(model.DefinitionModels === undefined || model.DefinitionModels === null || model.DefinitionModels.length === undefined || model.DefinitionModels.length === 0) {
+            var label = model.Label;
+            var role = model.Role;
+            var source = '';
+            var network = report.getNetwork('Presentation');
+            if(network !== undefined && network.Trees !== undefined && network.Trees.length !== undefined && network.Trees.length > 0){
+                source = network.Trees[0].Name;
+            } else if(network !== undefined && network.Trees !== undefined && typeof network.Trees === 'object' && network.Trees !== null && Object.keys(network.Trees).length >0){
+                source = Object.keys(network.Trees)[0];
+            }
+
+            model.DefinitionModels =
+                [ {
+                    'ModelKind' : 'DefinitionModel',
+                    'Labels' : [ label ],
+                    'Parameters' : {
+
+                    },
+                    'Breakdowns' : {
+                        'x' : [ {
+                            'BreakdownLabels' : [ 'Reporting Entity Breakdown' ],
+                            'BreakdownTrees' : [ {
+                                'Kind' : 'Rule',
+                                'Abstract' : true,
+                                'Labels' : [ 'Reporting Entity [Axis]' ],
+                                'Children' : [ {
+                                    'Kind' : 'Aspect',
+                                    'Aspect' : 'xbrl:Entity'
+                                } ]
+                            } ]
+                        }, {
+                            'BreakdownLabels' : [ 'Fiscal Year Breakdown' ],
+                            'BreakdownTrees' : [ {
+                                'Kind' : 'Rule',
+                                'Abstract' : true,
+                                'Labels' : [ 'Fiscal Year [Axis]' ],
+                                'Children' : [ {
+                                    'Kind' : 'Aspect',
+                                    'Aspect' : 'sec:FiscalYear'
+                                } ]
+                            } ]
+                        }, {
+                            'BreakdownLabels' : [ 'Fiscal Period Breakdown' ],
+                            'BreakdownTrees' : [ {
+                                'Kind' : 'Rule',
+                                'Abstract' : true,
+                                'Labels' : [ 'Fiscal Period [Axis]' ],
+                                'Children' : [ {
+                                    'Kind' : 'Aspect',
+                                    'Aspect' : 'sec:FiscalPeriod'
+                                } ]
+                            } ]
+                        } ],
+                        'y' : [ {
+                            'BreakdownLabels' : [ 'Breakdown on concepts' ],
+                            'BreakdownTrees' : [ {
+                                'Kind' : 'ConceptRelationship',
+                                'LinkName' : 'link:presentationLink',
+                                'LinkRole' : role,
+                                'ArcName' : 'link:presentationArc',
+                                'ArcRole' : 'http://www.xbrl.org/2003/arcrole/parent-child',
+                                'RelationshipSource' : source,
+                                'FormulaAxis' : 'descendant',
+                                'Generations' : 0
+                            } ]
+                        } ]
+                    },
+                    'TableFilters' : {
+
+                    }
+                } ];
+        }
+    };
+
     var ensureDefinitionModelRootConcept = function(report, conceptName){
         var model = report.getModel();
+        ensureDefinitionModel(report);
         if(model.DefinitionModels[0] !== undefined && model.DefinitionModels[0] !== null) {
+            model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].LinkRole = model.Role;
             model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].RelationshipSource = conceptName;
         }
     };
