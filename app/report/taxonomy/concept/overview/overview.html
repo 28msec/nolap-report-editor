@@ -1,6 +1,6 @@
 <div ng-show="error" class="alert alert-danger alert-dismissible" ng-click="error = undefined">
     <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-    <strong>Error {{ error.title }}</strong>
+    <strong>{{ error.title }}</strong><br/>
     {{ error.message }}
 </div>
 <div class="scrollable">

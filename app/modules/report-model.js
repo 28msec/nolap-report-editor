@@ -285,17 +285,60 @@ angular
         }
        
         var concept = this.getConcept(name);
-        if(concept.IsAbstract !== abstract && !abstract){
+        if(concept.IsAbstract !== abstract && !abstract) {
             // a concept can only be non-abstract if it has no children in presentation
-            var elementIds = this.findInTree('Presentation',name);
-            for(var i in elementIds) {
-                if(elementIds.hasOwnProperty(i)){
+            var elementIds = this.findInTree('Presentation', name);
+            for (var i in elementIds) {
+                if (elementIds.hasOwnProperty(i)) {
                     var id = elementIds[i];
-                    var element = this.getElementFromTree('Presentation',id);
-                    if(typeof element.To === 'object' && element.To !== null && Object.keys(element.To).length > 0){
+                    var element = this.getElementFromTree('Presentation', id);
+                    if (typeof element.To === 'object' && element.To !== null && Object.keys(element.To).length > 0) {
                         throw new Error('updateConcept: cannot make concept with name "' + name + '" non-abstract because it exists with children in the presentation tree.');
                     }
                 }
+            }
+        } else if(concept.IsAbstract !== abstract && abstract){
+            var references = this.findConceptReferences(name);
+            if(references.ConceptMaps.SynonymOf.length +
+                references.ConceptMaps.Maps.length +
+                references.Rules.Computing.length +
+                references.Rules.Validating.length +
+                references.Rules.Dependent.length > 0){
+                var msg = 'updateConcept: Cannot make concept with name "' + name + '" abstract because it has the following definitions: ';
+                var count = 0;
+                if (references.ConceptMaps.SynonymOf.length > 0){
+                    msg += references.ConceptMaps.SynonymOf.length + ' appearances as Synonym';
+                    count++;
+                }
+                if (references.ConceptMaps.Maps.length > 0){
+                    if(count > 0){
+                        msg += ', ';
+                    }
+                    msg += 'several Synonyms';
+                    count++;
+                }
+                if (references.Rules.Computing.length > 0){
+                    if(count > 0){
+                        msg += ', ';
+                    }
+                    msg += references.Rules.Computing.length + ' Formulas';
+                    count++;
+                }
+                if (references.Rules.Validating.length > 0){
+                    if(count > 0){
+                        msg += ', ';
+                    }
+                    msg += references.Rules.Validating.length + ' Validations';
+                    count++;
+                }
+                if (references.Rules.Dependent.length > 0){
+                    if(count > 0){
+                        msg += ', ';
+                    }
+                    msg += references.Rules.Dependent.length + ' times used in other Formulas';
+                }
+                msg += ' (None of these are allowed for abstract concepts).'
+                throw new Error(msg);
             }
         }
         concept.Label = label;
