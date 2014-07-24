@@ -337,7 +337,7 @@ angular
                     }
                     msg += references.Rules.Dependent.length + ' times used in other Formulas';
                 }
-                msg += ' (None of these are allowed for abstract concepts).'
+                msg += ' (None of these are allowed for abstract concepts).';
                 throw new Error(msg);
             }
         }
