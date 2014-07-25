@@ -112,7 +112,18 @@ angular
                                 'dei:LegalEntityAxis': {
                                     'Name': 'dei:LegalEntityAxis',
                                     'Label': 'Legal Entity',
-                                    'Default': 'sec:DefaultLegalEntity'
+                                    'Default': 'sec:DefaultLegalEntity',
+                                    'Domains' : {
+                                        'dei:LegalEntityAxisDomain': {
+                                            'Name': 'dei:LegalEntityAxisDomain',
+                                            'Label': 'Implicit dei:LegalEntityAxis Domain',
+                                            'Members': {
+                                                'sec:DefaultLegalEntity': {
+                                                    'Name': 'sec:DefaultLegalEntity'
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
