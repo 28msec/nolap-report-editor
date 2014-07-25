@@ -14,10 +14,7 @@ angular
             $scope.doLogout = function(){
                 Session.logout();
                 Session.redirectToLoginPage('/');
-            }
+            };
         }
     };
 });
-
-
-//<ul class="nav navbar-nav navbar-right"><li><a ng-href="{{accountUrl}}" class="std-right-margin"><i class="fa fa-user"></i>&nbsp;<span ng-bind="name"></span></a></li></ul>
