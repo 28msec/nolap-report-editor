@@ -332,6 +332,8 @@ angular
                             deferred.resolve(aspects);
                         }
                     );
+                } else {
+                    deferred.resolve(aspects);
                 }
 
                 return deferred.promise;
