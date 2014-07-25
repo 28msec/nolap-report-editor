@@ -233,9 +233,23 @@ angular
                 return result;
             }
 
+            function isLatestFiscalYearSelected(){
+                var hasLatest = false;
+                if((selection.fiscalYear.length || 0) > 0){
+                    selection.fiscalYear.forEach(
+                        function(year){
+                            if(year === 'LATEST'){
+                                hasLatest = true;
+                            }
+                        });
+                }
+                return hasLatest;
+            };
+
             function getAspects(){
                 var deferred = $q.defer();
 
+                var hasLatest = isLatestFiscalYearSelected();
                 var aspects = {
                     'sec:FiscalPeriod': selection.fiscalPeriod,
                     'sec:FiscalYear': [],
@@ -245,11 +259,15 @@ angular
 
                 // fiscal year
                 if((selection.fiscalYear.length || 0) > 0){
-                    selection.fiscalYear.forEach(
-                        function(year){
-                            aspects['sec:FiscalYear'].push(parseInt(year,10));
-                        }
-                    );
+                    if(!hasLatest) {
+                        selection.fiscalYear.forEach(
+                            function (year) {
+                                aspects['sec:FiscalYear'].push(parseInt(year, 10));
+                            }
+                        );
+                    } else {
+                        selection.fiscalYear = ['LATEST'];
+                    }
                 }
 
                 // cik
@@ -287,25 +305,26 @@ angular
                     });
                 }
 
-                // restrict sec:Archives
-                var parameters = {
-                    $method: 'POST',
-                    cik: aspects['xbrl:Entity'],
-                    fiscalYear: aspects['sec:FiscalYear'],
-                    fiscalPeriod: aspects['sec:FiscalPeriod'],
-                    token: Session.getToken()
-                };
-                API.Queries.listFilings(parameters)
-                    .then(
-                        function(filings){
+                if(hasLatest) {
+                    // restrict sec:Archives in case Fiscal Year is latest
+                    var parameters = {
+                        $method: 'POST',
+                        cik: aspects['xbrl:Entity'],
+                        fiscalYear: [ 'LATEST' ],
+                        fiscalPeriod: aspects['sec:FiscalPeriod'],
+                        token: Session.getToken()
+                    };
+                    API.Queries.listFilings(parameters)
+                        .then(
+                        function (filings) {
                             var archives = filings.Archives;
-                            if((archives.length || 0) > 0){
-                                if(aspects['sec:Archive'] === undefined){
+                            if ((archives.length || 0) > 0) {
+                                if (aspects['sec:Archive'] === undefined) {
                                     aspects['sec:Archive'] = [];
                                 }
-                                archives.forEach(function(archive){
+                                archives.forEach(function (archive) {
                                     var aid = archive.AccessionNumber;
-                                    if(!arrayContains(aspects['sec:Archive'], aid)){
+                                    if (!arrayContains(aspects['sec:Archive'], aid)) {
                                         aspects['sec:Archive'].push(aid);
                                     }
                                 });
@@ -313,6 +332,7 @@ angular
                             deferred.resolve(aspects);
                         }
                     );
+                }
 
                 return deferred.promise;
             }
@@ -368,6 +388,7 @@ angular
                 getEntity: getEntity,
                 selectEntity: selectEntity,
                 getYears: getYears,
+                isLatestFiscalYearSelected: isLatestFiscalYearSelected,
                 getPeriods: getPeriods,
                 getTags: getTags,
                 getSelection: getSelection,

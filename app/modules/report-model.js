@@ -1653,8 +1653,16 @@ angular
 
     Report.prototype.hasSufficientFilters = function(){
         var result = false;
-        var countAspectRestrictions = this.countAspectsRestrictions(['xbrl:Entity','sec:Archives']);
-        if(countAspectRestrictions > 0 && countAspectRestrictions < 500){
+        var countEntityRestrictions = this.countAspectsRestrictions(['xbrl:Entity']);
+        var countYearsRestrictions = this.countAspectsRestrictions(['sec:FiscalYear']);
+        var countPeriodRestrictions = this.countAspectsRestrictions(['sec:FiscalPeriod']);
+        if(countEntityRestrictions > 0 && countEntityRestrictions < 501){
+            result = true;
+        }
+        if(result && countYearsRestrictions < 10){
+            result = true;
+        }
+        if(result && countPeriodRestrictions < 10){
             result = true;
         }
         return result;
