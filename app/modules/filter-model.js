@@ -244,7 +244,7 @@ angular
                         });
                 }
                 return hasLatest;
-            };
+            }
 
             function getAspects(){
                 var deferred = $q.defer();
