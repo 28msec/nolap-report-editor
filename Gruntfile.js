@@ -280,6 +280,14 @@ module.exports = function (grunt) {
                     dest: '',
                     rel: 'dist/'
                 }]
+            },
+            demo: {
+                bucket: 'supercell-beta.secxbrl.info',
+                upload: [{
+                    src: 'dist/**/*',
+                    dest: '',
+                    rel: 'dist/'
+                }]
             }
         },
         jsonlint: {
