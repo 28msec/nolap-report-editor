@@ -4,6 +4,8 @@ angular
 .module('report-editor')
 .controller('ConceptsCtrl', function($scope, $state){
     $scope.concepts = $scope.report.listConcepts();
+    $scope.unselectElement();
+
     $scope.getResults = function($viewValue){
         var results = [];
         $scope.concepts.forEach(function(concept) {

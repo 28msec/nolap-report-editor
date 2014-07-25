@@ -3,7 +3,29 @@
 angular
 .module('report-editor')
 .controller('ConceptOverviewCtrl', function($scope, $state, $modal, ConceptIsStillReferencedError){
-    
+
+    $scope.error = undefined;
+    $scope.conceptCopy = angular.copy($scope.concept);
+
+    $scope.updateConcept = function(){
+        $scope.error = undefined;
+        if(!angular.equals($scope.conceptCopy, $scope.concept)){
+            try {
+                $scope.report.updateConcept($scope.conceptCopy.Name,$scope.conceptCopy.Label,$scope.conceptCopy.IsAbstract);
+                if($scope.conceptCopy.IsAbstract !== $scope.concept.IsAbstract){
+                    $scope.loadPresentationTree();
+                }
+            } catch (e) {
+                $scope.error =
+                    {
+                        'title': 'Updating concept failed',
+                        'message': e.message
+                    };
+                $scope.conceptCopy = angular.copy($scope.concept);
+            }
+        }
+    };
+
     var element;
     var initElement = function(){
         element = $scope.report.createNewElement($scope.concept);
@@ -17,8 +39,13 @@ angular
         },
         dropped: function(event){
             if(event.source.nodesScope !== event.dest.nodesScope) {
-                $scope.report.addElement('Presentation', event.dest.nodesScope.$nodeScope.$modelValue.Id, element, event.dest.index);
+                if(event.dest.nodesScope.$nodeScope !== undefined && event.dest.nodesScope.$nodeScope !== null) {
+                    $scope.report.addElement('Presentation', event.dest.nodesScope.$nodeScope.$modelValue.Id, element, event.dest.index);
+                }else {
+                    $scope.report.addElement('Presentation', undefined, element, event.dest.index);
+                }
                 initElement();
+                $scope.loadPresentationTree();
             }
         }
     };
@@ -66,6 +93,7 @@ angular
                 }).result.then(function(result){
                     if(result) {
                         $scope.report.removeConcept($scope.concept.Name, true /*force*/);
+                        $scope.loadPresentationTree();
                         $state.go('report.taxonomy.concepts');
                     }
                 });

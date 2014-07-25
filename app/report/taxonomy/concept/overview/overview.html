@@ -1,9 +1,14 @@
+<div ng-show="error" class="alert alert-danger alert-dismissible" ng-click="error = undefined">
+    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+    <strong>{{ error.title }}</strong><br/>
+    {{ error.message }}
+</div>
 <div class="scrollable">
 <h3>Label</h3>
-<input class="form-control" type="text" ng-model="concept.Label" placeholder="Concept label">
+<input class="form-control" type="text" ng-model="conceptCopy.Label" ng-change="updateConcept()" placeholder="Concept label">
 <div class="checkbox">
     <label>
-        <input type="checkbox" ng-model="concept.IsAbstract">
+        <input ng-change="updateConcept()" type="checkbox" ng-model="conceptCopy.IsAbstract">
         Abstract concept
     </label>
 </div>

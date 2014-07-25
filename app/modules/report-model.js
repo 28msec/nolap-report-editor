@@ -11,7 +11,7 @@ angular
     ConceptIsStillReferencedError.prototype = new Error();
     return ConceptIsStillReferencedError;
 })
-.factory('Report', function($log, ConceptIsStillReferencedError){
+.factory('Report', function($log, $q, ConceptIsStillReferencedError){
 
     //Constructor
     var Report = function(modelOrName, label, description, role, username, prefix){
@@ -78,49 +78,41 @@ angular
                                             'Members': {
                                             }
                                         }
-                                    },
-                                    'xbrl:Period': {
-                                        'Name': 'xbrl:Period',
-                                        'Label': 'Period'
-                                    },
-                                    'xbrl:Entity': {
-                                        'Name': 'xbrl:Entity',
-                                        'Label': 'Reporting Entity'
-                                    },
-                                    'xbrl:Unit': {
-                                        'Name': 'xbrl:Unit',
-                                        'Label': 'Unit',
-                                        'Default': 'xbrl:NonNumeric'
-                                    },
-                                    'sec:Accepted': {
-                                        'Name': 'sec:Accepted',
-                                        'Label': 'Acceptance Date'
-                                    },
-                                    'sec:Archive': {
-                                        'Name': 'sec:Archive',
-                                        'Label': 'Archive ID',
-                                        'Kind': 'TypedDimension',
-                                        'Type': 'string',
-                                        'DomainRestriction': {
-                                            'Name': 'sec:ArchiveDomain',
-                                            'Label': 'sec:Archive Domain',
-                                            // @TODO: remove temp filter
-                                            'Enumeration': [ '0000021344-14-000008', '0000104169-14-000019' ]
-                                        }
-                                    },
-                                    'sec:FiscalYear': {
-                                        'Name': 'sec:FiscalYear',
-                                        'Label': 'Fiscal Year'
-                                    },
-                                    'sec:FiscalPeriod': {
-                                        'Name': 'sec:FiscalPeriod',
-                                        'Label': 'Fiscal Period'
-                                    },
-                                    'dei:LegalEntityAxis': {
-                                        'Name': 'dei:LegalEntityAxis',
-                                        'Label': 'Legal Entity',
-                                        'Default': 'sec:DefaultLegalEntity'
                                     }
+                                },
+                                'xbrl:Period': {
+                                    'Name': 'xbrl:Period',
+                                    'Label': 'Period'
+                                },
+                                'xbrl:Entity': {
+                                    'Name': 'xbrl:Entity',
+                                    'Label': 'Reporting Entity'
+                                },
+                                'xbrl:Unit': {
+                                    'Name': 'xbrl:Unit',
+                                    'Label': 'Unit',
+                                    'Default': 'xbrl:NonNumeric'
+                                },
+                                'sec:Accepted': {
+                                    'Name': 'sec:Accepted',
+                                    'Label': 'Acceptance Date'
+                                },
+                                'sec:Archive': {
+                                    'Name': 'sec:Archive',
+                                    'Label': 'Archive ID'
+                                },
+                                'sec:FiscalYear': {
+                                    'Name': 'sec:FiscalYear',
+                                    'Label': 'Fiscal Year'
+                                },
+                                'sec:FiscalPeriod': {
+                                    'Name': 'sec:FiscalPeriod',
+                                    'Label': 'Fiscal Period'
+                                },
+                                'dei:LegalEntityAxis': {
+                                    'Name': 'dei:LegalEntityAxis',
+                                    'Label': 'Legal Entity',
+                                    'Default': 'sec:DefaultLegalEntity'
                                 }
                             }
                         }
@@ -141,6 +133,7 @@ angular
                 this.model.Prefix = startingChars;
             }
         } // if
+        ensureDefinitionModel(this);
     };
 
     // helper function to check parameters
@@ -178,6 +171,12 @@ angular
         }
     };
 
+    var ensureOptionalParameter = function(paramValue, paramName, paramType, functionName, regex, regexErrorMessage) {
+        if(paramValue !== undefined && paramValue !== null){
+            ensureParameter(paramValue, paramName, paramType, functionName, regex, regexErrorMessage);
+        }
+    };
+
     var ensureExists = function(value, valueType, functionName, errorMessage) {
         if(value === null || value === undefined || value === '') {
             throw new Error(functionName + ': ' + errorMessage);
@@ -212,7 +211,7 @@ angular
         var model = this.getModel();
         ensureExists(model, 'object', 'getPrefix', 'Report doesn\'t have a model.');
         if(model.Prefix !== undefined && model.Prefix !== null && typeof model.Prefix === 'string'){
-           return model.Prefix;
+            return model.Prefix;
         }
 
         // try to guess the prefix
@@ -286,16 +285,60 @@ angular
         }
        
         var concept = this.getConcept(name);
-        if(concept.IsAbstract !== abstract && !abstract){
+        if(concept.IsAbstract !== abstract && !abstract) {
             // a concept can only be non-abstract if it has no children in presentation
-            var elementIds = this.findInTree('Presentation',name);
-            for(var i in elementIds) {
-                if(elementIds.hasOwnProperty(i)){
-                    var element = this.getElementFromTree('Presentation',i);
-                    if(typeof element.To === 'object' && element.To !== null && Object.keys(element.To).length > 0){
+            var elementIds = this.findInTree('Presentation', name);
+            for (var i in elementIds) {
+                if (elementIds.hasOwnProperty(i)) {
+                    var id = elementIds[i];
+                    var element = this.getElementFromTree('Presentation', id);
+                    if (typeof element.To === 'object' && element.To !== null && Object.keys(element.To).length > 0) {
                         throw new Error('updateConcept: cannot make concept with name "' + name + '" non-abstract because it exists with children in the presentation tree.');
                     }
                 }
+            }
+        } else if(concept.IsAbstract !== abstract && abstract){
+            var references = this.findConceptReferences(name);
+            if(references.ConceptMaps.SynonymOf.length +
+                references.ConceptMaps.Maps.length +
+                references.Rules.Computing.length +
+                references.Rules.Validating.length +
+                references.Rules.Dependent.length > 0){
+                var msg = 'updateConcept: Cannot make concept with name "' + name + '" abstract because it has the following definitions: ';
+                var count = 0;
+                if (references.ConceptMaps.SynonymOf.length > 0){
+                    msg += references.ConceptMaps.SynonymOf.length + ' appearances as Synonym';
+                    count++;
+                }
+                if (references.ConceptMaps.Maps.length > 0){
+                    if(count > 0){
+                        msg += ', ';
+                    }
+                    msg += 'several Synonyms';
+                    count++;
+                }
+                if (references.Rules.Computing.length > 0){
+                    if(count > 0){
+                        msg += ', ';
+                    }
+                    msg += references.Rules.Computing.length + ' Formulas';
+                    count++;
+                }
+                if (references.Rules.Validating.length > 0){
+                    if(count > 0){
+                        msg += ', ';
+                    }
+                    msg += references.Rules.Validating.length + ' Validations';
+                    count++;
+                }
+                if (references.Rules.Dependent.length > 0){
+                    if(count > 0){
+                        msg += ', ';
+                    }
+                    msg += references.Rules.Dependent.length + ' times used in other Formulas';
+                }
+                msg += ' (None of these are allowed for abstract concepts).';
+                throw new Error(msg);
             }
         }
         concept.Label = label;
@@ -707,44 +750,141 @@ angular
         }
         return count;
     };
-    
-    Report.prototype.addElement = function(networkShortName, parentElementID, elementOrConceptName, offset){
-        ensureNetworkShortName(networkShortName, 'networkShortName', 'addElement');
 
+    var determineOrder = function(report, networkShortName, parentElementID, offset, doEnforceStrictChildOrder){
         // determine order
         var order = 1;
-        var maxOrder = getMaxOrder(this, networkShortName, parentElementID);
+        var maxOrder = getMaxOrder(report, networkShortName, parentElementID);
         if(offset !== undefined && offset !== null){
-            ensureParameter(offset, 'offset', 'number', 'addElement');
             order = offset + 1;
         } else {
             offset = 0; // default
         }
         if(offset > (maxOrder)){
-            throw new Error('addElement: offset out of bounds: ' + offset +
+            throw new Error('determineOrder: offset out of bounds: ' + offset +
                 ' (Max offset is ' + maxOrder + ' for parent ' + parentElementID  + '.');
         }
-        enforceStrictChildOrderAndShift(this, networkShortName, parentElementID, offset);
+        if(doEnforceStrictChildOrder) {
+            enforceStrictChildOrderAndShift(report, networkShortName, parentElementID, offset);
+        }
+        return order;
+    };
 
-        // determine element
+    var determineElement = function(report, elementOrConceptName, order){
         var element;
-        var conceptName;
         if(typeof elementOrConceptName === 'string'){
-            conceptName = elementOrConceptName;
-            ensureConceptName(conceptName, 'elementOrConceptName', 'addElement');
-            var concept = this.getConcept(conceptName);
-            ensureExists(concept, 'object', 'addElement', 'concept with name "' + conceptName + '" doesn\'t exist.');
-            element = this.createNewElement(concept);
+            ensureConceptName(elementOrConceptName, 'elementOrConceptName', 'addElement');
+            var concept = report.getConcept(elementOrConceptName);
+            ensureExists(concept, 'object', 'addElement', 'concept with name "' + elementOrConceptName + '" doesn\'t exist.');
+            element = report.createNewElement(concept);
         } else {
             element = elementOrConceptName;
             ensureParameter(element, 'elementOrConceptName', 'object', 'addElement');
-            conceptName = element.Name;
         }
         element.Order = order;
+        return element;
+    };
+
+    var ensureDefinitionModel = function(report){
+        var model = report.getModel();
+        if(model.DefinitionModels === undefined || model.DefinitionModels === null || model.DefinitionModels.length === undefined || model.DefinitionModels.length === 0) {
+            var label = model.Label;
+            var role = model.Role;
+            var source = '';
+            var network = report.getNetwork('Presentation');
+            if(network !== undefined && network.Trees !== undefined && network.Trees.length !== undefined && network.Trees.length > 0){
+                source = network.Trees[0].Name;
+            } else if(network !== undefined && network.Trees !== undefined && typeof network.Trees === 'object' && network.Trees !== null && Object.keys(network.Trees).length >0){
+                source = Object.keys(network.Trees)[0];
+            }
+
+            model.DefinitionModels =
+                [ {
+                    'ModelKind' : 'DefinitionModel',
+                    'Labels' : [ label ],
+                    'Parameters' : {
+
+                    },
+                    'Breakdowns' : {
+                        'x' : [ {
+                            'BreakdownLabels' : [ 'Reporting Entity Breakdown' ],
+                            'BreakdownTrees' : [ {
+                                'Kind' : 'Rule',
+                                'Abstract' : true,
+                                'Labels' : [ 'Reporting Entity [Axis]' ],
+                                'Children' : [ {
+                                    'Kind' : 'Aspect',
+                                    'Aspect' : 'xbrl:Entity'
+                                } ]
+                            } ]
+                        }, {
+                            'BreakdownLabels' : [ 'Fiscal Year Breakdown' ],
+                            'BreakdownTrees' : [ {
+                                'Kind' : 'Rule',
+                                'Abstract' : true,
+                                'Labels' : [ 'Fiscal Year [Axis]' ],
+                                'Children' : [ {
+                                    'Kind' : 'Aspect',
+                                    'Aspect' : 'sec:FiscalYear'
+                                } ]
+                            } ]
+                        }, {
+                            'BreakdownLabels' : [ 'Fiscal Period Breakdown' ],
+                            'BreakdownTrees' : [ {
+                                'Kind' : 'Rule',
+                                'Abstract' : true,
+                                'Labels' : [ 'Fiscal Period [Axis]' ],
+                                'Children' : [ {
+                                    'Kind' : 'Aspect',
+                                    'Aspect' : 'sec:FiscalPeriod'
+                                } ]
+                            } ]
+                        } ],
+                        'y' : [ {
+                            'BreakdownLabels' : [ 'Breakdown on concepts' ],
+                            'BreakdownTrees' : [ {
+                                'Kind' : 'ConceptRelationship',
+                                'LinkName' : 'link:presentationLink',
+                                'LinkRole' : role,
+                                'ArcName' : 'link:presentationArc',
+                                'ArcRole' : 'http://www.xbrl.org/2003/arcrole/parent-child',
+                                'RelationshipSource' : source,
+                                'FormulaAxis' : 'descendant',
+                                'Generations' : 0
+                            } ]
+                        } ]
+                    },
+                    'TableFilters' : {
+
+                    }
+                } ];
+        }
+    };
+
+    var ensureDefinitionModelRootConcept = function(report, conceptName){
+        var model = report.getModel();
+        ensureDefinitionModel(report);
+        if(model.DefinitionModels[0] !== undefined && model.DefinitionModels[0] !== null) {
+            model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].LinkRole = model.Role;
+            model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].RelationshipSource = conceptName;
+        }
+    };
+
+    Report.prototype.addElement = function(networkShortName, parentElementID, elementOrConceptName, offset){
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'addElement');
+        ensureOptionalParameter(offset, 'offset', 'number', 'addElement');
+
+        // determine order
+        var order = determineOrder(this,networkShortName, parentElementID, offset, true);
+
+        // determine element
+        var element = determineElement(this, elementOrConceptName, order);
+        var conceptName = element.Name;
 
         if(parentElementID === undefined || parentElementID === null) {
             // add a root element
             var network = this.getNetwork(networkShortName);
+            ensureDefinitionModelRootConcept(this, conceptName);
             network.Trees[conceptName] = element;
         } else {
             // add child to existing tree
@@ -775,23 +915,14 @@ angular
         ensureNetworkShortName(networkShortName, 'networkShortName', 'moveTreeBranch');
         ensureParameter(subtreeRootElementID, 'subtreeRootElementID', 'string', 'moveTreeBranch');
 
-        var newOrder = 1;
-        var maxOrder = getMaxOrder(this, networkShortName, newParentElementID);
-        if(newOffset !== undefined && newOffset !== null){
-            ensureParameter(newOffset, 'newOffset', 'number', 'moveTreeBranch');
-            newOrder = newOffset + 1;
-        } else {
-            newOffset = 0; // default
-        }
-        if(newOffset > (maxOrder)){
-            throw new Error('moveTreeBranch: offset out of bounds: ' + newOffset +
-                ' (Max offset is ' + maxOrder + ' for parent ' + newParentElementID  + '.');
-        }
+        var newOrder = determineOrder(this,networkShortName, newParentElementID, newOffset, false);
+
         if(newParentElementID !== undefined && newParentElementID !== null){
             ensureParameter(newParentElementID, 'newParentElementID', 'string', 'moveTreeBranch');
 
             var newParent = this.getElementFromTree(networkShortName, newParentElementID);
-            ensureExists(newParent, 'object', 'moveTreeBranch', 'Cannot move element with id "' + subtreeRootElementID + '" to new parent element with id "' + newParentElementID + '": Parent element doesn\'t exist.');
+            ensureExists(newParent, 'object', 'moveTreeBranch', 'Cannot move element with id "' + subtreeRootElementID + '" to new parent element with id "' +
+                newParentElementID + '": Parent element doesn\'t exist.');
             var parentConcept = this.getConcept(newParent.Name);
             if(networkShortName !== 'ConceptMap' && !parentConcept.IsAbstract) {
                 throw new Error('moveTreeBranch: cannot move element to target parent "' + newParentElementID +
@@ -802,7 +933,7 @@ angular
             }
 
             var element = this.removeTreeBranch(networkShortName, subtreeRootElementID);
-            enforceStrictChildOrderAndShift(this, networkShortName, newParentElementID, newOffset);
+            enforceStrictChildOrderAndShift(this, networkShortName, newParentElementID, (newOffset || 0));
             element.Order = newOrder;
             if(newParent.To === undefined || newParent.To === null) {
                 newParent.To = {};
@@ -812,11 +943,12 @@ angular
             // no new parent given -> make it a root element
             var network = this.getNetwork(networkShortName);
             var element2 = this.removeTreeBranch(networkShortName, subtreeRootElementID);
-            enforceStrictChildOrderAndShift(this, networkShortName, newParentElementID, newOffset);
+            enforceStrictChildOrderAndShift(this, networkShortName, newParentElementID, (newOffset || 0));
             element2.Order = newOrder;
             if(network.Trees === undefined || network.Trees === null) {
                 network.Trees = [];
             }
+            ensureDefinitionModelRootConcept(this, element2.Name);
             network.Trees[element2.Name] = element2;
         }
     };
@@ -1077,9 +1209,9 @@ angular
         return result;
     };
 
-     Report.prototype.computableByRules = function(oconceptName) {
-         var conceptName = this.alignConceptPrefix(oconceptName);
-         ensureConceptName(conceptName, 'oconceptName', 'computableByRules');
+    Report.prototype.computableByRules = function(oconceptName) {
+        var conceptName = this.alignConceptPrefix(oconceptName);
+        ensureConceptName(conceptName, 'oconceptName', 'computableByRules');
 
         var result = [];
         var model = this.getModel();
@@ -1161,26 +1293,10 @@ angular
         ensureParameter(formula, 'formula', 'string', 'createNewRule');
         ensureExists(computableConceptsArray, 'object', 'createNewRule', 'function called without computableConceptsArray.');
 
-        for(var i in computableConceptsArray) {
-            var cname = report.alignConceptPrefix(computableConceptsArray[i]);
-            ensureConceptName(cname, 'computableConceptsArray', 'createNewRule');
-            var rulesComputableConcepts = report.computableByRules(cname);
-            if(rulesComputableConcepts.lenght > 0 && rulesComputableConcepts[0].Id !== id) {
-                throw new Error('createNewRule: A rule which can compute facts of concept "' + cname + '" exists already: "' + rulesComputableConcepts[0] + '. Currently, only one rule must be able to compute a fact for a certain concept.');
-            }
-        }
-        if(dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
-            for(var j in dependingConceptsArray) {
-                var dname = report.alignConceptPrefix(dependingConceptsArray[j]);
-                ensureConceptName(dname, 'dependingConceptsArray', 'createNewRule');
-            }
-        }
-        if(validatedConceptsArray !== null && typeof validatedConceptsArray === 'object') {
-            for(var x in validatedConceptsArray) {
-                var vname = report.alignConceptPrefix(validatedConceptsArray[x]);
-                ensureConceptName(vname, 'validatedConceptsArray', 'createNewRule');
-            }
-        }
+        validateComputableConcepts(report, 'createNewRule', computableConceptsArray, id);
+        validateDependingConceptsArray(report, 'createNewRule', dependingConceptsArray);
+        validateValidatedConceptsArray(report, 'createNewRule', validatedConceptsArray);
+
         if(computableConceptsArray.length === 0) {
             throw new Error('createNewRule: rule of type "' + type + '" must have at least one computable concept. Function createNewRule was called with empty computableConceptsArray.');
         }
@@ -1198,11 +1314,66 @@ angular
         if(type === 'xbrl28:validation') {
             ensureExists(validatedConceptsArray, 'object', 'createNewRule', 'function called without validatedConceptsArray.');
             if(validatedConceptsArray.length === 0) {
-                throw new Error('validatedConceptsArray: rule of type "' + type + '" must have at least one validateble concept. Function createNewRule was called with empty validatedConceptsArray.');
+                throw new Error('validatedConceptsArray: rule of type "' + type +
+                    '" must have at least one validateble concept. Function createNewRule was called with empty validatedConceptsArray.');
             }
             rule.ValidatedConcepts = validatedConceptsArray;
         }
         return rule;
+    };
+
+    var validateComputableConcepts = function(report, errorMsgPrefix, computableConceptsArray, ruleId) {
+        ensureExists(computableConceptsArray[0], 'string', errorMsgPrefix, 'Mandatory computable concept missing.');
+        for(var i in computableConceptsArray) {
+            if(computableConceptsArray.hasOwnProperty(i)) {
+                var cname = report.alignConceptPrefix(computableConceptsArray[i]);
+                ensureConceptName(cname, 'computableConceptsArray', errorMsgPrefix, 'The computable concept name ' + cname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
+                var cconcept = report.getConcept(cname);
+                if (cconcept === undefined || cconcept === null) {
+                    throw new Error(errorMsgPrefix + ': the computable concept with name "' + cname +
+                        '" does not exist. You need to create this concept or adapt it to an existing one before you can create the rule.');
+                }
+                var rulesComputableConcepts = report.computableByRules(cname);
+                if (rulesComputableConcepts.length > 0 && rulesComputableConcepts[0].Id !== ruleId) {
+                    throw new Error(errorMsgPrefix + ': A rule which can compute facts for concept "' + cname + '" exists already: "' + rulesComputableConcepts[0].Id +
+                        '". Currently, only one rule must be able to compute a fact for a certain concept.');
+                }
+            }
+        }
+    };
+
+    var validateDependingConceptsArray = function(report, errorMsgPrefix, dependingConceptsArray) {
+        if(dependingConceptsArray !== undefined && dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
+            for (var j in dependingConceptsArray) {
+                if(dependingConceptsArray.hasOwnProperty(j)) {
+                    var dname = report.alignConceptPrefix(dependingConceptsArray[j]);
+                    ensureConceptName(dname, 'dependingConceptsArray', errorMsgPrefix, 'The dependency concept name ' + dname +
+                        ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
+                    var dconcept = report.getConcept(dname);
+                    if (dconcept === undefined || dconcept === null) {
+                        throw new Error(errorMsgPrefix + ': A concept with name "' + dname +
+                            '" does not exist (as used in the dependencies). You need to create this concept or remove it from the dependencies before you can create the rule.');
+                    }
+                }
+            }
+        }
+    };
+
+    var validateValidatedConceptsArray = function(report, errorMsgPrefix, validatedConceptsArray) {
+        if(validatedConceptsArray !== undefined && validatedConceptsArray !== null && typeof validatedConceptsArray === 'object') {
+            for(var x in validatedConceptsArray) {
+                if(validatedConceptsArray.hasOwnProperty(x)) {
+                    var vname = report.alignConceptPrefix(validatedConceptsArray[x]);
+                    ensureConceptName(vname, 'validatedConceptsArray', errorMsgPrefix, 'The validated concept name ' + vname +
+                        ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
+                    var vconcept = report.getConcept(vname);
+                    if (vconcept === undefined || vconcept === null) {
+                        throw new Error(errorMsgPrefix + ': The validated concept with name "' + vname +
+                            '" does not exist. You need to create this concept or adapt it to an existing one before you can create the rule.');
+                    }
+                }
+            }
+        }
     };
 
     var validate = function(report, errorMsgPrefix, action, id, label, type, description, formula, computableConceptsArray, dependingConceptsArray, validatedConceptsArray){
@@ -1217,45 +1388,9 @@ angular
         }
         ensureExists(label, 'string', errorMsgPrefix, 'Mandatory Label missing.');
         ensureExists(formula, 'string', errorMsgPrefix, 'Cannot store rule with empty source code.');
-        ensureExists(computableConceptsArray[0], 'string', errorMsgPrefix, 'Mandatory computable concept missing.');
-        for(var i in computableConceptsArray) {
-            if(computableConceptsArray.hasOwnProperty(i)) {
-                var cname = report.alignConceptPrefix(computableConceptsArray[i]);
-                ensureConceptName(cname, 'computableConceptsArray', errorMsgPrefix, 'The computable concept name ' + cname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
-                var cconcept = report.getConcept(cname);
-                if (cconcept === undefined || cconcept === null) {
-                    throw new Error(errorMsgPrefix + ': the computable concept with name "' + cname + '" does not exist. You need to <b>create this concept</b> or adapt it to an existing one before you can create the rule.');
-                }
-                var rulesComputableConcepts = report.computableByRules(cname);
-                if (rulesComputableConcepts.lenght > 0 && rulesComputableConcepts[0].Id !== id) {
-                    throw new Error(errorMsgPrefix + ': A rule which can compute facts for concept "' + cname + '" exists already: "' + rulesComputableConcepts[0].Id + '. Currently, only one rule must be able to compute a fact for a certain concept.');
-                }
-            }
-        }
-        if(dependingConceptsArray !== null && typeof dependingConceptsArray === 'object') {
-            for (var j in dependingConceptsArray) {
-                if(dependingConceptsArray.hasOwnProperty(j)) {
-                    var dname = report.alignConceptPrefix(dependingConceptsArray[j]);
-                    ensureConceptName(dname, 'dependingConceptsArray', errorMsgPrefix, 'The dependency concept name ' + dname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
-                    var dconcept = report.getConcept(dname);
-                    if (dconcept === undefined || dconcept === null) {
-                        throw new Error(errorMsgPrefix + ': A concept with name "' + dname + '" does not exist (as used in the dependencies). You need to create this concept or remove it from the dependencies before you can create the rule.');
-                    }
-                }
-            }
-        }
-        if(validatedConceptsArray !== null && typeof validatedConceptsArray === 'object') {
-            for(var x in validatedConceptsArray) {
-                if(validatedConceptsArray.hasOwnProperty(x)) {
-                    var vname = report.alignConceptPrefix(validatedConceptsArray[x]);
-                    ensureConceptName(vname, 'validatedConceptsArray', errorMsgPrefix, 'The validated concept name ' + vname + ' is not a valid concept name (correct pattern e.g. fac:Revenues).');
-                    var vconcept = report.getConcept(vname);
-                    if (vconcept === undefined || vconcept === null) {
-                        throw new Error(errorMsgPrefix + ': The validated concept with name "' + vname + '" does not exist. You need to create this concept or adapt it to an existing one before you can create the rule.');
-                    }
-                }
-            }
-        }
+        validateComputableConcepts(report, errorMsgPrefix, computableConceptsArray, id);
+        validateDependingConceptsArray(report, errorMsgPrefix, dependingConceptsArray);
+        validateValidatedConceptsArray(report, errorMsgPrefix, validatedConceptsArray);
     };
 
     Report.prototype.updateRule = function(rule){
@@ -1462,6 +1597,172 @@ angular
             }
         }
         return result;
+    };
+
+    /**********************
+     ** Filters API
+     **********************/
+    Report.prototype.resetFilters = function(){
+        var model = this.getModel();
+        model.Filters = {
+            'cik': [],
+            'tag': [ 'DOW30' ],
+            'fiscalYear': [],
+            'fiscalPeriod': [],
+            'sic': []
+        };
+        return model.Filters;
+    };
+
+    Report.prototype.getFilters = function(){
+        var model = this.getModel();
+        return model.Filters;
+    };
+
+    var getAspectEnumeration = function(report, aspectName){
+        var model = report.getModel();
+        var result = [];
+        var aspect =
+            model.Hypercubes['xbrl:DefaultHypercube']
+                .Aspects[aspectName];
+        if(aspectName === 'xbrl:Concept' && aspect.Domains && aspect.Domains['xbrl:ConceptDomain'] && aspect.Domains['xbrl:ConceptDomain'].Members ){
+            return Object.keys(aspect.Domains['xbrl:ConceptDomain'].Members);
+        }
+        if(aspect === undefined || aspect.DomainRestriction === undefined || aspect.DomainRestriction.Enumeration === undefined){
+            return result;
+        }
+        return aspect.DomainRestriction.Enumeration;
+    };
+
+    var setAspect = function(report, aspectName, aspect){
+        var model = report.getModel();
+        model.Hypercubes['xbrl:DefaultHypercube']
+            .Aspects[aspectName] = aspect;
+    };
+
+    Report.prototype.hasSufficientFilters = function(){
+        var result = false;
+        var countAspectRestrictions = this.countAspectsRestrictions(['xbrl:Entity','sec:Archives']);
+        if(countAspectRestrictions > 0 && countAspectRestrictions < 500){
+            result = true;
+        }
+        return result;
+    };
+
+    Report.prototype.countAspectsRestrictions = function(arrayOfAspectNames){
+        ensureParameter(arrayOfAspectNames, 'arrayOfAspectNames', 'object', 'countAspectsRestrictions');
+
+        var count = 0;
+        var that = this;
+        angular.forEach(arrayOfAspectNames, function(aspectName){
+            var aspects = getAspectEnumeration(that, aspectName);
+            if(aspects !== undefined && aspects.length !== undefined) {
+                count += aspects.length;
+            }
+        });
+        return count;
+    };
+
+    Report.prototype.updateAspects = function(aspects){
+        ensureParameter(aspects, 'aspects', 'object', 'updateAspects');
+
+        // xbrl:Entity
+        if(aspects['xbrl:Entity'] && aspects['xbrl:Entity'].length > 0){
+            var entities = [];
+            aspects['xbrl:Entity'].forEach(
+                function(cik){
+                    if(cik.indexOf('http://www.sec.gov/CIK ') === 0){
+                        entities.push(cik);
+                    } else {
+                        entities.push('http://www.sec.gov/CIK ' + cik);
+                    }
+                });
+            setAspect(this, 'xbrl:Entity',
+                {
+                    'Name': 'xbrl:Entity',
+                    'Label': 'Reporting Entity',
+                    'Kind': 'TypedDimension',
+                    'Type': 'string',
+                    'DomainRestriction': {
+                        'Name': 'xbrl:EntityDomain',
+                        'Label': 'Entity Domain',
+                        'Enumeration': entities
+                    }
+                });
+        } else {
+            setAspect(this, 'xbrl:Entity',
+                {
+                    'Name': 'xbrl:Entity',
+                    'Label': 'Reporting Entity'
+                });
+        }
+
+        // sec:Archive
+        if(aspects['sec:Archive'] && aspects['sec:Archive'].length > 0){
+            setAspect(this, 'sec:Archive',
+                {
+                    'Name': 'sec:Archive',
+                    'Label': 'Archive ID',
+                    'Kind': 'TypedDimension',
+                    'Type': 'string',
+                    'DomainRestriction': {
+                        'Name': 'sec:ArchiveDomain',
+                        'Label': 'Archive Domain',
+                        'Enumeration': aspects['sec:Archive']
+                    }
+                });
+        } else {
+            setAspect(this, 'sec:Archive',
+                {
+                    'Name': 'sec:Archive',
+                    'Label': 'Archive ID'
+                });
+        }
+
+        // sec:FiscalYear
+        if(aspects['sec:FiscalYear'] && aspects['sec:FiscalYear'].length > 0){
+            setAspect(this, 'sec:FiscalYear',
+                {
+                    'Name': 'sec:FiscalYear',
+                    'Label': 'Fiscal Year',
+                    'Kind': 'TypedDimension',
+                    'Type': 'integer',
+                    'DomainRestriction': {
+                        'Name': 'sec:FiscalYearDomain',
+                        'Label': 'Fiscal Year Domain',
+                        'Enumeration': aspects['sec:FiscalYear']
+                    }
+                });
+        } else {
+            setAspect(this, 'sec:FiscalYear',
+                {
+                    'Name': 'sec:FiscalYear',
+                    'Label': 'Fiscal Year'
+                });
+        }
+
+        // sec:FiscalPeriod
+        if(aspects['sec:FiscalPeriod'] && aspects['sec:FiscalPeriod'].length > 0){
+            setAspect(this, 'sec:FiscalPeriod',
+                {
+                    'Name': 'sec:FiscalPeriod',
+                    'Label': 'Fiscal Period',
+                    'Kind': 'TypedDimension',
+                    'Type': 'string',
+                    'DomainRestriction': {
+                        'Name': 'sec:FiscalPeriodDomain',
+                        'Label': 'Fiscal Period Domain',
+                        'Enumeration': aspects['sec:FiscalPeriod']
+                    }
+                });
+        } else {
+            setAspect(this, 'sec:FiscalPeriod',
+                {
+                    'Name': 'sec:FiscalPeriod',
+                    'Label': 'Fiscal Period'
+                });
+        }
+
     };
 
     return Report;

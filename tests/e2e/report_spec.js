@@ -12,8 +12,8 @@ describe('Report', function(){
             expect(browser.getTitle()).toBe('Report Editor');
         });
     
-        it('should have 93 elements', function(){
-            expect(report.elementCount()).toBe(93);
+        it('should have 107 elements', function(){
+            expect(report.elementCount()).toBe(107);
         });
         
         it('last element should be scrollable to', function(){

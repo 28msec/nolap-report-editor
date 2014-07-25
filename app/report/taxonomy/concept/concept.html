@@ -8,13 +8,22 @@
         <a ui-sref="report.taxonomy.concept.overview()">Overview</a>
     </li>
     <li ui-sref-active="active" ng-class="{ disabled: concept.IsAbstract === true }">
-        <a ui-sref="report.taxonomy.concept.synonyms()">Synonyms ({{synonymsCount}})</a>
+        <a ui-sref="report.taxonomy.concept.synonyms()">Synonyms ({{report.listConceptMapSynonyms(concept.Name).length}})</a>
     </li>
     <li ui-sref-active="active" ng-class="{ disabled: concept.IsAbstract === true }">
-        <a ui-sref="report.taxonomy.concept.formula.computation.list()">Computation Formula ({{computationFormulasCount}})</a>
+        <a ui-sref="report.taxonomy.concept.formula.computation.list()">Formula ({{report.listRules(concept.Name).length}})</a>
     </li>
-    <li ui-sref-active="active" ng-class="{ disabled: concept.IsAbstract === true }">
-        <a ui-sref="report.taxonomy.concept.formula.validations.list()">Validation Formulas ({{validationFormulasCount}})</a>
+
+
+    <li ng-if="isValidationConcept" ui-sref-active="active"
+        ng-class="{ disabled: (concept.IsAbstract === true || isValidationConcept === true)}"
+        tooltip-trigger="mouseenter" tooltip-placement="right" tooltip="Creating a validation of a validation is not allowed.">
+        <a ui-sref="report.taxonomy.concept.formula.validations.list()">Validations</a>
     </li>
+    <li ng-if="!isValidationConcept" ui-sref-active="active"
+        ng-class="{ disabled: (concept.IsAbstract === true || isValidationConcept === true)}">
+        <a ui-sref="report.taxonomy.concept.formula.validations.list()">Validations ({{report.listValidatingRules(concept.Name).length}})</a>
+    </li>
+
 </ul>
-<div ui-view class="concept-view"></div>
+<div ui-view></div>

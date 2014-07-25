@@ -260,6 +260,54 @@
                     ]
                 }
             ]
+        },
+        {
+            "path": "/parameters.jq",
+            "description": "Report Parameters",
+            "operations": [
+                {
+                    "method": "POST",
+                    "summary": "Retrieve a list of all Report Parameters",
+                    "nickname": "getParameters",
+                    "parameters": [
+                        {
+                            "name": "parameter",
+                            "description": "Only retrieve values for this parameter",
+                            "required": false,
+                            "type": "string",
+                            "enum": [
+                                "years",
+                                "periods",
+                                "sics",
+                                "tags",
+                                "entities"
+                            ],
+                            "paramType": "query"
+                        }
+                    ],
+                    "responseMessages": [
+                        {
+                            "code": 500,
+                            "message": "An internal error occurred during the processing of the request.",
+                            "responseModel": "Error"
+                        }
+                    ],
+                    "successMessages": [
+                        {
+                            "code": 200,
+                            "message": "Returns parameters object."
+                        }
+                    ],
+                    "examples": [
+                        {
+                            "title": "Retrieve report parameters",
+                            "description": "Retrieve an object with parameter name fields and array values containing the parameter values.",
+                            "request": "[API_URL]/_queries/public/reports/parameters.jq",
+                            "response": ""
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "models": {
