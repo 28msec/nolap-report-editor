@@ -20,7 +20,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="report in reports | orderBy:'LastModified':true">
+            <tr ng-repeat="report in reports | orderBy:'LastModified':true track by report._id">
                 <td>
                     <input type="checkbox" ng-model="selectedReports[report._id]" ng-change="toggleReport()" ng-checked="false">
                 </td>

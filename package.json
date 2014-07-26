@@ -67,7 +67,8 @@
     "grunt-contrib-imagemin": "~0.7.1",
     "grunt-contrib-uglify": "~0.5.0",
     "grunt-s3": "~0.2.0-alpha.3",
-    "protractor": "~1.0.0-rc6"
+    "protractor": "~1.0.0-rc6",
+    "lodash": "~2.4.1"
   },
   "contributors": [
     {
