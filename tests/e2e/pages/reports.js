@@ -11,7 +11,7 @@ var Reports = function(){
 };
 
 Reports.prototype.get = function(){
-    return browser.get('/');  
+    browser.get('/');  
 };
 
 Reports.prototype.createReport = function(reportName){

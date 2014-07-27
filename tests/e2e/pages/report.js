@@ -13,12 +13,10 @@ var Report = function(id){
 };
 
 Report.prototype.get = function(){
-    var that = this;
-    return browser.get('/' + this.id).then(function(){
-        that.label = element(by.binding('report.model.Label')).getText();
-        that.elements = element(by.id('presentation-tree')).all(by.css('.angular-ui-tree-node'));
-        that.searchBox = element(by.model('conceptName'));
-    });
+    browser.get('/' + this.id);
+    this.label = element(by.binding('report.model.Label')).getText();
+    this.elements = element(by.id('presentation-tree')).all(by.css('.angular-ui-tree-node'));
+    this.searchBox = element(by.model('conceptName'));
 };
 
 Report.prototype.elementCount = function(){

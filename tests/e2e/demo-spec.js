@@ -18,9 +18,7 @@ describe('Report', function(){
             .then(function(url){
                 var id = _.last(url.split('/'));
                 report = new Report(id);
-                return report.get();
-            })
-            .then(function(){
+                report.get();
                 expect(report.searchBox.isPresent()).toBe(true);
                 expect(report.label).toBe(reportName);
             });

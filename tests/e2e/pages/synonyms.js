@@ -7,7 +7,7 @@ var Synonyms = function(id, conceptName){
 };
 
 Synonyms.prototype.get = function(){
-    return browser.get('/' + this.id + '/concept/' + this.conceptName + '/synonyms');  
+    browser.get('/' + this.id + '/concept/' + this.conceptName + '/synonyms');  
 };
 
 Synonyms.prototype.addSynonym = function(synonym){
@@ -15,7 +15,7 @@ Synonyms.prototype.addSynonym = function(synonym){
     var input = form.element(by.name('synonym-value'));
     input.clear();
     input.sendKeys(synonym);
-    return form.submit();
+    form.submit();
 };
 
 Synonyms.prototype.count = function(){

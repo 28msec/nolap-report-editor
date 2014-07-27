@@ -13,7 +13,7 @@ Taxonomy.prototype.getSynonyms = function(conceptName) {
 };
 
 Taxonomy.prototype.get = function(){
-    return browser.get('/' + this.id);
+    browser.get('/' + this.id);
 };
 
 Taxonomy.prototype.createConcept = function(conceptName){
