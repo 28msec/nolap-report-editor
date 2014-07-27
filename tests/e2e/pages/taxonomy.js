@@ -28,7 +28,6 @@ Taxonomy.prototype.createConcept = function(conceptName){
 Taxonomy.prototype.createElement = function(conceptName, parent, offset){
     offset = offset ? offset : 0;
     browser.get('/' + this.id + '/concept/' + conceptName +'?action=addElement&parent=' + parent + '&offset=' + offset);
-    browser.waitForAngular();
     this.get();
 };
 
