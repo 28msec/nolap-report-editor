@@ -28,11 +28,9 @@ describe('Report', function(){
         
         it('Should create a new concept', function(){
             conceptName = 'h:assets';
-            report.taxonomy.get()
-            .then(function(){
-                report.taxonomy.createConcept(conceptName);
-                expect(report.taxonomy.conceptName).toBe(conceptName);
-            });
+            report.taxonomy.get();
+            report.taxonomy.createConcept(conceptName);
+            expect(report.taxonomy.conceptName).toBe(conceptName);
         });
         
         it('Creates a new element', function(){
