@@ -41,12 +41,8 @@ Reports.prototype.deleteReport = function(reportName){
         })[0];
     })
     .then(function(report){
-        return report.checkbox.click();
-    })
-    .then(function(){
-        return that.deleteBtn.click();
-    })
-    .then(function(){
+        report.checkbox.click();
+        that.deleteBtn.click();
         return element(by.id('confirm-delete-reports')).click();
     });
 };

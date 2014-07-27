@@ -55,8 +55,9 @@ describe('Report', function(){
         it('Should delete report', function() {
             reports.get();
             reports.list.count().then(function(count){
-                reports.deleteReport(reportName);
-                expect(reports.list.count()).toBe(count - 1);
+                reports.deleteReport(reportName).then(function(){
+                    expect(reports.list.count()).toBe(count - 1);
+                });
             });
         });
 });

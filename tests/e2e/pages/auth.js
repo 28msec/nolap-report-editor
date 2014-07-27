@@ -16,7 +16,7 @@ AuthPage.prototype.login = function(email, password){
     this.loginEmail.sendKeys(email);
     this.password.clear();
     this.password.sendKeys(password);
-    return this.form.submit();
+    this.form.submit();
 };
 
 AuthPage.prototype.logout = function(){
