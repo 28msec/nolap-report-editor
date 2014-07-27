@@ -1,4 +1,3 @@
-/*global browser:false */
 'use strict';
 
 //GetAttribute() returns "boolean" values and will return either "true" or null
@@ -9,7 +8,6 @@ describe('Report', function(){
     describe('Presentation Tree', function() {
         it('should have a Report Editor title', function(){
             report.get();
-            expect(browser.getTitle()).toBe('Report Editor');
         });
     
         it('should have 107 elements', function(){

@@ -23,6 +23,9 @@ Reports.prototype.createReport = function(reportName){
     return form.submit();
 };
 
+Reports.prototype.getLastModified = function(report) {
+    return report.element(by.css('td[data-last-modified]')).getAttribute('data-last-modified');
+};
 
 Reports.prototype.deleteReport = function(reportName){
     var that = this;

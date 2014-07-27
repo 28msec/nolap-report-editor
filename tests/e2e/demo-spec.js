@@ -1,4 +1,4 @@
-/*global browser:false, element:false, by:false */
+/*global browser:false */
 'use strict';
 
 //GetAttribute() returns "boolean" values and will return either "true" or null
@@ -10,24 +10,33 @@ describe('Report', function(){
     var reports = new Reports();
     var report, reportName, conceptName;
     
-    describe('Report Creation', function(){
         it('Should create a new empty report', function(){
             reports.get();
             reportName = 'HelloWorld' + Math.floor((Math.random() * 10) + 1);
-            reports.createReport(reportName).then(function(){
-                expect(element(by.model('conceptName')).isPresent()).toBe(true);
-                expect(element(by.binding('report.model.Label')).getText()).toBe(reportName);
-                browser.getCurrentUrl().then(function(url){
-                    var id = _.last(url.split('/'));
-                    report = new Report(id);
-                });
+            reports.createReport(reportName)
+            .then(function(){
+                return browser.getCurrentUrl();
+            })
+            .then(function(url){
+                var id = _.last(url.split('/'));
+                report = new Report(id);
+                return report.get();
+            })
+            .then(function(){
+                expect(report.searchBox.isPresent()).toBe(true);
+                expect(report.label).toBe(reportName);
             });
         });
         
         it('Should create a new concept', function(){
             conceptName = 'h:assets';
-            report.taxonomy.createConcept(conceptName);
-            expect(element(by.id('concept')).element(by.binding('concept.Name')).getText()).toBe(conceptName);
+            report.taxonomy.get()
+            .then(function(){
+                return report.taxonomy.createConcept(conceptName);
+            })
+            .then(function(){
+                expect(report.taxonomy.conceptName).toBe(conceptName);
+            });
         });
         
         it('Creates a new element', function(){
@@ -37,6 +46,7 @@ describe('Report', function(){
         
         it('Creates a us-gaap:Assets synonym', function(){
             var synonyms = report.taxonomy.getSynonyms(conceptName);
+            synonyms.get();
             synonyms.addSynonym('us-gaap:Assets');
             expect(synonyms.count()).toBe(1);
         });
@@ -55,5 +65,4 @@ describe('Report', function(){
                 expect(reports.list.count()).toBe(count - 1);
             });
         });
-    });
 });
