@@ -8,12 +8,12 @@ describe('Report', function(){
     var Reports = require('./pages/reports');
     var Report = require('./pages/report');
     var reports = new Reports();
-    var report, conceptName;
+    var report, reportName, conceptName;
     
     describe('Report Creation', function(){
         it('Should create a new empty report', function(){
             reports.get();
-            var reportName = 'HelloWorld' + Math.floor((Math.random() * 10) + 1);
+            reportName = 'HelloWorld' + Math.floor((Math.random() * 10) + 1);
             reports.createReport(reportName).then(function(){
                 expect(element(by.model('conceptName')).isPresent()).toBe(true);
                 expect(element(by.binding('report.model.Label')).getText()).toBe(reportName);
@@ -46,6 +46,14 @@ describe('Report', function(){
             browser.waitForAngular();
             report.factTable.get();
             expect(report.factTable.lineCount()).toBeGreaterThan(0);
+        });
+        
+        it('Should delete report', function() {
+            reports.get();
+            reports.list.count().then(function(count){
+                reports.deleteReport(reportName);
+                expect(reports.list.count()).toBe(count - 1);
+            });
         });
     });
 });

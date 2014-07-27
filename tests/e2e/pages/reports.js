@@ -10,7 +10,6 @@ var Reports = function(){
     this.checkboxes = element.all(by.model('selectedReports[report._id]'));
 };
 
-
 Reports.prototype.get = function(){
     return browser.get('/');  
 };
@@ -23,5 +22,31 @@ Reports.prototype.createReport = function(reportName){
     reportNameField.sendKeys(reportName);
     return form.submit();
 };
+
+
+Reports.prototype.deleteReport = function(reportName){
+    var that = this;
+    return this.list.map(function(report){
+        return {
+            name: report.element(by.binding('report.Label')).getText(),
+            checkbox: report.element(by.model('selectedReports[report._id]'))
+        };
+    })
+    .then(function(reports){
+        return reports.filter(function(report){
+            return report.name === reportName;
+        })[0];
+    })
+    .then(function(report){
+        return report.checkbox.click();
+    })
+    .then(function(){
+        return that.deleteBtn.click();
+    })
+    .then(function(){
+        return element(by.id('confirm-delete-reports')).click();
+    });
+};
+
 
 module.exports = Reports;
