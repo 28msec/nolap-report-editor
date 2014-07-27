@@ -20,7 +20,7 @@ Reports.prototype.createReport = function(reportName){
     var reportNameField = element(by.model('report.name'));
     reportNameField.clear();
     reportNameField.sendKeys(reportName);
-    return form.submit();
+    form.submit();
 };
 
 Reports.prototype.getLastModified = function(report) {

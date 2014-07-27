@@ -13,10 +13,8 @@ describe('Report', function(){
         it('Should create a new empty report', function(){
             reports.get();
             reportName = 'HelloWorld' + Math.floor((Math.random() * 10) + 1);
-            reports.createReport(reportName)
-            .then(function(){
-                return browser.getCurrentUrl();
-            })
+            reports.createReport(reportName);
+            browser.getCurrentUrl()
             .then(function(url){
                 var id = _.last(url.split('/'));
                 report = new Report(id);
