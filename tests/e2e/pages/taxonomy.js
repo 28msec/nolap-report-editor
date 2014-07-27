@@ -21,10 +21,8 @@ Taxonomy.prototype.createConcept = function(conceptName){
     input.clear();
     input.sendKeys(conceptName);
     var createConceptBtn = element.all(by.repeater('match in matches track by $index')).last();
-    var that = this;
-    createConceptBtn.click().then(function(){
-        that.conceptName = element(by.id('concept')).element(by.binding('concept.Name')).getText();
-    });
+    createConceptBtn.click();
+    this.conceptName = element(by.id('concept')).element(by.binding('concept.Name')).getText();
 };
 
 Taxonomy.prototype.createElement = function(conceptName, parent, offset){

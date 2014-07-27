@@ -32,9 +32,7 @@ describe('Report', function(){
             conceptName = 'h:assets';
             report.taxonomy.get()
             .then(function(){
-                return report.taxonomy.createConcept(conceptName);
-            })
-            .then(function(){
+                report.taxonomy.createConcept(conceptName);
                 expect(report.taxonomy.conceptName).toBe(conceptName);
             });
         });
