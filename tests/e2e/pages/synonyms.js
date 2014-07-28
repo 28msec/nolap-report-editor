@@ -22,4 +22,8 @@ Synonyms.prototype.getSynonyms = function(){
     return element.all(by.repeater('key in synonyms'));
 };
 
+Synonyms.prototype.getSynonymName = function(synonym){
+    return synonym.element(by.binding('key')).getText();
+};
+
 module.exports = Synonyms;
