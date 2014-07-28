@@ -39,8 +39,12 @@ describe('Report', function(){
         it('Creates a us-gaap:Assets synonym', function(){
             var synonyms = report.taxonomy.getSynonyms(conceptName);
             synonyms.get();
+            expect(synonyms.getSynonyms().count()).toBe(0);
             synonyms.addSynonym('us-gaap:Assets');
-            expect(synonyms.count()).toBe(1);
+            synonyms.addSynonym('us-gaap:AssetsCurrent');
+            expect(synonyms.getSynonyms().count()).toBe(2);
+            expect(synonyms.getSynonyms().first().element(by.binding('key')).getText()).toBe('us-gaap:Assets');
+            expect(synonyms.getSynonyms().last().element(by.binding('key')).getText()).toBe('us-gaap:AssetsCurrent');
         });
         
         it('Should display the fact table', function() {

@@ -18,8 +18,8 @@ Synonyms.prototype.addSynonym = function(synonym){
     form.submit();
 };
 
-Synonyms.prototype.count = function(){
-    return element.all(by.repeater('key in synonyms')).count();
+Synonyms.prototype.getSynonyms = function(){
+    return element.all(by.repeater('key in synonyms'));
 };
 
 module.exports = Synonyms;
