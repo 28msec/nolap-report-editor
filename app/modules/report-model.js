@@ -832,86 +832,105 @@ angular
 
     var ensureDefinitionModel = function(report){
         var model = report.getModel();
-        if(model.DefinitionModels === undefined || model.DefinitionModels === null || model.DefinitionModels.length === undefined || model.DefinitionModels.length === 0) {
-            var label = model.Label;
-            var role = model.Role;
-            var source = '';
-            var network = report.getNetwork('Presentation');
-            if(network !== undefined && network.Trees !== undefined && network.Trees.length !== undefined && network.Trees.length > 0){
+        var label = model.Label;
+        var role = model.Role;
+        var source = '';
+        var network = report.getNetwork('Presentation');
+        if(network !== undefined && network.Trees !== undefined && network.Trees.length !== undefined && network.Trees.length > 0){
+            angular.forEach(network.Trees,
+              function(element){
+                  var concept = report.getConcept(element.Name);
+                  if(concept.IsAbstract){
+                      source = concept.Name;
+                  }
+              });
+            if(source === '') {
                 source = network.Trees[0].Name;
-            } else if(network !== undefined && network.Trees !== undefined && typeof network.Trees === 'object' && network.Trees !== null && Object.keys(network.Trees).length >0){
+            }
+        } else if(network !== undefined && network.Trees !== undefined && typeof network.Trees === 'object' && network.Trees !== null && Object.keys(network.Trees).length >0){
+            var keys = Object.keys(network.Trees);
+            angular.forEach(keys,
+                function(key){
+                    var concept = report.getConcept(key);
+                    if(concept.IsAbstract){
+                        source = concept.Name;
+                    }
+                });
+            if(source === '') {
                 source = Object.keys(network.Trees)[0];
             }
+        }
 
-            model.DefinitionModels =
-                [ {
-                    'ModelKind' : 'DefinitionModel',
-                    'Labels' : [ label ],
-                    'Parameters' : {
+        model.DefinitionModels =
+            [ {
+                'ModelKind' : 'DefinitionModel',
+                'Labels' : [ label ],
+                'Parameters' : {
 
-                    },
-                    'Breakdowns' : {
-                        'x' : [ {
-                            'BreakdownLabels' : [ 'Reporting Entity Breakdown' ],
-                            'BreakdownTrees' : [ {
-                                'Kind' : 'Rule',
-                                'Abstract' : true,
-                                'Labels' : [ 'Reporting Entity [Axis]' ],
-                                'Children' : [ {
-                                    'Kind' : 'Aspect',
-                                    'Aspect' : 'xbrl:Entity'
-                                } ]
-                            } ]
-                        }, {
-                            'BreakdownLabels' : [ 'Fiscal Year Breakdown' ],
-                            'BreakdownTrees' : [ {
-                                'Kind' : 'Rule',
-                                'Abstract' : true,
-                                'Labels' : [ 'Fiscal Year [Axis]' ],
-                                'Children' : [ {
-                                    'Kind' : 'Aspect',
-                                    'Aspect' : 'sec:FiscalYear'
-                                } ]
-                            } ]
-                        }, {
-                            'BreakdownLabels' : [ 'Fiscal Period Breakdown' ],
-                            'BreakdownTrees' : [ {
-                                'Kind' : 'Rule',
-                                'Abstract' : true,
-                                'Labels' : [ 'Fiscal Period [Axis]' ],
-                                'Children' : [ {
-                                    'Kind' : 'Aspect',
-                                    'Aspect' : 'sec:FiscalPeriod'
-                                } ]
-                            } ]
-                        } ],
-                        'y' : [ {
-                            'BreakdownLabels' : [ 'Breakdown on concepts' ],
-                            'BreakdownTrees' : [ {
-                                'Kind' : 'ConceptRelationship',
-                                'LinkName' : 'link:presentationLink',
-                                'LinkRole' : role,
-                                'ArcName' : 'link:presentationArc',
-                                'ArcRole' : 'http://www.xbrl.org/2003/arcrole/parent-child',
-                                'RelationshipSource' : source,
-                                'FormulaAxis' : 'descendant',
-                                'Generations' : 0
+                },
+                'Breakdowns' : {
+                    'x' : [ {
+                        'BreakdownLabels' : [ 'Reporting Entity Breakdown' ],
+                        'BreakdownTrees' : [ {
+                            'Kind' : 'Rule',
+                            'Abstract' : true,
+                            'Labels' : [ 'Reporting Entity [Axis]' ],
+                            'Children' : [ {
+                                'Kind' : 'Aspect',
+                                'Aspect' : 'xbrl:Entity'
                             } ]
                         } ]
-                    },
-                    'TableFilters' : {
+                    }, {
+                        'BreakdownLabels' : [ 'Fiscal Year Breakdown' ],
+                        'BreakdownTrees' : [ {
+                            'Kind' : 'Rule',
+                            'Abstract' : true,
+                            'Labels' : [ 'Fiscal Year [Axis]' ],
+                            'Children' : [ {
+                                'Kind' : 'Aspect',
+                                'Aspect' : 'sec:FiscalYear'
+                            } ]
+                        } ]
+                    }, {
+                        'BreakdownLabels' : [ 'Fiscal Period Breakdown' ],
+                        'BreakdownTrees' : [ {
+                            'Kind' : 'Rule',
+                            'Abstract' : true,
+                            'Labels' : [ 'Fiscal Period [Axis]' ],
+                            'Children' : [ {
+                                'Kind' : 'Aspect',
+                                'Aspect' : 'sec:FiscalPeriod'
+                            } ]
+                        } ]
+                    } ],
+                    'y' : [ {
+                        'BreakdownLabels' : [ 'Breakdown on concepts' ],
+                        'BreakdownTrees' : [ {
+                            'Kind' : 'ConceptRelationship',
+                            'LinkName' : 'link:presentationLink',
+                            'LinkRole' : role,
+                            'ArcName' : 'link:presentationArc',
+                            'ArcRole' : 'http://www.xbrl.org/2003/arcrole/parent-child',
+                            'RelationshipSource' : source,
+                            'FormulaAxis' : 'descendant',
+                            'Generations' : 0
+                        } ]
+                    } ]
+                },
+                'TableFilters' : {
 
-                    }
-                } ];
-        }
+                }
+            } ];
     };
 
     var ensureDefinitionModelRootConcept = function(report, conceptName){
         var model = report.getModel();
         ensureDefinitionModel(report);
-        if(model.DefinitionModels[0] !== undefined && model.DefinitionModels[0] !== null) {
-            model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].LinkRole = model.Role;
-            model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].RelationshipSource = conceptName;
+        if(conceptName !== undefined) {
+            if (model.DefinitionModels[0] !== undefined && model.DefinitionModels[0] !== null) {
+                model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].LinkRole = model.Role;
+                model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].RelationshipSource = conceptName;
+            }
         }
     };
 
@@ -996,6 +1015,7 @@ angular
             ensureDefinitionModelRootConcept(this, element2.Name);
             network.Trees[element2.Name] = element2;
         }
+        ensureDefinitionModel(this);
     };
 
     Report.prototype.removeTreeBranch = function(networkShortName,subtreeRootElementID) {
