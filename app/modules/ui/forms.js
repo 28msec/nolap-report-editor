@@ -61,4 +61,16 @@ angular.module('forms-ui', [])
         }
     };
 })
+.directive('autofillCheck', function(){
+    return {
+        require: 'ngModel',
+        link: function($scope, element, attrs, ngModel){
+            // fix for: https://github.com/28msec/nolap-report-editor/issues/19,
+            //          https://github.com/28msec/nolap-report-editor/issues/95
+            $scope.$on('autofill:update', function() {
+                ngModel.$setViewValue(element.val());
+            });
+        }
+    };
+})
 ;
