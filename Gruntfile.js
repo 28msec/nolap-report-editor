@@ -16,9 +16,24 @@ module.exports = function (grunt) {
     var rewriteRules = [
         '!\\.html|\\.xml|\\images|\\.js|\\.css|\\.png|\\.jpg|\\.woff|\\.ttf|\\.svg|\\.ico /index.html [L]'
     ];
+    var aws = function() {
+        if (grunt.file.exists('config-aws.json')) {
+            /*  grunt-aws.json should look like this:
+                {
+                    "key": "***",
+                    "secret": "***",
+                    "region": "us-east-1",
+                }
+            */
+            return grunt.file.readJSON('config-aws.json');
+        }
+        grunt.log.warn('INFO: no config-aws.json file found. The "s3" task will not be available.');
+        return {};
+    };
 
     // Project configuration.
     grunt.initConfig({
+        aws: aws(),
         config: grunt.file.readJSON('config.json'),
         watch: {
             less: {
@@ -280,6 +295,8 @@ module.exports = function (grunt) {
         },
         s3: {
             options: {
+                key: '<%= aws.key %>',
+                secret: '<%= aws.secret %>',
                 access: 'public-read',
                 maxOperations: 5,
                 gzip: true,
@@ -290,7 +307,7 @@ module.exports = function (grunt) {
                 upload: [{
                     src: 'dist/**/*',
                     dest: '',
-                    rel: 'dist/',
+                    rel: 'dist/'
                 }]
             }
         },
