@@ -39,8 +39,13 @@ describe('Report', function(){
         it('Creates a us-gaap:Assets synonym', function(){
             var synonyms = report.taxonomy.getSynonyms(conceptName);
             synonyms.get();
+            expect(synonyms.getSynonyms().count()).toBe(0);
             synonyms.addSynonym('us-gaap:Assets');
-            expect(synonyms.count()).toBe(1);
+            synonyms.addSynonym('us-gaap:AssetsCurrent');
+            synonyms.addSynonym('us-gaap:AssetsCurrent');
+            expect(synonyms.getSynonyms().count()).toBe(2);
+            expect(synonyms.getSynonymName(synonyms.getSynonyms().first())).toBe('us-gaap:Assets');
+            expect(synonyms.getSynonymName(synonyms.getSynonyms().last())).toBe('us-gaap:AssetsCurrent');
         });
         
         it('Should display the fact table', function() {
@@ -49,7 +54,12 @@ describe('Report', function(){
             report.factTable.get();
             expect(report.factTable.lineCount()).toBeGreaterThan(0);
         });
-        
+
+        it('Should display the preview', function() {
+            report.preview.get();
+            //browser.waitForAngular();
+        });
+
         it('Should delete report', function() {
             reports.get();
             reports.list.count().then(function(count){
