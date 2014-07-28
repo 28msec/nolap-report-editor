@@ -22,6 +22,8 @@ angular
             //If the element hasn't be dropped in place
             if(event.dest.nodesScope.$nodeScope !== null) {
                 $scope.report.moveTreeBranch('Presentation', event.source.nodeScope.$modelValue.Id, event.dest.nodesScope.$nodeScope.$modelValue.Id, event.dest.index);
+            } else {
+                $scope.report.moveTreeBranch('Presentation', event.source.nodeScope.$modelValue.Id, null, event.dest.index);
             }
         },
         removed: function(node){
