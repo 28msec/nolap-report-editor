@@ -42,6 +42,7 @@ describe('Report', function(){
             expect(synonyms.getSynonyms().count()).toBe(0);
             synonyms.addSynonym('us-gaap:Assets');
             synonyms.addSynonym('us-gaap:AssetsCurrent');
+            synonyms.addSynonym('us-gaap:AssetsCurrent');
             expect(synonyms.getSynonyms().count()).toBe(2);
             expect(synonyms.getSynonymName(synonyms.getSynonyms().first())).toBe('us-gaap:Assets');
             expect(synonyms.getSynonymName(synonyms.getSynonyms().last())).toBe('us-gaap:AssetsCurrent');
