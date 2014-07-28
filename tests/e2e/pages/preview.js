@@ -1,4 +1,4 @@
-/*global browser:false, element:false, by:false */
+/*global browser:false */
 'use strict';
 
 var Preview = function(id){
