@@ -32,14 +32,14 @@
         <div class="row">
             <div class="col-xs-6">
                 <h6 class="nowrap">ADD FISCAL YEARS</h6>
-                <ul class="selector" style="height: 97px">
-                    <li ng-repeat="y in years" ng-class="{ selected: (selection.fiscalYear.indexOf(y) >= 0) }"
+                <ul class="selector" style="height: 127px">
+                    <li ng-repeat="y in years" ng-class="{ disabled: (y === 'LATEST' && selection.fiscalYear.length > 0 && !isLatestFiscalYearSelected()) || (y !== 'LATEST' && isLatestFiscalYearSelected()), selected: (selection.fiscalYear.indexOf(y) >= 0) }"
                         ng-click="(selection.fiscalYear.indexOf(y) >= 0 ? selection.fiscalYear.splice(selection.fiscalYear.indexOf(y), 1) : selection.fiscalYear.push(y))">{{y}}</li>
                 </ul>
             </div>
             <div class="col-xs-6">
                 <h6 class="nowrap">ADD FISCAL PERIODS</h6>
-                <ul class="selector" style="height: 97px">
+                <ul class="selector" style="height: 127px">
                     <li ng-repeat="p in periods" ng-class="{ selected: (selection.fiscalPeriod.indexOf(p) >= 0) }"
                         ng-click="(selection.fiscalPeriod.indexOf(p) >= 0 ? selection.fiscalPeriod.splice(selection.fiscalPeriod.indexOf(p), 1) : selection.fiscalPeriod.push(p))">{{p}}</li>
                 </ul>

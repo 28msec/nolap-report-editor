@@ -34,6 +34,7 @@ angular.module('report-editor')
         $scope.getSic = Filter.getSic;
         $scope.selectSic = Filter.selectSic;
         $scope.selectEntity = Filter.selectEntity;
+        $scope.isLatestFiscalYearSelected = Filter.isLatestFiscalYearSelected;
 
         $scope.$watch(function () {
             return $scope.selection;
