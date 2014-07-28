@@ -2,7 +2,7 @@
 
 angular
 .module('report-editor')
-.controller('ConceptOverviewCtrl', function($scope, $state, $modal, ConceptIsStillReferencedError){
+.controller('ConceptOverviewCtrl', function($scope, $state, $modal, $location, ConceptIsStillReferencedError){
 
     $scope.error = undefined;
     $scope.conceptCopy = angular.copy($scope.concept);
@@ -25,6 +25,7 @@ angular
             }
         }
     };
+    
 
     var element;
     var initElement = function(){
@@ -33,6 +34,16 @@ angular
     };
 
     initElement();
+
+    $scope.$watch(
+        function(){ return $location.search(); },
+        function(search){
+            if(search.action === 'addElement') {
+                $scope.report.addElement('Presentation', search.parent === 'undefined' ? undefined : search.parent, element, parseInt(search.offset, 10));
+            }
+        }
+    );
+
     $scope.elementOptions = {
         accept: function(){
             return false;

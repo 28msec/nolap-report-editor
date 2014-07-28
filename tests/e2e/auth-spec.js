@@ -17,16 +17,14 @@ describe('Authentication', function(){
     });
 
     it('shouldn\'t login', function(){
-        auth.login('w@28.io', 'hello').then(function(){
-            expect(auth.wrongCombinasionMessage().isDisplayed()).toBe(true);
-        });
+        auth.login('w@28.io', 'hello');
+        expect(auth.wrongCombinasionMessage().isDisplayed()).toBe(true);
     });
     
     it('should login', function(){
-        auth.login('w@28.io', 'foobar').then(function(){
-            browser.getCurrentUrl().then(function(url) {
-                expect(url.substring(url.length - 1)).toBe('/');
-            });
+        auth.login('w@28.io', 'foobar');
+        browser.getCurrentUrl().then(function(url) {
+            expect(url.substring(url.length - 1)).toBe('/');
         });
     });
 });

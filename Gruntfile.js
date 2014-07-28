@@ -222,7 +222,7 @@ module.exports = function (grunt) {
             }
         },
         protractor: {
-            travis: 'tests/e2e/config/protractor-conf.js',
+            travis: 'tests/e2e/config/protractor-travis-nosaucelabs-conf.js',
             local: 'tests/e2e/config/protractor-conf.js'
         },
         ngconstant: {
