@@ -4,12 +4,14 @@
 var Taxonomy = require('./taxonomy');
 var FactTable = require('./fact-table');
 var FiltersPage = require('./filters');
+var Preview = require('./preview');
 
 var Report = function(id){
     this.id = id;
     this.taxonomy = new Taxonomy(this.id);
     this.factTable = new FactTable(this.id);
     this.filters = new FiltersPage(this.id);
+    this.preview = new Preview(this.id);
 };
 
 Report.prototype.get = function(){
