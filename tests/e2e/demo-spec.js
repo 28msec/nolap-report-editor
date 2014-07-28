@@ -54,7 +54,12 @@ describe('Report', function(){
             report.factTable.get();
             expect(report.factTable.lineCount()).toBeGreaterThan(0);
         });
-        
+
+        it('Should display the preview', function() {
+            report.preview.get();
+            //browser.waitForAngular();
+        });
+
         it('Should delete report', function() {
             reports.get();
             reports.list.count().then(function(count){
