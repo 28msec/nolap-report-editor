@@ -344,8 +344,20 @@ angular
 
                 selection = report.resetFilters();
 
+                var date = new Date();
+                var year = date.getFullYear();
+                var month = date.getMonth();
+                if(month < 8){
+                    year = year - 1;
+                }
                 var yearsPromise = getYears()
-                    .then(function(years){selection.fiscalYear = [years[1]];});
+                    .then(function(years){
+                        if(arrayContains(years, year)){
+                            selection.fiscalYear = [year];
+                        } else {
+                            selection.fiscalYear = [years[1]];
+                        }
+                    });
                 var periodsPromise = getPeriods()
                     .then(function(periods){selection.fiscalPeriod = [periods[0]];});
                 $q.all([yearsPromise, periodsPromise])
