@@ -24,12 +24,13 @@ exports.config = {
         browser.getCapabilities().then(function(caps) {
             browser.params.browser = caps.get('browserName');
         });
-        
+
         //Login
-        var Auth = require('../pages/auth');
+        var Auth = require('../../../app/auth/page');
         var auth = new Auth();
-        auth.get();
+        auth.visitPage();
         auth.login('w@28.io', 'foobar');
+        browser.waitForAngular();
     },
 
     jasmineNodeOpts: {
