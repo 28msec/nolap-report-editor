@@ -9,7 +9,9 @@ function Filters(id){
 }
 
 Filters.prototype.visitPage = function(){
-    return browser.get('/' + this.id + '/filters');
+    browser.get('/' + this.id + '/filters');
+    //We wait for angular because not only the page must be visited but the report needs to be saved.
+    browser.waitForAngular();
 };
 
 Filters.prototype.setEntity = function(entityName){

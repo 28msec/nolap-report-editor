@@ -29,7 +29,7 @@ describe('Report', function(){
         report.taxonomy.createConcept(conceptName);
         var concept = report.taxonomy.getConcept(conceptName);
         concept.visitPage();
-        expect(concept.label.getText()).toBe('Hello World ID');
+        expect(concept.label).toBe('Hello World ID');
     });
     
     
@@ -61,14 +61,12 @@ describe('Report', function(){
     
     it('Should display the fact table', function() {
         report.filters.visitPage();
-        browser.waitForAngular();
         report.factTable.visitPage();
         expect(report.factTable.lineCount()).toBeGreaterThan(0);
     });
 
     it('Should display the preview', function() {
         report.preview.visitPage();
-        //browser.waitForAngular();
     });
 
     it('Should delete report', function() {
