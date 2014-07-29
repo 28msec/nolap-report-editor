@@ -16,6 +16,8 @@ Concept.prototype.visitPage = function(){
 Concept.prototype.createElement = function(parent, offset){
     offset = offset ? offset : 0;
     browser.get('/' + this.id + '/concept/' + this.name +'?action=addElement&parent=' + parent + '&offset=' + offset);
+    browser.waitForAngular();
+    this.visitPage();
 };
 
 Concept.prototype.getSynonyms = function(){

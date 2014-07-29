@@ -1,19 +1,18 @@
 /*global browser:false, element:false, by:false */
 'use strict';
 
-var FiltersPage = function(id){
-    browser.waitForAngular();
+function Filters(id){
     this.id = id;
     this.entity = element(by.model('entityName'));
     this.entities = element.all(by.repeater('entity in entities'));
     this.selectedCIK = element.all(by.repeater('c in selection.cik'));
-};
+}
 
-FiltersPage.prototype.get = function(){
+Filters.prototype.visitPage = function(){
     return browser.get('/' + this.id + '/filters');
 };
 
-FiltersPage.prototype.setEntity = function(entityName){
+Filters.prototype.setEntity = function(entityName){
     this.entity.clear();
     var ARROW_DOWN = '\uE015';
     var ENTER = '\uE007';
@@ -22,4 +21,4 @@ FiltersPage.prototype.setEntity = function(entityName){
     console.log(JSON.stringify(this.entity));
 };
 
-module.exports = FiltersPage;
+module.exports = Filters;

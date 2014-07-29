@@ -1,11 +1,11 @@
 /*global browser:false, element:false, by:false */
 'use strict';
 
-var FactTable = function(id){
+function FactTable(id){
     this.id = id;
-};
+}
 
-FactTable.prototype.get = function(){
+FactTable.prototype.visitPage = function(){
     return browser.get('/' + this.id + '/fact-table');  
 };
 
