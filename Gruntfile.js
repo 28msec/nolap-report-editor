@@ -210,6 +210,7 @@ module.exports = function (grunt) {
                         'app/modules/formula-parser.js',
                         
                         'app/report/taxonomy/taxonomy.js',
+                        'app/report/taxonomy/concept/overview/overview.js',
                         
                         'tests/unit/karma.start.js',
                         'app/**/*-test.js'
