@@ -39,26 +39,26 @@ describe('Report', function(){
             report.taxonomy.createConcept(conceptName);
             var concept = report.taxonomy.getConcept(conceptName);
             concept.visitPage();
-            expect(concept.label).toBe('Asset');
+            expect(concept.label).toBe('Assets');
         });
-        /*
+
         it('Creates a new element', function(){
-            report.taxonomy.createElement(conceptName);
-            expect(report.elementCount()).toBe(1);
+            report.taxonomy.getConcept(conceptName).createElement();
+            expect(report.taxonomy.elements.count()).toBe(1);
         });
-        
+
         it('Creates a us-gaap:Assets synonym', function(){
-            var synonyms = report.taxonomy.getSynonyms(conceptName);
-            synonyms.get();
-            expect(synonyms.getSynonyms().count()).toBe(0);
+            var synonyms = report.taxonomy.getConcept(conceptName).getSynonyms();
+            synonyms.visitPage();
+            expect(synonyms.list.count()).toBe(0);
             synonyms.addSynonym('us-gaap:Assets');
             synonyms.addSynonym('us-gaap:AssetsCurrent');
             synonyms.addSynonym('us-gaap:AssetsCurrent');
-            expect(synonyms.getSynonyms().count()).toBe(2);
-            expect(synonyms.getSynonymName(synonyms.getSynonyms().first())).toBe('us-gaap:Assets');
-            expect(synonyms.getSynonymName(synonyms.getSynonyms().last())).toBe('us-gaap:AssetsCurrent');
+            expect(synonyms.list.count()).toBe(2);
+            expect(synonyms.getName(synonyms.list.first())).toBe('us-gaap:Assets');
+            expect(synonyms.getName(synonyms.list.last())).toBe('us-gaap:AssetsCurrent');
         });
-        
+        /*
         it('Should display the fact table', function() {
             report.filters.get();
             browser.waitForAngular();
@@ -70,14 +70,13 @@ describe('Report', function(){
             report.preview.get();
             //browser.waitForAngular();
         });
-
+*/
         it('Should delete report', function() {
-            reports.get();
+            reports.visitPage();
             reports.list.count().then(function(count){
                 reports.deleteReport(reportName).then(function(){
                     expect(reports.list.count()).toBe(count - 1);
                 });
             });
         });
-        */
 });

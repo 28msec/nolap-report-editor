@@ -5,6 +5,7 @@ var Concept = require('./concept/concept-page');
 
 function Taxonomy(id){
     this.id = id;
+    this.elements = element(by.id('presentation-tree')).all(by.css('.angular-ui-tree-node'));
 }
 
 Taxonomy.prototype.visitPage = function(){
@@ -19,13 +20,6 @@ Taxonomy.prototype.createConcept = function(conceptName){
     createConceptBtn.click();
     this.conceptName = element(by.id('concept')).element(by.binding('concept.Name')).getText();
     this.conceptLabel = element(by.model('conceptCopy.Label')).getAttribute('value');
-};
-
-Taxonomy.prototype.createElement = function(conceptName, parent, offset){
-    offset = offset ? offset : 0;
-    browser.get('/' + this.id + '/concept/' + conceptName +'?action=addElement&parent=' + parent + '&offset=' + offset);
-    browser.waitForAngular();
-    this.get();
 };
 
 Taxonomy.prototype.getConcept = function(conceptName){
