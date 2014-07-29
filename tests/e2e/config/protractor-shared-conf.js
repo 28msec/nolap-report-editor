@@ -8,7 +8,7 @@ exports.config = {
 
     framework: 'jasmine',
 
-    specs: ['../*-spec.js'], 
+    specs: ['../*-scenario.js'], 
 
     onPrepare: function() {
         // Disable animations so e2e tests run more quickly
