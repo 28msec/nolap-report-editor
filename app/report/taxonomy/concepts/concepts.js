@@ -7,6 +7,9 @@ angular
     $scope.unselectElement();
     
     var splitCamelCase = function(value){
+        if(value.indexOf(':') !== -1) {
+            value = value.substring(value.indexOf(':') + 1);
+        }
         return value.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/^./, function(str){ return str.toUpperCase(); });
     };
 

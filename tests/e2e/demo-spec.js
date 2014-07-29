@@ -24,13 +24,20 @@ describe('Report', function(){
             });
         });
         
-        it('Should create a new concept', function(){
+        it('Should create a new concept (1)', function(){
+            conceptName = 'h:helloWorldID';
+            report.taxonomy.get();
+            report.taxonomy.createConcept(conceptName);
+            expect(report.taxonomy.conceptLabel).toBe('Hello World ID');
+        });
+        
+        
+        it('Should create a new concept (2)', function(){
             conceptName = 'h:assets';
             report.taxonomy.get();
             report.taxonomy.createConcept(conceptName);
             expect(report.taxonomy.conceptName).toBe(conceptName);
         });
-        
         it('Creates a new element', function(){
             report.taxonomy.createElement(conceptName);
             expect(report.elementCount()).toBe(1);
