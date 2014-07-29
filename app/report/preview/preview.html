@@ -40,11 +40,7 @@
 	     	</span>
 
 	</form>
-
-	<div ng-show="error" class="alert alert-danger">
-		<strong>Error {{ error.status }}</strong> {{ error.body.message }}
-	</div>
-
+	
 	<div ng-class="preview.css">
 		<layoutmodel model="mymodel" headers="myheaders"
 			labelidx="preview.labelidx" constraints="preview.constraints"
