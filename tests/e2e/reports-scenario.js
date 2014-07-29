@@ -4,7 +4,7 @@
 //GetAttribute() returns "boolean" values and will return either "true" or null
 describe('Reports', function(){
     
-    var Reports = require('../../app/reports/page.js');
+    var Reports = require('../../app/reports/reports-page.js');
     var reports = new Reports();
     
     describe('Reports List', function() {

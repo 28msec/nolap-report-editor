@@ -1,24 +1,23 @@
-/*global browser:false */
 'use strict';
 
 //GetAttribute() returns "boolean" values and will return either "true" or null
 describe('Report', function(){
     var _ = require('lodash');
 
-    var Reports = require('./pages/reports');
-    var Report = require('./pages/report');
+    var Reports = require('../../app/reports/reports-page');
+    var Report = require('../../app/report/report-page');
     var reports = new Reports();
     var report, reportName, conceptName;
     
         it('Should create a new empty report', function(){
-            reports.get();
+            reports.visitPage();
             reportName = 'HelloWorld' + Math.floor((Math.random() * 10) + 1);
             reports.createReport(reportName);
-            browser.getCurrentUrl()
+            reports.getCurrentUrl()
             .then(function(url){
                 var id = _.last(url.split('/'));
                 report = new Report(id);
-                report.get();
+                report.visitPage();
                 expect(report.searchBox.isPresent()).toBe(true);
                 expect(report.label).toBe(reportName);
             });
@@ -26,18 +25,23 @@ describe('Report', function(){
         
         it('Should create a new concept (1)', function(){
             conceptName = 'h:helloWorldID';
-            report.taxonomy.get();
+            report.taxonomy.visitPage();
             report.taxonomy.createConcept(conceptName);
-            expect(report.taxonomy.conceptLabel).toBe('Hello World ID');
+            var concept = report.taxonomy.getConcept(conceptName);
+            concept.visitPage();
+            expect(concept.label).toBe('Hello World ID');
         });
         
         
         it('Should create a new concept (2)', function(){
             conceptName = 'h:assets';
-            report.taxonomy.get();
+            report.taxonomy.visitPage();
             report.taxonomy.createConcept(conceptName);
-            expect(report.taxonomy.conceptName).toBe(conceptName);
+            var concept = report.taxonomy.getConcept(conceptName);
+            concept.visitPage();
+            expect(concept.label).toBe('Asset');
         });
+        /*
         it('Creates a new element', function(){
             report.taxonomy.createElement(conceptName);
             expect(report.elementCount()).toBe(1);
@@ -75,4 +79,5 @@ describe('Report', function(){
                 });
             });
         });
+        */
 });

@@ -5,7 +5,7 @@
 
 describe('Authentication', function(){
 
-    var AuthPage = require('../../app/auth/page');
+    var AuthPage = require('../../app/auth/auth-page');
     var auth = new AuthPage();
 
     it('should have been redirected to the auth page', function() {

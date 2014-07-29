@@ -26,7 +26,7 @@ exports.config = {
         });
 
         //Login
-        var Auth = require('../../../app/auth/page');
+        var Auth = require('../../../app/auth/auth-page');
         var auth = new Auth();
         auth.visitPage();
         auth.login('w@28.io', 'foobar');
