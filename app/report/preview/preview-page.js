@@ -1,11 +1,11 @@
 /*global browser:false */
 'use strict';
 
-var Preview = function(id){
+function Preview(id){
     this.id = id;
-};
+}
 
-Preview.prototype.get = function(){
+Preview.prototype.visitPage = function(){
     return browser.get('/' + this.id + '/preview');  
 };
 

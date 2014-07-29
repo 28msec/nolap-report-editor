@@ -187,6 +187,7 @@ module.exports = function (grunt) {
                         'bower_components/flexy-layout/flexy-layout.debug.js',
                         'bower_components/angular-ui-router/release/angular-ui-router.js',
                         'bower_components/angular-ui-tree/dist/angular-ui-tree.js',
+
                         'app/constants.js',
                         'app/modules/report-api.js',
                         'app/modules/session-api.js',
@@ -211,7 +212,7 @@ module.exports = function (grunt) {
                         'app/report/taxonomy/taxonomy.js',
                         
                         'tests/unit/karma.start.js',
-                        'tests/unit/*.js'
+                        'app/**/*-test.js'
                     ]
                 }
             }
