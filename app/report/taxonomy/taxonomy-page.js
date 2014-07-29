@@ -1,18 +1,14 @@
 /*global browser:false, element:false, by:false */
 'use strict';
 
-var Synonyms = require('./synonyms');
+var Concept = require('./concept/concept-page');
 
-var Taxonomy = function(id){
+function Taxonomy(id){
     this.id = id;
-};
+    this.elements = element(by.id('presentation-tree')).all(by.css('.angular-ui-tree-node'));
+}
 
-Taxonomy.prototype.getSynonyms = function(conceptName) {
-    var synonyms = new Synonyms(this.id, conceptName);
-    return synonyms;
-};
-
-Taxonomy.prototype.get = function(){
+Taxonomy.prototype.visitPage = function(){
     browser.get('/' + this.id);
 };
 
@@ -26,11 +22,8 @@ Taxonomy.prototype.createConcept = function(conceptName){
     this.conceptLabel = element(by.model('conceptCopy.Label')).getAttribute('value');
 };
 
-Taxonomy.prototype.createElement = function(conceptName, parent, offset){
-    offset = offset ? offset : 0;
-    browser.get('/' + this.id + '/concept/' + conceptName +'?action=addElement&parent=' + parent + '&offset=' + offset);
-    browser.waitForAngular();
-    this.get();
+Taxonomy.prototype.getConcept = function(conceptName){
+    return new Concept(this.id, conceptName);
 };
 
 module.exports = Taxonomy;
