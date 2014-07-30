@@ -46,6 +46,14 @@ describe('Report', function(){
         report.taxonomy.getConcept(conceptName).createElement();
         expect(report.taxonomy.elements.count()).toBe(1);
     });
+    
+    it('Renames the concept label', function(){
+        var overview = report.taxonomy.getConcept(conceptName).getOverview();
+        overview.visitPage();
+        expect(overview.form.conceptLabel.getAttribute('value')).toBe('Assets');
+        overview.changeLabel('Assets Label');
+        expect(overview.form.conceptLabel.getAttribute('value')).toBe('Assets Label');
+    });
 
     it('Creates a us-gaap:Assets synonym', function(){
         var synonyms = report.taxonomy.getConcept(conceptName).getSynonyms();
@@ -66,7 +74,8 @@ describe('Report', function(){
     });
 
     it('Should display the preview', function() {
-        report.preview.visitPage();
+        report.spreadsheet.visitPage();
+        expect(report.spreadsheet.getCellValueByCss('.first-row-header-row > td > span')).toBe('Assets Label');
     });
 
     it('Should delete report', function() {
