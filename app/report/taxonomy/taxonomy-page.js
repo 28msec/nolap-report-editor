@@ -1,10 +1,12 @@
 /*global browser:false, element:false, by:false */
 'use strict';
 
+var Concepts = require('./concepts/concepts-page');
 var Concept = require('./concept/concept-page');
 
 function Taxonomy(id){
     this.id = id;
+    this.concepts = new Concepts(this.id);
     this.elements = element(by.id('presentation-tree')).all(by.css('.angular-ui-tree-node'));
 }
 
@@ -33,6 +35,9 @@ Taxonomy.prototype.removeElement = function(element){
     browser.waitForAngular();
 };
 
+Taxonomy.prototype.getConcepts = function(){
+    return this.concepts;
+};
 
 Taxonomy.prototype.getConcept = function(conceptName){
     return new Concept(this.id, conceptName);
