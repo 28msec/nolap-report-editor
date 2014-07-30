@@ -95,7 +95,7 @@ angular
 
     $scope.loadPresentationTree = function(){
         $scope.presentationTree = [];
-        setPresentationTree($scope.report.getNetwork('Presentation').Trees, $scope.presentationTree);
+        setPresentationTree(angular.copy($scope.report.getNetwork('Presentation').Trees), $scope.presentationTree);
     };
 
     $scope.loadPresentationTree();
