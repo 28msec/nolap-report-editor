@@ -1,17 +1,22 @@
 /*global browser:false, element:false, by:false */
 'use strict';
 
-var Reports = function(){
-    browser.waitForAngular();
+var _ = require('lodash');
+
+var AppPage = require('../app-page.js').AppPage;
+
+function Reports(){
+    AppPage.call(this);
     this.list = element.all(by.repeater('report in reports'));
     this.deleteBtn = element(by.id('delete-reports'));
     this.createBtn = element(by.id('create-report'));
     this.toggle = element(by.model('toggle'));
     this.checkboxes = element.all(by.model('selectedReports[report._id]'));
-};
+}
+Reports.prototype = _.create(AppPage.prototype);
 
-Reports.prototype.get = function(){
-    browser.get('/');  
+Reports.prototype.visitPage = function(){
+    return browser.get('/');
 };
 
 Reports.prototype.createReport = function(reportName){

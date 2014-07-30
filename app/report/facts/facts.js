@@ -3,7 +3,7 @@
 /* global accounting : false */
 
 angular.module('report-editor')
-.controller('FactTableCtrl', function($scope, $timeout, Session, API, report, API_URL) {
+.controller('FactsCtrl', function($scope, $timeout, Session, API, report, API_URL) {
     $scope.columns = [];
     $scope.data = null;
     $scope.error = null;

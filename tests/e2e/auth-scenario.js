@@ -1,4 +1,3 @@
-/*global browser:false */
 'use strict';
 
 //https://github.com/angular/protractor/blob/master/docs/api.md
@@ -6,12 +5,12 @@
 
 describe('Authentication', function(){
 
-    var AuthPage = require('./pages/auth');
+    var AuthPage = require('../../app/auth/auth-page');
     var auth = new AuthPage();
 
     it('should have been redirected to the auth page', function() {
-        auth.logout(); 
-        browser.getCurrentUrl().then(function(url){
+        auth.logout();
+        auth.getCurrentUrl().then(function(url){
             expect(url.substring(url.length - '/auth'.length)).toBe('/auth');
         });
     });
@@ -23,7 +22,7 @@ describe('Authentication', function(){
     
     it('should login', function(){
         auth.login('w@28.io', 'foobar');
-        browser.getCurrentUrl().then(function(url) {
+        auth.getCurrentUrl().then(function(url) {
             expect(url.substring(url.length - 1)).toBe('/');
         });
     });

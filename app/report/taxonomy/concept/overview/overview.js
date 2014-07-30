@@ -12,9 +12,24 @@ angular
         if(!angular.equals($scope.conceptCopy, $scope.concept)){
             try {
                 $scope.report.updateConcept($scope.conceptCopy.Name,$scope.conceptCopy.Label,$scope.conceptCopy.IsAbstract);
+
+
+                // as long as we don't have individual labels for elements we update all of them
+                var elementIds = $scope.report.findInTree('Presentation', $scope.concept.Name);
+                angular.forEach(
+                    elementIds,
+                    function(id){
+                        var element = $scope.report.getElementFromTree('Presentation', id);
+                        if(element !== undefined && element !== null){
+                            element.Label = $scope.conceptCopy.Label;
+                        }
+                    }
+                );
+
                 if($scope.conceptCopy.IsAbstract !== $scope.concept.IsAbstract){
                     $scope.loadPresentationTree();
                 }
+                $scope.conceptCopy = angular.copy($scope.concept);
             } catch (e) {
                 $scope.error =
                     {
