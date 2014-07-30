@@ -59,7 +59,6 @@
     "shelljs": "~0.3.0",
     "grunt-swagger-js-codegen": "~0.2.2",
     "grunt-jsonlint": "~1.0.4",
-    "grunt-ngmin": "0.0.3",
     "grunt-usemin": "~2.3.0",
     "grunt-contrib-cssmin": "~0.10.0",
     "grunt-rev": "~0.1.0",
@@ -68,7 +67,8 @@
     "grunt-contrib-uglify": "~0.5.0",
     "grunt-s3": "~0.2.0-alpha.3",
     "protractor": "~1.0.0",
-    "lodash": "~2.4.1"
+    "lodash": "~2.4.1",
+    "grunt-ng-annotate": "~0.3.0"
   },
   "contributors": [
     {
