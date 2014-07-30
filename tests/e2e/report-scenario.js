@@ -14,6 +14,15 @@ describe('Report', function(){
         expect(report.taxonomy.elements.count()).toBe(107);
     });
     
+    it('should have the proper css properties', function() {
+        var abstractElement = report.taxonomy.getElementName(report.taxonomy.elements.get(0));
+        var concreteElement = report.taxonomy.getElementName(report.taxonomy.elements.get(4));
+        expect(abstractElement.getCssValue('font-weight')).toBe('bold');
+        expect(abstractElement.getCssValue('padding-left')).toBe('5px');
+        expect(concreteElement.getCssValue('font-weight')).toBe('normal');
+        expect(concreteElement.getCssValue('padding-left')).toBe('30px');
+    });
+    
     it('last element should be scrollable to', function(){
         var last = report.taxonomy.elements.last();
         last.click();
