@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('PreviewCtrl', function($scope, Session, API, report, API_URL){
+.controller('SpreadsheetCtrl', function($scope, Session, API, report, API_URL){
 	$scope.mymodel = null;
 	$scope.myheaders = null;
 	  
