@@ -32,4 +32,15 @@ Taxonomy.prototype.getConcept = function(conceptName){
     return new Concept(this.id, conceptName);
 };
 
+Taxonomy.prototype.getElementName = function(element){
+    return element.all(by.binding('element.Name')).get(0);
+};
+
+Taxonomy.prototype.removeElement = function(element){
+    element.click();
+    element.element(by.css('.btn-danger')).click();
+    //We wait for the report to save
+    browser.waitForAngular();
+};
+
 module.exports = Taxonomy;
