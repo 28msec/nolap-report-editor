@@ -1,12 +1,15 @@
 /*global browser:false, element:false, by:false */
 'use strict';
 
+var Overview = require('./overview/overview-page');
 var Synonyms = require('./synonyms/synonyms-page');
 
 function Concept(id, name){
     this.id = id;
     this.name = name;
     this.label = element(by.model('conceptCopy.Label')).getAttribute('value');
+    this.overview = new Overview(this.id, this.name);
+    this.synonyms = new Synonyms(this.id, this.name);
 }
 
 Concept.prototype.visitPage = function(){
@@ -20,8 +23,12 @@ Concept.prototype.createElement = function(parent, offset){
     this.visitPage();
 };
 
+Concept.prototype.getOverview = function(){
+    return this.overview;
+};
+
 Concept.prototype.getSynonyms = function(){
-    return new Synonyms(this.id, this.name); 
+    return this.synonyms;
 };
 
 module.exports = Concept;
