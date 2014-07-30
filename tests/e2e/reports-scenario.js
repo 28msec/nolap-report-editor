@@ -1,17 +1,17 @@
-/*global browser:false */
 'use strict';
 
 //https://github.com/angular/protractor/blob/master/docs/api.md
 //GetAttribute() returns "boolean" values and will return either "true" or null
 describe('Reports', function(){
     
-    var Reports = require('./pages/reports');
+    var Reports = require('../../app/reports/reports-page.js');
     var reports = new Reports();
     
     describe('Reports List', function() {
+
         it('should have a Report Editor title', function(){
-            reports.get();
-            expect(browser.getTitle()).toBe('Report Editor');
+            reports.visitPage();
+            expect(reports.getTitle()).toBe('Report Editor');
         });
       
         it('Should show have at least one report', function() {

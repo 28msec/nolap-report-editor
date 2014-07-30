@@ -4,9 +4,10 @@
 var Synonyms = function(id, conceptName){
     this.id = id;
     this.conceptName = conceptName;
+    this.list = element.all(by.repeater('key in synonyms'));
 };
 
-Synonyms.prototype.get = function(){
+Synonyms.prototype.visitPage = function(){
     browser.get('/' + this.id + '/concept/' + this.conceptName + '/synonyms');  
 };
 
@@ -18,8 +19,8 @@ Synonyms.prototype.addSynonym = function(synonym){
     form.submit();
 };
 
-Synonyms.prototype.count = function(){
-    return element.all(by.repeater('key in synonyms')).count();
+Synonyms.prototype.getName = function(synonym){
+    return synonym.element(by.binding('key')).getText();
 };
 
 module.exports = Synonyms;

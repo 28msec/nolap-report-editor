@@ -167,11 +167,6 @@ module.exports = function (grunt) {
                 configFile: './karma.conf.js'
             },
             dev: {
-                browsers: ['Chrome'],
-                autoWatch: true,
-                singleRun: false
-            },
-            '1.2.9': {
                 options: {
                     files: [
                         'bower_components/angular/angular.js',
@@ -187,6 +182,7 @@ module.exports = function (grunt) {
                         'bower_components/flexy-layout/flexy-layout.debug.js',
                         'bower_components/angular-ui-router/release/angular-ui-router.js',
                         'bower_components/angular-ui-tree/dist/angular-ui-tree.js',
+
                         'app/constants.js',
                         'app/modules/report-api.js',
                         'app/modules/session-api.js',
@@ -209,9 +205,10 @@ module.exports = function (grunt) {
                         'app/modules/formula-parser.js',
                         
                         'app/report/taxonomy/taxonomy.js',
+                        'app/report/taxonomy/concept/overview/overview.js',
                         
                         'tests/unit/karma.start.js',
-                        'tests/unit/*.js'
+                        'app/**/*-test.js'
                     ]
                 }
             }
@@ -465,6 +462,6 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('test', ['build', 'karma:1.2.9', 'e2e']);
+    grunt.registerTask('test', ['build', 'karma', 'e2e']);
     grunt.registerTask('default', ['jsonlint', 'jshint', 'test', 'deploy']);
 };
