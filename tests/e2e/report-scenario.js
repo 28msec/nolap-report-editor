@@ -19,7 +19,7 @@ describe('Report', function(){
         var concreteElement = report.taxonomy.getElementName(report.taxonomy.elements.get(4));
         expect(abstractElement.getCssValue('font-weight')).toMatch(/bold|700/);
         expect(abstractElement.getCssValue('padding-left')).toBe('5px');
-        expect(concreteElement.getCssValue('font-weight')).toMatch(/normal|500/);
+        expect(concreteElement.getCssValue('font-weight')).toMatch(/normal|400/);
         expect(concreteElement.getCssValue('padding-left')).toBe('30px');
     });
     
