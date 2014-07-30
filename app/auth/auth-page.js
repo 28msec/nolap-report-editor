@@ -1,13 +1,19 @@
 /*global browser:false, element:false, by:false */
 'use strict';
 
-var AuthPage = function(){
+var _ = require('lodash');
+
+var AppPage = require('../app-page.js').AppPage;
+
+function AuthPage(){
+    AppPage.call(this);
     this.form = element(by.name('loginForm'));
     this.loginEmail = element(by.model('loginEmail'));
     this.password = element(by.model('loginPassword'));
-};
+}
+AuthPage.prototype = _.create(AppPage.prototype);
 
-AuthPage.prototype.get = function(){
+AuthPage.prototype.visitPage = function(){
     return browser.get('/');
 };
 
@@ -16,11 +22,11 @@ AuthPage.prototype.login = function(email, password){
     this.loginEmail.sendKeys(email);
     this.password.clear();
     this.password.sendKeys(password);
-    return this.form.submit();
+    this.form.submit();
 };
 
 AuthPage.prototype.logout = function(){
-    browser.get('/logout');
+    return browser.get('/logout');
 };
 
 AuthPage.prototype.wrongCombinasionMessage = function(){

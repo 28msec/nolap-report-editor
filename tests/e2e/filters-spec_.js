@@ -17,6 +17,5 @@ describe('Filters', function(){
     it('should select COCA Cola', function() {
         filters.get();
         filters.setEntity('Coca Cola');
-        
     });
 });
