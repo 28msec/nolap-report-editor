@@ -1,27 +1,43 @@
 {
-  function create(type, left, right) {
-    return {Type: type, Children: [left,right]};
+  function inferReturnType(children){
+    var types = {};
+    children.forEach(function(child){
+      if(child.ReturnType){
+        types[child.ReturnType] = 1;
+      } else {
+        types.mixed = 1;
+      }
+    });
+    if(Object.keys(types).length === 1){
+      return Object.keys(types)[0];
+    } else {
+      return 'mixed';
+    }
   }
 
-  function createOne(type, one) {
-    return {Type: type, Children: [one]};
+  function create(returnType, type, left, right) {
+    return {Type: type, Children: [left,right], ReturnType: returnType};
   }
 
-  function createAtomic(type, val) {
-    return {Type: type, Value: val};
+  function createOne(returnType, type, one) {
+    return {Type: type, Children: [one], ReturnType: returnType};
+  }
+
+  function createAtomic(returnType, type, val) {
+    return {Type: type, Value: val, ReturnType: returnType};
   }
 
 
   function createVar(name) {
-    return {Type: "variable", Name: name};
+    return {Type: "variable", Name: name, ReturnType: 'mixed'};
   }
 
   
-  function createFun(name, params) {
+  function createFun(returnType, name, params) {
     if(typeof params === 'object' && params.length !== undefined){
-      return {Type: "function", Name: name.toLowerCase(), Children: params};
+      return {Type: "function", Name: name.toLowerCase(), Children: params, ReturnType: returnType};
     } else {
-      return {Type: "function", Name: name.toLowerCase(), Children: [params]};
+      return {Type: "function", Name: name.toLowerCase(), Children: [params], ReturnType: returnType};
     }
   }
 
@@ -36,17 +52,17 @@ start
 *******************/
 comparison
   = _ left:subadd _ operator:(op_comparator) _ right:comparison _
-    { return create(operator, left, right); }
+    { return create('boolean', operator, left, right); }
   / subadd
 
 subadd
   = _ left:muldiv _ operator:(op_subadd) _ right:subadd _
-    { return create(operator, left, right); }
+    { return create('decimal', operator, left, right); }
   / muldiv
 
 muldiv
   = _ left:primary _ operator:( op_muldiv ) _ right:muldiv _
-    { return create(operator, left, right); }
+    { return create('decimal', operator, left, right); }
   / primary
 
 
@@ -85,19 +101,19 @@ op_comparator_single
     Primaries
 *******************/
 primary
-  = integer / block / boolean / variable / function / variable2
+  = integer / string / block / boolean / variable / function / variable2
 
 block
-  = "(" _ block:comparison _ ")" { return createOne("block", block); }
+  = "(" _ block:comparison _ ")" { return createOne(inferReturnType([ block ]), "block", block); }
 
 boolean
   = true / false
 
 true
-  = _ ([Tt][Rr][Uu][Ee]) _ { return createAtomic('boolean', 'true'); }
+  = _ ([Tt][Rr][Uu][Ee]) _ { return createAtomic('boolean', 'boolean', 'true'); }
 
 false
-  = _ ([Ff][Aa][Ll][Ss][Ee]) _ { return createAtomic('boolean', 'false'); }
+  = _ ([Ff][Aa][Ll][Ss][Ee]) _ { return createAtomic('boolean', 'boolean', 'false'); }
 
 variable
   = _ name:( [a-zA-Z0-9._]+ & ( _ [^(] ) ) _ { return createVar(name[0].join("")); }
@@ -106,7 +122,10 @@ variable2
   = _ name:( [a-zA-Z0-9._]+ ) _ { return createVar(name.join("")); }
 
 integer "integer"
-  = digits:[0-9.]+ { return createAtomic('numeric', parseFloat(digits.join(""), 10)); }
+  = digits:[0-9.]+ { return createAtomic('decimal', 'numeric', parseFloat(digits.join(""), 10)); }
+
+string "string"
+  = '"' chars:[^"]* '"' { return createAtomic('string', 'string', chars.join("")); }
 
 function
   = fun_and / fun_or /fun_not
@@ -114,16 +133,16 @@ function
 
 fun_and
   = _ name:([aA][nN][dD]) _ "(" _ params:parameter+ _ ")" _
-    { return createFun(name.join("").toLowerCase(), params); }
+    { return createFun('boolean', name.join("").toLowerCase(), params); }
 
 fun_or
-  = _ name:([oO][rR]) _ "(" _ params:parameter+ _ ")" _ { return createFun(name.join(""), params); }
+  = _ name:([oO][rR]) _ "(" _ params:parameter+ _ ")" _ { return createFun('boolean', name.join(""), params); }
 
 fun_not
-  = _ name:"not" _ "(" _ param:parameter _ ")" _ { return createFun(name, param); }
+  = _ name:"not" _ "(" _ param:parameter _ ")" _ { return createFun('boolean', name, param); }
 
 fun_isblank
-  = _ name:"isblank" _ "(" _ param:parameter _ ")" _ { return createFun(name, param); }
+  = _ name:"isblank" _ "(" _ param:parameter _ ")" _ { return createFun('boolean', name, param); }
 
 parameter
   = _ comma? _ param:comparison _ { return param; }
@@ -136,4 +155,3 @@ _
 
 comma 
   = _ "," _
-

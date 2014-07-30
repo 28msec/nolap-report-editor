@@ -1,7 +1,11 @@
 .angular-ui-tree {
-
+    .abstract-element-name {
+        font-weight: bold;
+    }
+    .concrete-element-name {
+        padding-left: 30px;
+    }
 }
-
 .angular-ui-tree-empty {
     border: 2px dashed @clouds;
     min-height: 100px;
@@ -67,7 +71,12 @@
         background: @clouds;
         cursor: move;
     }
-    
+
+    &.notactive:hover {
+        background-color: #f5f5f5;
+        cursor:pointer;
+    }
+
     >span {
         overflow: hidden;
         text-overflow: ellipsis;
@@ -94,5 +103,3 @@
     z-index: 999;
     opacity: .8;
 }
-
-

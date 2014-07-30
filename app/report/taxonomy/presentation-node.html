@@ -1,9 +1,13 @@
-<div class="clearfix" ng-class="{ active: selectedElementId === element.Id }" dyn-nodrag ui-tree-handle>
-    <a class="btn btn-success btn-xs pull-left" ng-click="toggle(this)" ng-if="element.IsAbstract" data-nodrag>
+<div class="clearfix" ng-class="{ 'active': (selectedConceptName === element.Name),
+                                   'notactive': (selectedConceptName !== element.Name)}" dyn-nodrag ui-tree-handle>
+    <a class="btn btn-success btn-xs pull-left tree-node-hover" ng-click="toggle(this)" ng-if="element.IsAbstract" data-nodrag>
         <span class="fa fa-chevron-down" ng-class="{'fa-chevron-right': collapsed, 'fa-chevron-down': !collapsed}"></span>
     </a>
-    <span ng-bind="element.Name" ng-click="goToConcept(this)"  class="pull-left" ng-class="{ 'element-name-lg': !element.IsAbstract && selectedElementId !== element.Id,  'element-name': (element.IsAbstract || selectedElementId === element.Id) && (!element.IsAbstract || selectedElementId !== element.Id), 'element-name-xs': element.IsAbstract && selectedElementId === element.Id }"></span>
-    <a class="btn btn-danger btn-xs pull-right" ng-click="removeNode(this)" ng-if="selectedElementId === element.Id" data-nodrag>
+    <span ng-bind="element.Name" ng-click="goToConcept(this)"  class="pull-left"
+          ng-class="{'element-name-lg': !element.IsAbstract && (selectedConceptName !== element.Name),
+                     'element-name': (element.IsAbstract || selectedConceptName === element.Name) && (!element.IsAbstract || selectedConceptName !== element.Name),
+                     'element-name-xs': element.IsAbstract && (selectedConceptName === element.Name), 'abstract-element-name': element.IsAbstract, 'concrete-element-name': !element.IsAbstract }"></span>
+    <a class="btn btn-danger btn-xs pull-right tree-node-hover" ng-click="removeNode(this)" ng-if="selectedConceptName === element.Name" data-nodrag>
         <span class="fa fa-times"></span>
     </a>
 </div>

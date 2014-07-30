@@ -167,22 +167,48 @@ module.exports = function (grunt) {
                 configFile: './karma.conf.js'
             },
             dev: {
-                browsers: ['Chrome'],
-                autoWatch: true,
-                singleRun: false
-            },
-            '1.2.9': {
                 options: {
                     files: [
                         'bower_components/angular/angular.js',
                         'bower_components/angular-mocks-1.2.9/angular-mocks.js',
+                        'bower_components/ngprogress-lite/ngprogress-lite.js',
+                        'bower_components/angular-ui-router/release/angular-ui-router.js',
+                        'bower_components/angular-sanitize/angular-sanitize.js',
+                        'bower_components/angular-ui-bootstrap-bower/ui-bootstrap.js',
+                        'bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js',
+                        'bower_components/angular-cache/dist/angular-cache.js',
+                        'bower_components/layoutmodel-renderer-angular/app/directive/layoutmodel.js',
+                        'bower_components/layoutmodel-renderer-angular/app/directive/layoutmodeltemplate.js',
+                        'bower_components/flexy-layout/flexy-layout.debug.js',
+                        'bower_components/angular-ui-router/release/angular-ui-router.js',
+                        'bower_components/angular-ui-tree/dist/angular-ui-tree.js',
+
+                        'app/constants.js',
+                        'app/modules/report-api.js',
+                        'app/modules/session-api.js',
+                        'app/modules/queries-api.js',
+                        'app/modules/api.js',
                         'app/modules/excel-parser.js',
                         'app/modules/formula-parser.js',
                         'app/modules/report-api.js',
                         'app/modules/report-model.js',
                         'app/modules/rules-model.js',
+                        'app/app.js',
+                        'app/modules/excel-parser.js',
+                        'app/modules/session-model.js',
+                        'app/modules/rules-model.js',
+                        'app/modules/filter-model.js',
+                        'app/modules/ui/api-status.js',
+                        'app/modules/ui/forms.js',
+                        'app/modules/ui/account.js',
+                        'app/modules/ui/resize.js',
+                        'app/modules/formula-parser.js',
+                        
+                        'app/report/taxonomy/taxonomy.js',
+                        'app/report/taxonomy/concept/overview/overview.js',
+                        
                         'tests/unit/karma.start.js',
-                        'tests/unit/*.js'
+                        'app/**/*-test.js'
                     ]
                 }
             }
@@ -436,6 +462,6 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('test', ['build', 'karma:1.2.9', 'e2e']);
+    grunt.registerTask('test', ['build', 'karma', 'e2e']);
     grunt.registerTask('default', ['jsonlint', 'jshint', 'test', 'deploy']);
 };
