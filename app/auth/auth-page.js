@@ -26,7 +26,7 @@ AuthPage.prototype.login = function(email, password){
 };
 
 AuthPage.prototype.logout = function(){
-    return browser.get('/logout');
+    return element(by.css('.account-sign-out')).click();
 };
 
 AuthPage.prototype.wrongCombinasionMessage = function(){
