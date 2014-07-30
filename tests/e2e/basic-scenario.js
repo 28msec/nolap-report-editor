@@ -69,8 +69,8 @@ describe('Report', function(){
     
     it('Should display the fact table', function() {
         report.filters.visitPage();
-        report.factTable.visitPage();
-        expect(report.factTable.lineCount()).toBeGreaterThan(0);
+        report.facts.visitPage();
+        expect(report.facts.lineCount()).toBeGreaterThan(0);
     });
 
     it('Should display the preview', function() {
