@@ -4,7 +4,7 @@
 var Taxonomy = require('./taxonomy/taxonomy-page');
 var Filters = require('./filters/filters-page');
 var Spreadsheet = require('./spreadsheet/spreadsheet-page');
-var Facts = require('./facts/facts');
+var Facts = require('./facts/facts-page');
 
 function Report(id){
     this.id        = id;
