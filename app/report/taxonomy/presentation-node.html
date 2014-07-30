@@ -6,7 +6,7 @@
     <span ng-bind="element.Name" ng-click="goToConcept(this)"  class="pull-left"
           ng-class="{'element-name-lg': !element.IsAbstract && (selectedConceptName !== element.Name),
                      'element-name': (element.IsAbstract || selectedConceptName === element.Name) && (!element.IsAbstract || selectedConceptName !== element.Name),
-                     'element-name-xs': element.IsAbstract && (selectedConceptName === element.Name)}"></span>
+                     'element-name-xs': element.IsAbstract && (selectedConceptName === element.Name), 'abstract-element-name': element.IsAbstract, 'concrete-element-name': !element.IsAbstract }"></span>
     <a class="btn btn-danger btn-xs pull-right tree-node-hover" ng-click="removeNode(this)" ng-if="selectedConceptName === element.Name" data-nodrag>
         <span class="fa fa-times"></span>
     </a>
