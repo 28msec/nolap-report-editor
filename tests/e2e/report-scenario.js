@@ -36,5 +36,4 @@ describe('Report', function(){
         expect(recompilePage.errorMessages.count()).toBe(0);
         expect(recompilePage.successMessages.count()).toBe(66);
     });
-
 });
