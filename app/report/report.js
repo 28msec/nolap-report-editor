@@ -4,46 +4,54 @@ angular.module('report-editor')
 .controller('ReportCtrl', function($q, $rootScope, $scope, $timeout, Session, API, Report, report){
     $scope.report = report;
 
-    var lastKnowSavedModel = $scope.report.model;
-    var lastKnowSavedModelAsString = JSON.stringify(lastKnowSavedModel);
-    var saveCanceler;
-    var savePromise;
+    var lastSavedModel;
+    
+    var inProgress, isWaiting;
 
-    $scope.$watch('report.model', function(newVal, oldVal){
-        var reportAsString = JSON.stringify(newVal);
-        if(oldVal === undefined || reportAsString === lastKnowSavedModelAsString) {
+    var save = function(reportModel){
+        $rootScope.$emit('apiStatus', { message: 'Saving Report...', code: 'warning' });
+        return API.Report.addOrReplaceOrValidateReport({
+            report: JSON.stringify(reportModel),
+            token: Session.getToken()
+        })
+        .then(function(){
+            lastSavedModel = reportModel;
+            $rootScope.$emit('apiStatus', { message: 'Report saved', code: 'success', expires: 500 });
+        })
+        .catch(function(error){
+            //error.statuys === 0 means two things: either we don't have internet of the http call has been canceled out. Either way it's not handled here
+            if(error.status !== 0) {
+                $rootScope.$emit('apiStatus', { message: 'Error while saving', code: 'error', expires: 4000 });
+                $scope.report = new Report(lastSavedModel);
+            }
+        })
+        .finally(function(){
+            //3. When inProgress is done execute isWaiting if present.
+            if(isWaiting) {
+                inProgress = isWaiting();
+                isWaiting = undefined;
+            } else {
+                inProgress = undefined;
+            }
+        });
+    };    
+
+    $scope.$watch('report.model', function(newReportModel, oldReportModel){
+        //TODO: fix report comparison
+        if(oldReportModel === undefined) {
+            lastSavedModel = newReportModel;
             return;
         }
         $scope.$broadcast('autofill:update');
 
-        // we need a timeout (>=0) here to ensure the broadcast is handled first
-        savePromise = $timeout(function(){
-            if(savePromise){
-                // cancel previous attempt to save
-                $timeout.cancel(savePromise);
+        $timeout(function(){
+            //1. inProgress === null, execute request
+            if(inProgress === undefined) {
+                inProgress = save(newReportModel);
+            //2. inProgress !== null, isWaiting = request
+            } else {
+                isWaiting = function(){ return save(newReportModel); };
             }
-            $rootScope.$emit('apiStatus', { message: 'Saving Report...', code: 'warning' });
-            if(saveCanceler) {
-                saveCanceler.resolve();
-            }
-            saveCanceler = $q.defer();
-            API.Report.addOrReplaceOrValidateReport({
-                report: reportAsString,
-                token: Session.getToken(),
-                $timeout: saveCanceler.promise
-            })
-            .then(function(){
-                lastKnowSavedModel = newVal;
-                lastKnowSavedModelAsString = JSON.stringify(lastKnowSavedModel);
-                $rootScope.$emit('apiStatus', { message: 'Report saved', code: 'success', expires: 500 });
-            })
-            .catch(function(error){
-                //error.statuys === 0 means two things: either we don't have internet of the http call has been canceled out. Either way it's not handled here
-                if(error.status !== 0) {
-                    $rootScope.$emit('apiStatus', { message: 'Error while saving', code: 'error', expires: 4000 });
-                    $scope.report = new Report(lastKnowSavedModelAsString);
-                }
-            });
         }, 28);
     }, true);
 })
