@@ -15,6 +15,9 @@ angular
 
     $scope.getResults = function($viewValue){
         var results = [];
+        if($scope.conceptSearchForm.$error.pattern) {
+            return results;
+        }
         $scope.concepts.forEach(function(concept) {
             if(concept.Name.indexOf($viewValue) !== -1) {
                 results.push(concept);
