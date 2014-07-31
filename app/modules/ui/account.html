@@ -1,8 +1,6 @@
 <ul class="nav navbar-nav navbar-right">
-    <li>
-        <a ng-href="{{accountUrl}}"><i class="fa fa-user"></i>&nbsp;<span ng-bind="name"></span></a>
-    </li>
-    <li>
-        <a ng-click="doLogout()" class="std-right-margin"><i class="fa fa-sign-out"></i>&nbsp;Logout</a>
-    </li>
+    <div class="btn-group" style="margin-right: 15px; margin-top: 5px;">
+        <a ng-href="{{accountUrl}}" class="btn btn-primary" ng-bind="name"></a>
+        <a href="/logout" class="btn btn-primary account-sign-out"><i class="fa fa-sign-out"></i></a>
+    </div>
 </ul>

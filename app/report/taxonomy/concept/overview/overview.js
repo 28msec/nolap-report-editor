@@ -2,7 +2,7 @@
 
 angular
 .module('report-editor')
-.controller('ConceptOverviewCtrl', function($scope, $state, $modal, ConceptIsStillReferencedError){
+.controller('ConceptOverviewCtrl', function($scope, $state, $modal, $location, ConceptIsStillReferencedError){
 
     $scope.error = undefined;
     $scope.conceptCopy = angular.copy($scope.concept);
@@ -12,9 +12,24 @@ angular
         if(!angular.equals($scope.conceptCopy, $scope.concept)){
             try {
                 $scope.report.updateConcept($scope.conceptCopy.Name,$scope.conceptCopy.Label,$scope.conceptCopy.IsAbstract);
+
+
+                // as long as we don't have individual labels for elements we update all of them
+                var elementIds = $scope.report.findInTree('Presentation', $scope.concept.Name);
+                angular.forEach(
+                    elementIds,
+                    function(id){
+                        var element = $scope.report.getElementFromTree('Presentation', id);
+                        if(element !== undefined && element !== null){
+                            element.Label = $scope.conceptCopy.Label;
+                        }
+                    }
+                );
+
                 if($scope.conceptCopy.IsAbstract !== $scope.concept.IsAbstract){
                     $scope.loadPresentationTree();
                 }
+                $scope.conceptCopy = angular.copy($scope.concept);
             } catch (e) {
                 $scope.error =
                     {
@@ -25,6 +40,7 @@ angular
             }
         }
     };
+    
 
     var element;
     var initElement = function(){
@@ -33,6 +49,16 @@ angular
     };
 
     initElement();
+
+    $scope.$watch(
+        function(){ return $location.search(); },
+        function(search){
+            if(search.action === 'addElement') {
+                $scope.report.addElement('Presentation', search.parent === 'undefined' ? undefined : search.parent, element, parseInt(search.offset, 10));
+            }
+        }
+    );
+
     $scope.elementOptions = {
         accept: function(){
             return false;
@@ -41,7 +67,7 @@ angular
             if(event.source.nodesScope !== event.dest.nodesScope) {
                 if(event.dest.nodesScope.$nodeScope !== undefined && event.dest.nodesScope.$nodeScope !== null) {
                     $scope.report.addElement('Presentation', event.dest.nodesScope.$nodeScope.$modelValue.Id, element, event.dest.index);
-                }else {
+                } else {
                     $scope.report.addElement('Presentation', undefined, element, event.dest.index);
                 }
                 initElement();
