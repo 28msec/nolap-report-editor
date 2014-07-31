@@ -32,16 +32,5 @@ angular.module('report-editor')
     .controller('LogoutCtrl', function($state, Session){
         Session.logout();
         $state.go('auth');
-    })
-    .directive('autofillCheck', function(){
-        return {
-            require: 'ngModel',
-            link: function($scope, element, attrs, ngModel){
-                // fix for: https://github.com/28msec/nolap-report-editor/issues/19
-                $scope.$on('autofill:update', function() {
-                    ngModel.$setViewValue(element.val());
-                });
-            }
-        };
     });
     

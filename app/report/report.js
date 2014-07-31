@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('ReportCtrl', function($q, $rootScope, $scope, Session, API, Report, report){
+.controller('ReportCtrl', function($q, $rootScope, $scope, $timeout, Session, API, Report, report){
     $scope.report = report;
 
     var lastSavedModel;
@@ -42,13 +42,17 @@ angular.module('report-editor')
             lastSavedModel = newReportModel;
             return;
         }
-        //1. inProgress === null, execute request
-        if(inProgress === undefined) {
-            inProgress = save(newReportModel);
-        //2. inProgress !== null, isWaiting = request
-        } else {
-            isWaiting = function(){ return save(newReportModel); };
-        }
+        $scope.$broadcast('autofill:update');
+
+        $timeout(function(){
+            //1. inProgress === null, execute request
+            if(inProgress === undefined) {
+                inProgress = save(newReportModel);
+            //2. inProgress !== null, isWaiting = request
+            } else {
+                isWaiting = function(){ return save(newReportModel); };
+            }
+        }, 28);
     }, true);
 })
 ;
