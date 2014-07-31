@@ -13,6 +13,13 @@ angular
 
     $scope.messages =[];
 
+    var addMessage = function(type, msg){
+      $scope.messages.push({
+        'Type': type,
+        'Message': msg      
+      });
+    };
+
     var addCompiledRule = function(rule){
         $scope.compiledRules.push(rule);
         $scope.allRules.push(rule);
@@ -30,45 +37,45 @@ angular
 
     $scope.recompile = function() {
 
-        $scope.messages.push('Starting to recompile ' + $scope.rules.length + ' rules');
+        addMessage('info', 'Starting to recompile ' + $scope.rules.length + ' rules');
 
         angular.forEach($scope.rules, function (rule) {
 
             if (rule.OriginalLanguage === 'SpreadsheetFormula') {
-                $scope.messages.push('Recompiling formula computing ' + rule.ComputableConcepts);
+                addMessage('info', 'Recompiling formula computing ' + rule.ComputableConcepts);
                 var formula = new Rule(rule, $scope.report);
                 try {
                     formula.compile();
                     try {
                         if (formula.validate($scope.report, 'Update')) {
                             addCompiledRule(formula.getRule());
-                            $scope.messages.push('[SUCCESS] formula recompiled and validated');
+                            addMessage('success', 'formula recompiled and validated (' + rule.ComputableConcepts + ')');
                         } else {
                             addBuggyRule(rule);
-                            $scope.messages.push('[ERROR] Formula not valid: ' + JSON.stringify(formula.getModel()));
+                            addMessage('error', 'Formula not valid: ' + JSON.stringify(formula.getModel()));
                         }
                     } catch (e) {
                         addBuggyRule(rule);
-                        $scope.messages.push('[ERROR] Validation failed:' + e.message);
+                        addMessage('error', 'Validation failed:' + e.message);
                     }
                 } catch (e) {
                     addBuggyRule(rule);
-                    $scope.messages.push('[ERROR] Compilation failed:' + e.message);
+                    addMessage('error', 'Compilation failed:' + e.message);
                 }
 
             } else {
                 addSkippedRule(rule);
-                $scope.messages.push('Skipping formula computing ' + rule.ComputableConcepts);
+                addMessage('info', 'Skipping formula computing ' + rule.ComputableConcepts);
             }
         });
         if ($scope.buggyRules.length > 0) {
-            $scope.messages.push('[ERROR] ' + $scope.buggyRules.length + ' formulas are buggy. Not updating report.');
+            addMessage('error', $scope.buggyRules.length + ' formulas are buggy. Not updating report.');
         } else {
             if ($scope.compiledRules.length > 0) {
-                $scope.messages.push('updating ' + $scope.compiledRules.length + ' formulas in report');
-                $scope.report.getModel().Rules = $scope.compiledRules;
+                addMessage('info', 'updating ' + $scope.compiledRules.length + ' formulas in report');
+                $scope.report.getModel().Rules = $scope.allRules;
             }
-            $scope.messages.push('[SUCCESS] all rules up-to-date');
+            addMessage('success', 'all rules up-to-date');
         }
     };
 
