@@ -28,7 +28,7 @@ Filters.prototype.visitPage = function(){
     return browser.get('/' + this.id + '/filters');
 };
 
-Filters.prototype.resetSelectedFilters = function(text) {
+Filters.prototype.resetSelectedFilters = function() {
     return this.selectedFilters.reset.click();
 };
 
@@ -37,10 +37,10 @@ var ENTER = '\uE007';
 
 var closeSelectedFiltersBox = function(boxes, text) {
     boxes
-    .filter(function(box, index){
+    .filter(function(box){
         return box.getText().then(function(t){
             return (t.indexOf(text, t.length - text.length) !== -1);
-        })
+        });
     })
     .then(function(foundBoxes){
         foundBoxes.forEach(function(box){ box.element(by.css('a')).click();});
@@ -81,7 +81,7 @@ Filters.prototype.setFiltersEntityName = function(entityName, typeaheadPosition)
 
 Filters.prototype.clickFiltersTag = function(tag){
     this.setFilters.tags
-    .filter(function(item, index){
+    .filter(function(item){
         var a = item.element(by.css('a'));
         return a.getText().then(function(text){
             return (text === tag);
@@ -106,10 +106,10 @@ Filters.prototype.setFiltersIndustryGroup = function(industryGroup, typeaheadPos
 
 var clickFiltersSelectors = function(list, value){
     list
-    .filter(function(item, index){
+    .filter(function(item){
         return item.getText().then(function(text){
             return (text === '' + value);
-        })
+        });
     })
     .then(function (foundItems){
         foundItems.forEach(function(item){ item.click(); });

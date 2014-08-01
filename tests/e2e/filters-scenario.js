@@ -34,7 +34,7 @@ describe('Filters', function(){
         .then(function(){
             expect(filters.selectedFilters.tag.count()).toBe(0);
             expect(filters.filterTooGenericWarning.count()).toBe(1);
-        })
+        });
     });
 
     it('should select COCA Cola', function() {
@@ -43,7 +43,7 @@ describe('Filters', function(){
             expect(filters.setFilters.entity.getAttribute('value')).toBe('');
             expect(filters.selectedFilters.cik.count()).toBe(1);
             expect(filters.selectedFilters.cik.get(0).getText()).toBe('\u00D7\nCOCA COLA CO');
-        })
+        });
     });
 
     it('should select FORTUNE100', function() {
