@@ -296,7 +296,7 @@ angular
                 if((selection.sic.length || 0)  > 0){
                     selection.sic.forEach(function(sic){
                         entities.forEach(function(entity){
-                            if(entity.sic === sic){
+                            if(entity.sic === '' + sic){
                                 if(!arrayContains(aspects['xbrl:Entity'], entity.cik)){
                                     aspects['xbrl:Entity'].push(entity.cik);
                                 }
