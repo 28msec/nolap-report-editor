@@ -34,6 +34,17 @@ angular
             if(modelOrName === undefined || modelOrName === null){
                 modelOrName = _uuid();
             }
+            if(prefix === undefined || prefix === null || typeof prefix !== 'string'){
+                // do a good guess
+                var startingChars = '';
+                label.split(/[^A-Za-z0-9]+/).forEach(function(elem){
+                    var char = elem.substr(0,1);
+                    if(/[A-Za-z]/.test(char) && elem.length > 1) {
+                        startingChars += char.toLowerCase();
+                    }
+                });
+                prefix = startingChars;
+            }
             this.model =
                 {
                     '_id' : modelOrName,
@@ -42,6 +53,7 @@ angular
                     'Description': description,
                     'Owner': username,
                     'Role' : role,
+                    'Prefix': prefix,
                     'Networks' : [
                         {
                             'LinkName' : 'link:presentationLink',
@@ -119,19 +131,8 @@ angular
                     },
                     'Rules' : []
                 };
-            if(prefix !== undefined && prefix !== null && typeof prefix === 'string'){
-                this.model.Prefix = prefix;
-            } else {
-                // do a good guess
-                var startingChars = '';
-                label.split(/[^A-Za-z0-9]+/).forEach(function(elem){
-                    var char = elem.substr(0,1);
-                    if(/[A-Za-z]/.test(char) && elem.length > 1) {
-                        startingChars += char.toLowerCase();
-                    }
-                });
-                this.model.Prefix = startingChars;
-            }
+            this.addConcept('ReportLineItems', label, true);
+            this.addElement('Presentation', null, 'ReportLineItems', 0);
         } // if
         ensureDefinitionModel(this);
     };
@@ -773,13 +774,14 @@ angular
     var determineElement = function(report, elementOrConceptName, order){
         var element;
         if(typeof elementOrConceptName === 'string'){
-            ensureConceptName(elementOrConceptName, 'elementOrConceptName', 'addElement');
-            var concept = report.getConcept(elementOrConceptName);
-            ensureExists(concept, 'object', 'addElement', 'concept with name "' + elementOrConceptName + '" doesn\'t exist.');
+            var conceptName = report.alignConceptPrefix(elementOrConceptName);
+            ensureConceptName(conceptName, 'conceptName', 'determineElement');
+            var concept = report.getConcept(conceptName);
+            ensureExists(concept, 'object', 'determineElement', 'concept with name "' + conceptName + '" doesn\'t exist.');
             element = report.createNewElement(concept);
         } else {
             element = elementOrConceptName;
-            ensureParameter(element, 'elementOrConceptName', 'object', 'addElement');
+            ensureParameter(element, 'elementOrConceptName', 'object', 'determineElement');
         }
         element.Order = order;
         return element;
@@ -868,6 +870,34 @@ angular
             model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].LinkRole = model.Role;
             model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].RelationshipSource = conceptName;
         }
+    };
+
+    // check wheter a concept is used as root element in a network
+    Report.prototype.isRootElement = function(networkShortName, elementOrConceptName){
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'isRootElement');
+        var isRootElem = false;
+
+        if(typeof elementOrConceptName === 'string') {
+            var conceptName = this.alignConceptPrefix(elementOrConceptName);
+            ensureConceptName(conceptName, 'oconceptName', 'isRootElement');
+
+            var elementIds = this.findInTree(networkShortName, conceptName);
+            var that = this;
+            angular.forEach(elementIds, function (id) {
+                var parent = that.getParentElementFromTree(networkShortName, id);
+                if (parent === undefined || parent === null) {
+                    isRootElem = true;
+                }
+            });
+        } else {
+            var element = elementOrConceptName;
+            ensureParameter(element, 'elementOrConceptName', 'object', 'isRootElement');
+            var parent = this.getParentElementFromTree(networkShortName, element.Id);
+            if (parent === undefined || parent === null) {
+                isRootElem = true;
+            }
+        }
+        return isRootElem;
     };
 
     Report.prototype.addElement = function(networkShortName, parentElementID, elementOrConceptName, offset){
@@ -962,7 +992,8 @@ angular
         var parent = this.getParentElementFromTree(networkShortName, subtreeRootElementID);
         if(parent === null || parent === undefined) {
             var network = this.getNetwork(networkShortName);
-            delete network.Trees[element.Name];
+            //delete network.Trees[element.Name];
+            throw new Error('removeTreeBranch: cannot remove root element from ' + networkShortName + ' tree.');
         } else {
             delete parent.To[element.Name];
         }

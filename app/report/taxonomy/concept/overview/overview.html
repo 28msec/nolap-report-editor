@@ -6,11 +6,20 @@
 <div class="scrollable">
 <h3>Label</h3>
 <input class="form-control" type="text" ng-model="conceptCopy.Label" ng-change="updateConcept()" placeholder="Concept label">
-<div class="checkbox">
+<div class="checkbox" ng-if="!isRootElementInPresentation">
     <label>
         <input ng-change="updateConcept()" type="checkbox" ng-model="conceptCopy.IsAbstract">
         Abstract concept
     </label>
+</div>
+<div class="checkbox" ng-if="isRootElementInPresentation">
+    <div class="tooltip-wrapper"
+         tooltip-trigger="mouseenter" tooltip-placement="right" tooltip="The concept of the root element in the presentation tree must be abstract.">
+        <label ng-if="isRootElementInPresentation">
+            <input class="disabled" type="checkbox" ng-model="conceptCopy.IsAbstract" disabled>
+            Abstract concept
+        </label>
+    </div>
 </div>
 <hr>
 <h3>Presentation</h3>
@@ -36,5 +45,9 @@
 </div>
 <hr>
 <h3>Management</h3>
-<button class="btn btn-danger" ng-click="deleteConcept()">Delete concept</button>
+<button ng-if="!isRootElementInPresentation" class="btn btn-danger" ng-click="deleteConcept()">Delete concept</button>
+<div class="tooltip-wrapper" ng-if="isRootElementInPresentation"
+     tooltip-trigger="mouseenter" tooltip-placement="right" tooltip="The concept of the root element in the presentation tree cannot be deleted.">
+    <button class="btn btn-danger disabled">Delete concept</button>
+</div>
 </div>
