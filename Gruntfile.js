@@ -220,7 +220,8 @@ module.exports = function (grunt) {
         },
         protractor: {
             travis: 'tests/e2e/config/protractor-travis-nosaucelabs-conf.js',
-            local: 'tests/e2e/config/protractor-conf.js'
+            local: 'tests/e2e/config/protractor-conf.js',
+            debug: 'tests/e2e/config/protractor-conf.js'
         },
         ngconstant: {
             options: {
@@ -397,6 +398,17 @@ module.exports = function (grunt) {
                 //sourceMap: true,
                 //sourceMapIncludeSources: true
             }
+        },
+        run: {
+            options: {
+            },
+            elementExplorer: {
+                cmd: 'node',
+                args: [
+                    'node_modules/protractor/bin/elementexplorer.js',
+                    'http://localhost:<%= connect.options.port %>'
+                ]
+            }
         }
     });
     
@@ -421,6 +433,15 @@ module.exports = function (grunt) {
             'webdriver',
             'connect:dist-dev',
             'protractor:' + target
+        ]);
+    });
+
+    grunt.registerTask('e2e-debug', function(){
+        grunt.task.run([
+            'webdriver',
+            'connect:dist-dev',
+            'protractor:debug:keepalive',
+            'run:elementExplorer'
         ]);
     });
 

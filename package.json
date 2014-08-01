@@ -68,7 +68,8 @@
     "grunt-contrib-uglify": "~0.5.0",
     "grunt-s3": "~0.2.0-alpha.3",
     "protractor": "~1.0.0",
-    "lodash": "~2.4.1"
+    "lodash": "~2.4.1",
+    "grunt-run": "^0.2.2"
   },
   "contributors": [
     {
