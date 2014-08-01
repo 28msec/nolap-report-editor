@@ -915,7 +915,11 @@ angular
             // add a root element
             var network = this.getNetwork(networkShortName);
             ensureDefinitionModelRootConcept(this, conceptName);
-            network.Trees[conceptName] = element;
+            if(network.Trees === undefined || network.Trees === null || Object.keys(network.Trees).length === 0){
+                network.Trees[conceptName] = element;
+            } else {
+                throw new Error('addElement: network ' + networkShortName + ' can only have a single root element.');
+            }
         } else {
             // add child to existing tree
             ensureParameter(parentElementID, 'parentElementID', 'string', 'addElement');
