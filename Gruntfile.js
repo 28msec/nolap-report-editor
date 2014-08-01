@@ -220,8 +220,7 @@ module.exports = function (grunt) {
         },
         protractor: {
             travis: 'tests/e2e/config/protractor-travis-nosaucelabs-conf.js',
-            local: 'tests/e2e/config/protractor-conf.js',
-            debug: 'tests/e2e/config/protractor-conf.js'
+            local: 'tests/e2e/config/protractor-conf.js'
         },
         ngconstant: {
             options: {
@@ -440,7 +439,7 @@ module.exports = function (grunt) {
         grunt.task.run([
             'webdriver',
             'connect:dist-dev',
-            'protractor:debug:keepalive',
+            'protractor:local:keepalive',
             'run:elementExplorer'
         ]);
     });
