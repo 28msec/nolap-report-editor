@@ -50,16 +50,16 @@
     <block-container>
         <header class="std-header">Selected Filters</header>
         <div ng-if="!report.hasSufficientFilters()" class="content">
-            <div class="alert alert-warning">
+            <div id="filter-too-generic" class="alert alert-warning">
                 <strong>Too generic Filter</strong><br/>
                 It won't be possible to retrieve a fact-table or preview page because the filters are too generic.
                 Either, you haven't got enough filters selected or your selection is too broad.
                 Please, refine your Filtering.
             </div>
         </div>
-        <div class="comparison-filter" ng-if="selection.cik.length + selection.tag.length">
+        <div class="comparison-filter">
             <a class="pull-right" ng-click="reset()">RESET</a>
-            <div>
+            <div ng-if="selection.cik.length + selection.tag.length">
                 <h6>ENTITIES OR ENTITY GROUPS</h6>
                 <div class="alert alert-success" ng-repeat="tag in selection.tag">
                     <a class="close" ng-click="selection.tag.splice($index, 1)">&times;</a>

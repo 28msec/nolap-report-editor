@@ -34,11 +34,11 @@ angular.module('report-editor')
         $scope.getSic = Filter.getSic;
         $scope.selectSic = function(sic){
           Filter.selectSic(sic);
-          $scope.sicCode = undefined;
+          this.sicCode = '';
         };
         $scope.selectEntity = function(entity){
           Filter.selectEntity(entity);
-          $scope.entityName = undefined;
+          this.entityName = '';
         };
         $scope.isLatestFiscalYearSelected = Filter.isLatestFiscalYearSelected;
 
