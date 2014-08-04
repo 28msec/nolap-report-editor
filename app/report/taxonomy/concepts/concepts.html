@@ -1,6 +1,12 @@
 <h2>Concepts</h2>
-<input class="form-control input-lg" type="text" placeholder="Find or create a concept..."
-        ng-model="conceptName" typeahead="result.Name for result in getResults($viewValue)"
-        typeahead-on-select="onSelect($item, $model, $label)"
-        typeahead-template-url="/report/taxonomy/concepts/concept-typeahead.html">
+<form name="conceptSearchForm">
+    <div class="form-group" ng-class="{ 'has-error': conceptSearchForm.conceptName.$error.pattern }">
+        <input class="form-control input-lg" type="text" placeholder="Find or create a concept..."
+                ng-model="conceptName" typeahead="result.Name for result in getResults($viewValue)"
+                typeahead-on-select="onSelect($item, $model, $label)"
+                typeahead-template-url="/report/taxonomy/concepts/concept-typeahead.html"
+                ng-pattern="/^[a-zA-Z0-9:]+$/" name="conceptName">
+        <span class="text-danger" ng-show="conceptSearchForm.conceptName.$error.pattern">Invalid Concept Name</span>
+    </div>
+</form>
 <div ui-view></div>
