@@ -7,7 +7,7 @@ var Synonyms = require('./synonyms/synonyms-page');
 function Concept(id, name){
     this.id = id;
     this.name = name;
-    this.label = element(by.model('conceptCopy.Label')).getAttribute('value');
+    this.label = element(by.model('conceptCopy.Label'));
     this.overview = new Overview(this.id, this.name);
     this.synonyms = new Synonyms(this.id, this.name);
 }
