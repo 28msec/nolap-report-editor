@@ -55,7 +55,12 @@ angular
         function(){ return $location.search(); },
         function(search){
             if(search.action === 'addElement') {
-                $scope.report.addElement('Presentation', search.parent === 'undefined' ? undefined : search.parent, element, parseInt(search.offset, 10));
+                var parentId;
+                if(search.parent !== 'undefined'){
+                    var parentIds = $scope.report.findInTree('Presentation', search.parent);
+                    parentId = parentIds[0];
+                }
+                $scope.report.addElement('Presentation', parentId, element, parseInt(search.offset, 10));
             }
         }
     );
