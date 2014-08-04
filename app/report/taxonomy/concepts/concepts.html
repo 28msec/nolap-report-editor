@@ -5,7 +5,7 @@
                 ng-model="conceptName" typeahead="result.Name for result in getResults($viewValue)"
                 typeahead-on-select="onSelect($item, $model, $label)"
                 typeahead-template-url="/report/taxonomy/concepts/concept-typeahead.html"
-                ng-pattern="/^[a-zA-Z0-9]+$/" name="conceptName">
+                ng-pattern="/^[a-zA-Z0-9:]+$/" name="conceptName">
         <span class="text-danger" ng-show="conceptSearchForm.conceptName.$error.pattern">Invalid Concept Name</span>
     </div>
 </form>
