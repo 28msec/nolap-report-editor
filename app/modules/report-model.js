@@ -45,6 +45,12 @@ angular
                 });
                 prefix = startingChars;
             }
+            var date = new Date();
+            var year = date.getFullYear();
+            var month = date.getMonth();
+            if(month < 8){
+                year = year - 1;
+            }
             this.model =
                 {
                     '_id' : modelOrName,
@@ -98,7 +104,14 @@ angular
                                 },
                                 'xbrl:Entity': {
                                     'Name': 'xbrl:Entity',
-                                    'Label': 'Reporting Entity'
+                                    'Label': 'Reporting Entity',
+                                    'Kind' : 'TypedDimension',
+                                    'Type' : 'string',
+                                    'DomainRestriction' : {
+                                        'Name' : 'xbrl:EntityDomain',
+                                        'Label' : 'Entity Domain',
+                                        'Enumeration' : [ 'http://www.sec.gov/CIK 0001403161', 'http://www.sec.gov/CIK 0000004962', 'http://www.sec.gov/CIK 0000019617', 'http://www.sec.gov/CIK 0000030554', 'http://www.sec.gov/CIK 0000034088', 'http://www.sec.gov/CIK 0000040545', 'http://www.sec.gov/CIK 0000066740', 'http://www.sec.gov/CIK 0000078003', 'http://www.sec.gov/CIK 0000080424', 'http://www.sec.gov/CIK 0000093410', 'http://www.sec.gov/CIK 0000101829', 'http://www.sec.gov/CIK 0000310158', 'http://www.sec.gov/CIK 0000320187', 'http://www.sec.gov/CIK 0000354950', 'http://www.sec.gov/CIK 0000732712', 'http://www.sec.gov/CIK 0000732717', 'http://www.sec.gov/CIK 0000789019', 'http://www.sec.gov/CIK 0000858877', 'http://www.sec.gov/CIK 0000886982', 'http://www.sec.gov/CIK 0001001039', 'http://www.sec.gov/CIK 0000012927', 'http://www.sec.gov/CIK 0000018230', 'http://www.sec.gov/CIK 0000021344', 'http://www.sec.gov/CIK 0000050863', 'http://www.sec.gov/CIK 0000051143', 'http://www.sec.gov/CIK 0000063908', 'http://www.sec.gov/CIK 0000086312', 'http://www.sec.gov/CIK 0000104169', 'http://www.sec.gov/CIK 0000200406', 'http://www.sec.gov/CIK 0000731766' ]
+                                    }
                                 },
                                 'xbrl:Unit': {
                                     'Name': 'xbrl:Unit',
@@ -115,21 +128,53 @@ angular
                                 },
                                 'sec:FiscalYear': {
                                     'Name': 'sec:FiscalYear',
-                                    'Label': 'Fiscal Year'
+                                    'Label': 'Fiscal Year',
+                                    'Kind' : 'TypedDimension',
+                                    'Type' : 'integer',
+                                    'DomainRestriction' : {
+                                        'Name' : 'sec:FiscalYearDomain',
+                                        'Label' : 'Fiscal Year Domain',
+                                        'Enumeration' : [ year ]
+                                    }
                                 },
                                 'sec:FiscalPeriod': {
                                     'Name': 'sec:FiscalPeriod',
-                                    'Label': 'Fiscal Period'
+                                    'Label': 'Fiscal Period',
+                                    'Kind' : 'TypedDimension',
+                                    'Type' : 'string',
+                                    'DomainRestriction' : {
+                                        'Name' : 'sec:FiscalPeriodDomain',
+                                        'Label' : 'Fiscal Period Domain',
+                                        'Enumeration' : [ 'FY' ]
+                                    }
                                 },
                                 'dei:LegalEntityAxis': {
                                     'Name': 'dei:LegalEntityAxis',
                                     'Label': 'Legal Entity',
-                                    'Default': 'sec:DefaultLegalEntity'
+                                    'Default': 'sec:DefaultLegalEntity',
+                                    'Domains' : {
+                                        'dei:LegalEntityAxisDomain': {
+                                            'Name': 'dei:LegalEntityAxisDomain',
+                                            'Label': 'Implicit dei:LegalEntityAxis Domain',
+                                            'Members': {
+                                                'sec:DefaultLegalEntity': {
+                                                    'Name': 'sec:DefaultLegalEntity'
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     },
-                    'Rules' : []
+                    'Rules' : [],
+                    'Filters' : {
+                        'cik' : [  ],
+                        'tag' : [ 'DOW30' ],
+                        'fiscalYear' : [ year ],
+                        'fiscalPeriod' : [ 'FY' ],
+                        'sic' : [  ]
+                    }
                 };
             this.addConcept('ReportLineItems', label, true);
             this.addElement('Presentation', null, 'ReportLineItems', 0);
@@ -789,78 +834,95 @@ angular
 
     var ensureDefinitionModel = function(report){
         var model = report.getModel();
-        if(model.DefinitionModels === undefined || model.DefinitionModels === null || model.DefinitionModels.length === undefined || model.DefinitionModels.length === 0) {
-            var label = model.Label;
-            var role = model.Role;
-            var source = '';
-            var network = report.getNetwork('Presentation');
-            if(network !== undefined && network.Trees !== undefined && network.Trees.length !== undefined && network.Trees.length > 0){
+        var label = model.Label;
+        var role = model.Role;
+        var source = '';
+        var network = report.getNetwork('Presentation');
+        if(network !== undefined && network.Trees !== undefined && network.Trees.length !== undefined && network.Trees.length > 0){
+            angular.forEach(network.Trees,
+              function(element){
+                  var concept = report.getConcept(element.Name);
+                  if(concept.IsAbstract){
+                      source = concept.Name;
+                  }
+              });
+            if(source === '') {
                 source = network.Trees[0].Name;
-            } else if(network !== undefined && network.Trees !== undefined && typeof network.Trees === 'object' && network.Trees !== null && Object.keys(network.Trees).length >0){
+            }
+        } else if(network !== undefined && network.Trees !== undefined && typeof network.Trees === 'object' && network.Trees !== null && Object.keys(network.Trees).length >0){
+            var keys = Object.keys(network.Trees);
+            angular.forEach(keys,
+                function(key){
+                    var concept = report.getConcept(key);
+                    if(concept.IsAbstract){
+                        source = concept.Name;
+                    }
+                });
+            if(source === '') {
                 source = Object.keys(network.Trees)[0];
             }
+        }
 
-            model.DefinitionModels =
-                [ {
-                    'ModelKind' : 'DefinitionModel',
-                    'Labels' : [ label ],
-                    'Parameters' : {
+        model.DefinitionModels =
+            [ {
+                'ModelKind' : 'DefinitionModel',
+                'Labels' : [ label ],
+                'Parameters' : {
 
-                    },
-                    'Breakdowns' : {
-                        'x' : [ {
-                            'BreakdownLabels' : [ 'Reporting Entity Breakdown' ],
-                            'BreakdownTrees' : [ {
-                                'Kind' : 'Rule',
-                                'Abstract' : true,
-                                'Labels' : [ 'Reporting Entity [Axis]' ],
-                                'Children' : [ {
-                                    'Kind' : 'Aspect',
-                                    'Aspect' : 'xbrl:Entity'
-                                } ]
-                            } ]
-                        }, {
-                            'BreakdownLabels' : [ 'Fiscal Year Breakdown' ],
-                            'BreakdownTrees' : [ {
-                                'Kind' : 'Rule',
-                                'Abstract' : true,
-                                'Labels' : [ 'Fiscal Year [Axis]' ],
-                                'Children' : [ {
-                                    'Kind' : 'Aspect',
-                                    'Aspect' : 'sec:FiscalYear'
-                                } ]
-                            } ]
-                        }, {
-                            'BreakdownLabels' : [ 'Fiscal Period Breakdown' ],
-                            'BreakdownTrees' : [ {
-                                'Kind' : 'Rule',
-                                'Abstract' : true,
-                                'Labels' : [ 'Fiscal Period [Axis]' ],
-                                'Children' : [ {
-                                    'Kind' : 'Aspect',
-                                    'Aspect' : 'sec:FiscalPeriod'
-                                } ]
-                            } ]
-                        } ],
-                        'y' : [ {
-                            'BreakdownLabels' : [ 'Breakdown on concepts' ],
-                            'BreakdownTrees' : [ {
-                                'Kind' : 'ConceptRelationship',
-                                'LinkName' : 'link:presentationLink',
-                                'LinkRole' : role,
-                                'ArcName' : 'link:presentationArc',
-                                'ArcRole' : 'http://www.xbrl.org/2003/arcrole/parent-child',
-                                'RelationshipSource' : source,
-                                'FormulaAxis' : 'descendant',
-                                'Generations' : 0
+                },
+                'Breakdowns' : {
+                    'x' : [ {
+                        'BreakdownLabels' : [ 'Reporting Entity Breakdown' ],
+                        'BreakdownTrees' : [ {
+                            'Kind' : 'Rule',
+                            'Abstract' : true,
+                            'Labels' : [ 'Reporting Entity [Axis]' ],
+                            'Children' : [ {
+                                'Kind' : 'Aspect',
+                                'Aspect' : 'xbrl:Entity'
                             } ]
                         } ]
-                    },
-                    'TableFilters' : {
+                    }, {
+                        'BreakdownLabels' : [ 'Fiscal Year Breakdown' ],
+                        'BreakdownTrees' : [ {
+                            'Kind' : 'Rule',
+                            'Abstract' : true,
+                            'Labels' : [ 'Fiscal Year [Axis]' ],
+                            'Children' : [ {
+                                'Kind' : 'Aspect',
+                                'Aspect' : 'sec:FiscalYear'
+                            } ]
+                        } ]
+                    }, {
+                        'BreakdownLabels' : [ 'Fiscal Period Breakdown' ],
+                        'BreakdownTrees' : [ {
+                            'Kind' : 'Rule',
+                            'Abstract' : true,
+                            'Labels' : [ 'Fiscal Period [Axis]' ],
+                            'Children' : [ {
+                                'Kind' : 'Aspect',
+                                'Aspect' : 'sec:FiscalPeriod'
+                            } ]
+                        } ]
+                    } ],
+                    'y' : [ {
+                        'BreakdownLabels' : [ 'Breakdown on concepts' ],
+                        'BreakdownTrees' : [ {
+                            'Kind' : 'ConceptRelationship',
+                            'LinkName' : 'link:presentationLink',
+                            'LinkRole' : role,
+                            'ArcName' : 'link:presentationArc',
+                            'ArcRole' : 'http://www.xbrl.org/2003/arcrole/parent-child',
+                            'RelationshipSource' : source,
+                            'FormulaAxis' : 'descendant',
+                            'Generations' : 0
+                        } ]
+                    } ]
+                },
+                'TableFilters' : {
 
-                    }
-                } ];
-        }
+                }
+            } ];
     };
 
     // check wheter a concept is used as root element in a network
@@ -1654,8 +1716,16 @@ angular
 
     Report.prototype.hasSufficientFilters = function(){
         var result = false;
-        var countAspectRestrictions = this.countAspectsRestrictions(['xbrl:Entity','sec:Archives']);
-        if(countAspectRestrictions > 0 && countAspectRestrictions < 500){
+        var countEntityRestrictions = this.countAspectsRestrictions(['xbrl:Entity']);
+        var countYearsRestrictions = this.countAspectsRestrictions(['sec:FiscalYear']);
+        var countPeriodRestrictions = this.countAspectsRestrictions(['sec:FiscalPeriod']);
+        if(countEntityRestrictions > 0 && countEntityRestrictions < 501){
+            result = true;
+        }
+        if(result && countYearsRestrictions < 10){
+            result = true;
+        }
+        if(result && countPeriodRestrictions < 10){
             result = true;
         }
         return result;
