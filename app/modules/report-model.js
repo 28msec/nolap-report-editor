@@ -603,7 +603,9 @@ angular
         return result;
     };
 
-    Report.prototype.findInTree = function(networkShortName, conceptName) {
+    Report.prototype.findInTree = function(networkShortName, oconceptName) {
+        var conceptName = this.alignConceptPrefix(oconceptName);
+        ensureConceptName(conceptName, 'oconceptName', 'findInTree');
         ensureNetworkShortName(networkShortName, 'networkShortName', 'findInTree');
         
         var network = this.getNetwork(networkShortName);
