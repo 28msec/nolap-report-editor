@@ -73,7 +73,6 @@ describe('Report', function(){
     });
     
     it('Should display the fact table', function() {
-        report.filters.visitPage();
         report.facts.visitPage();
         expect(report.facts.lineCount()).toBeGreaterThan(0);
     });
