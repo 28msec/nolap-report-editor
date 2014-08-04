@@ -30,10 +30,12 @@ angular
                     if(data.expires) {
                         $timeout(function(){
                             $scope.message = undefined;
+                            code = undefined;
                         }, data.expires);
                     }
                 } else {
                     $scope.message = undefined;
+                    code = undefined;
                 }
             });
         }
