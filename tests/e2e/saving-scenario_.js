@@ -6,7 +6,6 @@ describe('Reports', function(){
 
     var id = '1fueA5hrxIHxvRf7Btr_J6efDJ3qp-s9KV731wDc4OOaw';
     var Report = require('../../app/report/report-page');
-    var FiltersPage = require('../../app/report/filters/filters-page');
 
     it('Should throw an exception if we reloading while saving the report', function(){
         var report = new Report(id);
