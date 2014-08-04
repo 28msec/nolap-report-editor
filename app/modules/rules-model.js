@@ -608,7 +608,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
         }
     };
 
-    var bodyEmptyErrorMessage = 'Rule code section cannot be empty. Example code: "((NetIncomeLoss/Revenues)*(1+(Assets-Equity)/Equity))/((1/(Revenues/Assets))-((NetIncomeLoss/Revenues)*(1+(Assets-Equity)/Equity)))"';
+    var bodyEmptyErrorMessage = 'Example: "NetIncomeLoss / Assets"';
 
     Rule.prototype.compileBodyDeferred = function(index) {
         ensureParameter(index, 'index', 'number', 'compileBodyDeferred');

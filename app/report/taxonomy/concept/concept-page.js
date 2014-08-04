@@ -16,6 +16,14 @@ Concept.prototype.visitPage = function(){
     browser.get('/' + this.id + '/concept/' + this.name);
 };
 
+Concept.prototype.getLabel = function(){
+    return this.label.getAttribute('value');
+};
+
+Concept.prototype.getConceptName = function(){
+    return element(by.id('concept')).element(by.binding('concept.Name')).getText();
+};
+
 Concept.prototype.createElement = function(parent, offset){
     offset = offset ? offset : 0;
     browser.get('/' + this.id + '/concept/' + this.name +'?action=addElement&parent=' + parent + '&offset=' + offset);
