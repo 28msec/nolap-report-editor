@@ -8,8 +8,11 @@ angular
 
             var cache;
 
-            function redirectToLoginPage(){
-                var p = $location.url();
+            function redirectToLoginPage(optionalReturnPage){
+                var p = optionalReturnPage;
+                if(p === undefined){
+                    p = $location.url();
+                }
                 if (p.substring(0, 5) === '/auth')
                 {
                     p = p.substring(5);
