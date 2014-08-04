@@ -24,7 +24,6 @@ describe('Report', function(){
     });
     
     it('Shouldn\'t create a new concept with an invalid name', function(){
-        return;
         conceptName = 'hello World';
         var concepts = report.taxonomy.concepts;
         concepts.visitPage();
@@ -36,7 +35,6 @@ describe('Report', function(){
         var concepts = report.taxonomy.concepts;
         concepts.visitPage();
         concepts.createConcept(conceptName);
-        browser.waitForAngular();
     });
     
     
@@ -45,7 +43,6 @@ describe('Report', function(){
         var concepts = report.taxonomy.concepts;
         concepts.visitPage();
         concepts.createConcept(conceptName);
-        browser.waitForAngular();
     });
 
     it('Creates a new element', function(){
