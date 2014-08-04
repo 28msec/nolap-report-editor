@@ -114,7 +114,7 @@
                         <div  class="col-sm-10">
                             <textarea class="form-control" id="rule{{$index}}" rows="6" placeholder="" ng-change="formula.compileBody($index, true, action)" ng-model="alt.BodySrc"></textarea>
                         </div>
-                        <div class="alert alert-info col-sm-offset-2 col-sm-10" ng-show="alt.BodyErr" style="margin-top: 20px;">{{alt.BodyErr}}</div>
+                        <div class="alert alert-danger col-sm-offset-2 col-sm-10" ng-show="alt.BodyErr" style="margin-top: 20px;">{{alt.BodyErr}}</div>
                     </div>
                 </div>
             </tab>
