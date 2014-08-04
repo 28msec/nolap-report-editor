@@ -8,6 +8,7 @@ function Taxonomy(id){
     this.id = id;
     this.concepts = new Concepts(this.id);
     this.elements = element(by.id('presentation-tree')).all(by.css('.angular-ui-tree-node'));
+    this.rootElements = element.all(by.repeater('element in presentationTree'));
 }
 
 Taxonomy.prototype.visitPage = function(){
