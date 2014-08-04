@@ -3,7 +3,7 @@ describe('Concepts Model API Tests', function () {
 
     /* global Report */
     var report = null;
-    var defaultRootElement;
+    var defaultRootElementId;
 
     it('Create a New Report', function () {
         var label = 'Report for Testing';
@@ -19,7 +19,7 @@ describe('Concepts Model API Tests', function () {
         expect(report.getConcept(defaultConceptName).IsAbstract).toBe(true);
 
         var elementIds = report.findInTree('Presentation', defaultConceptName);
-        defaultRootElement = elementIds[0];
+        defaultRootElementId = elementIds[0];
         expect(elementIds.length).toEqual(1);
     });
 
@@ -93,7 +93,7 @@ describe('Concepts Model API Tests', function () {
         var name = 'fac:Test';
         var offset = 0;
         var element = report.createNewElement(name);
-        var newElement = report.addElement('Presentation', defaultRootElement, element, offset);
+        var newElement = report.addElement('Presentation', defaultRootElementId, element, offset);
                       
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
@@ -129,12 +129,12 @@ describe('Concepts Model API Tests', function () {
         expect(report.existsElementInTree('Presentation',element.Id)).toBe(true);
     });
 
-    it('Add another root presentation element (should fail)', function () {
+    it('Try to add another root presentation element', function () {
         expect(report).not.toBeNull();
         var name = 'fac:Group2';
         var label = 'Another root';
         report.addConcept(name, label, true);
-        expect(report.existsConcept(name)).toBe(false);
+        expect(report.existsConcept(name)).toBe(true);
 
         var element;
         try {
@@ -149,7 +149,7 @@ describe('Concepts Model API Tests', function () {
     it('Add another grouping presentation element', function () {
         expect(report).not.toBeNull();
         var name = 'fac:Group2';
-        var element = report.addElement('Presentation', defaultRootElement, name);
+        var element = report.addElement('Presentation', defaultRootElementId, name);
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
         expect(element.Id).toBeDefined();
@@ -224,8 +224,7 @@ describe('Concepts Model API Tests', function () {
         var label = 'Another test leaf';
         var to = [ 'us-gaap:Revenues', 'us-gaap:Liabilities' ];
         report.addConcept(from, label, false);
-        var root2ID = report.findInTree('Presentation','fac:Root2')[0];
-        report.addElement('Presentation', root2ID, from);
+        report.addElement('Presentation', defaultRootElementId, from);
         report.updateConceptMap(from, to);
 
         expect(report.existsConceptMap(from)).toBe(true);
