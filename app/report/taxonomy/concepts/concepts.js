@@ -5,7 +5,7 @@ angular
 .controller('ConceptsCtrl', function($scope, $state){
     $scope.concepts = $scope.report.listConcepts();
     $scope.unselectElement();
-    
+
     var splitCamelCase = function(value){
         if(value.indexOf(':') !== -1) {
             value = value.substring(value.indexOf(':') + 1);
@@ -26,8 +26,8 @@ angular
         results.push({ Name: 'Create ' + $viewValue + ' concept.', newConcept: true, viewValue: $viewValue });
         return results;
     };
-    
-    $scope.onSelect = function($item){
+
+    $scope.onSelect = function($item) {
         if($item.newConcept === true) {
             $scope.report.addConcept($item.viewValue, splitCamelCase($item.viewValue), false);
         }

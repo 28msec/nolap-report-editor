@@ -28,6 +28,8 @@ describe('Report', function(){
         var concepts = report.taxonomy.concepts;
         concepts.visitPage();
         concepts.createConcept(conceptName);
+        expect(concepts.errorMessage.isDisplayed()).toBe(true);
+        expect(concepts.errorMessage.getText()).toBe('Invalid Concept Name');
     });
     
     it('Should create a new concept (1)', function(){
@@ -73,7 +75,7 @@ describe('Report', function(){
     it('Should display the fact table', function() {
         report.filters.visitPage();
         report.facts.visitPage();
-        //expect(report.facts.lineCount()).toBeGreaterThan(0);
+        expect(report.facts.lineCount()).toBeGreaterThan(0);
     });
 
     it('Should display the preview', function() {

@@ -8,6 +8,7 @@ function Concepts(reportId){
     this.recompile = new Recompile(this.reportId);
     this.form = element(by.name('conceptSearchForm'));
     this.conceptName = element(by.model('conceptName'));
+    this.errorMessage = this.form.element(by.css('.text-danger'));
 }
 
 Concepts.prototype.visitPage = function(){
