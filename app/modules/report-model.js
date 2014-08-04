@@ -863,15 +863,6 @@ angular
         }
     };
 
-    var ensureDefinitionModelRootConcept = function(report, conceptName){
-        var model = report.getModel();
-        ensureDefinitionModel(report);
-        if(model.DefinitionModels[0] !== undefined && model.DefinitionModels[0] !== null) {
-            model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].LinkRole = model.Role;
-            model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].RelationshipSource = conceptName;
-        }
-    };
-
     // check wheter a concept is used as root element in a network
     Report.prototype.isRootElement = function(networkShortName, elementOrConceptName){
         ensureNetworkShortName(networkShortName, 'networkShortName', 'isRootElement');
@@ -912,9 +903,8 @@ angular
         var conceptName = element.Name;
 
         if(parentElementID === undefined || parentElementID === null) {
-            // add a root element
+            // add a root element (only one allowed)
             var network = this.getNetwork(networkShortName);
-            ensureDefinitionModelRootConcept(this, conceptName);
             if(network.Trees === undefined || network.Trees === null || Object.keys(network.Trees).length === 0){
                 network.Trees[conceptName] = element;
             } else {
@@ -939,11 +929,6 @@ angular
         }
         return element;
     };
-
-    //Report.prototype.addTreeChild = function(networkShortName, parentElementID, oconceptName, offset) {
-    //    var element = this.createNewElement(concept, order);
-    //    return this.addElement(network, parentElementID, element, offset);
-    //};
 
     Report.prototype.moveTreeBranch = function(networkShortName, subtreeRootElementID, newParentElementID, newOffset) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'moveTreeBranch');
@@ -974,16 +959,8 @@ angular
             }
             newParent.To[element.Name] = element;
         } else {
-            // no new parent given -> make it a root element
-            var network = this.getNetwork(networkShortName);
-            var element2 = this.removeTreeBranch(networkShortName, subtreeRootElementID);
-            enforceStrictChildOrderAndShift(this, networkShortName, newParentElementID, (newOffset || 0));
-            element2.Order = newOrder;
-            if(network.Trees === undefined || network.Trees === null) {
-                network.Trees = [];
-            }
-            ensureDefinitionModelRootConcept(this, element2.Name);
-            network.Trees[element2.Name] = element2;
+            // no new parent given -> making it a root element -> not allowed
+            throw new Error('moveTreeBranch: moving an element to ' + networkShortName + ' network root is not allowed.');
         }
     };
 
@@ -996,7 +973,7 @@ angular
         var parent = this.getParentElementFromTree(networkShortName, subtreeRootElementID);
         if(parent === null || parent === undefined) {
             var network = this.getNetwork(networkShortName);
-            //delete network.Trees[element.Name];
+            // deleting root not allowed
             throw new Error('removeTreeBranch: cannot remove root element from ' + networkShortName + ' tree.');
         } else {
             delete parent.To[element.Name];
