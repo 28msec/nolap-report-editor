@@ -839,28 +839,9 @@ angular
         var source = '';
         var network = report.getNetwork('Presentation');
         if(network !== undefined && network.Trees !== undefined && network.Trees.length !== undefined && network.Trees.length > 0){
-            angular.forEach(network.Trees,
-              function(element){
-                  var concept = report.getConcept(element.Name);
-                  if(concept.IsAbstract){
-                      source = concept.Name;
-                  }
-              });
-            if(source === '') {
-                source = network.Trees[0].Name;
-            }
+            source = network.Trees[0].Name;
         } else if(network !== undefined && network.Trees !== undefined && typeof network.Trees === 'object' && network.Trees !== null && Object.keys(network.Trees).length >0){
-            var keys = Object.keys(network.Trees);
-            angular.forEach(keys,
-                function(key){
-                    var concept = report.getConcept(key);
-                    if(concept.IsAbstract){
-                        source = concept.Name;
-                    }
-                });
-            if(source === '') {
-                source = Object.keys(network.Trees)[0];
-            }
+            source = Object.keys(network.Trees)[0];
         }
 
         model.DefinitionModels =
