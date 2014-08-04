@@ -6,9 +6,10 @@
 describe('Filters', function(){
 
     var FiltersPage = require('../../app/report/filters/filters-page');
-    var filters = new FiltersPage('1fueA5hrxIHxvRf7Btr_J6efDJ3qp-s9KV731wDc4OOaw');
+    var filters;
 
     it('should reset the filters', function() {
+        filters = new FiltersPage('1fueA5hrxIHxvRf7Btr_J6efDJ3qp-s9KV731wDc4OOaw');
         filters.visitPage()
         .then(function(){
             filters.resetSelectedFilters()
