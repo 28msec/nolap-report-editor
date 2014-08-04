@@ -1015,7 +1015,6 @@ angular
         ensureExists(element, 'object', 'removeTreeBranch', 'Cannot remove element with id "' + subtreeRootElementID + '" from network: Element doesn\'t exist.');
         var parent = this.getParentElementFromTree(networkShortName, subtreeRootElementID);
         if(parent === null || parent === undefined) {
-            var network = this.getNetwork(networkShortName);
             // deleting root not allowed
             throw new Error('removeTreeBranch: cannot remove root element from ' + networkShortName + ' tree.');
         } else {
