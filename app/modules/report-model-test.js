@@ -3,16 +3,24 @@ describe('Concepts Model API Tests', function () {
 
     /* global Report */
     var report = null;
+    var defaultRootElement;
 
     it('Create a New Report', function () {
-        var name = 'Report Name';
         var label = 'Report for Testing';
         var description = 'This Report is not intended to be used in production';
         var role = 'http://www.28.io/nolap/test';
-        report = new Report(name, label, description, role, 'd@28.io');
+        report = new Report(undefined, label, description, role, 'd@28.io');
         var model = report.getModel();
         expect(model._id).toBeDefined();
-        expect(model._id).toEqual(name);
+        expect(model._id).not.toBeNull();
+
+        var defaultConceptName = 'ReportLineItems';
+        expect(report.existsConcept(defaultConceptName)).toBe(true);
+        expect(report.getConcept(defaultConceptName).IsAbstract).toBe(true);
+
+        var elementIds = report.findInTree('Presentation', defaultConceptName);
+        defaultRootElement = elementIds[0];
+        expect(elementIds.length).toEqual(1);
     });
 
     // concepts
@@ -76,7 +84,7 @@ describe('Concepts Model API Tests', function () {
         expect(report).not.toBeNull();
         var concepts = report.listConcepts();
                          
-        expect(concepts.length).toBe(2);
+        expect(concepts.length).toBe(3);
     });
 
     // trees
@@ -85,7 +93,7 @@ describe('Concepts Model API Tests', function () {
         var name = 'fac:Test';
         var offset = 0;
         var element = report.createNewElement(name);
-        var newElement = report.addElement('Presentation', null, element, offset);
+        var newElement = report.addElement('Presentation', defaultRootElement, element, offset);
                       
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
@@ -121,13 +129,27 @@ describe('Concepts Model API Tests', function () {
         expect(report.existsElementInTree('Presentation',element.Id)).toBe(true);
     });
 
-    it('Add another root presentation element', function () {
+    it('Add another root presentation element (should fail)', function () {
         expect(report).not.toBeNull();
-        var name = 'fac:Root2';
+        var name = 'fac:Group2';
         var label = 'Another root';
         report.addConcept(name, label, true);
+        expect(report.existsConcept(name)).toBe(false);
 
-        var element = report.addElement('Presentation', null, name);
+        var element;
+        try {
+            report.addElement('Presentation', null, name);
+        } catch (ex) {
+            expect(ex.message.match(/can only have a single root element/g)).not.toBeNull();
+        }
+        expect(element).not.toBeDefined();
+        expect(report.findInTree('Presentation', name).length).toBe(0);
+    });
+
+    it('Add another grouping presentation element', function () {
+        expect(report).not.toBeNull();
+        var name = 'fac:Group2';
+        var element = report.addElement('Presentation', defaultRootElement, name);
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
         expect(element.Id).toBeDefined();
@@ -162,7 +184,7 @@ describe('Concepts Model API Tests', function () {
     it('Move Subtree', function () {
         expect(report).not.toBeNull();
         var name1 = 'fac:Leaf';
-        var name2 = 'fac:Root2';
+        var name2 = 'fac:Group2';
         var subtreeID = report.findInTree('Presentation',name1)[0];
         var oldParent = report.getParentElementFromTree('Presentation', subtreeID);
         var newParentID = report.findInTree('Presentation',name2)[0];
@@ -180,7 +202,7 @@ describe('Concepts Model API Tests', function () {
     it('List trees', function () {
         expect(report).not.toBeNull();
         var trees = report.listTrees('Presentation');
-        expect(trees.length).toBe(2);
+        expect(trees.length).toBe(1);
     });
 
     // concept maps
