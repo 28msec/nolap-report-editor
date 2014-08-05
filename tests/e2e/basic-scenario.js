@@ -39,6 +39,9 @@ describe('Report', function(){
         concepts.createConcept(conceptName);
     });
     
+    it('Taxonomy Section should be active', function(){
+        expect(report.getActiveSection()).toBe('Taxonomy');
+    });
     
     it('Should create a new concept (2)', function(){
         conceptName = 'h:assets';
