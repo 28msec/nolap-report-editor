@@ -16,6 +16,10 @@ function Report(id){
     this.searchBox = element(by.model('conceptName'));
 }
 
+Report.prototype.getActiveSection = function(){
+    return element(by.css('#report > header')).element(by.css('.active')).element(by.css('a')).getText();
+};
+
 Report.prototype.visitPage = function(){
     browser.get('/' + this.id);
 };

@@ -4,3 +4,4 @@ app/modules/report-api.js
 app/modules/session-api.js
 app/modules/formula-parser.js
 app/modules/excel-parser.js
+app/modules/state-directives.js
