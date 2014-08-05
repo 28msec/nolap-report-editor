@@ -50,6 +50,9 @@ describe('Report', function(){
         expect(concept.label.getAttribute('value')).toBe('Hello World ID');
     });
     
+    it('Taxonomy Section should be active', function(){
+        expect(report.getActiveSection()).toBe('Taxonomy');
+    });
     
     it('Should create a new concept (2)', function(){
         conceptName = 'h:assets';
@@ -93,7 +96,6 @@ describe('Report', function(){
     });
     
     it('Should display the fact table', function() {
-        report.filters.visitPage();
         report.facts.visitPage()
         .then(function(){
             expect(report.facts.lineCount()).toBeGreaterThan(0);
