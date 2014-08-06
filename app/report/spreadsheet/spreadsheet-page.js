@@ -24,4 +24,8 @@ Spreadsheet.prototype.getCellValueByCss = function(css){
     return this.table.element(by.css(css)).getText();
 };
 
+Spreadsheet.prototype.getCellValue = function(cell){
+    return cell.element(by.css('div > span.ng-binding'));
+};
+
 module.exports = Spreadsheet;

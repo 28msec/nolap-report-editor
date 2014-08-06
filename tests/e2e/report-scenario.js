@@ -1,4 +1,3 @@
-/*global by:false */
 'use strict';
 
 //GetAttribute() returns "boolean" values and will return either "true" or null
@@ -49,7 +48,7 @@ describe('Report', function(){
         report.spreadsheet.visitPage();
         var roas = report.spreadsheet.getValueTDsByHeaderContainingText('(ROA)');
         expect(roas.count()).toBe(1);
-        var value = roas.get(0).element(by.css('div > span.ng-binding'));
+        var value = report.spreadsheet.getCellValue(roas.get(0));
         expect(value.getText()).toBe('0.10');
     });
 });
