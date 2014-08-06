@@ -36,4 +36,29 @@ describe('Report', function(){
         expect(recompilePage.errorMessages.count()).toBe(0);
         expect(recompilePage.successMessages.count()).toBe(66);
     });
+
+    it('should select Coca Cola on filters page', function(){
+        report.filters.visitPage()
+        .then(function(){
+            report.filters.closeSelectedFiltersTag('DOW30')
+            .then(function(){
+                report.filters.setFiltersEntityName('Coca Cola', 2)
+                .then(function(){
+                    expect(report.filters.selectedFilters.cik.count()).toBe(1);
+                });
+            });
+        });
+    });
+
+    it('should render ratios as decimals', function(){
+        report.spreadsheet.visitPage()
+        .then(function(){
+            var roas = report.spreadsheet.getValuesByHeaderContainingText('(ROA)');
+            expect(roas.length).toBe(1);
+            roas.forEach(function(value){
+                // should be a decimal and not rounded to zero
+                expect(value).not.toBe(0);
+            });
+        });
+    });
 });
