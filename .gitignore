@@ -15,3 +15,4 @@ out
 *.css
 dist
 .tmp
+.idea

@@ -3,8 +3,7 @@
 var config = require('./protractor-shared-conf').config;
 
 config.capabilities = {
-    browserName: 'firefox',
-    version: '28'
+    browserName: 'firefox'
 };
 
 exports.config = config;
