@@ -2,7 +2,7 @@
 'use strict';
 
 exports.config = {
-    allScriptsTimeout: 20000,
+    allScriptsTimeout: 11000,
 
     baseUrl: 'http://localhost:9000',
 
@@ -34,6 +34,6 @@ exports.config = {
     },
 
     jasmineNodeOpts: {
-        defaultTimeoutInterval: 40000
+        defaultTimeoutInterval: 30000
     }
 };
