@@ -8,7 +8,7 @@ describe('Report', function(){
     var Report = require('../../app/report/report-page');
     var reports = new Reports();
     var report, reportName, conceptName;
-    
+
     it('Should create a new empty report', function(){
         reports.visitPage();
         reportName = 'HelloWorld' + Math.floor((Math.random() * 10) + 1);
@@ -23,23 +23,31 @@ describe('Report', function(){
         });
     });
     
-    it('Should create a new concept (1)', function(){
-        conceptName = 'h:helloWorldID';
-        report.taxonomy.visitPage();
-        report.taxonomy.createConcept(conceptName);
-        var concept = report.taxonomy.getConcept(conceptName);
-        concept.visitPage();
-        expect(concept.label).toBe('Hello World ID');
+    it('Shouldn\'t create a new concept with an invalid name', function(){
+        conceptName = 'hello World';
+        var concepts = report.taxonomy.concepts;
+        concepts.visitPage();
+        concepts.createConcept(conceptName);
+        expect(concepts.errorMessage.isDisplayed()).toBe(true);
+        expect(concepts.errorMessage.getText()).toBe('Invalid Concept Name');
     });
     
+    it('Should create a new concept (1)', function(){
+        conceptName = 'h:helloWorldID';
+        var concepts = report.taxonomy.concepts;
+        concepts.visitPage();
+        concepts.createConcept(conceptName);
+    });
+    
+    it('Taxonomy Section should be active', function(){
+        expect(report.getActiveSection()).toBe('Taxonomy');
+    });
     
     it('Should create a new concept (2)', function(){
         conceptName = 'h:assets';
-        report.taxonomy.visitPage();
-        report.taxonomy.createConcept(conceptName);
-        var concept = report.taxonomy.getConcept(conceptName);
-        concept.visitPage();
-        expect(concept.label).toBe('Assets');
+        var concepts = report.taxonomy.concepts;
+        concepts.visitPage();
+        concepts.createConcept(conceptName);
     });
 
     it('Creates a new element', function(){
@@ -68,7 +76,6 @@ describe('Report', function(){
     });
     
     it('Should display the fact table', function() {
-        report.filters.visitPage();
         report.facts.visitPage();
         expect(report.facts.lineCount()).toBeGreaterThan(0);
     });

@@ -7,13 +7,20 @@ var Synonyms = require('./synonyms/synonyms-page');
 function Concept(id, name){
     this.id = id;
     this.name = name;
-    this.label = element(by.model('conceptCopy.Label')).getAttribute('value');
     this.overview = new Overview(this.id, this.name);
     this.synonyms = new Synonyms(this.id, this.name);
 }
 
 Concept.prototype.visitPage = function(){
     browser.get('/' + this.id + '/concept/' + this.name);
+};
+
+Concept.prototype.getLabel = function(){
+    return element(by.model('conceptCopy.Label')).getAttribute('value');
+};
+
+Concept.prototype.getConceptName = function(){
+    return element(by.id('concept')).element(by.binding('concept.Name')).getText();
 };
 
 Concept.prototype.createElement = function(parent, offset){

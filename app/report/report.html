@@ -1,18 +1,20 @@
-<header class="navbar navbar-default">
-    <div class="navbar-header">
-        <span class="navbar-brand">
-            <a class="fa fa-list" ui-sref="reports()" id="reports"></a>
-            <span ng-bind="report.model.Label"></span>
-        </span>
-    </div>
-    <div>
-        <ul class="nav navbar-nav">
-            <li sref-active="active"><a ui-sref="report.taxonomy.concepts()">Taxonomy</a></li>
-            <li sref-active="active"><a ui-sref="report.filters()">Filters</a></li>
-            <li sref-active="active"><a ui-sref="report.facts()">Facts</a></li>
-            <li sref-active="active"><a ui-sref="report.spreadsheet()">Spreadsheet</a></li>
-        </ul>
-    </div>
-    <account></account>
-</header>
-<div ui-view></div>
+<div id="report">
+    <header class="navbar navbar-default">
+        <div class="navbar-header">
+            <span class="navbar-brand">
+                <a class="fa fa-list" ui-sref="reports()" id="reports"></a>
+                <span ng-bind="report.model.Label"></span>
+            </span>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li ui-sref-active2="active"><a ui-sref2="report.taxonomy()">Taxonomy</a></li>
+                <li ui-sref-active2="active"><a ui-sref2="report.filters()">Filters</a></li>
+                <li ui-sref-active2="active"><a ui-sref2="report.facts()">Facts</a></li>
+                <li ui-sref-active2="active"><a ui-sref2="report.spreadsheet()">Spreadsheet</a></li>
+            </ul>
+        </div>
+        <account></account>
+    </header>
+    <div ui-view></div>
+</div>
