@@ -38,29 +38,17 @@ describe('Report', function(){
     });
 
     it('should select Coca Cola on filters page', function(){
-        report.filters.visitPage()
-        .then(function(){
-            report.filters.closeSelectedFiltersTag('DOW30')
-            .then(function(){
-                report.filters.setFiltersEntityName('Coca Cola', 2)
-                .then(function(){
-                    expect(report.filters.selectedFilters.cik.count()).toBe(1);
-                });
-            });
-        });
+        report.filters.visitPage();
+        report.filters.closeSelectedFiltersTag('DOW30');
+        report.filters.setFiltersEntityName('Coca Cola', 2);
+        expect(report.filters.selectedFilters.cik.count()).toBe(1);
     });
 
     it('should render ratios as decimals', function(){
-        report.spreadsheet.visitPage()
-        .then(function(){
-            report.spreadsheet.getValuesByHeaderContainingText('(ROA)')
-            .then(function(roas){
-                expect(roas.length).toBe(1);
-                roas.forEach(function(value){
-                    // should be a decimal and not rounded to zero
-                    expect(value).not.toBe(0);
-                });
-            });
-        });
+        report.spreadsheet.visitPage();
+        var roas = report.spreadsheet.getValueTDsByHeaderContainingText('(ROA)');
+        expect(roas.count()).toBe(1);
+        var value = roas.get(0).element(by.css('div > span.ng-binding'));
+        expect(value.getText()).toBe('0.10');
     });
 });

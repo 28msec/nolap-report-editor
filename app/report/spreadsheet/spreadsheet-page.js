@@ -11,27 +11,13 @@ Spreadsheet.prototype.visitPage = function(){
     return browser.get('/' + this.id + '/spreadsheet');  
 };
 
-Spreadsheet.prototype.getValuesByHeaderContainingText = function(containedText){
-    return this.dataRows
-        .filter(function(elem){
-            return elem.element(by.css('td.header > span'))
-                   .getText()
-                   .then(function(text){
-                       return text.indexOf(containedText) > -1;            
-                   });
-        })
-        .then(function(foundElems){     
-            var results = [];
-            foundElems
-            .forEach(function(elem){
-                elem.element(by.css('td.NumericValue > div > span.ng-binding'))
-                .getText()    
-                .then(function(text){         
-                    results.push(text);    
-                });
-            });
-            return results;
-        });
+Spreadsheet.prototype.getValueTDsByHeaderContainingText = function(containedText){
+    return element.all(
+        by.xpath('//table[@class="rendering"]' +
+                 '/tbody/tr[@ng-repeat="headerGroup in yHeaderGroups"]' +
+                 '[contains(./td[@ng-include="headerTemplate"]/span/text(),' +
+                            '"' + containedText + '")]' +
+                 '/td[@ng-include="dataTemplate"]'));
 };
 
 Spreadsheet.prototype.getCellValueByCss = function(css){
