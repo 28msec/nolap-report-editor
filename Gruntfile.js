@@ -463,5 +463,7 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('test', ['build', 'karma', 'e2e']);
+    grunt.registerTask('unit-tests', ['jsonlint', 'jshint', 'karma']);
+    grunt.registerTask('e2e-tests', ['jsonlint', 'jshint', 'build', 'e2e']);
     grunt.registerTask('default', ['jsonlint', 'jshint', 'test', 'deploy']);
 };
