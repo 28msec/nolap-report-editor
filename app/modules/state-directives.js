@@ -110,6 +110,8 @@ function $StateRefActiveDirective($state, $stateParams, $interpolate) {
       function isMatch() {
         if (typeof $attrs.uiSrefActiveEq !== 'undefined') {
           return $state.$current.self === state && matchesParams();
+        } else if(typeof $attrs.uiSrefActiveIncludes !== 'undefined') {
+          return $state.includes($attrs.uiSrefActiveIncludes) && matchesParams();
         } else {
           return $state.includes(state.name) && matchesParams();
         }

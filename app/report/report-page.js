@@ -20,6 +20,10 @@ Report.prototype.getActiveSection = function(){
     return element(by.css('#report > header')).element(by.css('.active')).element(by.css('a')).getText();
 };
 
+Report.prototype.goToTaxonomy = function(){
+    return element(by.css('#report > header li:first-child > a')).click();
+};
+
 Report.prototype.visitPage = function(){
     browser.get('/' + this.id);
 };
