@@ -15,7 +15,7 @@ after_success: grunt deploy
 matrix:
   fast_finish: true
   allow_failures:
-    - GRUNT_TASK=saucelabs-tests
+    - env: GRUNT_TASK=saucelabs-tests
 env:
   matrix:
     - GRUNT_TASK=tests

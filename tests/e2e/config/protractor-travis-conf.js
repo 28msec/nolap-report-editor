@@ -18,7 +18,7 @@ config.multiCapabilities = [
     'name': 'NoLAP Report Editor',
     'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
     'build': process.env.TRAVIS_BUILD_NUMBER,
-    'version': '28'
+    'version': '31'
 }, {
     browserName: 'safari',
     'platform': 'OS X 10.9',
@@ -31,4 +31,5 @@ config.multiCapabilities = [
 
 config.allScriptsTimeout = 30000;
 config.getPageTimeout = 30000;
+config.jasmineNodeOpts.defaultTimeoutInterval = 60000;
 exports.config = config;
