@@ -462,8 +462,9 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('test', ['build', 'karma', 'e2e']);
-    grunt.registerTask('unit-tests', ['build', 'karma']);
-    grunt.registerTask('e2e-tests', ['build', 'e2e']);
-    grunt.registerTask('default', ['jsonlint', 'jshint', 'test', 'deploy']);
+    grunt.registerTask('tests', ['karma', 'e2e']);
+    grunt.registerTask('static-checks', ['jsonlint', 'jshint', 'build']);
+    grunt.registerTask('unit-tests', ['static-checks', 'karma']);
+    grunt.registerTask('e2e-tests', ['static-checks', 'e2e']);
+    grunt.registerTask('default', ['static-checks', 'tests', 'deploy']);
 };
