@@ -41,6 +41,9 @@ describe('Report', function(){
     
     it('Taxonomy Section should be active', function(){
         expect(report.getActiveSection()).toBe('Taxonomy');
+        report.facts.visitPage();
+        report.goToTaxonomy();
+        expect(report.getActiveSection()).toBe('Taxonomy');
     });
     
     it('Should create a new concept (2)', function(){
