@@ -1,3 +1,4 @@
+/*global by:false */
 'use strict';
 
 //GetAttribute() returns "boolean" values and will return either "true" or null
