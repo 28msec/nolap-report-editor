@@ -15,8 +15,8 @@ Spreadsheet.prototype.getValuesByHeaderContainingText = function(containedText){
     return this.dataRows
         .filter(function(elem){
             return elem.element(by.css('td.header > span'))
-                   .getText()           
-                   .then(function(text){                
+                   .getText()
+                   .then(function(text){
                        return text.indexOf(containedText) > -1;            
                    });
         })
