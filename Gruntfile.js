@@ -471,10 +471,10 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('tests', ['karma', 'e2e']);
+    grunt.registerTask('tests', ['static-checks', 'karma', 'e2e']);
     grunt.registerTask('static-checks', ['jsonlint', 'jshint', 'build']);
     grunt.registerTask('unit-tests', ['static-checks', 'karma']);
     grunt.registerTask('e2e-tests', ['static-checks', 'e2e']);
     grunt.registerTask('saucelabs-tests', ['static-checks', 'e2e-saucelabs']);
-    grunt.registerTask('default', ['static-checks', 'tests', 'deploy']);
+    grunt.registerTask('default', ['tests', 'deploy']);
 };

@@ -13,17 +13,13 @@ config.multiCapabilities = [
     'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
     'build': process.env.TRAVIS_BUILD_NUMBER,
     'version': '34'
-}
-,
-{
+}, {
     'browserName': 'firefox',
     'name': 'NoLAP Report Editor',
     'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
     'build': process.env.TRAVIS_BUILD_NUMBER,
     'version': '28'
-}
-,
-{
+}, {
     browserName: 'safari',
     'platform': 'OS X 10.9',
     'version': '7',
