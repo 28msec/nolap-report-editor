@@ -18,6 +18,8 @@ env:
     - GRUNT_TASK=build
     - GRUNT_TASK=unit-tests
     - GRUNT_TASK=e2e-tests
+    - GRUNT_TASK=jsonlint
+    - GRUNT_TASK=jshint
   global:
     - secure: USgTTaw/Vn69/M8X4ZJHEOZO9II18PQdaztoRgp9o71gQYvq7J/F+cYIfnyF1rwnlY6bbl/IJWQF6vmw338pXO20H8Ppk33SMom2uTasNTrq64Fb6Yd7wIvbZdj11yhGGd9OYpB+/ONU+0ArOBWGu2po/yCvbgAESpA5hcGOegc=
     - secure: b8O5l0rlwvjo2R/QjfGIgD6GOEHpDPkVygv0FixZrywlM18ZThiaWn5tp8liY7DQsi7AB6m2Q/bXKd39uAxJnWAgOBLUwXB1NN6jG1qZxzDCF7hEPs25/WYLD6vIW9o0j5e3rmMgDU6dtLH141njOLhWG93oy0+h6jzRnH2niWo=
