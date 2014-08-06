@@ -14,22 +14,25 @@ config.multiCapabilities = [
     'build': process.env.TRAVIS_BUILD_NUMBER,
     'version': '34'
 }
-//, {
-//{
-//    'browserName': 'firefox',
-//    'name': 'NoLAP Report Editor',
-//    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
-//    'build': process.env.TRAVIS_BUILD_NUMBER,
-//    'version': '28'
-//}
-//, {
-//    browserName: 'safari',
-//    'platform': 'OS X 10.9',
-//    'version': '7',
-//    'name': 'NoLAP Report Editor',
-//    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
-//    'build': process.env.TRAVIS_BUILD_NUMBER
-//}
+,
+{
+    'browserName': 'firefox',
+    'name': 'NoLAP Report Editor',
+    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
+    'build': process.env.TRAVIS_BUILD_NUMBER,
+    'version': '28'
+}
+,
+{
+    browserName: 'safari',
+    'platform': 'OS X 10.9',
+    'version': '7',
+    'name': 'NoLAP Report Editor',
+    'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER,
+    'build': process.env.TRAVIS_BUILD_NUMBER
+}
 ];
 
+config.allScriptsTimeout = 30000;
+config.getPageTimeout = 30000;
 exports.config = config;

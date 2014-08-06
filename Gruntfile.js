@@ -220,6 +220,7 @@ module.exports = function (grunt) {
         },
         protractor: {
             travis: 'tests/e2e/config/protractor-travis-nosaucelabs-conf.js',
+            saucelabs: 'tests/e2e/config/protractor-travis-conf.js',
             local: 'tests/e2e/config/protractor-conf.js'
         },
         ngconstant: {
@@ -415,6 +416,14 @@ module.exports = function (grunt) {
         ]);
     });
 
+    grunt.registerTask('e2e-saucelabs', function(){
+        grunt.task.run([
+            'webdriver',
+            'connect:dist',
+            'protractor:saucelabs'
+        ]);
+    });
+ 
     grunt.registerTask('e2e-dev', function(){
         var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
         grunt.task.run([
@@ -466,5 +475,6 @@ module.exports = function (grunt) {
     grunt.registerTask('static-checks', ['jsonlint', 'jshint', 'build']);
     grunt.registerTask('unit-tests', ['static-checks', 'karma']);
     grunt.registerTask('e2e-tests', ['static-checks', 'e2e']);
+    grunt.registerTask('saucelabs-tests', ['static-checks', 'e2e-saucelabs']);
     grunt.registerTask('default', ['static-checks', 'tests', 'deploy']);
 };
