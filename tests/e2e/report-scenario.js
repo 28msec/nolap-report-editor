@@ -53,11 +53,13 @@ describe('Report', function(){
     it('should render ratios as decimals', function(){
         report.spreadsheet.visitPage()
         .then(function(){
-            var roas = report.spreadsheet.getValuesByHeaderContainingText('(ROA)');
-            expect(roas.length).toBe(1);
-            roas.forEach(function(value){
-                // should be a decimal and not rounded to zero
-                expect(value).not.toBe(0);
+            report.spreadsheet.getValuesByHeaderContainingText('(ROA)')
+            .then(function(roas){
+                expect(roas.length).toBe(1);
+                roas.forEach(function(value){
+                    // should be a decimal and not rounded to zero
+                    expect(value).not.toBe(0);
+                });
             });
         });
     });
