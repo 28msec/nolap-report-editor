@@ -2,7 +2,6 @@ describe('Check Presentation Tree Processing ', function () {
     'use strict';
 
     var scope, rootScope, createController; 
-    var defaultConceptName = 'ReportLineItems';
 
     beforeEach(inject(function($rootScope, $controller, Report) {
         rootScope = $rootScope;

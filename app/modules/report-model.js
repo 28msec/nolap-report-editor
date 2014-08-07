@@ -911,8 +911,7 @@ angular
 
     Report.prototype.getRootElement = function(networkShortName) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'getRootElement');
-        var model = this.getModel();
-        var rootElem = undefined;
+        var rootElem;
         var network = this.getNetwork('Presentation');
         if (network !== undefined && network.Trees !== undefined && network.Trees.length !== undefined && network.Trees.length > 0) {
             rootElem = network.Trees[0];
