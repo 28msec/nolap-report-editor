@@ -6,7 +6,7 @@ angular
 
     $scope.error = undefined;
     $scope.conceptCopy = angular.copy($scope.concept);
-    $scope.isRootElementInPresentation = $scope.report.isRootElement('Presentation', $scope.concept.Name);
+    $scope.isRootElementInPresentation = $scope.report.isConceptUsedAsRootElement('Presentation', $scope.concept.Name);
 
     $scope.updateConcept = function(){
         $scope.error = undefined;
@@ -60,7 +60,7 @@ angular
                     var parentIds = $scope.report.findInTree('Presentation', search.parent);
                     parentId = parentIds[0];
                 }
-                $scope.report.addElement('Presentation', parentId, element, parseInt(search.offset, 10));
+                $scope.report.addElement('Presentation', element, parseInt(search.offset, 10), parentId);
             }
         }
     );
@@ -72,10 +72,11 @@ angular
         dropped: function(event){
             if(event.source.nodesScope !== event.dest.nodesScope) {
                 if(event.dest.nodesScope.$nodeScope !== undefined && event.dest.nodesScope.$nodeScope !== null) {
-                    $scope.report.addElement('Presentation', event.dest.nodesScope.$nodeScope.$modelValue.Id, element, event.dest.index);
+                    $scope.report.addElement('Presentation', element, event.dest.index, event.dest.nodesScope.$nodeScope.$modelValue.Id);
                 } else {
-                    // dropped as root -> disabled right now in accept of taxonomy.js
-                    $scope.report.addElement('Presentation', undefined, element, event.dest.index);
+                    // dropped as root -> will automatically be added as child of the root element (should never happen, 
+                    // because dropping as root is disabled)
+                    $scope.report.addElement('Presentation', element, event.dest.index);
                 }
                 initElement();
                 $scope.loadPresentationTree();

@@ -93,7 +93,7 @@ describe('Concepts Model API Tests', function () {
         var name = 'fac:Test';
         var offset = 0;
         var element = report.createNewElement(name);
-        var newElement = report.addElement('Presentation', defaultRootElementId, element, offset);
+        var newElement = report.addElement('Presentation', element, offset);
                       
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
@@ -108,7 +108,7 @@ describe('Concepts Model API Tests', function () {
         var parentID = report.findInTree('Presentation','fac:Test');
         var offset = 0;
         var element = report.createNewElement(report.getConcept(name));
-        var newElement = report.addElement('Presentation', parentID[0], element, offset);
+        var newElement = report.addElement('Presentation', element, offset, parentID[0]);
                       
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
@@ -121,7 +121,7 @@ describe('Concepts Model API Tests', function () {
         expect(report).not.toBeNull();
         var name = 'fac:Test';
         var parentID = report.findInTree('Presentation','fac:Test');
-        var element = report.addElement('Presentation', parentID[0], name, 1);
+        var element = report.addElement('Presentation', name, 1, parentID[0]);
                       
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
@@ -129,30 +129,14 @@ describe('Concepts Model API Tests', function () {
         expect(report.existsElementInTree('Presentation',element.Id)).toBe(true);
     });
 
-    it('Try to add another root presentation element', function () {
+    it('Add another grouping presentation element', function () {
         expect(report).not.toBeNull();
         var name = 'fac:Group2';
         var label = 'Another root';
         report.addConcept(name, label, true);
         expect(report.existsConcept(name)).toBe(true);
 
-        //this doesn't really work: expect(report.addElement('Presentation', null, name)).toThrowError('addElement: network Presentation can only have a single root element.');
-        var element;
-        try {
-            element = report.addElement('Presentation', null, name);
-            // ensure that the exception has been thrown:
-            expect(true).toBe(false);
-        } catch (ex) {
-            expect(ex.message.match(/can only have a single root element/g)).not.toBeNull();
-        }
-        expect(element).not.toBeDefined();
-        expect(report.findInTree('Presentation', name).length).toBe(0);
-    });
-
-    it('Add another grouping presentation element', function () {
-        expect(report).not.toBeNull();
-        var name = 'fac:Group2';
-        var element = report.addElement('Presentation', defaultRootElementId, name);
+        var element = report.addElement('Presentation', name, 0);
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
         expect(element.Id).toBeDefined();
@@ -165,7 +149,7 @@ describe('Concepts Model API Tests', function () {
         var name = 'fac:Test';
         var parentID = report.findInTree('Presentation','fac:Leaf');
         try {
-            report.addElement('Presentation', parentID[0], name);
+            report.addElement('Presentation', name, 0, parentID[0]);
         } catch (ex) {
             expect(ex.message.match(/"fac:Leaf" is not abstract/g)).not.toBeNull();
         }
@@ -227,7 +211,7 @@ describe('Concepts Model API Tests', function () {
         var label = 'Another test leaf';
         var to = [ 'us-gaap:Revenues', 'us-gaap:Liabilities' ];
         report.addConcept(from, label, false);
-        report.addElement('Presentation', defaultRootElementId, from);
+        report.addElement('Presentation', from);
         report.updateConceptMap(from, to);
 
         expect(report.existsConceptMap(from)).toBe(true);

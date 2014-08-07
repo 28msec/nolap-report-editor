@@ -1,15 +1,13 @@
 describe('Check Presentation Tree Processing ', function () {
     'use strict';
 
-    var scope, rootScope, createController, defaultRootElementId;
+    var scope, rootScope, createController; 
     var defaultConceptName = 'ReportLineItems';
 
     beforeEach(inject(function($rootScope, $controller, Report) {
         rootScope = $rootScope;
         scope = $rootScope.$new();
         scope.report = new Report('My Report', 'Label', 'Description', 'Role', 'w@28.io');
-        var elementIds = scope.report.findInTree('Presentation', defaultConceptName);
-        defaultRootElementId = elementIds[0];
         createController = function() {
             return $controller('TaxonomyCtrl', {
                 '$scope': scope
@@ -19,13 +17,12 @@ describe('Check Presentation Tree Processing ', function () {
     
 
     it('Creates a presentation tree with a non abstract element.', function(){
-        expect(defaultRootElementId).toBeDefined();
         createController();
         expect(scope.report.getNetwork('Presentation').Trees).toBeDefined();
         expect(scope.report.getNetwork('Presentation').Trees).not.toEqual({});
         scope.report.addConcept('mr:assets', 'Assets', false);
         var concept = scope.report.getConcept('mr:assets');
-        scope.report.addElement('Presentation', defaultRootElementId, concept.Name, 0);
+        scope.report.addElement('Presentation', concept.Name, 0);
         scope.loadPresentationTree();
         var assetsElementId = scope.report.findInTree('Presentation', 'mr:assets')[0];
         var assetsElement = scope.report.getElementFromTree('Presentation', assetsElementId);
@@ -35,13 +32,12 @@ describe('Check Presentation Tree Processing ', function () {
     });
 
     it('Should transform the presentation tree into another tree that can be processed by the UI.', function(){
-        expect(defaultRootElementId).toBeDefined();
         createController();
         expect(scope.report.getNetwork('Presentation').Trees).toBeDefined();
         expect(scope.report.getNetwork('Presentation').Trees).not.toEqual({});
         scope.report.addConcept('mr:assets', 'Assets', true);
         var concept = scope.report.getConcept('mr:assets');
-        scope.report.addElement('Presentation', defaultRootElementId, concept.Name, 0);
+        scope.report.addElement('Presentation', concept.Name, 0);
         scope.loadPresentationTree();
         var assetsElementId = scope.report.findInTree('Presentation', 'mr:assets')[0];
         var assetsElement = scope.report.getElementFromTree('Presentation', assetsElementId);

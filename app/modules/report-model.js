@@ -177,7 +177,7 @@ angular
                     }
                 };
             this.addConcept('ReportLineItems', label, true);
-            this.addElement('Presentation', null, 'ReportLineItems', 0);
+            this.addElement('Presentation', 'ReportLineItems', 0);
         } // if
         addDefinitionModel(this);
     };
@@ -818,6 +818,9 @@ angular
         return order;
     };
 
+    // determine an Element either from:
+    // 1. concept name which will create a new element with the desired order
+    // 2. element which will return the element with the desired order
     var determineElement = function(report, elementOrConceptName, order){
         var element;
         if(typeof elementOrConceptName === 'string'){
@@ -908,9 +911,9 @@ angular
 
     Report.prototype.getRootElement = function(networkShortName) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'getRootElement');
-        var model = report.getModel();
+        var model = this.getModel();
         var rootElem = undefined;
-        var network = report.getNetwork('Presentation');
+        var network = this.getNetwork('Presentation');
         if (network !== undefined && network.Trees !== undefined && network.Trees.length !== undefined && network.Trees.length > 0) {
             rootElem = network.Trees[0];
         } else if (network !== undefined && network.Trees !== undefined && typeof network.Trees === 'object' && network.Trees !== null && Object.keys(network.Trees).length > 0) {
@@ -920,36 +923,38 @@ angular
     };
 
     // check wheter a concept is used as root element in a network
-    Report.prototype.isRootElement = function(networkShortName, elementOrConceptName){
-        ensureNetworkShortName(networkShortName, 'networkShortName', 'isRootElement');
+    Report.prototype.isConceptUsedAsRootElement = function(networkShortName, oConceptName){
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'isConceptUsedAsRootElement');
+        var conceptName = this.alignConceptPrefix(oConceptName);
+        ensureConceptName(conceptName, 'oconceptName', 'isConceptUsedAsRootElement');
         var isRootElem = false;
-
-        if(typeof elementOrConceptName === 'string') {
-            var conceptName = this.alignConceptPrefix(elementOrConceptName);
-            ensureConceptName(conceptName, 'oconceptName', 'isRootElement');
-
-            var elementIds = this.findInTree(networkShortName, conceptName);
-            var that = this;
-            angular.forEach(elementIds, function (id) {
-                var parent = that.getParentElementFromTree(networkShortName, id);
-                if (parent === undefined || parent === null) {
-                    isRootElem = true;
-                }
-            });
-        } else {
-            var element = elementOrConceptName;
-            ensureParameter(element, 'elementOrConceptName', 'object', 'isRootElement');
-            var parent = this.getParentElementFromTree(networkShortName, element.Id);
+        var elementIds = this.findInTree(networkShortName, conceptName);
+        var that = this;
+        angular.forEach(elementIds, function (id) {
+            var parent = that.getParentElementFromTree(networkShortName, id);
             if (parent === undefined || parent === null) {
                 isRootElem = true;
             }
+        });
+        return isRootElem;
+    };
+
+    // check wheter an element is used as root element in a network
+    Report.prototype.isRootElement = function(networkShortName, element){
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'isRootElement');
+        var isRootElem = false;
+        ensureParameter(element, 'elementOrConceptName', 'object', 'isRootElement');
+        var parent = this.getParentElementFromTree(networkShortName, element.Id);
+        if (parent === undefined || parent === null) {
+            isRootElem = true;
         }
         return isRootElem;
     };
 
-    Report.prototype.addElement = function(networkShortName, parentElementID, elementOrConceptName, offset){
+    Report.prototype.addElement = function(networkShortName, elementOrConceptName, offset, parentElementID){
         ensureNetworkShortName(networkShortName, 'networkShortName', 'addElement');
         ensureOptionalParameter(offset, 'offset', 'number', 'addElement');
+        var rootElem = this.getRootElement('Presentation');
 
         // determine order
         var order = determineOrder(this,networkShortName, parentElementID, offset, true);
@@ -958,31 +963,35 @@ angular
         var element = determineElement(this, elementOrConceptName, order);
         var conceptName = element.Name;
 
-        if(parentElementID === undefined || parentElementID === null) {
+        if((parentElementID === undefined || parentElementID === null) && rootElem === undefined) {
             // add a root element (only one allowed)
             var network = this.getNetwork(networkShortName);
-            if(network.Trees === undefined || network.Trees === null || Object.keys(network.Trees).length === 0){
-                network.Trees[conceptName] = element;
-            } else {
-                throw new Error('addElement: network ' + networkShortName + ' can only have a single root element.');
-            }
+            network.Trees[conceptName] = element;
+            return element;
+        } 
+        
+        var parent;
+        if(parentElementID === undefined || parentElementID === null){
+            parent = rootElem;
         } else {
             // add child to existing tree
             ensureParameter(parentElementID, 'parentElementID', 'string', 'addElement');
-        
-            var parent = this.getElementFromTree(networkShortName, parentElementID);
+            parent = this.getElementFromTree(networkShortName, parentElementID);
             ensureExists(parent, 'object', 'addElement', 'cannot add child to tree. Parent with id "' + parentElementID + '" doesn\'t exist.');
-            var parentConcept = this.getConcept(parent.Name);
-            if(!parentConcept.IsAbstract) {
-                throw new Error('addElement: cannot add child to parent "' + parentElementID +
-                    '". Reason: Parent concept "' + parent.Name  + '" is not abstract.');
-            }
-
-            if(parent.To === undefined || parent.To === null) {
-                parent.To = {};
-            }
-            parent.To[conceptName] = element;
         }
+
+        // ensure parent is abstract
+        var parentConcept = this.getConcept(parent.Name);
+        if(!parentConcept.IsAbstract) {
+            throw new Error('addElement: cannot add child to parent "' + parentElementID +
+                '". Reason: Parent concept "' + parent.Name  + '" is not abstract.');
+        }
+
+        if(parent.To === undefined || parent.To === null) {
+            parent.To = {};
+        }
+
+        parent.To[conceptName] = element;
         return element;
     };
 
