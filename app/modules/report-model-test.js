@@ -136,9 +136,12 @@ describe('Concepts Model API Tests', function () {
         report.addConcept(name, label, true);
         expect(report.existsConcept(name)).toBe(true);
 
+        //this doesn't really work: expect(report.addElement('Presentation', null, name)).toThrowError('addElement: network Presentation can only have a single root element.');
         var element;
         try {
-            report.addElement('Presentation', null, name);
+            element = report.addElement('Presentation', null, name);
+            // ensure that the exception has been thrown:
+            expect(true).toBe(false);
         } catch (ex) {
             expect(ex.message.match(/can only have a single root element/g)).not.toBeNull();
         }

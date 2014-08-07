@@ -179,7 +179,7 @@ angular
             this.addConcept('ReportLineItems', label, true);
             this.addElement('Presentation', null, 'ReportLineItems', 0);
         } // if
-        ensureDefinitionModel(this);
+        addDefinitionModel(this);
     };
 
     // helper function to check parameters
@@ -834,17 +834,15 @@ angular
         return element;
     };
 
-    var ensureDefinitionModel = function(report){
+    /* *
+       idempotent function to make sure a report has a single proper definition model in place.
+    * */
+    var addDefinitionModel = function(report){
         var model = report.getModel();
         var label = model.Label;
         var role = model.Role;
-        var source = '';
-        var network = report.getNetwork('Presentation');
-        if(network !== undefined && network.Trees !== undefined && network.Trees.length !== undefined && network.Trees.length > 0){
-            source = network.Trees[0].Name;
-        } else if(network !== undefined && network.Trees !== undefined && typeof network.Trees === 'object' && network.Trees !== null && Object.keys(network.Trees).length >0){
-            source = Object.keys(network.Trees)[0];
-        }
+        var rootElem = report.getRootElement('Presentation');
+        var source = rootElem ? rootElem.Name : '';
 
         model.DefinitionModels =
             [ {
@@ -906,6 +904,19 @@ angular
 
                 }
             } ];
+    };
+
+    Report.prototype.getRootElement = function(networkShortName) {
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'getRootElement');
+        var model = report.getModel();
+        var rootElem = undefined;
+        var network = report.getNetwork('Presentation');
+        if (network !== undefined && network.Trees !== undefined && network.Trees.length !== undefined && network.Trees.length > 0) {
+            rootElem = network.Trees[0];
+        } else if (network !== undefined && network.Trees !== undefined && typeof network.Trees === 'object' && network.Trees !== null && Object.keys(network.Trees).length > 0) {
+            rootElem = network.Trees[Object.keys(network.Trees)[0]];
+        }
+        return rootElem;
     };
 
     // check wheter a concept is used as root element in a network
