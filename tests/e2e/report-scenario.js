@@ -36,4 +36,19 @@ describe('Report', function(){
         expect(recompilePage.errorMessages.count()).toBe(0);
         expect(recompilePage.successMessages.count()).toBe(66);
     });
+
+    it('should select Coca Cola on filters page', function(){
+        report.filters.visitPage();
+        report.filters.closeSelectedFiltersTag('DOW30');
+        report.filters.setFiltersEntityName('Coca Cola', 2);
+        expect(report.filters.selectedFilters.cik.count()).toBe(1);
+    });
+
+    it('should render ratios as decimals', function(){
+        report.spreadsheet.visitPage();
+        var roas = report.spreadsheet.getValueTDsByHeaderContainingText('(ROA)');
+        expect(roas.count()).toBe(1);
+        var value = report.spreadsheet.getCellValue(roas.get(0));
+        expect(value.getText()).toBe('0.10');
+    });
 });
