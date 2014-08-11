@@ -4,11 +4,7 @@
     <a class="btn btn-success btn-xs pull-left tree-node-hover" ng-click="toggle(this)" ng-if="element.IsAbstract" data-nodrag>
         <span class="fa fa-chevron-down" ng-class="{'fa-chevron-right': collapsed, 'fa-chevron-down': !collapsed}"></span>
     </a>
-    <span ng-if="element.IsPresentationRoot" ng-bind="element.Name" ng-click="goToConcept(this)"  class="pull-left"
-          ng-class="{'element-name-lg': !element.IsAbstract && (selectedConceptName !== element.Name),
-                     'element-name': (element.IsAbstract || selectedConceptName === element.Name) && (!element.IsAbstract || selectedConceptName !== element.Name),
-                     'element-name-xs': element.IsAbstract && (selectedConceptName === element.Name), 'abstract-element-name': element.IsAbstract, 'concrete-element-name': !element.IsAbstract }"
-          data-nodrag></span>
+    <span ng-if="element.IsPresentationRoot" ng-bind="element.Name" ng-click="goToConcept(this)" class="pull-left element-name abstract-element-name" data-nodrag></span>
     <span ng-if="!element.IsPresentationRoot" ng-bind="element.Name" ng-click="goToConcept(this)"  class="pull-left"
           ng-class="{'element-name-lg': !element.IsAbstract && (selectedConceptName !== element.Name),
                      'element-name': (element.IsAbstract || selectedConceptName === element.Name) && (!element.IsAbstract || selectedConceptName !== element.Name),
