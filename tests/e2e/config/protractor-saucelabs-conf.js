@@ -18,7 +18,7 @@ config.multiCapabilities = [
     'name': 'NoLAP Report Editor',
     'tunnel-identifier': process.env.WERCKER_STEP_ID,
     'build': process.env.WERCKER_GIT_COMMIT,
-   'version': '31'
+    'version': '28'
 },
 {
     browserName: 'safari',
