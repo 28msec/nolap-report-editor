@@ -33,5 +33,5 @@ config.multiCapabilities = [
 config.allScriptsTimeout = 30000;
 config.getPageTimeout = 30000;
 config.jasmineNodeOpts.defaultTimeoutInterval = 100000;
-config.specs = ['../*-scenario.js'];
+config.specs = ['../basic-scenario.js'];
 exports.config = config;
