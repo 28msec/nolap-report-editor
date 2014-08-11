@@ -1,13 +1,15 @@
-<div class="clearfix" ng-class="{ 'active': (selectedConceptName === element.Name),
-                                   'notactive': (selectedConceptName !== element.Name)}" dyn-nodrag ui-tree-handle>
+<div class="clearfix" ng-class="{ 'active': (!element.IsPresentationRoot && selectedConceptName === element.Name),
+                                  'active-no-drag': (element.IsPresentationRoot && selectedConceptName === element.Name),
+                                  'notactive': (selectedConceptName !== element.Name)}" dyn-nodrag ui-tree-handle>
     <a class="btn btn-success btn-xs pull-left tree-node-hover" ng-click="toggle(this)" ng-if="element.IsAbstract" data-nodrag>
         <span class="fa fa-chevron-down" ng-class="{'fa-chevron-right': collapsed, 'fa-chevron-down': !collapsed}"></span>
     </a>
-    <span ng-bind="element.Name" ng-click="goToConcept(this)"  class="pull-left"
+    <span ng-if="element.IsPresentationRoot" ng-bind="element.Name" ng-click="goToConcept(this)" class="pull-left element-name abstract-element-name" data-nodrag></span>
+    <span ng-if="!element.IsPresentationRoot" ng-bind="element.Name" ng-click="goToConcept(this)"  class="pull-left"
           ng-class="{'element-name-lg': !element.IsAbstract && (selectedConceptName !== element.Name),
                      'element-name': (element.IsAbstract || selectedConceptName === element.Name) && (!element.IsAbstract || selectedConceptName !== element.Name),
                      'element-name-xs': element.IsAbstract && (selectedConceptName === element.Name), 'abstract-element-name': element.IsAbstract, 'concrete-element-name': !element.IsAbstract }"></span>
-    <a class="btn btn-danger btn-xs pull-right tree-node-hover" ng-click="removeNode(this)" ng-if="selectedConceptName === element.Name" data-nodrag>
+    <a ng-if="!element.IsPresentationRoot && selectedConceptName === element.Name" class="btn btn-danger btn-xs pull-right tree-node-hover" ng-click="removeNode(this)" data-nodrag>
         <span class="fa fa-times"></span>
     </a>
 </div>
