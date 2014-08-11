@@ -9,7 +9,7 @@
             <a ui-sref2="report.taxonomy.concept.overview()">Overview</a>
         </li>
         <li ui-sref-active2="active" ng-class="{ disabled: concept.IsAbstract === true }">
-            <a ui-sref2="report.taxonomy.concept.synonyms()">Synonyms ({{report.listConceptMapSynonyms(concept.Name).length}})</a>
+            <a ui-sref2="report.taxonomy.concept.synonyms()" id="synonyms-link">Synonyms ({{report.listConceptMapSynonyms(concept.Name).length}})</a>
         </li>
         <li ui-sref-active2="active" ng-class="{ disabled: concept.IsAbstract === true }">
             <a ui-sref2="report.taxonomy.concept.formula.computation.list()">Formula</a>

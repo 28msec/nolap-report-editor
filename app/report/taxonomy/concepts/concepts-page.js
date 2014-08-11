@@ -2,6 +2,7 @@
 'use strict';
 
 var Recompile = require('./recompile/recompile-page');
+var Concept = require('../concept/concept-page');
 
 function Concepts(reportId){
     this.reportId = reportId;
@@ -27,6 +28,14 @@ Concepts.prototype.createConcept = function(conceptName){
             });
         }
     });
+};
+
+Concepts.prototype.goToConcept = function(conceptName){
+    this.conceptName.clear();
+    this.conceptName.sendKeys(conceptName);
+    var completion = element.all(by.repeater('match in matches track by $index'));
+    completion.first().click();
+    return new Concept(this.reportId, conceptName);
 };
 
 Concepts.prototype.hasError = function(){
