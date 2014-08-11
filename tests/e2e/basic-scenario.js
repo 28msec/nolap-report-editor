@@ -68,12 +68,7 @@ describe('Report', function(){
     });
 
     it('Creates a new element', function(){
-        // this should fail because only one root element is allowed:
         report.taxonomy.getConcept(conceptName).createElement();
-        expect(report.taxonomy.elements.count()).toBe(1);
-        expect(report.taxonomy.rootElements.count()).toBe(1);
-        // as a child it should work:
-        report.taxonomy.getConcept(conceptName).createElement('h:ReportLineItems');
         expect(report.taxonomy.elements.count()).toBe(2);
         expect(report.taxonomy.rootElements.count()).toBe(1);
     });
