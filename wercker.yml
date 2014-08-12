@@ -1,4 +1,4 @@
-box: mihkels/java8-oracle@0.0.1
+box: olger/box-yeoman@0.5.4
 build:
     steps:
         - aussiegeek/install-phantomjs@0.0.3
