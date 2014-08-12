@@ -13,9 +13,7 @@ config.multiCapabilities = [
     'tunnel-identifier': process.env.WERCKER_STEP_ID,
     'build': process.env.WERCKER_GIT_COMMIT,
     'version': '34'
-}
-, 
-{
+}, {
     'browserName': 'firefox',
     'name': 'NoLAP Report Editor',
     'tunnel-identifier': process.env.WERCKER_STEP_ID,
