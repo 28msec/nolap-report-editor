@@ -6,7 +6,7 @@ build:
             code: |
                 echo "Installing Firefox v#31.0"
                 sudo mkdir -p /usr/local/firefox-#31.0
-                sudo chown -R travis /usr/local/firefox-#31.0
+                sudo chown -R wercker /usr/local/firefox-#31.0
                 wget -O /tmp/firefox.tar.bz2 http://ftp.mozilla.org/pub/firefox/releases/#31.0/linux-x86_64/en-US/firefox-#31.0.tar.bz2
                 pushd /usr/local/firefox-#31.0
                 tar xf /tmp/firefox.tar.bz2
