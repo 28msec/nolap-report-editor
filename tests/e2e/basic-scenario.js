@@ -23,6 +23,14 @@ describe('Report', function(){
         });
     });
     
+    it('Should already contain an element', function(){
+        var concept = report.taxonomy.getConcept('h:ReportLineItems');
+        concept.visitPage();
+        expect(concept.label.getAttribute('value')).toBe(reportName);
+        expect(report.taxonomy.elements.count()).toBe(1);
+        expect(report.taxonomy.rootElements.count()).toBe(1);
+    });
+
     it('Shouldn\'t create a new concept with an invalid name', function(){
         conceptName = 'hello World';
         var concepts = report.taxonomy.concepts;
@@ -37,6 +45,9 @@ describe('Report', function(){
         var concepts = report.taxonomy.concepts;
         concepts.visitPage();
         concepts.createConcept(conceptName);
+        var concept = report.taxonomy.getConcept(conceptName);
+        concept.visitPage();
+        expect(concept.label.getAttribute('value')).toBe('Hello World ID');
     });
     
     it('Taxonomy Section should be active', function(){
@@ -51,11 +62,15 @@ describe('Report', function(){
         var concepts = report.taxonomy.concepts;
         concepts.visitPage();
         concepts.createConcept(conceptName);
+        var concept = report.taxonomy.getConcept(conceptName);
+        concept.visitPage();
+        expect(concept.label.getAttribute('value')).toBe('Assets');
     });
 
     it('Creates a new element', function(){
         report.taxonomy.getConcept(conceptName).createElement();
-        expect(report.taxonomy.elements.count()).toBe(1);
+        expect(report.taxonomy.elements.count()).toBe(2);
+        expect(report.taxonomy.rootElements.count()).toBe(1);
     });
     
     it('Renames the concept label', function(){
@@ -79,13 +94,15 @@ describe('Report', function(){
     });
     
     it('Should display the fact table', function() {
-        report.facts.visitPage();
-        expect(report.facts.lineCount()).toBeGreaterThan(0);
+        report.facts.visitPage()
+        .then(function(){
+            expect(report.facts.lineCount()).toBeGreaterThan(0);
+        });
     });
 
     it('Should display the preview', function() {
         report.spreadsheet.visitPage();
-        expect(report.spreadsheet.getCellValueByCss('.first-row-header-row > td > span')).toBe('Assets Label');
+        expect(report.spreadsheet.getCellValueByCss('.first-row-header-row > td > span')).toBe(reportName);
     });
 
     it('Should delete report', function() {

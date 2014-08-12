@@ -5,37 +5,40 @@
         {{ error.message }}
     </div>
     <div class="scrollable">
-    <h3>Label</h3>
-    <input class="form-control" type="text" ng-model="conceptCopy.Label" ng-change="updateConcept()" placeholder="Concept label">
-    <div class="checkbox">
-        <label>
-            <input ng-change="updateConcept()" type="checkbox" ng-model="conceptCopy.IsAbstract">
-            Abstract concept
-        </label>
+        <h3>Label</h3>
+        <input class="form-control" type="text" ng-model="conceptCopy.Label" ng-change="updateConcept()" placeholder="Concept label">
+        <div ng-if="!isRootElementInPresentation">
+            <div class="checkbox">
+                <label>
+                    <input ng-change="updateConcept()" type="checkbox" ng-model="conceptCopy.IsAbstract">
+                    Abstract concept
+                </label>
+            </div>
+            <hr>
+            <h3>Presentation</h3>
+            <p ng-if="ref.length === 0">
+                There are no elements for this concept in the presentation tree.
+            </p>
+            <p ng-if="refs.length === 1">
+                There is one element for this concept in the presentation tree.
+            </p>
+            <p ng-if="refs.length > 1">
+                There are <span ng-bind="refs.length"></span> for this concept in the presentation tree.
+            </p>
+            <p>You can drop the element below in presentation tree.</p>
+            <div ui-tree="elementOptions">
+                <ol ui-tree-nodes="" ng-model="element">
+                    <li ng-repeat="element in element" ui-tree-node>
+                        <div class="element-to-drop clearfix" ui-tree-handle>
+                            <span class="fa fa-arrows btn btn-success btn-xs pull-left" style="cursor: move;"></span>
+                            <span ng-bind="element.Name" class="pull-left"></span>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+            <hr>
+            <h3>Management</h3>
+            <button class="btn btn-danger" ng-click="deleteConcept()">Delete concept</button>
+        </div>
     </div>
-    <hr>
-    <h3>Presentation</h3>
-    <p ng-if="ref.length === 0">
-        There are no elements for this concept in the presentation tree.
-    </p>
-    <p ng-if="refs.length === 1">
-        There is one element for this concept in the presentation tree.
-    </p>
-    <p ng-if="refs.length > 1">
-        There are <span ng-bind="refs.length"></span> for this concept in the presentation tree.
-    </p>
-    <p>You can drop the element below in presentation tree.</p>
-    <div ui-tree="elementOptions">
-        <ol ui-tree-nodes="" ng-model="element">
-            <li ng-repeat="element in element" ui-tree-node>
-                <div class="element-to-drop clearfix" ui-tree-handle>
-                    <span class="fa fa-arrows btn btn-success btn-xs pull-left" style="cursor: move;"></span>
-                    <span ng-bind="element.Name" class="pull-left"></span>
-                </div>
-            </li>
-        </ol>
-    </div>
-    <hr>
-    <h3>Management</h3>
-    <button class="btn btn-danger" ng-click="deleteConcept()">Delete concept</button>
 </div>

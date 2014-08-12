@@ -18,6 +18,13 @@ angular
 .controller('TaxonomyCtrl', function($scope, $state){
 
     $scope.treeOptions = {
+        accept: function(sourceNodeScope, destNodesScope){
+            // only allow dropping as non-root
+            if(destNodesScope !== undefined && destNodesScope.$nodeScope !== null && destNodesScope.$nodeScope !== undefined) {
+                return true;
+            }
+            return false;
+        },
         dropped: function(event){
             //If the element hasn't be dropped in place
             if(event.dest.nodesScope.$nodeScope !== null) {
@@ -75,18 +82,21 @@ angular
             }   
             return 0;
         }).forEach(function(key){
-            var child = element[key];
-            var concept = $scope.report.getConcept(child.Name);
+            var childElement = element[key];
+            var concept = $scope.report.getConcept(childElement.Name);
             if(concept === null) {
-                console.error('Concept ' + child.Name + ' not found in report.');
+                console.error('Concept ' + childElement.Name + ' not found in report.');
                 console.error('Invalid report detected. This is a serious bug!');
                 return;
             }
-            current.push(child);
+            current.push(childElement);
+            if($scope.report.isRootElement('Presentation', childElement)){
+                childElement.IsPresentationRoot = true;
+            }
             if(concept.IsAbstract === true) {
-                child.IsAbstract = true;
-                child.children = [];
-                setPresentationTree(child.To ? child.To : {}, child.children);
+                childElement.IsAbstract = true;
+                childElement.children = [];
+                setPresentationTree(childElement.To ? childElement.To : {}, childElement.children);
             }
         });
     };

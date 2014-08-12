@@ -3,16 +3,24 @@ describe('Concepts Model API Tests', function () {
 
     /* global Report */
     var report = null;
+    var defaultRootElementId;
 
     it('Create a New Report', function () {
-        var name = 'Report Name';
         var label = 'Report for Testing';
         var description = 'This Report is not intended to be used in production';
         var role = 'http://www.28.io/nolap/test';
-        report = new Report(name, label, description, role, 'd@28.io');
+        report = new Report(undefined, label, description, role, 'd@28.io');
         var model = report.getModel();
         expect(model._id).toBeDefined();
-        expect(model._id).toEqual(name);
+        expect(model._id).not.toBeNull();
+
+        var defaultConceptName = 'ReportLineItems';
+        expect(report.existsConcept(defaultConceptName)).toBe(true);
+        expect(report.getConcept(defaultConceptName).IsAbstract).toBe(true);
+
+        var elementIds = report.findInTree('Presentation', defaultConceptName);
+        defaultRootElementId = elementIds[0];
+        expect(elementIds.length).toEqual(1);
     });
 
     // concepts
@@ -76,7 +84,7 @@ describe('Concepts Model API Tests', function () {
         expect(report).not.toBeNull();
         var concepts = report.listConcepts();
                          
-        expect(concepts.length).toBe(2);
+        expect(concepts.length).toBe(3);
     });
 
     // trees
@@ -85,7 +93,7 @@ describe('Concepts Model API Tests', function () {
         var name = 'fac:Test';
         var offset = 0;
         var element = report.createNewElement(name);
-        var newElement = report.addElement('Presentation', null, element, offset);
+        var newElement = report.addElement('Presentation', element, offset);
                       
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
@@ -100,7 +108,7 @@ describe('Concepts Model API Tests', function () {
         var parentID = report.findInTree('Presentation','fac:Test');
         var offset = 0;
         var element = report.createNewElement(report.getConcept(name));
-        var newElement = report.addElement('Presentation', parentID[0], element, offset);
+        var newElement = report.addElement('Presentation', element, offset, parentID[0]);
                       
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
@@ -113,7 +121,7 @@ describe('Concepts Model API Tests', function () {
         expect(report).not.toBeNull();
         var name = 'fac:Test';
         var parentID = report.findInTree('Presentation','fac:Test');
-        var element = report.addElement('Presentation', parentID[0], name, 1);
+        var element = report.addElement('Presentation', name, 1, parentID[0]);
                       
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
@@ -121,13 +129,14 @@ describe('Concepts Model API Tests', function () {
         expect(report.existsElementInTree('Presentation',element.Id)).toBe(true);
     });
 
-    it('Add another root presentation element', function () {
+    it('Add another grouping presentation element', function () {
         expect(report).not.toBeNull();
-        var name = 'fac:Root2';
+        var name = 'fac:Group2';
         var label = 'Another root';
         report.addConcept(name, label, true);
+        expect(report.existsConcept(name)).toBe(true);
 
-        var element = report.addElement('Presentation', null, name);
+        var element = report.addElement('Presentation', name, 0);
         expect(element).not.toBeNull();
         expect(element.Id).not.toBeNull();
         expect(element.Id).toBeDefined();
@@ -140,7 +149,7 @@ describe('Concepts Model API Tests', function () {
         var name = 'fac:Test';
         var parentID = report.findInTree('Presentation','fac:Leaf');
         try {
-            report.addElement('Presentation', parentID[0], name);
+            report.addElement('Presentation', name, 0, parentID[0]);
         } catch (ex) {
             expect(ex.message.match(/"fac:Leaf" is not abstract/g)).not.toBeNull();
         }
@@ -162,7 +171,7 @@ describe('Concepts Model API Tests', function () {
     it('Move Subtree', function () {
         expect(report).not.toBeNull();
         var name1 = 'fac:Leaf';
-        var name2 = 'fac:Root2';
+        var name2 = 'fac:Group2';
         var subtreeID = report.findInTree('Presentation',name1)[0];
         var oldParent = report.getParentElementFromTree('Presentation', subtreeID);
         var newParentID = report.findInTree('Presentation',name2)[0];
@@ -180,7 +189,7 @@ describe('Concepts Model API Tests', function () {
     it('List trees', function () {
         expect(report).not.toBeNull();
         var trees = report.listTrees('Presentation');
-        expect(trees.length).toBe(2);
+        expect(trees.length).toBe(1);
     });
 
     // concept maps
@@ -202,8 +211,7 @@ describe('Concepts Model API Tests', function () {
         var label = 'Another test leaf';
         var to = [ 'us-gaap:Revenues', 'us-gaap:Liabilities' ];
         report.addConcept(from, label, false);
-        var root2ID = report.findInTree('Presentation','fac:Root2')[0];
-        report.addElement('Presentation', root2ID, from);
+        report.addElement('Presentation', from);
         report.updateConceptMap(from, to);
 
         expect(report.existsConceptMap(from)).toBe(true);
