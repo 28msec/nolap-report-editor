@@ -18,7 +18,7 @@ config.multiCapabilities = [
     'name': 'NoLAP Report Editor',
     'tunnel-identifier': process.env.WERCKER_STEP_ID,
     'build': process.env.WERCKER_GIT_COMMIT,
-    'version': '26'
+    'version': '31'
 },
 {
     browserName: 'safari',
@@ -33,5 +33,5 @@ config.multiCapabilities = [
 config.allScriptsTimeout = 30000;
 config.getPageTimeout = 30000;
 config.jasmineNodeOpts.defaultTimeoutInterval = 100000;
-config.specs = ['../basic-scenario.js'];
+config.specs = ['../auth-scenario.js'];
 exports.config = config;
