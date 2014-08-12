@@ -16,6 +16,11 @@ Concept.prototype.visitPage = function(){
     browser.get('/' + this.id + '/concept/' + this.name);
 };
 
+Concept.prototype.goToSynonyms = function(){
+    element(by.id('synonyms-link')).click();
+    return this.synonyms;
+};
+
 Concept.prototype.getLabel = function(){
     return this.label.getAttribute('value');
 };

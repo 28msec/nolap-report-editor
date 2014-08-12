@@ -21,7 +21,20 @@ Report.prototype.getActiveSection = function(){
 };
 
 Report.prototype.goToTaxonomy = function(){
-    return element(by.css('#report > header li:first-child > a')).click();
+    element(by.id('taxonomy-link')).click();
+    return this.taxonomy;
+};
+
+Report.prototype.goToFilters = function(){
+    return element(by.id('filters-link')).click();
+};
+
+Report.prototype.goToFacts = function(){
+    return element(by.id('facts-link')).click();
+};
+
+Report.prototype.goToSpreadsheet = function(){
+    return element(by.id('spreadsheet-link')).click();
 };
 
 Report.prototype.visitPage = function(){
