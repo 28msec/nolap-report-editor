@@ -1,21 +1,21 @@
 {
     "server": {
-        "api": "secxbrl-dev.xbrl.io",
+        "api": "secxbrl-dev.28.io",
         "registration": "http://localhost:9001/auth",
         "account": "http://localhost:9001/account/info"
     },
     "test": {
-        "api": "secxbrl-test.xbrl.io",
+        "api": "secxbrl-test.28.io",
         "registration": "http://test.secxbrl.info/auth",
         "account": "http://test.secxbrl.info/account/info"
     },
     "beta": {
-        "api": "secxbrl-beta.xbrl.io",
+        "api": "secxbrl-beta.28.io",
         "registration": "http://beta.secxbrl.info/auth",
         "account": "http://test.secxbrl.info/account/info"
     },
     "prod": {
-        "api": "secxbrl.xbrl.io",
+        "api": "secxbrl.28.io",
         "registration": "https://app.secxbrl.info/auth",
         "account": "http://test.secxbrl.info/account/info"
     }
