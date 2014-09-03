@@ -273,6 +273,18 @@ module.exports = function (grunt) {
                     'ACCOUNT_URL': '<%= config.prod.account %>',
                     'DEBUG': false
                 }
+            },
+            custom: {
+                dest: 'app/constants.js',
+                name: 'constants',
+                wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
+                constants: {
+                    'APPNAME': 'report-editor',
+                    'API_URL': '//secxbrl-<%= config.custom.buildId %>.28.io/v1',
+                    'REGISTRATION_URL': 'http://secxbrl-<%= config.custom.buildId %>.s3-website-us-east-1.amazonaws.com/auth',
+                    'ACCOUNT_URL': 'http://secxbrl-<%= config.custom.buildId %>.s3-website-us-east-1.amazonaws.com/account/info',
+                    'DEBUG': true
+                }
             }
         },
         s3: {
