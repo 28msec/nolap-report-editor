@@ -6,8 +6,8 @@ describe('Report', function(){
     var report;
 
     it('should have a Report Editor title', function(){
-        // FAC report in account w@28.io:
-        report = new Report('1fueA5hrxIHxvRf7Btr_J6efDJ3qp-s9KV731wDc4OOaw');
+        // FAC report in account support@28.io:
+        report = new Report('supportFundamentalAccountingConcepts');
         report.visitPage();
     });
 
