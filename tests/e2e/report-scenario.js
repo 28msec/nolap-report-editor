@@ -44,7 +44,7 @@ describe('Report', function(){
         report.filters.setFiltersEntityName('Coca Cola', 2);
         expect(report.filters.selectedFilters.cik.count()).toBe(1);
         report.filters.closeSelectedFiltersYear(2014);
-        report.filters.clickFiltersYear(2013)
+        report.filters.clickFiltersYear(2013);
         expect(report.filters.selectedFilters.fiscalYear.count()).toBe(1);
     });
 
