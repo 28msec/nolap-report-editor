@@ -39,9 +39,13 @@ describe('Report', function(){
 
     it('should select Coca Cola on filters page', function(){
         report.filters.visitPage();
+        report.filters.resetSelectedFilters();
         report.filters.closeSelectedFiltersTag('DOW30');
         report.filters.setFiltersEntityName('Coca Cola', 2);
         expect(report.filters.selectedFilters.cik.count()).toBe(1);
+        report.filters.closeSelectedFiltersYear(2014);
+        report.filters.clickFiltersYear(2013)
+        expect(report.filters.selectedFilters.fiscalYear.count()).toBe(1);
     });
 
     it('should render ratios as decimals', function(){
