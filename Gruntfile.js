@@ -37,10 +37,9 @@ module.exports = function (grunt) {
         var id = buildId === '' ? 'secxbrl' : 'secxbrl-' + buildId;
         grunt.log.writeln('Build ID: ' + id);
         var config = grunt.file.readJSON('config.json');
+        config.custom = {};
         if (buildId) {
-            config.custom = {
-                buildId: id
-            };
+            config.custom.buildId = id;
         }
         return config;
     };
