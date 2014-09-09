@@ -534,6 +534,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         } else if(sourceFacts[0] !== undefined) {
                             sourceFactVariable = sourceFacts[0].replace(/:/g, '_');
                         }
+                        
                         var sourceFactExistenceCheck = '';
                         for(var s in sourceFacts){
                             if(sourceFacts.hasOwnProperty(s)){
@@ -570,7 +571,23 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         result.push('            $rule,');
                         result.push('            $audit-trail-message,');
                         result.push('            $source-facts,');
-                        result.push('            $options)');
+                        if (this.model.Type === 'xbrl28:validation') {
+                        var validatedConcept = report.alignConceptPrefix(this.model.ValidatedConcepts[0]);
+                        var validatedFactVariable;
+                        if(validatedConcept.indexOf( prefix + ':') === 0){
+                            validatedFactVariable = report.hideDefaultConceptPrefix(validatedConcept);
+                        }else{
+                            validatedFactVariable = validatedConcept.replace(/:/g, '_');
+                        }
+                        
+                        
+                            result.push('            $options,');
+                            result.push('            $' + validatedFactVariable + ',');
+                            result.push('            $computed-value)');
+                        }
+                        else {
+                            result.push('            $options)');
+                        }
                         result.push('        modify (');
                         result.push('            replace value of json $newfact("Decimals") with 2');
                         result.push('          )');
@@ -583,7 +600,21 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         result.push('          $rule,');
                         result.push('          $audit-trail-message,');
                         result.push('          $source-facts,');
-                        result.push('          $options)');
+                        if (this.model.Type === 'xbrl28:validation') {
+                        var validatedConcept = report.alignConceptPrefix(this.model.ValidatedConcepts[0]);
+                        var validatedFactVariable;
+                        if(validatedConcept.indexOf( prefix + ':') === 0){
+                            validatedFactVariable = report.hideDefaultConceptPrefix(validatedConcept);
+                        }else{
+                            validatedFactVariable = validatedConcept.replace(/:/g, '_');
+                        }
+                            result.push('            $options,');
+                            result.push('            $' + validatedFactVariable + ',');
+                            result.push('            $computed-value)');
+                        }
+                        else {
+                            result.push('            $options)');
+                        }
 
                     }
                 }
