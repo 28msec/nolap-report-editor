@@ -38,7 +38,7 @@ module.exports = function (grunt) {
         grunt.log.writeln('Report editor will be setup to run against backend: ' + id);
         var config = grunt.file.readJSON('config.json');
         config.custom = {};
-        if (buildId) {
+        if (buildId !== undefined) {
             config.custom.buildId = id;
         }
         return config;
