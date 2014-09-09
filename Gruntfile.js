@@ -35,7 +35,7 @@ module.exports = function (grunt) {
             grunt.fail.fatal('Unable to find --build-id=myfeature. ngconstant:custom only works with arg --build-id.');
         }
         var id = buildId === '' ? 'secxbrl' : 'secxbrl-' + buildId;
-        grunt.log.writeln('Build ID: ' + id);
+        grunt.log.writeln('Report editor will be setup to run against backend: ' + id);
         var config = grunt.file.readJSON('config.json');
         config.custom = {};
         if (buildId) {
