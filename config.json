@@ -12,11 +12,14 @@
     "beta": {
         "api": "secxbrl-beta.xbrl.io",
         "registration": "http://beta.secxbrl.info/auth",
-        "account": "http://test.secxbrl.info/account/info"
+        "account": "http://beta.secxbrl.info/account/info"
     },
     "prod": {
         "api": "secxbrl.xbrl.io",
         "registration": "https://app.secxbrl.info/auth",
-        "account": "http://test.secxbrl.info/account/info"
+        "account": "http://app.secxbrl.info/account/info"
+    },
+    "custom": {
+        "buildId": "dennis-default-rules"
     }
 }
