@@ -29,7 +29,7 @@ module.exports = function (grunt) {
             return val.substring(0, '--build-id='.length) === '--build-id=';
         });
         buildId = idx > -1 ? process.argv[idx].substring('--build-id='.length) : undefined;
-        if (buildId) {
+        if (buildId !== undefined) {
             buildId = buildId.replace('.', '-');
         } else if (isCustomEndpoint) {
             grunt.fail.fatal('Unable to find --build-id=myfeature. ngconstant:custom only works with arg --build-id.');
