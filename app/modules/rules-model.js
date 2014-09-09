@@ -550,6 +550,16 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                                 sourceFactExistenceCheck += 'exists($' + sFact + ')';
                             }
                         }
+                        
+                        var validatedFactVariable;
+                        if(this.model.Type === 'xbrl28:validation'){
+                            var validatedConcept = report.alignConceptPrefix(this.model.ValidatedConcepts[0]);
+                            if(validatedConcept.indexOf( prefix + ':') === 0){
+                                validatedFactVariable = report.hideDefaultConceptPrefix(validatedConcept);
+                            }else{
+                                validatedFactVariable = validatedConcept.replace(/:/g, '_');
+                            }
+                        }                        
 
                         result.push('  case (' + sourceFactExistenceCheck + ' and ' + toComputation(prereq) + ')');
                         result.push('  return');
@@ -572,15 +582,6 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         result.push('            $audit-trail-message,');
                         result.push('            $source-facts,');
                         if (this.model.Type === 'xbrl28:validation') {
-                        var validatedConcept = report.alignConceptPrefix(this.model.ValidatedConcepts[0]);
-                        var validatedFactVariable;
-                        if(validatedConcept.indexOf( prefix + ':') === 0){
-                            validatedFactVariable = report.hideDefaultConceptPrefix(validatedConcept);
-                        }else{
-                            validatedFactVariable = validatedConcept.replace(/:/g, '_');
-                        }
-                        
-                        
                             result.push('            $options,');
                             result.push('            $' + validatedFactVariable + ',');
                             result.push('            $computed-value)');
@@ -601,13 +602,6 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         result.push('          $audit-trail-message,');
                         result.push('          $source-facts,');
                         if (this.model.Type === 'xbrl28:validation') {
-                        var validatedConcept = report.alignConceptPrefix(this.model.ValidatedConcepts[0]);
-                        var validatedFactVariable;
-                        if(validatedConcept.indexOf( prefix + ':') === 0){
-                            validatedFactVariable = report.hideDefaultConceptPrefix(validatedConcept);
-                        }else{
-                            validatedFactVariable = validatedConcept.replace(/:/g, '_');
-                        }
                             result.push('            $options,');
                             result.push('            $' + validatedFactVariable + ',');
                             result.push('            $computed-value)');
