@@ -1041,6 +1041,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
         }
         rule.AllowCrossPeriod = model.AllowCrossPeriod;
         rule.AllowCrossBalance = model.AllowCrossBalance;
+        rule.HideRulesForConcepts = model.HideRulesForConcepts;
         //$log.log('getRule done');
         return rule;
     };
