@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('SpreadsheetCtrl', function($scope, Session, API, report, API_URL){
+.controller('SpreadsheetCtrl', function($scope, $modal, $filter, Session, API, report, API_URL){
 	$scope.mymodel = null;
 	$scope.myheaders = null;
 	  
@@ -36,6 +36,38 @@ angular.module('report-editor')
                 });
         }
     };
+
+    $scope.onDataCellClick = function(data){
+        //alert(JSON.stringify(data));
+        var validationStampIdx = $filter('getAuditTrailByTypeIdx')(data.AuditTrails, "xbrl28:validation-stamp");
+        var validationIdx = $filter('getAuditTrailByTypeIdx')(data.AuditTrails, "xbrl28:validation");
+        var isStampedFact = validationStampIdx > -1;
+        var isValidationFact = validationIdx > -1;
+        var validationStamp = data.AuditTrails[validationStampIdx];
+        var validation = data.AuditTrails[validationIdx];
+
+        if(isStampedFact || isValidationFact) {
+            $modal.open({
+                templateUrl: '/modules/ui/validation-details-modal.html',
+                controller: 'FactDetailCtrl',
+                size: 'lg',
+                resolve: {
+                    isStampedFact: function () {
+                        return isStampedFact;
+                    },
+                    validationStamp: function () {
+                        return validationStamp;
+                    },
+                    isValidationFact: function(){
+                        return isValidationFact;
+                    },
+                    validation: function(){
+                        return validation;
+                    }
+                }
+            });
+        }
+    };
 	  
 	$scope.getExportURL = function(format) {
 	     return API_URL + '/_queries/public/api/spreadsheet-for-report.jq?_method=POST&format=' + format + '&report=' + encodeURIComponent(report.model._id) + '&token=' + Session.getToken();
@@ -45,4 +77,25 @@ angular.module('report-editor')
 	  
 	$scope.$watch('preview.elimination', $scope.reload);
 	  	  
-});
+})
+    .controller('FactDetailCtrl', function($scope, $modalInstance, isStampedFact, validationStamp, isValidationFact, validation){
+        $scope.isStampedFact = isStampedFact;
+        $scope.validationStamp = validationStamp;
+        $scope.isValidationFact = isValidationFact;
+        $scope.validation = validation;
+        $scope.close = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    })
+    .filter('getAuditTrailByTypeIdx', function(){
+        return function(auditTrails, type){
+            if(auditTrails === undefined || auditTrails === null){
+                return -1;
+            }
+            for (var i = 0; i<auditTrails.length; i++){
+                if(auditTrails[i].Type === type){
+                    return i;
+                }
+            }
+        }
+    });
