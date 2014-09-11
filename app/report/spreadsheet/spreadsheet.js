@@ -38,35 +38,16 @@ angular.module('report-editor')
     };
 
     $scope.onDataCellClick = function(data){
-        //alert(JSON.stringify(data));
-        var validationStampIdx = $filter('getAuditTrailByTypeIdx')(data.AuditTrails, "xbrl28:validation-stamp");
-        var validationIdx = $filter('getAuditTrailByTypeIdx')(data.AuditTrails, "xbrl28:validation");
-        var isStampedFact = validationStampIdx > -1;
-        var isValidationFact = validationIdx > -1;
-        var validationStamp = data.AuditTrails[validationStampIdx];
-        var validation = data.AuditTrails[validationIdx];
-
-        if(isStampedFact || isValidationFact) {
-            $modal.open({
-                templateUrl: '/modules/ui/validation-details-modal.html',
-                controller: 'FactDetailCtrl',
-                size: 'lg',
-                resolve: {
-                    isStampedFact: function () {
-                        return isStampedFact;
-                    },
-                    validationStamp: function () {
-                        return validationStamp;
-                    },
-                    isValidationFact: function(){
-                        return isValidationFact;
-                    },
-                    validation: function(){
-                        return validation;
-                    }
+        $modal.open({
+            template: '<fact-details-modal fact="fact" />',
+            controller: 'FactDetailCtrl',
+            size: 'lg',
+            resolve: {
+                fact: function () {
+                    return data;
                 }
-            });
-        }
+            }
+        });
     };
 	  
 	$scope.getExportURL = function(format) {
@@ -78,24 +59,4 @@ angular.module('report-editor')
 	$scope.$watch('preview.elimination', $scope.reload);
 	  	  
 })
-    .controller('FactDetailCtrl', function($scope, $modalInstance, isStampedFact, validationStamp, isValidationFact, validation){
-        $scope.isStampedFact = isStampedFact;
-        $scope.validationStamp = validationStamp;
-        $scope.isValidationFact = isValidationFact;
-        $scope.validation = validation;
-        $scope.close = function () {
-            $modalInstance.dismiss('cancel');
-        };
-    })
-    .filter('getAuditTrailByTypeIdx', function(){
-        return function(auditTrails, type){
-            if(auditTrails === undefined || auditTrails === null){
-                return -1;
-            }
-            for (var i = 0; i<auditTrails.length; i++){
-                if(auditTrails[i].Type === type){
-                    return i;
-                }
-            }
-        }
-    });
+;
