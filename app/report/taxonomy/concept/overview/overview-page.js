@@ -1,7 +1,7 @@
 /*global browser:false, element:false, by:false */
 'use strict';
 
-function Overview(reportId, conceptName){
+function Formula(reportId, conceptName){
     this.reportId = reportId;
     this.conceptName = conceptName;
     this.form = {
@@ -10,27 +10,27 @@ function Overview(reportId, conceptName){
     };
 }
 
-Overview.prototype.visitPage = function(){
+Formula.prototype.visitPage = function(){
     browser.get('/' + this.reportId + '/concept/' + this.conceptName);
 };
 
-Overview.prototype.toggleAbstract = function(){
+Formula.prototype.toggleAbstract = function(){
     this.form.isAbstract.click();
     //We wait for the report to be saved (no http requests pending)
     browser.waitForAngular();
 };
 
-Overview.prototype.deleteConcept = function(){
+Formula.prototype.deleteConcept = function(){
     element(by.css('.btn-danger')).click();
     //We wait for the report to be saved (no http requests pending)
     browser.waitForAngular();
 };
 
-Overview.prototype.changeLabel = function(label){
+Formula.prototype.changeLabel = function(label){
     this.form.conceptLabel.clear();
     this.form.conceptLabel.sendKeys(label);
     //We wait for the report to be saved (no http requests pending)
     browser.waitForAngular();
 };
 
-module.exports = Overview;
+module.exports = Formula;
