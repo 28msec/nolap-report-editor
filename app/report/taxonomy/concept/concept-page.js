@@ -3,7 +3,7 @@
 
 var Overview = require('./overview/overview-page');
 var Synonyms = require('./synonyms/synonyms-page');
-var Formula = require('./formula/formula-page')
+var Formula = require('./formula/formula-page');
 
 function Concept(id, name){
     this.id = id;
