@@ -9,7 +9,7 @@ describe('Filters', function(){
     var filters;
 
     it('should reset the filters', function() {
-        filters = new FiltersPage('1fueA5hrxIHxvRf7Btr_J6efDJ3qp-s9KV731wDc4OOaw');
+        filters = new FiltersPage('supportFundamentalAccountingConcepts');
         filters.visitPage()
         .then(function(){
             filters.resetSelectedFilters()
