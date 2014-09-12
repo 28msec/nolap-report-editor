@@ -25,8 +25,8 @@
     	                <tr ng-repeat="item in data | filter : search">
     	                  <td>{{$index + 1}}</td>
     	                  <td ng-repeat="key in columns" class="nowrap"><span ng-if="$index==entityIndex">{{item.Aspects[key].substring(23)}}</span><span ng-if="$index!=entityIndex">{{item.Aspects[key]}}</span></td>
-    	                  <td ng-if="(item.Type == 'NumericValue')" style="text-align: right">{{showNumber(item.Value)}}</td>
-    	                  <td ng-if="(item.Type != 'NumericValue' && !isBlock(item.Value))">{{item.Value}}</td>
+    	                  <td ng-if="(item.Type == 'NumericValue')" style="text-align: right" ng-click="onValueClick(item)">{{showNumber(item.Value)}}</td>
+    	                  <td ng-if="(item.Type != 'NumericValue' && !isBlock(item.Value))" ng-click="onValueClick(item)">{{item.Value}}</td>
     	                  <td ng-if="(item.Type != 'NumericValue' && isBlock(item.Value))"><a ng-click="showText(item.Value)">Show Text</a></td>
     	                  <td>{{item.Unit=='xbrl:NonNumeric'?"":item.Unit}}</td>
     	                  <td>{{item.Decimals}}</td>

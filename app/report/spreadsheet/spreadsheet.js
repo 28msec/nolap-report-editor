@@ -39,7 +39,7 @@ angular.module('report-editor')
 
     $scope.onDataCellClick = function(data){
         $modal.open({
-            template: '<fact-details-modal fact="fact" />',
+            templateUrl: '/modules/ui/fact-details-modal.html',
             controller: 'FactDetailCtrl',
             size: 'lg',
             resolve: {
