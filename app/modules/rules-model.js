@@ -1070,7 +1070,6 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
         rule.AllowCrossBalance = model.AllowCrossBalance;
         rule.HideRulesForConcepts = report.alignConceptPrefixes(model.HideRulesForConcepts);
 
-        //$log.log('getRule done');
         return rule;
     };
 
