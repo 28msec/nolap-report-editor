@@ -447,6 +447,11 @@ module.exports = function (grunt) {
     
     grunt.registerTask('e2e', function(){
         var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
+        var constants = grunt.file.read('app/constants.js');
+        var startFound = constants.indexOf('"API_URL", "') + 12;
+        var endFound = constants.indexOf('/v1")') - startFound;
+        var backendURL = constants.substr(startFound, endFound);
+        grunt.log.writeln('Running tests against backend: ' + backendURL);
         grunt.task.run([
             'webdriver',
             'connect:dist',
