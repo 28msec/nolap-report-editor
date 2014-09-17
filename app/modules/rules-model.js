@@ -64,6 +64,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         'ComputableConcepts': [ alignedComputableConcept ],
                         'ValidatedConcepts': [ this.report.hideDefaultConceptPrefix(computableConcept) ],
                         'DependsOn': [],
+                        'HideRulesForConcepts': [],
                         'AllowCrossPeriod': true,
                         'AllowCrossBalance': true,
                         'Formulae': [
@@ -87,6 +88,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         'ComputableConcepts': [ computableConcept + 'Validation' ],
                         'ValidatedConcepts': [ computableConcept ],
                         'DependsOn': [],
+                        'HideRulesForConcepts': [],
                         'Formula': ''
                     });
                 }
@@ -100,6 +102,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         'Description': 'Rule to compute ' + concept.Label + ' (' + computableConcept + ').',
                         'ComputableConcepts': [ computableConcept ],
                         'DependsOn': [],
+                        'HideRulesForConcepts': [],
                         'AllowCrossPeriod': true,
                         'AllowCrossBalance': true,
                         'Formulae': [
@@ -121,6 +124,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         'Description': 'Rule to compute ' + concept.Label + ' (' + computableConcept + ').',
                         'ComputableConcepts': [ computableConcept ],
                         'DependsOn': [],
+                        'HideRulesForConcepts': [],
                         'Formula': ''
                     });
                 }
@@ -842,6 +846,28 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
         }
     };
 
+    var validateHideRulesForConcepts = function(rule, report){
+        var hideRulesForConcepts = rule.HideRulesForConcepts;
+        var notExistingConcepts = [];
+        for (var i in hideRulesForConcepts){
+            if(hideRulesForConcepts.hasOwnProperty(i)) {
+                var concept = report.getConcept(report.alignConceptPrefix(hideRulesForConcepts[i]));
+                if (concept === undefined || concept === null) {
+                    notExistingConcepts.push(hideRulesForConcepts[i]);
+                }
+            }
+        }
+        if(notExistingConcepts.length === 1) {
+            rule.HideRulesForConceptsErr = 'The concept "' + notExistingConcepts[0] + '" does not exist.';
+            rule.valid = false;
+        } else if(notExistingConcepts.length > 1) {
+            rule.HideRulesForConceptsErr = 'The following concepts do not exist: "' + notExistingConcepts.join('", "') + '".';
+            rule.valid = false;
+        }else {
+            delete rule.HideRulesForConceptsErr;
+        }
+    };
+
     var validateValidatedConcepts = function(rule, report){
         var validatedConcepts = rule.ValidatedConcepts;
         if(validatedConcepts[0] === '' || validatedConcepts.length === 0){
@@ -953,6 +979,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                 inferDependencies(this, this.model, true);
             }
             validateDependsOnConcepts(rule, report);
+            validateHideRulesForConcepts(rule, report);
             if(type === 'xbrl28:validation' ){
                 validateValidatedConcepts(rule, report);
             }
@@ -1059,7 +1086,8 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
         }
         rule.AllowCrossPeriod = model.AllowCrossPeriod;
         rule.AllowCrossBalance = model.AllowCrossBalance;
-        //$log.log('getRule done');
+        rule.HideRulesForConcepts = report.alignConceptPrefixes(model.HideRulesForConcepts);
+
         return rule;
     };
 
@@ -1071,6 +1099,11 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
         ensureParameter(model, 'model', 'object', 'setModel');
         this.model = angular.copy(model);
         this.model.ComputableConcepts = this.report.hideDefaultConceptPrefixes(this.model.ComputableConcepts);
+        if(this.model.HideRulesForConcepts !== undefined){
+            this.model.HideRulesForConcepts = this.report.hideDefaultConceptPrefixes(this.model.HideRulesForConcepts);
+        } else {
+            this.model.HideRulesForConcepts = [];
+        }
         this.parser = null;
         //this.compile();
     };

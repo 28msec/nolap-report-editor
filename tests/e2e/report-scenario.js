@@ -6,8 +6,8 @@ describe('Report', function(){
     var report;
 
     it('should have a Report Editor title', function(){
-        // FAC report in account w@28.io:
-        report = new Report('1fueA5hrxIHxvRf7Btr_J6efDJ3qp-s9KV731wDc4OOaw');
+        // FAC report in account support@28.io:
+        report = new Report('supportFundamentalAccountingConcepts');
         report.visitPage();
     });
 
@@ -27,6 +27,12 @@ describe('Report', function(){
     it('last element should be scrollable to', function(){
         var last = report.taxonomy.elements.last();
         last.click();
+    });
+
+    it('should contain a computation rule for Revenues with a hidden Concept OtherOperatingIncomeExpenses', function(){
+        var editFormulaPage = report.taxonomy.getConcept('fac:Revenues').formula.computation.getEdit('fd810901-ee86-46ad-8c55-ec933c27169a');
+        editFormulaPage.visitPage();
+        expect(editFormulaPage.form.hiddenRules.getAttribute('value')).toBe('OtherOperatingIncomeExpenses');
     });
 
     it('should only contain formulas that compile without error', function(){

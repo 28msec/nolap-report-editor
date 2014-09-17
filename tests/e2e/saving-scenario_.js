@@ -4,7 +4,7 @@
 //GetAttribute() returns "boolean" values and will return either "true" or null
 describe('Reports', function(){
 
-    var id = '1fueA5hrxIHxvRf7Btr_J6efDJ3qp-s9KV731wDc4OOaw';
+    var id = 'supportFundamentalAccountingConcepts';
     var Report = require('../../app/report/report-page');
 
     it('Should throw an exception if we reloading while saving the report', function(){
