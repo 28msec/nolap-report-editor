@@ -581,14 +581,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         result.push('            $rule,');
                         result.push('            $audit-trail-message,');
                         result.push('            $source-facts,');
-                        if (this.model.Type === 'xbrl28:validation') {
-                            result.push('            $options,');
-                            result.push('            $' + validatedFactVariable + ',');
-                            result.push('            $computed-value)');
-                        }
-                        else {
-                            result.push('            $options)');
-                        }
+                        result.push('            $options)');
                         result.push('        modify (');
                         result.push('            replace value of json $newfact("Decimals") with 2');
                         result.push('          )');
