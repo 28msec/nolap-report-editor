@@ -2,18 +2,6 @@
 
 angular
     .module('report-editor')
-    .directive('fact-details-modal', function($modal, $log){
-        return {
-            restrict: 'E',
-            scope: {
-                'fact': '='
-            },
-            templateUrl: '/modules/ui/fact-details-modal.html',
-            link: function($scope) {
-                $log.log('huhu2');
-            }
-        };
-    })
     .controller('FactDetailCtrl', function($scope, $templateCache, $compile, $modalInstance, fact){
         $scope.fact = fact;
         $scope.close = function () {
