@@ -61,4 +61,17 @@ describe('Report', function(){
         var value = report.spreadsheet.getCellValue(roas.get(0));
         expect(value.getText()).toBe('0.10');
     });
+
+    it('should display validation and fact details on fact click', function(){
+        report.spreadsheet.visitPage();
+        var income = report.spreadsheet.getValueTDsByHeaderContainingText('Operating Income (Loss)');
+        expect(income.count()).toBe(1);
+        income.get(0).click();
+        var factDetails = report.spreadsheet.getFactDetailsModal();
+        expect(factDetails.count()).toBe(1);
+
+        // there should be 2 failing stamps for operating income
+        var failingStamps = report.spreadsheet.getValidationStampsDetails(false);
+        expect(failingStamps.count()).toBe(2);
+    });
 });

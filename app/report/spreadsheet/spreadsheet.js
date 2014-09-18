@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('SpreadsheetCtrl', function($scope, Session, API, report, API_URL){
+.controller('SpreadsheetCtrl', function($scope, $modal, $filter, Session, API, report, API_URL){
 	$scope.mymodel = null;
 	$scope.myheaders = null;
 	  
@@ -36,6 +36,19 @@ angular.module('report-editor')
                 });
         }
     };
+
+    $scope.onDataCellClick = function(data){
+        $modal.open({
+            templateUrl: '/modules/ui/fact-details-modal.html',
+            controller: 'FactDetailCtrl',
+            size: 'lg',
+            resolve: {
+                fact: function () {
+                    return data;
+                }
+            }
+        });
+    };
 	  
 	$scope.getExportURL = function(format) {
 	     return API_URL + '/_queries/public/api/spreadsheet-for-report.jq?_method=POST&format=' + format + '&report=' + encodeURIComponent(report.model._id) + '&token=' + Session.getToken();
@@ -45,4 +58,5 @@ angular.module('report-editor')
 	  
 	$scope.$watch('preview.elimination', $scope.reload);
 	  	  
-});
+})
+;
