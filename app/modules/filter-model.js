@@ -2,7 +2,7 @@
 
 angular
     .module('filter-model', ['constants', 'api'])
-    .factory('Filter', function($q, $angularCacheFactory, API, APPNAME, Session){
+    .factory('Filter', function($q, API, Session){
 
         return (function() {
 
