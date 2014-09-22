@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('ReportCtrl', function($q, $rootScope, $scope, Session, API, Report, report){
+.controller('ReportCtrl', function($q, $rootScope, $scope, $log, Session, API, Report, report){
     $scope.report = report;
 
     var lastSavedModel;
@@ -37,11 +37,15 @@ angular.module('report-editor')
     };    
 
     $scope.$watch('report.model', function(newReportModel, oldReportModel){
-        //TODO: fix report comparison
         if(oldReportModel === undefined) {
             lastSavedModel = newReportModel;
             return;
         }
+        if(angular.equals(oldReportModel, newReportModel)){
+            // nothing has changed
+            return;
+        }
+
         //1. inProgress === null, execute request
         if(inProgress === undefined) {
             inProgress = save(newReportModel);

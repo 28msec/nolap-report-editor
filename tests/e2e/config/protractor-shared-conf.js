@@ -2,7 +2,7 @@
 'use strict';
 
 exports.config = {
-    allScriptsTimeout: 11000,
+    allScriptsTimeout: 30000,
 
     baseUrl: 'http://localhost:9000',
 
@@ -29,11 +29,11 @@ exports.config = {
         var Auth = require('../../../app/auth/auth-page');
         var auth = new Auth();
         auth.visitPage();
-        auth.login('w@28.io', 'foobar');
+        auth.login('support@28.io', 'foobar');
         browser.waitForAngular();
     },
 
     jasmineNodeOpts: {
-        defaultTimeoutInterval: 30000
+        defaultTimeoutInterval: 100000
     }
 };

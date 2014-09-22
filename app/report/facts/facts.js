@@ -3,7 +3,7 @@
 /* global accounting : false */
 
 angular.module('report-editor')
-.controller('FactTableCtrl', function($scope, $timeout, Session, API, report, API_URL) {
+.controller('FactsCtrl', function($scope, $timeout, $modal, Session, API, report, API_URL) {
     $scope.columns = [];
     $scope.data = null; 
     $scope.loading = false;
@@ -95,7 +95,20 @@ angular.module('report-editor')
         }
         return string.length > 60;
     };
-    
+
+    $scope.onValueClick = function(data){
+        $modal.open({
+            templateUrl: '/modules/ui/fact-details-modal.html',
+            controller: 'FactDetailCtrl',
+            size: 'lg',
+            resolve: {
+                fact: function () {
+                    return data;
+                }
+            }
+        });
+    };
+
     $scope.getExportURL = function(format) {
         return API_URL + '/_queries/public/api/facttable-for-report.jq?_method=POST&format=' + format + '&report=' + encodeURIComponent(report.model._id) + '&token=' + Session.getToken();
     };

@@ -1,5 +1,9 @@
-<div class="scrollable">
-    <h2>Recompiling All Formulas</h2>
-    <button class="btn btn-primary" ng-click="recompile()">Recompile</button>
-    <div ng-repeat="msg in messages track by $index">{{msg}}</div>
+<div id="recompile">
+    <div class="scrollable">
+        <h2>Recompiling All Formulas</h2>
+        <button id="btn-recompile" class="btn btn-primary" ng-click="recompile()">Recompile</button>
+        <div ng-repeat="msg in messages track by $index"
+            class="recompile-message"
+            ng-class="{'bg-success': msg.Type === 'success', 'bg-danger': msg.Type === 'error', 'text-info': msg.Type === 'info'}">{{msg.Message}}</div>
+    </div>
 </div>

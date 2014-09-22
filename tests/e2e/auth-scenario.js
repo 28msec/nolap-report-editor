@@ -16,12 +16,12 @@ describe('Authentication', function(){
     });
 
     it('shouldn\'t login', function(){
-        auth.login('w@28.io', 'hello');
+        auth.login('support@28.io', 'hello');
         expect(auth.wrongCombinasionMessage().isDisplayed()).toBe(true);
     });
     
     it('should login', function(){
-        auth.login('w@28.io', 'foobar');
+        auth.login('support@28.io', 'foobar');
         auth.getCurrentUrl().then(function(url) {
             expect(url.substring(url.length - 1)).toBe('/');
         });

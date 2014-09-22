@@ -1,3 +1,4 @@
+<div id="spreadsheet">
 <div class="scrollable content">
 	<form ng-if="report.hasSufficientFilters()" style="margin-bottom: 5px" class="form-inline preview-form"
 		role="form">
@@ -40,13 +41,13 @@
 	     	</span>
 
 	</form>
-	
+
 	<div ng-class="preview.css">
 		<layoutmodel model="mymodel" headers="myheaders"
 			labelidx="preview.labelidx" constraints="preview.constraints"
 			truncate="preview.truncate"
 			checks="preview.checks" headerclick="test(header)"
-			dataclick="test(data)"></layoutmodel>
+			dataclick="onDataCellClick(data)"></layoutmodel>
 	</div>
 
 	<div ng-if="report.hasSufficientFilters()">
@@ -57,5 +58,5 @@
         <strong>Too generic Filter</strong><br/>
         Cannot Load preview because the filters are too generic. Please, go back to the <a ui-sref="report.filters()">Filters</a> page and refine your Filtering.
     </div>
-
+</div>
 </div>

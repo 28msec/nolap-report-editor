@@ -34,6 +34,23 @@ angular
             if(modelOrName === undefined || modelOrName === null){
                 modelOrName = _uuid();
             }
+            if(prefix === undefined || prefix === null || typeof prefix !== 'string'){
+                // do a good guess
+                var startingChars = '';
+                label.split(/[^A-Za-z0-9]+/).forEach(function(elem){
+                    var char = elem.substr(0,1);
+                    if(/[A-Za-z]/.test(char) && elem.length > 1) {
+                        startingChars += char.toLowerCase();
+                    }
+                });
+                prefix = startingChars;
+            }
+            var date = new Date();
+            var year = date.getFullYear();
+            var month = date.getMonth();
+            if(month < 8){
+                year = year - 1;
+            }
             this.model =
                 {
                     '_id' : modelOrName,
@@ -42,6 +59,7 @@ angular
                     'Description': description,
                     'Owner': username,
                     'Role' : role,
+                    'Prefix': prefix,
                     'Networks' : [
                         {
                             'LinkName' : 'link:presentationLink',
@@ -86,7 +104,14 @@ angular
                                 },
                                 'xbrl:Entity': {
                                     'Name': 'xbrl:Entity',
-                                    'Label': 'Reporting Entity'
+                                    'Label': 'Reporting Entity',
+                                    'Kind' : 'TypedDimension',
+                                    'Type' : 'string',
+                                    'DomainRestriction' : {
+                                        'Name' : 'xbrl:EntityDomain',
+                                        'Label' : 'Entity Domain',
+                                        'Enumeration' : [ 'http://www.sec.gov/CIK 0001403161', 'http://www.sec.gov/CIK 0000004962', 'http://www.sec.gov/CIK 0000019617', 'http://www.sec.gov/CIK 0000030554', 'http://www.sec.gov/CIK 0000034088', 'http://www.sec.gov/CIK 0000040545', 'http://www.sec.gov/CIK 0000066740', 'http://www.sec.gov/CIK 0000078003', 'http://www.sec.gov/CIK 0000080424', 'http://www.sec.gov/CIK 0000093410', 'http://www.sec.gov/CIK 0000101829', 'http://www.sec.gov/CIK 0000310158', 'http://www.sec.gov/CIK 0000320187', 'http://www.sec.gov/CIK 0000354950', 'http://www.sec.gov/CIK 0000732712', 'http://www.sec.gov/CIK 0000732717', 'http://www.sec.gov/CIK 0000789019', 'http://www.sec.gov/CIK 0000858877', 'http://www.sec.gov/CIK 0000886982', 'http://www.sec.gov/CIK 0001001039', 'http://www.sec.gov/CIK 0000012927', 'http://www.sec.gov/CIK 0000018230', 'http://www.sec.gov/CIK 0000021344', 'http://www.sec.gov/CIK 0000050863', 'http://www.sec.gov/CIK 0000051143', 'http://www.sec.gov/CIK 0000063908', 'http://www.sec.gov/CIK 0000086312', 'http://www.sec.gov/CIK 0000104169', 'http://www.sec.gov/CIK 0000200406', 'http://www.sec.gov/CIK 0000731766' ]
+                                    }
                                 },
                                 'xbrl:Unit': {
                                     'Name': 'xbrl:Unit',
@@ -103,37 +128,58 @@ angular
                                 },
                                 'sec:FiscalYear': {
                                     'Name': 'sec:FiscalYear',
-                                    'Label': 'Fiscal Year'
+                                    'Label': 'Fiscal Year',
+                                    'Kind' : 'TypedDimension',
+                                    'Type' : 'integer',
+                                    'DomainRestriction' : {
+                                        'Name' : 'sec:FiscalYearDomain',
+                                        'Label' : 'Fiscal Year Domain',
+                                        'Enumeration' : [ year ]
+                                    }
                                 },
                                 'sec:FiscalPeriod': {
                                     'Name': 'sec:FiscalPeriod',
-                                    'Label': 'Fiscal Period'
+                                    'Label': 'Fiscal Period',
+                                    'Kind' : 'TypedDimension',
+                                    'Type' : 'string',
+                                    'DomainRestriction' : {
+                                        'Name' : 'sec:FiscalPeriodDomain',
+                                        'Label' : 'Fiscal Period Domain',
+                                        'Enumeration' : [ 'FY' ]
+                                    }
                                 },
                                 'dei:LegalEntityAxis': {
                                     'Name': 'dei:LegalEntityAxis',
                                     'Label': 'Legal Entity',
-                                    'Default': 'sec:DefaultLegalEntity'
+                                    'Default': 'sec:DefaultLegalEntity',
+                                    'Domains' : {
+                                        'dei:LegalEntityAxisDomain': {
+                                            'Name': 'dei:LegalEntityAxisDomain',
+                                            'Label': 'Implicit dei:LegalEntityAxis Domain',
+                                            'Members': {
+                                                'sec:DefaultLegalEntity': {
+                                                    'Name': 'sec:DefaultLegalEntity'
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     },
-                    'Rules' : []
-                };
-            if(prefix !== undefined && prefix !== null && typeof prefix === 'string'){
-                this.model.Prefix = prefix;
-            } else {
-                // do a good guess
-                var startingChars = '';
-                label.split(/[^A-Za-z0-9]+/).forEach(function(elem){
-                    var char = elem.substr(0,1);
-                    if(/[A-Za-z]/.test(char) && elem.length > 1) {
-                        startingChars += char.toLowerCase();
+                    'Rules' : [],
+                    'Filters' : {
+                        'cik' : [  ],
+                        'tag' : [ 'DOW30' ],
+                        'fiscalYear' : [ year ],
+                        'fiscalPeriod' : [ 'FY' ],
+                        'sic' : [  ]
                     }
-                });
-                this.model.Prefix = startingChars;
-            }
+                };
+            this.addConcept('ReportLineItems', label, true);
+            this.addElement('Presentation', 'ReportLineItems', 0);
         } // if
-        ensureDefinitionModel(this);
+        addDefinitionModel(this);
     };
 
     // helper function to check parameters
@@ -557,7 +603,9 @@ angular
         return result;
     };
 
-    Report.prototype.findInTree = function(networkShortName, conceptName) {
+    Report.prototype.findInTree = function(networkShortName, oconceptName) {
+        var conceptName = this.alignConceptPrefix(oconceptName);
+        ensureConceptName(conceptName, 'oconceptName', 'findInTree');
         ensureNetworkShortName(networkShortName, 'networkShortName', 'findInTree');
         
         var network = this.getNetwork(networkShortName);
@@ -770,109 +818,142 @@ angular
         return order;
     };
 
+    // determine an Element either from:
+    // 1. concept name which will create a new element with the desired order
+    // 2. element which will return the element with the desired order
     var determineElement = function(report, elementOrConceptName, order){
         var element;
         if(typeof elementOrConceptName === 'string'){
-            ensureConceptName(elementOrConceptName, 'elementOrConceptName', 'addElement');
-            var concept = report.getConcept(elementOrConceptName);
-            ensureExists(concept, 'object', 'addElement', 'concept with name "' + elementOrConceptName + '" doesn\'t exist.');
+            var conceptName = report.alignConceptPrefix(elementOrConceptName);
+            ensureConceptName(conceptName, 'conceptName', 'determineElement');
+            var concept = report.getConcept(conceptName);
+            ensureExists(concept, 'object', 'determineElement', 'concept with name "' + conceptName + '" doesn\'t exist.');
             element = report.createNewElement(concept);
         } else {
             element = elementOrConceptName;
-            ensureParameter(element, 'elementOrConceptName', 'object', 'addElement');
+            ensureParameter(element, 'elementOrConceptName', 'object', 'determineElement');
         }
         element.Order = order;
         return element;
     };
 
-    var ensureDefinitionModel = function(report){
+    /* *
+       idempotent function to make sure a report has a single proper definition model in place.
+    * */
+    var addDefinitionModel = function(report){
         var model = report.getModel();
-        if(model.DefinitionModels === undefined || model.DefinitionModels === null || model.DefinitionModels.length === undefined || model.DefinitionModels.length === 0) {
-            var label = model.Label;
-            var role = model.Role;
-            var source = '';
-            var network = report.getNetwork('Presentation');
-            if(network !== undefined && network.Trees !== undefined && network.Trees.length !== undefined && network.Trees.length > 0){
-                source = network.Trees[0].Name;
-            } else if(network !== undefined && network.Trees !== undefined && typeof network.Trees === 'object' && network.Trees !== null && Object.keys(network.Trees).length >0){
-                source = Object.keys(network.Trees)[0];
-            }
+        var label = model.Label;
+        var role = model.Role;
+        var rootElem = report.getRootElement('Presentation');
+        var source = rootElem ? rootElem.Name : '';
 
-            model.DefinitionModels =
-                [ {
-                    'ModelKind' : 'DefinitionModel',
-                    'Labels' : [ label ],
-                    'Parameters' : {
+        model.DefinitionModels =
+            [ {
+                'ModelKind' : 'DefinitionModel',
+                'Labels' : [ label ],
+                'Parameters' : {
 
-                    },
-                    'Breakdowns' : {
-                        'x' : [ {
-                            'BreakdownLabels' : [ 'Reporting Entity Breakdown' ],
-                            'BreakdownTrees' : [ {
-                                'Kind' : 'Rule',
-                                'Abstract' : true,
-                                'Labels' : [ 'Reporting Entity [Axis]' ],
-                                'Children' : [ {
-                                    'Kind' : 'Aspect',
-                                    'Aspect' : 'xbrl:Entity'
-                                } ]
-                            } ]
-                        }, {
-                            'BreakdownLabels' : [ 'Fiscal Year Breakdown' ],
-                            'BreakdownTrees' : [ {
-                                'Kind' : 'Rule',
-                                'Abstract' : true,
-                                'Labels' : [ 'Fiscal Year [Axis]' ],
-                                'Children' : [ {
-                                    'Kind' : 'Aspect',
-                                    'Aspect' : 'sec:FiscalYear'
-                                } ]
-                            } ]
-                        }, {
-                            'BreakdownLabels' : [ 'Fiscal Period Breakdown' ],
-                            'BreakdownTrees' : [ {
-                                'Kind' : 'Rule',
-                                'Abstract' : true,
-                                'Labels' : [ 'Fiscal Period [Axis]' ],
-                                'Children' : [ {
-                                    'Kind' : 'Aspect',
-                                    'Aspect' : 'sec:FiscalPeriod'
-                                } ]
-                            } ]
-                        } ],
-                        'y' : [ {
-                            'BreakdownLabels' : [ 'Breakdown on concepts' ],
-                            'BreakdownTrees' : [ {
-                                'Kind' : 'ConceptRelationship',
-                                'LinkName' : 'link:presentationLink',
-                                'LinkRole' : role,
-                                'ArcName' : 'link:presentationArc',
-                                'ArcRole' : 'http://www.xbrl.org/2003/arcrole/parent-child',
-                                'RelationshipSource' : source,
-                                'FormulaAxis' : 'descendant',
-                                'Generations' : 0
+                },
+                'Breakdowns' : {
+                    'x' : [ {
+                        'BreakdownLabels' : [ 'Reporting Entity Breakdown' ],
+                        'BreakdownTrees' : [ {
+                            'Kind' : 'Rule',
+                            'Abstract' : true,
+                            'Labels' : [ 'Reporting Entity [Axis]' ],
+                            'Children' : [ {
+                                'Kind' : 'Aspect',
+                                'Aspect' : 'xbrl:Entity'
                             } ]
                         } ]
-                    },
-                    'TableFilters' : {
+                    }, {
+                        'BreakdownLabels' : [ 'Fiscal Year Breakdown' ],
+                        'BreakdownTrees' : [ {
+                            'Kind' : 'Rule',
+                            'Abstract' : true,
+                            'Labels' : [ 'Fiscal Year [Axis]' ],
+                            'Children' : [ {
+                                'Kind' : 'Aspect',
+                                'Aspect' : 'sec:FiscalYear'
+                            } ]
+                        } ]
+                    }, {
+                        'BreakdownLabels' : [ 'Fiscal Period Breakdown' ],
+                        'BreakdownTrees' : [ {
+                            'Kind' : 'Rule',
+                            'Abstract' : true,
+                            'Labels' : [ 'Fiscal Period [Axis]' ],
+                            'Children' : [ {
+                                'Kind' : 'Aspect',
+                                'Aspect' : 'sec:FiscalPeriod'
+                            } ]
+                        } ]
+                    } ],
+                    'y' : [ {
+                        'BreakdownLabels' : [ 'Breakdown on concepts' ],
+                        'BreakdownTrees' : [ {
+                            'Kind' : 'ConceptRelationship',
+                            'LinkName' : 'link:presentationLink',
+                            'LinkRole' : role,
+                            'ArcName' : 'link:presentationArc',
+                            'ArcRole' : 'http://www.xbrl.org/2003/arcrole/parent-child',
+                            'RelationshipSource' : source,
+                            'FormulaAxis' : 'descendant',
+                            'Generations' : 0
+                        } ]
+                    } ]
+                },
+                'TableFilters' : {
 
-                    }
-                } ];
-        }
+                }
+            } ];
     };
 
-    var ensureDefinitionModelRootConcept = function(report, conceptName){
-        var model = report.getModel();
-        ensureDefinitionModel(report);
-        if(model.DefinitionModels[0] !== undefined && model.DefinitionModels[0] !== null) {
-            model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].LinkRole = model.Role;
-            model.DefinitionModels[0].Breakdowns.y[0].BreakdownTrees[0].RelationshipSource = conceptName;
+    Report.prototype.getRootElement = function(networkShortName) {
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'getRootElement');
+        var rootElem;
+        var network = this.getNetwork('Presentation');
+        if (network !== undefined && network.Trees !== undefined && network.Trees.length !== undefined && network.Trees.length > 0) {
+            rootElem = network.Trees[0];
+        } else if (network !== undefined && network.Trees !== undefined && typeof network.Trees === 'object' && network.Trees !== null && Object.keys(network.Trees).length > 0) {
+            rootElem = network.Trees[Object.keys(network.Trees)[0]];
         }
+        return rootElem;
     };
 
-    Report.prototype.addElement = function(networkShortName, parentElementID, elementOrConceptName, offset){
+    // check wheter a concept is used as root element in a network
+    Report.prototype.isConceptUsedAsRootElement = function(networkShortName, oConceptName){
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'isConceptUsedAsRootElement');
+        var conceptName = this.alignConceptPrefix(oConceptName);
+        ensureConceptName(conceptName, 'oconceptName', 'isConceptUsedAsRootElement');
+        var isRootElem = false;
+        var elementIds = this.findInTree(networkShortName, conceptName);
+        var that = this;
+        angular.forEach(elementIds, function (id) {
+            var parent = that.getParentElementFromTree(networkShortName, id);
+            if (parent === undefined || parent === null) {
+                isRootElem = true;
+            }
+        });
+        return isRootElem;
+    };
+
+    // check wheter an element is used as root element in a network
+    Report.prototype.isRootElement = function(networkShortName, element){
+        ensureNetworkShortName(networkShortName, 'networkShortName', 'isRootElement');
+        var isRootElem = false;
+        ensureParameter(element, 'elementOrConceptName', 'object', 'isRootElement');
+        var parent = this.getParentElementFromTree(networkShortName, element.Id);
+        if (parent === undefined || parent === null) {
+            isRootElem = true;
+        }
+        return isRootElem;
+    };
+
+    Report.prototype.addElement = function(networkShortName, elementOrConceptName, offset, parentElementID){
         ensureNetworkShortName(networkShortName, 'networkShortName', 'addElement');
         ensureOptionalParameter(offset, 'offset', 'number', 'addElement');
+        var rootElem = this.getRootElement('Presentation');
 
         // determine order
         var order = determineOrder(this,networkShortName, parentElementID, offset, true);
@@ -881,35 +962,37 @@ angular
         var element = determineElement(this, elementOrConceptName, order);
         var conceptName = element.Name;
 
-        if(parentElementID === undefined || parentElementID === null) {
-            // add a root element
+        if((parentElementID === undefined || parentElementID === null) && rootElem === undefined) {
+            // add a root element (only one allowed)
             var network = this.getNetwork(networkShortName);
-            ensureDefinitionModelRootConcept(this, conceptName);
             network.Trees[conceptName] = element;
+            return element;
+        } 
+        
+        var parent;
+        if(parentElementID === undefined || parentElementID === null){
+            parent = rootElem;
         } else {
             // add child to existing tree
             ensureParameter(parentElementID, 'parentElementID', 'string', 'addElement');
-        
-            var parent = this.getElementFromTree(networkShortName, parentElementID);
+            parent = this.getElementFromTree(networkShortName, parentElementID);
             ensureExists(parent, 'object', 'addElement', 'cannot add child to tree. Parent with id "' + parentElementID + '" doesn\'t exist.');
-            var parentConcept = this.getConcept(parent.Name);
-            if(!parentConcept.IsAbstract) {
-                throw new Error('addElement: cannot add child to parent "' + parentElementID +
-                    '". Reason: Parent concept "' + parent.Name  + '" is not abstract.');
-            }
-
-            if(parent.To === undefined || parent.To === null) {
-                parent.To = {};
-            }
-            parent.To[conceptName] = element;
         }
+
+        // ensure parent is abstract
+        var parentConcept = this.getConcept(parent.Name);
+        if(!parentConcept.IsAbstract) {
+            throw new Error('addElement: cannot add child to parent "' + parentElementID +
+                '". Reason: Parent concept "' + parent.Name  + '" is not abstract.');
+        }
+
+        if(parent.To === undefined || parent.To === null) {
+            parent.To = {};
+        }
+
+        parent.To[conceptName] = element;
         return element;
     };
-
-    //Report.prototype.addTreeChild = function(networkShortName, parentElementID, oconceptName, offset) {
-    //    var element = this.createNewElement(concept, order);
-    //    return this.addElement(network, parentElementID, element, offset);
-    //};
 
     Report.prototype.moveTreeBranch = function(networkShortName, subtreeRootElementID, newParentElementID, newOffset) {
         ensureNetworkShortName(networkShortName, 'networkShortName', 'moveTreeBranch');
@@ -940,16 +1023,8 @@ angular
             }
             newParent.To[element.Name] = element;
         } else {
-            // no new parent given -> make it a root element
-            var network = this.getNetwork(networkShortName);
-            var element2 = this.removeTreeBranch(networkShortName, subtreeRootElementID);
-            enforceStrictChildOrderAndShift(this, networkShortName, newParentElementID, (newOffset || 0));
-            element2.Order = newOrder;
-            if(network.Trees === undefined || network.Trees === null) {
-                network.Trees = [];
-            }
-            ensureDefinitionModelRootConcept(this, element2.Name);
-            network.Trees[element2.Name] = element2;
+            // no new parent given -> making it a root element -> not allowed
+            throw new Error('moveTreeBranch: moving an element to ' + networkShortName + ' network root is not allowed.');
         }
     };
 
@@ -961,8 +1036,8 @@ angular
         ensureExists(element, 'object', 'removeTreeBranch', 'Cannot remove element with id "' + subtreeRootElementID + '" from network: Element doesn\'t exist.');
         var parent = this.getParentElementFromTree(networkShortName, subtreeRootElementID);
         if(parent === null || parent === undefined) {
-            var network = this.getNetwork(networkShortName);
-            delete network.Trees[element.Name];
+            // deleting root not allowed
+            throw new Error('removeTreeBranch: cannot remove root element from ' + networkShortName + ' tree.');
         } else {
             delete parent.To[element.Name];
         }
@@ -1642,8 +1717,16 @@ angular
 
     Report.prototype.hasSufficientFilters = function(){
         var result = false;
-        var countAspectRestrictions = this.countAspectsRestrictions(['xbrl:Entity','sec:Archives']);
-        if(countAspectRestrictions > 0 && countAspectRestrictions < 500){
+        var countEntityRestrictions = this.countAspectsRestrictions(['xbrl:Entity']);
+        var countYearsRestrictions = this.countAspectsRestrictions(['sec:FiscalYear']);
+        var countPeriodRestrictions = this.countAspectsRestrictions(['sec:FiscalPeriod']);
+        if(countEntityRestrictions > 0 && countEntityRestrictions < 501){
+            result = true;
+        }
+        if(result && countYearsRestrictions < 10){
+            result = true;
+        }
+        if(result && countPeriodRestrictions < 10){
             result = true;
         }
         return result;
