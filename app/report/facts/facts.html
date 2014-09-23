@@ -36,12 +36,7 @@
     	          
     		</div>
     
-           <div ng-if="report.hasSufficientFilters()" class="content">
-               <div ng-show="error" class="alert alert-danger">
-                 <strong>Error {{ error.status }}</strong>
-                 {{ error.body.message }}
-               </div>
-    
+           <div ng-if="report.hasSufficientFilters()" class="content">                  
                <div ng-show="data.length == 0">Fact Table is empty.</div>
     
                <p ng-show="loading">Updating fact table...</p>

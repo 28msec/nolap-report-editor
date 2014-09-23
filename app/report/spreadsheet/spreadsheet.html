@@ -9,17 +9,9 @@
 					<option value="preview-style">Web Style</option>
 					<option value="document-style">Document Style</option>
 				</select>
-			</div>
-	
-			<div class="form-group">
-				<label class="sr-only" for="labels">Labels</label> <select
-					class="form-control" id="labels" ng-model="preview.labelidx">
-					<option value="0">Prefer Labels</option>
-					<option value="1">Prefer Names</option>
-				</select>
-			</div>
-	
-			<div class="form-group">
+			</div>				
+         	
+			<div class="form-group" style="display:none">
 				<label class="checkbox-inline"> <input type="checkbox"
 					id="checks" ng-model="preview.checks" value="true" />Show
 					validation checks
@@ -29,6 +21,12 @@
 			<div class="form-group">
 				<label class="checkbox-inline"> <input type="checkbox"
 					id="elimination" ng-model="preview.elimination" value="true" />Elimination
+				</label>
+			</div>
+			
+			<div class="form-group">
+				<label class="checkbox-inline"> <input type="checkbox"
+					id="truncate" ng-model="preview.truncate" value="true" />Shorten textblocks
 				</label>
 			</div>
 			
@@ -44,13 +42,10 @@
 
 	</form>
 
-	<div ng-show="error" class="alert alert-danger ws-pre">
-		<strong>Error {{ error.status }}</strong> {{ error.body.message }}
-	</div>
-
 	<div ng-class="preview.css">
 		<layoutmodel model="mymodel" headers="myheaders"
-			labelidx="preview.labelidx" constraints="'true'"
+			labelidx="preview.labelidx" constraints="preview.constraints"
+			truncate="preview.truncate"
 			checks="preview.checks" headerclick="test(header)"
 			dataclick="onDataCellClick(data)"></layoutmodel>
 	</div>

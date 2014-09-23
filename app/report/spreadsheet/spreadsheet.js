@@ -5,16 +5,14 @@ angular.module('report-editor')
 	$scope.mymodel = null;
 	$scope.myheaders = null;
 	  
-	$scope.preview = { constraints : false, checks : true, css : 'preview-style', labelidx : 0, elimination : false };
-	$scope.error = null;
+	$scope.preview = { constraints : true, checks : false, truncate:true, css : 'preview-style', labelidx : 0, elimination : true };	
 	  
 	$scope.loading = false;
 
 	$scope.reload = function() {
 		  
 	    $scope.loading = true;
-		$scope.mymodel = null;
-		$scope.error = null;
+		$scope.mymodel = null;	
 		  
 		var id = report.model._id;
 		var params = { report: id, validate : true, token: Session.getToken(), $method: 'POST', eliminate : $scope.preview.elimination };
@@ -25,14 +23,10 @@ angular.module('report-editor')
                     $scope.mymodel = data;
                     $scope.myheaders = [
                         { label: '', value: data.TableSetLabels[0] }
-                    ];
-                    $scope.error = null;
-                    $scope.loading = false;
+                    ];                                       
                 })
-                .catch(function (error) {
-                    $scope.loading = false;
-                    $scope.mymodel = null;
-                    $scope.error = error;
+                .finally(function () {
+                    $scope.loading = false;                    
                 });
         }
     };
