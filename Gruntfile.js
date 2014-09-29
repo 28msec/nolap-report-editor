@@ -17,9 +17,36 @@ module.exports = function (grunt) {
         '!\\.html|\\.xml|\\images|\\.js|\\.css|\\.png|\\.jpg|\\.woff|\\.ttf|\\.svg|\\.ico /index.html [L]'
     ];
 
+    var readConfigJson = function() {
+        var _ = require('lodash');
+
+        var isCustomEndpoint = _.findIndex(process.argv, function (val) {
+            return val === 'ngconstant:custom';
+        }) > -1;
+
+        var buildId;
+        var idx = _.findIndex(process.argv, function (val) {
+            return val.substring(0, '--build-id='.length) === '--build-id=';
+        });
+        buildId = idx > -1 ? process.argv[idx].substring('--build-id='.length) : undefined;
+        if (buildId !== undefined) {
+            buildId = buildId.replace('.', '-');
+        } else if (isCustomEndpoint) {
+            grunt.fail.fatal('Unable to find --build-id=myfeature. ngconstant:custom only works with arg --build-id.');
+        }
+        var id = buildId === '' ? 'secxbrl' : 'secxbrl-' + buildId;
+        var config = grunt.file.readJSON('config.json');
+        config.custom = {};
+        if (buildId !== undefined) {
+            grunt.log.writeln('Report editor will be setup to run against backend: ' + id);
+            config.custom.buildId = id;
+        }
+        return config;
+    };
+
     // Project configuration.
     grunt.initConfig({
-        config: grunt.file.readJSON('config.json'),
+        config: readConfigJson(),
         watch: {
             less: {
                 files:  ['app/**/*.less'],
@@ -274,6 +301,18 @@ module.exports = function (grunt) {
                     'ACCOUNT_URL': '<%= config.prod.account %>',
                     'DEBUG': false
                 }
+            },
+            custom: {
+                dest: 'app/constants.js',
+                name: 'constants',
+                wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
+                constants: {
+                    'APPNAME': 'report-editor',
+                    'API_URL': '//<%= config.custom.buildId %>.28.io/v1',
+                    'REGISTRATION_URL': 'http://<%= config.custom.buildId %>.s3-website-us-east-1.amazonaws.com/auth',
+                    'ACCOUNT_URL': 'http://<%= config.custom.buildId %>.s3-website-us-east-1.amazonaws.com/account/info',
+                    'DEBUG': true
+                }
             }
         },
         s3: {
@@ -409,6 +448,14 @@ module.exports = function (grunt) {
     
     grunt.registerTask('e2e', function(){
         var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
+
+        // log backend url
+        var constants = grunt.file.read('app/constants.js');
+        var startFound = constants.indexOf('"API_URL", "') + 12;
+        var endFound = constants.indexOf('/v1")') - startFound;
+        var backendURL = constants.substr(startFound, endFound);
+        grunt.log.writeln('Running tests against backend: ' + backendURL);
+
         grunt.task.run([
             'webdriver',
             'connect:dist',

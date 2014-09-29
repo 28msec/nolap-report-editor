@@ -28,7 +28,11 @@ env:
   - GRUNT_TASK=tests
   - GRUNT_TASK=saucelabs-tests BROWSER_PROVIDER_READY_FILE=/tmp/sauce-connect-ready LOGS_DIR=/tmp/nolap-report-editor-build/logs
   global:
-  - secure: YqbQT5/kfhFkcjKek8HD0FklGTa9/TwCXul1p6G+xS3gTNRdlWW2TvOglhlvUNTJeVSNT/vGZs/IsbTunxs3mk8ztDUMZVUfnlkJoRJLL0I6vLyBMnr+UnJhuwiBOB7583Lichi1wCn7SVFCamH0EscatqySO1F9xBEx1GDnA9I=
-  - secure: Q/x0pr+/P/BB+kUfMWqI1NOyETCEoarFB2RtVQTd3B0zRo4oyjUQ+vCzEl2UUvErn+jOJ9suZxQ1usKKZOCe5u4Mi2rmdJJjpgrNYdbmcqwdSVMEcqEx0urYFz5eu1ZmFmM5XYsim0WLdjfLzlDJzlB0uyteurtHPwIbc9x9W1M=
-  - secure: HgQbwQth2+xvoQ9LaE94SqH6XZ/NwBxW+wLxtJZHnbURRQPIZTNpWTw8A9L+3yymsMFYxievt9rFqNzwEep74qc994WnUKz23zEglUuzFdq9IULaCaVZwryAnEhe5QzGTaFzfxeYA/zPNfCZMLg1a4mkFIVTlzdKP181rmcLn/c=
-  - secure: CNa8pS2/HuRa4yHIMjq43yPNOkJGz5K2q8JNAAxs31sLlj6iYY7fPcmjogOCo6ZuXxPAwMEUGTiewl3dyHFGqVvcc4MN680TjouxoXQ4C62oBzrS++Rh1E05EE6a50O4EwxaETIwEJUJJsY9fFb+GYi2+BRM4olI4rSLfYQtq7s=
+  - secure: USgTTaw/Vn69/M8X4ZJHEOZO9II18PQdaztoRgp9o71gQYvq7J/F+cYIfnyF1rwnlY6bbl/IJWQF6vmw338pXO20H8Ppk33SMom2uTasNTrq64Fb6Yd7wIvbZdj11yhGGd9OYpB+/ONU+0ArOBWGu2po/yCvbgAESpA5hcGOegc=
+  - secure: b8O5l0rlwvjo2R/QjfGIgD6GOEHpDPkVygv0FixZrywlM18ZThiaWn5tp8liY7DQsi7AB6m2Q/bXKd39uAxJnWAgOBLUwXB1NN6jG1qZxzDCF7hEPs25/WYLD6vIW9o0j5e3rmMgDU6dtLH141njOLhWG93oy0+h6jzRnH2niWo=
+  - secure: Anp6iY7L5E6PBR1yBwZw3arxUfMQeikJt5AQ9YPUtDfv95imt1QLfzk+KrtXnpRETTvPCYSLfSECBBnBTFS/d2u/Sq0I7dK5/ooBHUjhu9MSxwsO8lNiw83hH5d9LTkQ6Faxz2LZ3vLXsDIQZBjYW6nuRgLaoCPkcx3SMxdOCL8=
+  - secure: Pgh2rWa+D7UfFjycLI1RIdLOT3ukrs9pum0gEhLzCSkWk9EvOHCIIRVvm4aXHk/dik4CZ8WgOqej9e0vsFxApEXubZr7cx/VX66fdC9B8juuiCCrZf8sMhTKCSIgrrlM/dLPy8xlt0sYtVpfKNCogKMDSWuB1XP32gESpnJfjeQ=
+notifications:
+  hipchat:
+    rooms:
+      secure: Or8uZlbwUPuAJYPH6Hyzfq+h1OVJBInsh243XCQsr33Jkfbjk4Lurpe216qV0MaK2QwIB2vw0JVQQDFwBxwvn+zVRNtKeWDfbRDkH1NOb8B0cuwTjvI8IuOn7Kt81Hlkuwc8RUOQPVgdVGRmBSXoGhUL1MnSTRePFgBc/bg0AJ4=

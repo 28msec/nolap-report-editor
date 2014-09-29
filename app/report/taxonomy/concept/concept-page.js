@@ -3,6 +3,7 @@
 
 var Overview = require('./overview/overview-page');
 var Synonyms = require('./synonyms/synonyms-page');
+var Formula = require('./formula/formula-page');
 
 function Concept(id, name){
     this.id = id;
@@ -10,10 +11,16 @@ function Concept(id, name){
     this.label = element(by.model('conceptCopy.Label'));
     this.overview = new Overview(this.id, this.name);
     this.synonyms = new Synonyms(this.id, this.name);
+    this.formula = new Formula(this.id, this.name);
 }
 
 Concept.prototype.visitPage = function(){
     browser.get('/' + this.id + '/concept/' + this.name);
+};
+
+Concept.prototype.goToSynonyms = function(){
+    element(by.id('synonyms-link')).click();
+    return this.synonyms;
 };
 
 Concept.prototype.getLabel = function(){

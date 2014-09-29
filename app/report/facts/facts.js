@@ -3,10 +3,9 @@
 /* global accounting : false */
 
 angular.module('report-editor')
-.controller('FactsCtrl', function($scope, $timeout, Session, API, report, API_URL) {
+.controller('FactsCtrl', function($scope, $timeout, $modal, Session, API, report, API_URL) {
     $scope.columns = [];
-    $scope.data = null;
-    $scope.error = null;
+    $scope.data = null; 
     $scope.loading = false;
     $scope.dynamic = 0;
     $scope.max = 0;
@@ -35,8 +34,7 @@ angular.module('report-editor')
         var params = { report: report.model._id, token: Session.getToken(), $method: 'POST' };
         //params.aik = "0000021344-14-000008";
 
-        $scope.data = null;
-        $scope.error = null;
+        $scope.data = null;     
 
         if(report.hasSufficientFilters()) {
             $scope.loading = true;
@@ -44,8 +42,7 @@ angular.module('report-editor')
 
             API.Queries.listFactTableForReport(params).then(function (data) {
                 console.log(data);
-                $scope.data = data.FactTable;
-                $scope.error = null;
+                $scope.data = data.FactTable;             
 
                 if ($scope.data && $scope.data.length > 0) {
                     $scope.columns.push('xbrl:Entity');
@@ -73,15 +70,11 @@ angular.module('report-editor')
                         }
                     });
                 }
-
-                $scope.loading = false;
-
+                
             })
-            .catch(
-                function (error) {
-                    $scope.loading = false;
-                    $scope.data = null;
-                    $scope.error = error;
+            .finally(
+                function () {
+                    $scope.loading = false;                  
                 });
         }
     };
@@ -102,7 +95,20 @@ angular.module('report-editor')
         }
         return string.length > 60;
     };
-    
+
+    $scope.onValueClick = function(data){
+        $modal.open({
+            templateUrl: '/modules/ui/fact-details-modal.html',
+            controller: 'FactDetailCtrl',
+            size: 'lg',
+            resolve: {
+                fact: function () {
+                    return data;
+                }
+            }
+        });
+    };
+
     $scope.getExportURL = function(format) {
         return API_URL + '/_queries/public/api/facttable-for-report.jq?_method=POST&format=' + format + '&report=' + encodeURIComponent(report.model._id) + '&token=' + Session.getToken();
     };

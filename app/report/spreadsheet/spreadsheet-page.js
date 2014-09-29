@@ -28,4 +28,17 @@ Spreadsheet.prototype.getCellValue = function(cell){
     return cell.element(by.css('div > span.ng-binding'));
 };
 
+Spreadsheet.prototype.getFactDetailsModal = function(){
+    return element.all(by.css('div.fact-details'));
+};
+
+Spreadsheet.prototype.getValidationStampsDetails = function(success){
+    if (success === true){
+        return element.all(by.css('tr.validation-stamp-row.bg-success'));
+    } else if (success === false){
+        return element.all(by.css('tr.validation-stamp-row.bg-warning'));
+    }
+    return element.all(by.css('tr.validation-stamp-row'));
+};
+
 module.exports = Spreadsheet;

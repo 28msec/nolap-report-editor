@@ -13,7 +13,7 @@
       	           </span>
       	          </div>
     	    	         
-    	          <table class="table table-condensed table-justcolumns small">
+    	          <table class="table table-condensed table-justcolumns small table-hover fact-table">
     	              <thead>
     	                <th>#</th>
     	                <th ng-repeat="key in columns">{{key}}</th>
@@ -22,7 +22,7 @@
     	                <th>Decimals</th>
     	              </thead>
     	              <tbody>
-    	                <tr ng-repeat="item in data | filter : search">
+    	                <tr ng-repeat="item in data | filter : search" ng-click="onValueClick(item)">
     	                  <td>{{$index + 1}}</td>
     	                  <td ng-repeat="key in columns" class="nowrap"><span ng-if="$index==entityIndex">{{item.Aspects[key].substring(23)}}</span><span ng-if="$index!=entityIndex">{{item.Aspects[key]}}</span></td>
     	                  <td ng-if="(item.Type == 'NumericValue')" style="text-align: right">{{showNumber(item.Value)}}</td>
@@ -36,12 +36,7 @@
     	          
     		</div>
     
-           <div ng-if="report.hasSufficientFilters()" class="content">
-               <div ng-show="error" class="alert alert-danger">
-                 <strong>Error {{ error.status }}</strong>
-                 {{ error.body.message }}
-               </div>
-    
+           <div ng-if="report.hasSufficientFilters()" class="content">                  
                <div ng-show="data.length == 0">Fact Table is empty.</div>
     
                <p ng-show="loading">Updating fact table...</p>
