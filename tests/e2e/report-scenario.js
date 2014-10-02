@@ -47,7 +47,7 @@ describe('Report', function(){
         report.filters.visitPage();
         report.filters.resetSelectedFilters();
         report.filters.closeSelectedFiltersTag('DOW30');
-        report.filters.setFiltersEntityName('Coca Cola', 2);
+        report.filters.setFiltersEntityName('Coca Cola', 1);
         expect(report.filters.selectedFilters.cik.count()).toBe(1);
         report.filters.closeSelectedFiltersYear(2014);
         report.filters.clickFiltersYear(2013);
@@ -59,7 +59,7 @@ describe('Report', function(){
         var roas = report.spreadsheet.getValueTDsByHeaderContainingText('(ROA)');
         expect(roas.count()).toBe(1);
         var value = report.spreadsheet.getCellValue(roas.get(0));
-        expect(value.getText()).toBe('0.03');
+        expect(value.getText()).toBe('0.10');
     });
 
     it('should display validation and fact details on fact click', function(){

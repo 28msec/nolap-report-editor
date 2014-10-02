@@ -39,18 +39,18 @@ describe('Filters', function(){
     });
 
     it('should select COCA Cola', function() {
-        filters.setFiltersEntityName('Coca Cola', 2)
+        filters.setFiltersEntityName('Coca Cola', 1)
         .then(function(){
             expect(filters.setFilters.entity.getAttribute('value')).toBe('');
             expect(filters.selectedFilters.cik.count()).toBe(1);
-            expect(filters.selectedFilters.cik.get(0).getText()).toMatch('COCA COLA');
+            expect(filters.selectedFilters.cik.get(0).getText()).toMatch('COCA COLA CO');
         });
     });
 
     it('should select FORTUNE100', function() {
         filters.closeSelectedFiltersEntity('COCA COLA CO')
         .then(function(){
-            //expect(filters.filterTooGenericWarning.count()).toBe(1);
+            expect(filters.filterTooGenericWarning.count()).toBe(1);
             filters.clickFiltersTag('FORTUNE100')
             .then(function(){
                 expect(filters.filterTooGenericWarning.count()).toBe(0);
@@ -63,8 +63,8 @@ describe('Filters', function(){
     it('should select Beverages', function() {
         filters.closeSelectedFiltersTag('FORTUNE100')
         .then(function(){
-            //expect(filters.filterTooGenericWarning.count()).toBe(1);
-            filters.setFiltersIndustryGroup('bev', 3)
+            expect(filters.filterTooGenericWarning.count()).toBe(1);
+            filters.setFiltersIndustryGroup('bev', 1)
             .then(function(){
                 expect(filters.filterTooGenericWarning.count()).toBe(0);
                 expect(filters.setFilters.sic.getAttribute('value')).toBe('');
