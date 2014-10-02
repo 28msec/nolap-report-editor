@@ -59,7 +59,7 @@ describe('Report', function(){
         var roas = report.spreadsheet.getValueTDsByHeaderContainingText('(ROA)');
         expect(roas.count()).toBe(1);
         var value = report.spreadsheet.getCellValue(roas.get(0));
-        expect(value.getText()).toBe('0.10');
+        expect(value.getText()).toBe('0.03');
     });
 
     it('should display validation and fact details on fact click', function(){
