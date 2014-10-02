@@ -47,7 +47,7 @@ describe('Report', function(){
         report.filters.visitPage();
         report.filters.resetSelectedFilters();
         report.filters.closeSelectedFiltersTag('DOW30');
-        report.filters.setFiltersEntityName('Coca Cola', 2);
+        report.filters.setFiltersEntityName('Coca Cola', 1);
         expect(report.filters.selectedFilters.cik.count()).toBe(1);
         report.filters.closeSelectedFiltersYear(2014);
         report.filters.clickFiltersYear(2013);
