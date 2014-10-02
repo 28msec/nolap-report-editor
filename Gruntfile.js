@@ -492,7 +492,7 @@ module.exports = function (grunt) {
         //var env = (target ? target : 'server');
 
         grunt.task.run([
-            'ngconstant:server',
+            'ngconstant:prod',
             'clean:dist',
             'less',
             'peg',
