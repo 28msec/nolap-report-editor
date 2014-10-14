@@ -295,7 +295,7 @@ module.exports = function (grunt) {
                 wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
                 constants: {
                     'APPNAME': 'report-editor',
-                    'API_URL': '//<%= config.prod.api %>/v1',
+                    'API_URL': 'https://<%= config.prod.api %>/v1',
                     'REGISTRATION_URL': '<%= config.prod.registration %>',
                     'ACCOUNT_URL': '<%= config.prod.account %>',
                     'DEBUG': false
