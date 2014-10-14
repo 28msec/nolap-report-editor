@@ -17,6 +17,6 @@
     "prod": {
         "api": "secxbrl.28.io",
         "registration": "https://app.secxbrl.info/auth",
-        "account": "http://test.secxbrl.info/account/info"
+        "account": "https://app.secxbrl.info/account/info"
     }
 }
