@@ -3,6 +3,7 @@
 
 angular.module('report-editor')
 .controller('ReportsCtrl', function($rootScope, $log, $scope, $stateParams, $state, $modal, reports){
+
     $scope.reports = reports;
     $scope.selectedReports = {};
 

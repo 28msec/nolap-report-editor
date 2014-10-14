@@ -39,7 +39,7 @@ angular
             function getToken(){
                 var token = getCache().get('token');
                 if(token === undefined){
-                    redirectToLoginPage();
+                    throw new Error('AuthError');
                 }
                 return token;
             }

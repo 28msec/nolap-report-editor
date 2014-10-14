@@ -72,7 +72,9 @@ angular.module('report-editor', [
     });
 
     $rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
-        console.error(error);
+        if(error.message === 'AuthError') {
+            Session.redirectToLoginPage();
+        }
         ngProgressLite.done();
     });
 
