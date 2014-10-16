@@ -145,24 +145,21 @@ module.exports = function (grunt) {
             options: {
                 apis: [
                     {
-                        swagger: 'swagger/reports.json',
+                        swagger: 'https://raw.githubusercontent.com/28msec/secxbrl.info/master/swagger/reports.json',
                         moduleName: 'report-api',
                         className: 'ReportAPI',
-                        fileName: 'report-api.js',
                         angularjs: true
                     },
                     {
-                        swagger: 'swagger/session.json',
+                        swagger: 'https://raw.githubusercontent.com/28msec/secxbrl.info/master/swagger/session.json',
                         moduleName: 'session-api',
                         className: 'SessionAPI',
-                        fileName: 'session-api.js',
                         angularjs: true
                     },
                     {
-                        swagger: 'swagger/queries.json',
+                        swagger: 'https://raw.githubusercontent.com/28msec/secxbrl.info/master/swagger/queries.json',
                         moduleName: 'queries-api',
                         className: 'QueriesAPI',
-                        fileName: 'queries-api.js',
                         angularjs: true
                     }
                 ],
@@ -336,8 +333,7 @@ module.exports = function (grunt) {
                     'package.json',
                     'config.json',
                     'bower.json',
-                    '.bowerrc',
-                    'swagger/*'
+                    '.bowerrc'
                 ]
             }
         },
