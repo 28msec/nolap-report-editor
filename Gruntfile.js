@@ -333,8 +333,7 @@ module.exports = function (grunt) {
                     'package.json',
                     'config.json',
                     'bower.json',
-                    '.bowerrc',
-                    'swagger/*'
+                    '.bowerrc'
                 ]
             }
         },
