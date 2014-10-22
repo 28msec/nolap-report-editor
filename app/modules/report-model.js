@@ -106,63 +106,12 @@ angular
                                     'Name': 'xbrl:Entity',
                                     'Label': 'Reporting Entity',
                                     'Kind' : 'TypedDimension',
-                                    'Type' : 'string',
-                                    'DomainRestriction' : {
-                                        'Name' : 'xbrl:EntityDomain',
-                                        'Label' : 'Entity Domain',
-                                        'Enumeration' : [ 'http://www.sec.gov/CIK 0001403161', 'http://www.sec.gov/CIK 0000004962', 'http://www.sec.gov/CIK 0000019617', 'http://www.sec.gov/CIK 0000030554', 'http://www.sec.gov/CIK 0000034088', 'http://www.sec.gov/CIK 0000040545', 'http://www.sec.gov/CIK 0000066740', 'http://www.sec.gov/CIK 0000078003', 'http://www.sec.gov/CIK 0000080424', 'http://www.sec.gov/CIK 0000093410', 'http://www.sec.gov/CIK 0000101829', 'http://www.sec.gov/CIK 0000310158', 'http://www.sec.gov/CIK 0000320187', 'http://www.sec.gov/CIK 0000354950', 'http://www.sec.gov/CIK 0000732712', 'http://www.sec.gov/CIK 0000732717', 'http://www.sec.gov/CIK 0000789019', 'http://www.sec.gov/CIK 0000858877', 'http://www.sec.gov/CIK 0000886982', 'http://www.sec.gov/CIK 0001001039', 'http://www.sec.gov/CIK 0000012927', 'http://www.sec.gov/CIK 0000018230', 'http://www.sec.gov/CIK 0000021344', 'http://www.sec.gov/CIK 0000050863', 'http://www.sec.gov/CIK 0000051143', 'http://www.sec.gov/CIK 0000063908', 'http://www.sec.gov/CIK 0000086312', 'http://www.sec.gov/CIK 0000104169', 'http://www.sec.gov/CIK 0000200406', 'http://www.sec.gov/CIK 0000731766' ]
-                                    }
+                                    'Type' : 'string'
                                 },
                                 'xbrl:Unit': {
                                     'Name': 'xbrl:Unit',
                                     'Label': 'Unit',
                                     'Default': 'xbrl:NonNumeric'
-                                },
-                                'sec:Accepted': {
-                                    'Name': 'sec:Accepted',
-                                    'Label': 'Acceptance Date'
-                                },
-                                'sec:Archive': {
-                                    'Name': 'sec:Archive',
-                                    'Label': 'Archive ID'
-                                },
-                                'sec:FiscalYear': {
-                                    'Name': 'sec:FiscalYear',
-                                    'Label': 'Fiscal Year',
-                                    'Kind' : 'TypedDimension',
-                                    'Type' : 'integer',
-                                    'DomainRestriction' : {
-                                        'Name' : 'sec:FiscalYearDomain',
-                                        'Label' : 'Fiscal Year Domain',
-                                        'Enumeration' : [ year ]
-                                    }
-                                },
-                                'sec:FiscalPeriod': {
-                                    'Name': 'sec:FiscalPeriod',
-                                    'Label': 'Fiscal Period',
-                                    'Kind' : 'TypedDimension',
-                                    'Type' : 'string',
-                                    'DomainRestriction' : {
-                                        'Name' : 'sec:FiscalPeriodDomain',
-                                        'Label' : 'Fiscal Period Domain',
-                                        'Enumeration' : [ 'FY' ]
-                                    }
-                                },
-                                'dei:LegalEntityAxis': {
-                                    'Name': 'dei:LegalEntityAxis',
-                                    'Label': 'Legal Entity',
-                                    'Default': 'sec:DefaultLegalEntity',
-                                    'Domains' : {
-                                        'dei:LegalEntityAxisDomain': {
-                                            'Name': 'dei:LegalEntityAxisDomain',
-                                            'Label': 'Implicit dei:LegalEntityAxis Domain',
-                                            'Members': {
-                                                'sec:DefaultLegalEntity': {
-                                                    'Name': 'sec:DefaultLegalEntity'
-                                                }
-                                            }
-                                        }
-                                    }
                                 }
                             }
                         }
@@ -170,9 +119,9 @@ angular
                     'Rules' : [],
                     'Filters' : {
                         'cik' : [  ],
-                        'tag' : [ 'DOW30' ],
-                        'fiscalYear' : [ year ],
-                        'fiscalPeriod' : [ 'FY' ],
+                        'tag' : [  ],
+                        'fiscalYear' : [  ],
+                        'fiscalPeriod' : [ ],
                         'sic' : [  ]
                     }
                 };
@@ -864,28 +813,6 @@ angular
                             'Children' : [ {
                                 'Kind' : 'Aspect',
                                 'Aspect' : 'xbrl:Entity'
-                            } ]
-                        } ]
-                    }, {
-                        'BreakdownLabels' : [ 'Fiscal Year Breakdown' ],
-                        'BreakdownTrees' : [ {
-                            'Kind' : 'Rule',
-                            'Abstract' : true,
-                            'Labels' : [ 'Fiscal Year [Axis]' ],
-                            'Children' : [ {
-                                'Kind' : 'Aspect',
-                                'Aspect' : 'sec:FiscalYear'
-                            } ]
-                        } ]
-                    }, {
-                        'BreakdownLabels' : [ 'Fiscal Period Breakdown' ],
-                        'BreakdownTrees' : [ {
-                            'Kind' : 'Rule',
-                            'Abstract' : true,
-                            'Labels' : [ 'Fiscal Period [Axis]' ],
-                            'Children' : [ {
-                                'Kind' : 'Aspect',
-                                'Aspect' : 'sec:FiscalPeriod'
                             } ]
                         } ]
                     } ],
@@ -1716,6 +1643,7 @@ angular
     };
 
     Report.prototype.hasSufficientFilters = function(){
+        return true;
         var result = false;
         var countEntityRestrictions = this.countAspectsRestrictions(['xbrl:Entity']);
         var countYearsRestrictions = this.countAspectsRestrictions(['sec:FiscalYear']);
