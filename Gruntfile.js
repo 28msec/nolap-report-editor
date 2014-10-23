@@ -327,7 +327,7 @@ module.exports = function (grunt) {
                 }]
             },
             dev: {
-                bucket: 'reports-nttdata.secxbrl.info',
+                bucket: 'reports-nttdata3.secxbrl.info',
                 upload: [{
                     src: 'dist/**/*',
                     dest: '',
