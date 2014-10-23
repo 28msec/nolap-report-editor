@@ -815,7 +815,21 @@ angular
                                 'Aspect' : 'xbrl:Entity'
                             } ]
                         } ]
-                    } ],
+                    } , {
+                        "BreakdownLabels" : [ "Reporting Period Breakdown" ],
+                        "BreakdownTrees" : [
+                            {
+                                "Kind": "Rule",
+                                "Abstract": true,
+                                "Labels": [ "Period [Axis]" ],
+                                "Children": [
+                                    {
+                                        "Kind": "Aspect",
+                                        "Aspect": "xbrl:Period"
+                                    }
+                                ]
+                            }]
+                    }],
                     'y' : [ {
                         'BreakdownLabels' : [ 'Breakdown on concepts' ],
                         'BreakdownTrees' : [ {
