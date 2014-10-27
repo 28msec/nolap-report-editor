@@ -560,12 +560,13 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         result.push('  case (' + sourceFactExistenceCheck + ' and ' + toComputation(prereq) + ')');
                         result.push('  return');
                         result.push('    let $computed-value := ' + toComputation(body));
-                        result.push('    let $audit-trail-message := ');
+                        result.push('    let $audit-trail-message as string* := ');
                         if(this.model.Type === 'xbrl28:formula'){
                             result.push('      rules:fact-trail({"Aspects": { "xbrl:Unit" : $_unit, "xbrl:Concept" : "' + computedConcept + '" }, Value: $computed-value }) || " = " || ');
                         }
                         result.push('         ' + toAuditTrail(body));
-                        result.push('  let $source-facts := (' + auditTrailSourceFacts + ')');
+                        result.push('    let $audit-trail-message as string* := ($audit-trail-message, $warnings)');
+                        result.push('    let $source-facts as object* := (' + auditTrailSourceFacts + ')');
                         result.push('    return');
                         result.push('      if(string(number($computed-value)) != "NaN" and not($computed-value instance of xs:boolean) and $computed-value ne xs:integer($computed-value))');
                         result.push('      then');
@@ -580,7 +581,6 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         result.push('            $options)');
                         result.push('        modify (');
                         result.push('            replace value of json $newfact("Decimals") with 2,');
-                        result.push('            if(exists($warnings)) then insert json { Warnings: [ $warnings ] } into $newfact else ()');
                         result.push('          )');
                         result.push('        return $newfact');
                         result.push('      else');
