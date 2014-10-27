@@ -21,7 +21,7 @@ describe('Authentication', function(){
     });
     
     it('should login', function(){
-        auth.login('support@28.io', 'foobar');
+        auth.login('support@28.io', 'foobar42');
         auth.getCurrentUrl().then(function(url) {
             expect(url.substring(url.length - 1)).toBe('/');
         });
