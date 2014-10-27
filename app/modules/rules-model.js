@@ -499,14 +499,11 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                 result.push('for $facts in facts:facts-for-internal((');
                 result.push('      ' + factsFilter);
                 result.push('    ), $hypercube, $aligned-filter, $concept-maps, $rules, $cache, $options)');
-                if (allowCrossPeriod) {
-                    result.push('let $aligned-period := ( facts:duration-for-fact($facts).End, facts:instant-for-fact($facts), "forever")[1]');
-                }
-                result.push('group by $canonical-filter-string := ');
-                var canonicalSerialization = '  facts:canonically-serialize-object($facts, ($facts:CONCEPT, "_id", "IsInDefaultHypercube", "Type", "Value", "Decimals", "AuditTrails", "xbrl28:Type"';
-                if (allowCrossBalance) {
-                    canonicalSerialization += ', "Balance"';
-                }
+                result.push('let $duration-period as object? := facts:duration-for-fact($facts, {Typed: false })');
+                result.push('let $instant-period as string?  := facts:instant-for-fact($facts, {Typed: false })');
+                result.push('let $aligned-period as string  := ( $duration-period.End, $instant-period, "forever")[1]');
+                result.push('group by $canonical-filter-string :=');
+                var canonicalSerialization = '  facts:canonical-grouping-key($facts, ($facts:CONCEPT, $facts:UNIT';
                 if (allowCrossPeriod) {
                     canonicalSerialization += ', $facts:PERIOD';
                 }
@@ -515,6 +512,9 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                 if (allowCrossPeriod) {
                     result.push('  , $aligned-period');
                 }
+                result.push('for $duration-string as string? allowing empty in distinct-values($facts[$$.Concept.PeriodType eq "duration"].$facts:ASPECTS.$facts:PERIOD)');
+                result.push('let $facts := $facts[$$.$facts:ASPECTS.$facts:PERIOD = ($duration-string, $aligned-period)]');
+
                 for(var x in variables){
                     if(variables.hasOwnProperty(x)) {
                         var v = variables[x];
