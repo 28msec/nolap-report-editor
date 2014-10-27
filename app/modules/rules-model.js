@@ -515,7 +515,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                 if (allowCrossPeriod) {
                     result.push('  , $aligned-period');
                 }
-                result.push('let $warnings as string* := ()')
+                result.push('let $warnings as string* := ()');
                 for(var x in variables){
                     if(variables.hasOwnProperty(x)) {
                         var v = variables[x];
