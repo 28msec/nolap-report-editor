@@ -580,7 +580,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         result.push('            $source-facts,');
                         result.push('            $options)');
                         result.push('        modify (');
-                        result.push('            replace value of json $newfact("Decimals") with 2,');
+                        result.push('            replace value of json $newfact("Decimals") with 2');
                         result.push('          )');
                         result.push('        return $newfact');
                         result.push('      else');
