@@ -511,10 +511,17 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                 if (allowCrossPeriod) {
                     result.push('  , $aligned-period');
                 }
+                result.push('let $warnings as string* := ()')
                 for(var x in variables){
                     if(variables.hasOwnProperty(x)) {
                         var v = variables[x];
-                        result.push('let $' + v.Name + ' as object? := $facts[$$.$facts:ASPECTS.$facts:CONCEPT eq "' + v.Concept + '"]');
+                        result.push('let $' + v.Name + ' as object* := $facts[$$.$facts:ASPECTS.$facts:CONCEPT eq "' + v.Concept + '"]');
+                        result.push('let $warnings := ($warnings, if(count($' + v.Name + ') gt 1)');
+                        result.push('                             then if(count(distinct-values($'+v.Name+'.Value)) gt 1))');
+                        result.push('                                  then "Cell collision with multiple values for concept ' + v.Name + '"');
+                        result.push('                                  else "Cell collision with consistent values for concept ' + v.Name + '"');
+                        result.push('                             else ())');
+                        result.push('let $' + v.Name + ' as object? := $' + v.Name + '[1]');
                     }
                 }
                 result.push('let $_unit := ($facts.$facts:ASPECTS.$facts:UNIT)[1]');
@@ -572,7 +579,8 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         result.push('            $source-facts,');
                         result.push('            $options)');
                         result.push('        modify (');
-                        result.push('            replace value of json $newfact("Decimals") with 2');
+                        result.push('            replace value of json $newfact("Decimals") with 2,');
+                        result.push('            if(exists($warnings)) then insert json { Warnings: [ $warnings ] } into $newfact else ()');
                         result.push('          )');
                         result.push('        return $newfact');
                         result.push('      else');
