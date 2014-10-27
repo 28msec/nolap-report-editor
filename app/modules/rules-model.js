@@ -64,7 +64,6 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         'ComputableConcepts': [ alignedComputableConcept ],
                         'ValidatedConcepts': [ this.report.hideDefaultConceptPrefix(computableConcept) ],
                         'DependsOn': [],
-                        'HideRulesForConcepts': [],
                         'AllowCrossPeriod': true,
                         'AllowCrossBalance': true,
                         'Formulae': [
@@ -88,7 +87,6 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         'ComputableConcepts': [ computableConcept + 'Validation' ],
                         'ValidatedConcepts': [ computableConcept ],
                         'DependsOn': [],
-                        'HideRulesForConcepts': [],
                         'Formula': ''
                     });
                 }
@@ -102,7 +100,6 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         'Description': 'Rule to compute ' + concept.Label + ' (' + computableConcept + ').',
                         'ComputableConcepts': [ computableConcept ],
                         'DependsOn': [],
-                        'HideRulesForConcepts': [],
                         'AllowCrossPeriod': true,
                         'AllowCrossBalance': true,
                         'Formulae': [
@@ -124,7 +121,6 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         'Description': 'Rule to compute ' + concept.Label + ' (' + computableConcept + ').',
                         'ComputableConcepts': [ computableConcept ],
                         'DependsOn': [],
-                        'HideRulesForConcepts': [],
                         'Formula': ''
                     });
                 }
@@ -515,10 +511,17 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                 if (allowCrossPeriod) {
                     result.push('  , $aligned-period');
                 }
+                result.push('let $warnings as string* := ()')
                 for(var x in variables){
                     if(variables.hasOwnProperty(x)) {
                         var v = variables[x];
-                        result.push('let $' + v.Name + ' as object? := $facts[$$.$facts:ASPECTS.$facts:CONCEPT eq "' + v.Concept + '"]');
+                        result.push('let $' + v.Name + ' as object* := $facts[$$.$facts:ASPECTS.$facts:CONCEPT eq "' + v.Concept + '"]');
+                        result.push('let $warnings := ($warnings, if(count($' + v.Name + ') gt 1)');
+                        result.push('                             then if(count(distinct-values($'+v.Name+'.Value)) gt 1)');
+                        result.push('                                  then "Cell collision with conflicting values for concept ' + v.Name + '."');
+                        result.push('                                  else "Cell collision with consistent values for concept ' + v.Name + '."');
+                        result.push('                             else ())');
+                        result.push('let $' + v.Name + ' as object? := $' + v.Name + '[1]');
                     }
                 }
                 result.push('let $_unit := ($facts.$facts:ASPECTS.$facts:UNIT)[1]');
@@ -538,7 +541,6 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         } else if(sourceFacts[0] !== undefined) {
                             sourceFactVariable = sourceFacts[0].replace(/:/g, '_');
                         }
-                        
                         var sourceFactExistenceCheck = '';
                         for(var s in sourceFacts){
                             if(sourceFacts.hasOwnProperty(s)){
@@ -554,26 +556,17 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                                 sourceFactExistenceCheck += 'exists($' + sFact + ')';
                             }
                         }
-                        
-                        var validatedFactVariable;
-                        if(this.model.Type === 'xbrl28:validation'){
-                            var validatedConcept = report.alignConceptPrefix(this.model.ValidatedConcepts[0]);
-                            if(validatedConcept.indexOf( prefix + ':') === 0){
-                                validatedFactVariable = report.hideDefaultConceptPrefix(validatedConcept);
-                            }else{
-                                validatedFactVariable = validatedConcept.replace(/:/g, '_');
-                            }
-                        }                        
 
                         result.push('  case (' + sourceFactExistenceCheck + ' and ' + toComputation(prereq) + ')');
                         result.push('  return');
                         result.push('    let $computed-value := ' + toComputation(body));
-                        result.push('    let $audit-trail-message := ');
+                        result.push('    let $audit-trail-message as string* := ');
                         if(this.model.Type === 'xbrl28:formula'){
                             result.push('      rules:fact-trail({"Aspects": { "xbrl:Unit" : $_unit, "xbrl:Concept" : "' + computedConcept + '" }, Value: $computed-value }) || " = " || ');
                         }
                         result.push('         ' + toAuditTrail(body));
-                        result.push('  let $source-facts := (' + auditTrailSourceFacts + ')');
+                        result.push('    let $audit-trail-message as string* := ($audit-trail-message, $warnings)');
+                        result.push('    let $source-facts as object* := (' + auditTrailSourceFacts + ')');
                         result.push('    return');
                         result.push('      if(string(number($computed-value)) != "NaN" and not($computed-value instance of xs:boolean) and $computed-value ne xs:integer($computed-value))');
                         result.push('      then');
@@ -598,14 +591,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         result.push('          $rule,');
                         result.push('          $audit-trail-message,');
                         result.push('          $source-facts,');
-                        if (this.model.Type === 'xbrl28:validation') {
-                            result.push('            $options,');
-                            result.push('            $' + validatedFactVariable + ',');
-                            result.push('            $computed-value)');
-                        }
-                        else {
-                            result.push('            $options)');
-                        }
+                        result.push('          $options)');
 
                     }
                 }
@@ -630,7 +616,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
         }
     };
 
-    var bodyEmptyErrorMessage = 'Example: "NetIncomeLoss / Assets"';
+    var bodyEmptyErrorMessage = 'Rule code section cannot be empty. Example code: "((NetIncomeLoss/Revenues)*(1+(Assets-Equity)/Equity))/((1/(Revenues/Assets))-((NetIncomeLoss/Revenues)*(1+(Assets-Equity)/Equity)))"';
 
     Rule.prototype.compileBodyDeferred = function(index) {
         ensureParameter(index, 'index', 'number', 'compileBodyDeferred');
@@ -846,28 +832,6 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
         }
     };
 
-    var validateHideRulesForConcepts = function(rule, report){
-        var hideRulesForConcepts = rule.HideRulesForConcepts;
-        var notExistingConcepts = [];
-        for (var i in hideRulesForConcepts){
-            if(hideRulesForConcepts.hasOwnProperty(i)) {
-                var concept = report.getConcept(report.alignConceptPrefix(hideRulesForConcepts[i]));
-                if (concept === undefined || concept === null) {
-                    notExistingConcepts.push(hideRulesForConcepts[i]);
-                }
-            }
-        }
-        if(notExistingConcepts.length === 1) {
-            rule.HideRulesForConceptsErr = 'The concept "' + notExistingConcepts[0] + '" does not exist.';
-            rule.valid = false;
-        } else if(notExistingConcepts.length > 1) {
-            rule.HideRulesForConceptsErr = 'The following concepts do not exist: "' + notExistingConcepts.join('", "') + '".';
-            rule.valid = false;
-        }else {
-            delete rule.HideRulesForConceptsErr;
-        }
-    };
-
     var validateValidatedConcepts = function(rule, report){
         var validatedConcepts = rule.ValidatedConcepts;
         if(validatedConcepts[0] === '' || validatedConcepts.length === 0){
@@ -979,7 +943,6 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                 inferDependencies(this, this.model, true);
             }
             validateDependsOnConcepts(rule, report);
-            validateHideRulesForConcepts(rule, report);
             if(type === 'xbrl28:validation' ){
                 validateValidatedConcepts(rule, report);
             }
@@ -1086,8 +1049,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
         }
         rule.AllowCrossPeriod = model.AllowCrossPeriod;
         rule.AllowCrossBalance = model.AllowCrossBalance;
-        rule.HideRulesForConcepts = report.alignConceptPrefixes(model.HideRulesForConcepts);
-
+        //$log.log('getRule done');
         return rule;
     };
 
@@ -1099,11 +1061,6 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
         ensureParameter(model, 'model', 'object', 'setModel');
         this.model = angular.copy(model);
         this.model.ComputableConcepts = this.report.hideDefaultConceptPrefixes(this.model.ComputableConcepts);
-        if(this.model.HideRulesForConcepts !== undefined){
-            this.model.HideRulesForConcepts = this.report.hideDefaultConceptPrefixes(this.model.HideRulesForConcepts);
-        } else {
-            this.model.HideRulesForConcepts = [];
-        }
         this.parser = null;
         //this.compile();
     };
