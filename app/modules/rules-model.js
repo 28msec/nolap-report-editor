@@ -521,7 +521,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         var v = variables[x];
                         result.push('let $' + v.Name + ' as object* := $facts[$$.$facts:ASPECTS.$facts:CONCEPT eq "' + v.Concept + '"]');
                         result.push('let $warnings := ($warnings, if(count($' + v.Name + ') gt 1)');
-                        result.push('                             then if(count(distinct-values($'+v.Name+'.Value)) gt 1))');
+                        result.push('                             then if(count(distinct-values($'+v.Name+'.Value)) gt 1)');
                         result.push('                                  then "Cell collision with multiple values for concept ' + v.Name + '"');
                         result.push('                                  else "Cell collision with consistent values for concept ' + v.Name + '"');
                         result.push('                             else ())');
