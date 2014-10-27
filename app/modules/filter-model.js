@@ -2,7 +2,7 @@
 
 angular
     .module('filter-model', ['constants', 'api'])
-    .factory('Filter', function($q, $angularCacheFactory, API, APPNAME, Session){
+    .factory('Filter', function($q, API, Session){
 
         return (function() {
 
@@ -210,7 +210,7 @@ angular
             }
 
             function getEntity(cik){
-                var result = undefined;
+                var result;
                 if(entities !== undefined) {
                     entities.forEach(function (entity) {
                         if (entity.cik === cik) {
@@ -222,7 +222,7 @@ angular
             }
 
             function getSic(sicCode){
-                var result = undefined;
+                var result;
                 if(sics !== undefined) {
                     sics.forEach(function (sic) {
                         if (sic.ID === sicCode) {
@@ -233,9 +233,23 @@ angular
                 return result;
             }
 
+            function isLatestFiscalYearSelected(){
+                var hasLatest = false;
+                if((selection.fiscalYear.length || 0) > 0){
+                    selection.fiscalYear.forEach(
+                        function(year){
+                            if(year === 'LATEST'){
+                                hasLatest = true;
+                            }
+                        });
+                }
+                return hasLatest;
+            }
+
             function getAspects(){
                 var deferred = $q.defer();
 
+                var hasLatest = isLatestFiscalYearSelected();
                 var aspects = {
                     'sec:FiscalPeriod': selection.fiscalPeriod,
                     'sec:FiscalYear': [],
@@ -245,11 +259,15 @@ angular
 
                 // fiscal year
                 if((selection.fiscalYear.length || 0) > 0){
-                    selection.fiscalYear.forEach(
-                        function(year){
-                            aspects['sec:FiscalYear'].push(parseInt(year,10));
-                        }
-                    );
+                    if(!hasLatest) {
+                        selection.fiscalYear.forEach(
+                            function (year) {
+                                aspects['sec:FiscalYear'].push(parseInt(year, 10));
+                            }
+                        );
+                    } else {
+                        selection.fiscalYear = ['LATEST'];
+                    }
                 }
 
                 // cik
@@ -278,7 +296,7 @@ angular
                 if((selection.sic.length || 0)  > 0){
                     selection.sic.forEach(function(sic){
                         entities.forEach(function(entity){
-                            if(entity.sic === sic){
+                            if(entity.sic === '' + sic){
                                 if(!arrayContains(aspects['xbrl:Entity'], entity.cik)){
                                     aspects['xbrl:Entity'].push(entity.cik);
                                 }
@@ -287,25 +305,26 @@ angular
                     });
                 }
 
-                // restrict sec:Archives
-                var parameters = {
-                    $method: 'POST',
-                    cik: aspects['xbrl:Entity'],
-                    fiscalYear: aspects['sec:FiscalYear'],
-                    fiscalPeriod: aspects['sec:FiscalPeriod'],
-                    token: Session.getToken()
-                };
-                API.Queries.listFilings(parameters)
-                    .then(
-                        function(filings){
+                if(hasLatest) {
+                    // restrict sec:Archives in case Fiscal Year is latest
+                    var parameters = {
+                        $method: 'POST',
+                        cik: aspects['xbrl:Entity'],
+                        fiscalYear: [ 'LATEST' ],
+                        fiscalPeriod: aspects['sec:FiscalPeriod'],
+                        token: Session.getToken()
+                    };
+                    API.Queries.listFilings(parameters)
+                        .then(
+                        function (filings) {
                             var archives = filings.Archives;
-                            if((archives.length || 0) > 0){
-                                if(aspects['sec:Archive'] === undefined){
+                            if ((archives.length || 0) > 0) {
+                                if (aspects['sec:Archive'] === undefined) {
                                     aspects['sec:Archive'] = [];
                                 }
-                                archives.forEach(function(archive){
+                                archives.forEach(function (archive) {
                                     var aid = archive.AccessionNumber;
-                                    if(!arrayContains(aspects['sec:Archive'], aid)){
+                                    if (!arrayContains(aspects['sec:Archive'], aid)) {
                                         aspects['sec:Archive'].push(aid);
                                     }
                                 });
@@ -313,6 +332,9 @@ angular
                             deferred.resolve(aspects);
                         }
                     );
+                } else {
+                    deferred.resolve(aspects);
+                }
 
                 return deferred.promise;
             }
@@ -322,8 +344,20 @@ angular
 
                 selection = report.resetFilters();
 
+                var date = new Date();
+                var year = date.getFullYear();
+                var month = date.getMonth();
+                if(month < 8){
+                    year = year - 1;
+                }
                 var yearsPromise = getYears()
-                    .then(function(years){selection.fiscalYear = [years[1]];});
+                    .then(function(years){
+                        if(arrayContains(years, year)){
+                            selection.fiscalYear = [year];
+                        } else {
+                            selection.fiscalYear = [years[1]];
+                        }
+                    });
                 var periodsPromise = getPeriods()
                     .then(function(periods){selection.fiscalPeriod = [periods[0]];});
                 $q.all([yearsPromise, periodsPromise])
@@ -368,6 +402,7 @@ angular
                 getEntity: getEntity,
                 selectEntity: selectEntity,
                 getYears: getYears,
+                isLatestFiscalYearSelected: isLatestFiscalYearSelected,
                 getPeriods: getPeriods,
                 getTags: getTags,
                 getSelection: getSelection,

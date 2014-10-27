@@ -1,34 +1,36 @@
-<header class="navbar navbar-default">
-    <div class="container">
-        <div class="navbar-header">
-            <span class="navbar-brand">Reports</span>
+<div id="reports">
+    <header class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <span class="navbar-brand">Reports</span>
+            </div>
+            <account></account>
         </div>
-        <account></account>
+    </header>
+    <div class="container scrollable std-top-padding">
+        <section>
+            <button class="btn btn-primary" ng-click="createReport()" id="create-report">CREATE</button>
+            <button class="btn btn-default fa fa-trash-o" ng-show="hasSelectedReport" ng-click="deleteReports()" id="delete-reports"></button>
+        </section>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" ng-model="toggle" ng-change="toggleAll()" tristate="toggle" ng-checked="false"></th>
+                    <th>Name</th>
+                    <th>Last Opened</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="report in reports | orderBy:'LastModified':true track by report._id">
+                    <td>
+                        <input type="checkbox" ng-model="selectedReports[report._id]" ng-change="toggleReport()" ng-checked="false">
+                    </td>
+                    <td>
+                        <a ng-href="/{{report._id}}" ng-bind="report.Label"></a>
+                    </td>
+                    <td data-last-modified="{{report.LastModified}}">{{formatDateTime(report.LastModified)}}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-</header>
-<div class="container scrollable std-top-padding">
-    <section>
-        <button class="btn btn-primary" ng-click="createReport()" id="create-report">CREATE</button>
-        <button class="btn btn-default fa fa-trash-o" ng-show="hasSelectedReport" ng-click="deleteReports()" id="delete-reports"></button>
-    </section>
-    <table class="table">
-        <thead>
-            <tr>
-                <th><input type="checkbox" ng-model="toggle" ng-change="toggleAll()" tristate="toggle" ng-checked="false"></th>
-                <th>Name</th>
-                <th>Last Opened</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="report in reports | orderBy:'LastModified':true">
-                <td>
-                    <input type="checkbox" ng-model="selectedReports[report._id]" ng-change="toggleReport()" ng-checked="false">
-                </td>
-                <td>
-                    <a ng-href="/{{report._id}}" ng-bind="report.Label"></a>
-                </td>
-                <td data-last-modified="{{report.LastModified}}">{{formatDateTime(report.LastModified)}}</td>
-            </tr>
-        </tbody>
-    </table>
 </div>

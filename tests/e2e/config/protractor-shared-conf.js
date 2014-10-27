@@ -2,13 +2,13 @@
 'use strict';
 
 exports.config = {
-    allScriptsTimeout: 11000,
+    allScriptsTimeout: 30000,
 
     baseUrl: 'http://localhost:9000',
 
     framework: 'jasmine',
 
-    specs: ['../*_spec.js'], 
+    specs: ['../*-scenario.js'], 
 
     onPrepare: function() {
         // Disable animations so e2e tests run more quickly
@@ -24,16 +24,16 @@ exports.config = {
         browser.getCapabilities().then(function(caps) {
             browser.params.browser = caps.get('browserName');
         });
-        
+
         //Login
-        var Auth = require('../pages/auth');
+        var Auth = require('../../../app/auth/auth-page');
         var auth = new Auth();
-        auth.get();
-        auth.login('w@28.io', 'foobar');
+        auth.visitPage();
+        auth.login('support@28.io', 'foobar');
         browser.waitForAngular();
     },
 
     jasmineNodeOpts: {
-        defaultTimeoutInterval: 30000
+        defaultTimeoutInterval: 100000
     }
 };

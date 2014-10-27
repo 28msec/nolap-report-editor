@@ -61,7 +61,7 @@ angular.module('report-editor', [
     });
 })
 
-.run(function($rootScope, ngProgressLite, $state, $location, API, Session) {
+.run(function($rootScope, ngProgressLite, $state, $location, $modal, API, Session) {
 
     $rootScope.$on('$stateChangeStart', function() {
         ngProgressLite.start();
@@ -72,12 +72,29 @@ angular.module('report-editor', [
     });
 
     $rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
-        console.error(error);
+        if(error.message === 'AuthError') {
+            Session.redirectToLoginPage();
+        }
         ngProgressLite.done();
     });
 
     $rootScope.$on('auth', function() {
         Session.redirectToLoginPage();
+    });
+    
+    $rootScope.$on('alert', function(event, title, message){
+        $modal.open( {
+            template: '<div class="modal-header"><span ng-bind-html="object.title"></span><a class="close" ng-click="cancel()">&times;</a></div><div class="modal-body" ng-bind-html="object.message"></div><div class="text-right modal-footer"><button class="btn btn-default" ng-click="cancel()">OK</button></div>',
+            controller: ['$scope', '$modalInstance', 'object',  function ($scope, $modalInstance, object) {
+                $scope.object = object;
+                $scope.cancel = function () {
+                    $modalInstance.dismiss('cancel');
+                };
+            }],
+            resolve: {
+                object: function() { return { title: title, message: message }; }
+            }
+        });
     });
 })
 ;

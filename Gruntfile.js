@@ -17,9 +17,36 @@ module.exports = function (grunt) {
         '!\\.html|\\.xml|\\images|\\.js|\\.css|\\.png|\\.jpg|\\.woff|\\.ttf|\\.svg|\\.ico /index.html [L]'
     ];
 
+    var readConfigJson = function() {
+        var _ = require('lodash');
+
+        var isCustomEndpoint = _.findIndex(process.argv, function (val) {
+            return val === 'ngconstant:custom';
+        }) > -1;
+
+        var buildId;
+        var idx = _.findIndex(process.argv, function (val) {
+            return val.substring(0, '--build-id='.length) === '--build-id=';
+        });
+        buildId = idx > -1 ? process.argv[idx].substring('--build-id='.length) : undefined;
+        if (buildId !== undefined) {
+            buildId = buildId.replace('.', '-');
+        } else if (isCustomEndpoint) {
+            grunt.fail.fatal('Unable to find --build-id=myfeature. ngconstant:custom only works with arg --build-id.');
+        }
+        var id = buildId === '' ? 'secxbrl' : 'secxbrl-' + buildId;
+        var config = grunt.file.readJSON('config.json');
+        config.custom = {};
+        if (buildId !== undefined) {
+            grunt.log.writeln('Report editor will be setup to run against backend: ' + id);
+            config.custom.buildId = id;
+        }
+        return config;
+    };
+
     // Project configuration.
     grunt.initConfig({
-        config: grunt.file.readJSON('config.json'),
+        config: readConfigJson(),
         watch: {
             less: {
                 files:  ['app/**/*.less'],
@@ -118,24 +145,21 @@ module.exports = function (grunt) {
             options: {
                 apis: [
                     {
-                        swagger: 'swagger/reports.json',
+                        swagger: 'https://raw.githubusercontent.com/28msec/secxbrl.info/master/swagger/reports.json',
                         moduleName: 'report-api',
                         className: 'ReportAPI',
-                        fileName: 'report-api.js',
                         angularjs: true
                     },
                     {
-                        swagger: 'swagger/session.json',
+                        swagger: 'https://raw.githubusercontent.com/28msec/secxbrl.info/master/swagger/session.json',
                         moduleName: 'session-api',
                         className: 'SessionAPI',
-                        fileName: 'session-api.js',
                         angularjs: true
                     },
                     {
-                        swagger: 'swagger/queries.json',
+                        swagger: 'https://raw.githubusercontent.com/28msec/secxbrl.info/master/swagger/queries.json',
                         moduleName: 'queries-api',
                         className: 'QueriesAPI',
-                        fileName: 'queries-api.js',
                         angularjs: true
                     }
                 ],
@@ -167,22 +191,48 @@ module.exports = function (grunt) {
                 configFile: './karma.conf.js'
             },
             dev: {
-                browsers: ['Chrome'],
-                autoWatch: true,
-                singleRun: false
-            },
-            '1.2.9': {
                 options: {
                     files: [
                         'bower_components/angular/angular.js',
                         'bower_components/angular-mocks-1.2.9/angular-mocks.js',
+                        'bower_components/ngprogress-lite/ngprogress-lite.js',
+                        'bower_components/angular-ui-router/release/angular-ui-router.js',
+                        'bower_components/angular-sanitize/angular-sanitize.js',
+                        'bower_components/angular-ui-bootstrap-bower/ui-bootstrap.js',
+                        'bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js',
+                        'bower_components/angular-cache/dist/angular-cache.js',
+                        'bower_components/layoutmodel-renderer-angular/app/directive/layoutmodel.js',
+                        'bower_components/layoutmodel-renderer-angular/app/directive/layoutmodeltemplate.js',
+                        'bower_components/flexy-layout/flexy-layout.debug.js',
+                        'bower_components/angular-ui-router/release/angular-ui-router.js',
+                        'bower_components/angular-ui-tree/dist/angular-ui-tree.js',
+
+                        'app/constants.js',
+                        'app/modules/report-api.js',
+                        'app/modules/session-api.js',
+                        'app/modules/queries-api.js',
+                        'app/modules/api.js',
                         'app/modules/excel-parser.js',
                         'app/modules/formula-parser.js',
                         'app/modules/report-api.js',
                         'app/modules/report-model.js',
                         'app/modules/rules-model.js',
+                        'app/app.js',
+                        'app/modules/excel-parser.js',
+                        'app/modules/session-model.js',
+                        'app/modules/rules-model.js',
+                        'app/modules/filter-model.js',
+                        'app/modules/ui/api-status.js',
+                        'app/modules/ui/forms.js',
+                        'app/modules/ui/account.js',
+                        'app/modules/ui/resize.js',
+                        'app/modules/formula-parser.js',
+                        
+                        'app/report/taxonomy/taxonomy.js',
+                        'app/report/taxonomy/concept/overview/overview.js',
+                        
                         'tests/unit/karma.start.js',
-                        'tests/unit/*.js'
+                        'app/**/*-test.js'
                     ]
                 }
             }
@@ -193,7 +243,7 @@ module.exports = function (grunt) {
             }
         },
         protractor: {
-            travis: 'tests/e2e/config/protractor-conf.js',
+            travis: 'tests/e2e/config/protractor-travis-nosaucelabs-conf.js',
             local: 'tests/e2e/config/protractor-conf.js'
         },
         ngconstant: {
@@ -242,10 +292,22 @@ module.exports = function (grunt) {
                 wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
                 constants: {
                     'APPNAME': 'report-editor',
-                    'API_URL': '//<%= config.prod.api %>/v1',
+                    'API_URL': 'https://<%= config.prod.api %>/v1',
                     'REGISTRATION_URL': '<%= config.prod.registration %>',
                     'ACCOUNT_URL': '<%= config.prod.account %>',
                     'DEBUG': false
+                }
+            },
+            custom: {
+                dest: 'app/constants.js',
+                name: 'constants',
+                wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
+                constants: {
+                    'APPNAME': 'report-editor',
+                    'API_URL': '//<%= config.custom.buildId %>.28.io/v1',
+                    'REGISTRATION_URL': 'http://<%= config.custom.buildId %>.s3-website-us-east-1.amazonaws.com/auth',
+                    'ACCOUNT_URL': 'http://<%= config.custom.buildId %>.s3-website-us-east-1.amazonaws.com/account/info',
+                    'DEBUG': true
                 }
             }
         },
@@ -271,8 +333,7 @@ module.exports = function (grunt) {
                     'package.json',
                     'config.json',
                     'bower.json',
-                    '.bowerrc',
-                    'swagger/*'
+                    '.bowerrc'
                 ]
             }
         },
@@ -382,6 +443,14 @@ module.exports = function (grunt) {
     
     grunt.registerTask('e2e', function(){
         var target = process.env.TRAVIS_JOB_NUMBER ? 'travis' : 'local';
+
+        // log backend url
+        var constants = grunt.file.read('app/constants.js');
+        var startFound = constants.indexOf('"API_URL", "') + 12;
+        var endFound = constants.indexOf('/v1")') - startFound;
+        var backendURL = constants.substr(startFound, endFound);
+        grunt.log.writeln('Running tests against backend: ' + backendURL);
+
         grunt.task.run([
             'webdriver',
             'connect:dist',
@@ -419,7 +488,7 @@ module.exports = function (grunt) {
         //var env = (target ? target : 'server');
 
         grunt.task.run([
-            'ngconstant:server',
+            'ngconstant:prod',
             'clean:dist',
             'less',
             'peg',
@@ -436,6 +505,6 @@ module.exports = function (grunt) {
         ]);
     });
 
-    grunt.registerTask('test', ['build', 'karma:1.2.9', 'e2e']);
+    grunt.registerTask('test', ['build', 'karma', 'e2e']);
     grunt.registerTask('default', ['jsonlint', 'jshint', 'test', 'deploy']);
 };

@@ -1,9 +1,11 @@
+@progressbar-color: white;
+
 .ngProgressLite {
   pointer-events: none;
 }
 
 .ngProgressLiteBar {
-  background: @brand-primary;
+  background: @progressbar-color;
   position: fixed;
   z-index: 2000;
   top: 0;
@@ -17,7 +19,7 @@
   right: 0px;
   width: 100px;
   height: 100%;
-  box-shadow: 0 0 10px @brand-primary, 0 0 5px @brand-primary;
+  box-shadow: 0 0 10px @progressbar-color, 0 0 5px @progressbar-color;
   opacity: 1;
   -webkit-transform: rotate(3deg) translate(0px, -4px);
   -ms-transform: rotate(3deg) translate(0px, -4px);

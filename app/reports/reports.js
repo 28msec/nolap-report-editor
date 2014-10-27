@@ -3,6 +3,7 @@
 
 angular.module('report-editor')
 .controller('ReportsCtrl', function($rootScope, $log, $scope, $stateParams, $state, $modal, reports){
+
     $scope.reports = reports;
     $scope.selectedReports = {};
 
@@ -56,7 +57,7 @@ angular.module('report-editor')
         });
         modal.result.then(function(report){
             $scope.reports.push(report);
-            $state.go('report', { id: report._id });
+            $state.go('report.taxonomy.concepts', { 'reportId': report._id });
         });
     };
     
