@@ -816,16 +816,16 @@ angular
                             } ]
                         } ]
                     } , {
-                        "BreakdownLabels" : [ "Reporting Period Breakdown" ],
-                        "BreakdownTrees" : [
+                        'BreakdownLabels' : [ 'Reporting Period Breakdown' ],
+                        'BreakdownTrees' : [
                             {
-                                "Kind": "Rule",
-                                "Abstract": true,
-                                "Labels": [ "Period [Axis]" ],
-                                "Children": [
+                                'Kind': 'Rule',
+                                'Abstract': true,
+                                'Labels': [ 'Period [Axis]' ],
+                                'Children': [
                                     {
-                                        "Kind": "Aspect",
-                                        "Aspect": "xbrl:Period"
+                                        'Kind': 'Aspect',
+                                        'Aspect': 'xbrl:Period'
                                     }
                                 ]
                             }]
@@ -1658,6 +1658,7 @@ angular
 
     Report.prototype.hasSufficientFilters = function(){
         return true;
+        /*
         var result = false;
         var countEntityRestrictions = this.countAspectsRestrictions(['xbrl:Entity']);
         var countYearsRestrictions = this.countAspectsRestrictions(['sec:FiscalYear']);
@@ -1672,6 +1673,7 @@ angular
             result = true;
         }
         return result;
+        */
     };
 
     Report.prototype.countAspectsRestrictions = function(arrayOfAspectNames){
