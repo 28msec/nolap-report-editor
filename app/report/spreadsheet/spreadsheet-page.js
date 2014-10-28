@@ -13,7 +13,7 @@ Spreadsheet.prototype.visitPage = function(){
 
 Spreadsheet.prototype.getValueTDsByHeaderContainingText = function(containedText){
     return element.all(
-        by.xpath('//table[@class="rendering"]' +
+        by.xpath('//table[contains(@class, "rendering")]' +
                  '/tbody/tr[@ng-repeat="headerGroup in yHeaderGroups"]' +
                  '[contains(./td[@ng-include="headerTemplate"]/span/text(),' +
                             '"' + containedText + '")]' +
