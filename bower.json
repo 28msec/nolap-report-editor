@@ -36,7 +36,7 @@
     "angular-cache": "2.3.0",
     "bootstrap": "~3.1.1",
     "accounting": "~0.3.2",
-    "layoutmodel-renderer-angular" : "https://github.com/28msec/layoutmodel-renderer-angular.git#1f8d1471787000e6f0a93b23ddc4390ca39ad88a",
+    "layoutmodel-renderer-angular" : "https://github.com/28msec/layoutmodel-renderer-angular.git",
     "flexy-layout": "git://github.com/lorenzofox3/flexy-layout.git",
     "angular-ui-tree": "git://github.com/wcandillon/angular-ui-tree.git#master",
     "moment": "~2.7.0"
