@@ -2,7 +2,7 @@
 
 angular
     .module('report-editor')
-    .controller('FactDetailCtrl', function($scope, $templateCache, $compile, $modalInstance, fact){
+    .controller('FactDetailCtrl', function(_, $scope, $templateCache, $compile, $modalInstance, fact){
         if(_.isArray(fact)) {
             fact = fact[0];
         }
