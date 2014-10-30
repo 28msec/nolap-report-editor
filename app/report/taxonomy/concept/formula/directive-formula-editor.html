@@ -141,7 +141,7 @@
         <div class="form-group" ng-class="{'has-error': formula.model.FormulaErr!==undefined}">
             <label for="rule" class="col-sm-2 control-label">Advanced Rule</label>
             <div  class="col-sm-10">
-                <textarea class="form-control" id="rule" rows="20" placeholder="" ng-change="formula.validate(action, false)" ng-model="formula.model.Formula"></textarea>
+                <textarea class="form-control" id="rule" rows="20" placeholder="" ng-change="formula.compile()" ng-model="formula.model.Formula"></textarea>
             </div>
             <div class="alert alert-danger col-sm-offset-2 col-sm-10" ng-show="formula.model.FormulaErr" style="margin-top: 20px;">{{formula.model.FormulaErr}}</div>
         </div>
