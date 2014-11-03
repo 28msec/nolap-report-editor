@@ -326,6 +326,14 @@ module.exports = function (grunt) {
                     dest: '',
                     rel: 'dist/',
                 }]
+            },
+            dev: {
+                bucket: 'reports-nttdata3.secxbrl.info',
+                upload: [{
+                    src: 'dist/**/*',
+                    dest: '',
+                    rel: 'dist/',
+                }]
             }
         },
         jsonlint: {

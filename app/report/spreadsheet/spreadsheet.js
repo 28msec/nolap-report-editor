@@ -5,7 +5,7 @@ angular.module('report-editor')
 	$scope.mymodel = null;
 	$scope.myheaders = null;
 	  
-	$scope.preview = { constraints : true, checks : false, truncate:true, css : 'preview-style', labelidx : 0, elimination : true };	
+	$scope.preview = { constraints : true, checks : false, truncate:true, css : 'preview-style', labelidx : 0  };
 	  
 	$scope.loading = false;
 

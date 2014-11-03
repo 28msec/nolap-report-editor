@@ -31,7 +31,6 @@ angular
         $scope.nonKeyAspects = [];
         //var aspects = keys($scope.fact.Aspects);
         var keyAspects = angular.copy($scope.fact.KeyAspects);
-        keyAspects.push('dei:LegalEntityAxis');
         for (var aspect in $scope.fact.Aspects){
             //var aspect = aspects[i];
             if($scope.fact.Aspects.hasOwnProperty(aspect)) {
