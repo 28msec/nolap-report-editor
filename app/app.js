@@ -1,6 +1,7 @@
 'use strict';
 
 angular.module('report-editor', [
+    'lodash',
     'ui.router',
     'ui.bootstrap',
     'ui.tree',

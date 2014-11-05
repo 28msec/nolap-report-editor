@@ -514,11 +514,17 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                 }
                 result.push('for $duration-string as string? allowing empty in distinct-values($facts[$$.Concept.PeriodType eq "duration"].$facts:ASPECTS.$facts:PERIOD)');
                 result.push('let $facts := $facts[$$.$facts:ASPECTS.$facts:PERIOD = ($duration-string, $aligned-period)]');
-
+                result.push('let $warnings as string* := ()');
                 for(var x in variables){
                     if(variables.hasOwnProperty(x)) {
                         var v = variables[x];
-                        result.push('let $' + v.Name + ' as object? := $facts[$$.$facts:ASPECTS.$facts:CONCEPT eq "' + v.Concept + '"]');
+                        result.push('let $' + v.Name + ' as object* := $facts[$$.$facts:ASPECTS.$facts:CONCEPT eq "' + v.Concept + '"]');
+                        result.push('let $warnings := ($warnings, if(count($' + v.Name + ') gt 1)');
+                        result.push('                             then if(count(distinct-values($'+v.Name+'.Value)) gt 1)');
+                        result.push('                                  then "Cell collision with conflicting values for concept ' + v.Name + '."');
+                        result.push('                                  else "Cell collision with consistent values for concept ' + v.Name + '."');
+                        result.push('                             else ())');
+                        result.push('let $' + v.Name + ' as object? := $' + v.Name + '[1]');
                     }
                 }
                 result.push('let $_unit := ($facts.$facts:ASPECTS.$facts:UNIT)[1]');
@@ -568,12 +574,13 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                         result.push('  case (' + sourceFactExistenceCheck + ' and ' + toComputation(prereq) + ')');
                         result.push('  return');
                         result.push('    let $computed-value := ' + toComputation(body));
-                        result.push('    let $audit-trail-message := ');
+                        result.push('    let $audit-trail-message as string* := ');
                         if(this.model.Type === 'xbrl28:formula'){
                             result.push('      rules:fact-trail({"Aspects": { "xbrl:Unit" : $_unit, "xbrl:Concept" : "' + computedConcept + '" }, Value: $computed-value }) || " = " || ');
                         }
                         result.push('         ' + toAuditTrail(body));
-                        result.push('  let $source-facts := (' + auditTrailSourceFacts + ')');
+                        result.push('    let $audit-trail-message as string* := ($audit-trail-message, $warnings)');
+                        result.push('    let $source-facts as object* := (' + auditTrailSourceFacts + ')');
                         result.push('    return');
                         result.push('      if(string(number($computed-value)) != "NaN" and not($computed-value instance of xs:boolean) and $computed-value ne xs:integer($computed-value))');
                         result.push('      then');
