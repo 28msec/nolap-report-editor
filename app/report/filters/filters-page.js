@@ -21,6 +21,8 @@ function Filters(id){
     this.selectedFilters.sic = element.all(by.repeater('s in selection.sic'));
     this.selectedFilters.fiscalYear = element.all(by.repeater('y in selection.fiscalYear'));
     this.selectedFilters.fiscalPeriod = element.all(by.repeater('p in selection.fiscalPeriod'));
+    this.selectedFilters.fiscalPeriodTypeYTD = element(by.id('btn-YTD'));
+    this.selectedFilters.fiscalPeriodTypeQTD = element(by.id('btn-QTD'));
     this.selectedFilters.reset = element(by.xpath('//a[./text() = "RESET"]'));
 }
 

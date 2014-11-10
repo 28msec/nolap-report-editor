@@ -46,12 +46,12 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-xs-6">
-                <h6 class="nowrap">ADD FISCAL PERIOD TYPES</h6>
-                <ul class="selector" style="height: 127px">
-                    <li ng-repeat="p in periodTypes" ng-class="{ selected: (selection.fiscalPeriodType.indexOf(p) >= 0) }"
-                        ng-click="(selection.fiscalPeriodType.indexOf(p) >= 0 ? selection.fiscalPeriodType.splice(selection.fiscalPeriodType.indexOf(p), 1) : selection.fiscalPeriodType.push(p))">{{p}}</li>
-                </ul>
+            <div class="col-xs-10">
+                <h6 class="nowrap">FISCAL PERIOD TYPE</h6>
+                <div class="btn-group">
+                    <label class="btn btn-default" id="btn-YTD" ng-model="selection.fiscalPeriodType" btn-radio="[ 'instant', 'YTD' ]">Year-To-Date (YTD)</label>
+                    <label class="btn btn-default" id="btn-QTD" ng-model="selection.fiscalPeriodType" btn-radio="[ 'instant', 'QTD' ]">Quarter (QTD)</label>
+                </div>
             </div>
         </div>
     </block-container>

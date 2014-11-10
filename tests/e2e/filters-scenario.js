@@ -19,6 +19,7 @@ describe('Filters', function(){
                 expect(filters.selectedFilters.sic.count()).toBe(0);
                 expect(filters.selectedFilters.fiscalYear.count()).toBe(1);
                 expect(filters.selectedFilters.fiscalPeriod.count()).toBe(1);
+                expect(filters.selectedFilters.fiscalPeriodTypeYTD.getAttribute('class')).toMatch(/active/);
             });
         });
     });
