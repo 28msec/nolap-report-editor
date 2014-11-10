@@ -14,7 +14,7 @@ angular.module('report-editor')
         if(init){
             $scope.max = 100;
             $scope.dynamic = 0;
-            var estimate = $scope.report.countAspectsRestrictions(['sec:Archive']) * $scope.report.countAspectsRestrictions(['xbrl:Concept']);
+            var estimate = $scope.report.countAspectsRestrictions(['xbrl28:Archive']) * $scope.report.countAspectsRestrictions(['xbrl:Concept']);
             $scope.step = $scope.max * 10 / estimate;
         }
         if($scope.loading){
@@ -59,7 +59,7 @@ angular.module('report-editor')
                             case 'sec:Accepted':
                             case 'sec:FiscalYear':
                             case 'sec:FiscalPeriod':
-                            case 'sec:Archive':
+                            case 'xbrl28:Archive':
                                 break;
                             case 'dei:LegalEntityAxis':
                                 $scope.columns.splice(insertIndex, 0, key);

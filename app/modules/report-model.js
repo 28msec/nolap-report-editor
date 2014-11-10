@@ -122,8 +122,8 @@ angular
                                     'Name': 'sec:Accepted',
                                     'Label': 'Acceptance Date'
                                 },
-                                'sec:Archive': {
-                                    'Name': 'sec:Archive',
+                                'xbrl28:Archive': {
+                                    'Name': 'xbrl28:Archive',
                                     'Label': 'Archive ID'
                                 },
                                 'sec:FiscalYear': {
@@ -146,6 +146,17 @@ angular
                                         'Name' : 'sec:FiscalPeriodDomain',
                                         'Label' : 'Fiscal Period Domain',
                                         'Enumeration' : [ 'FY' ]
+                                    }
+                                },
+                                'sec:FiscalPeriodType': {
+                                    'Name': 'sec:FiscalPeriodType',
+                                    'Label': 'Fiscal Period Type',
+                                    'Kind': 'TypedDimension',
+                                    'Type': 'string',
+                                    'DomainRestriction': {
+                                        'Name': 'sec:FiscalPeriodTypeDomain',
+                                        'Label': 'Fiscal Period Type Domain',
+                                        'Enumeration': [ 'instant', 'YTD' ]
                                     }
                                 },
                                 'dei:LegalEntityAxis': {
@@ -179,6 +190,7 @@ angular
             this.addConcept('ReportLineItems', label, true);
             this.addElement('Presentation', 'ReportLineItems', 0);
         } // if
+        addFiscalPeriodTypeDimension(this);
         addDefinitionModel(this);
     };
 
@@ -835,6 +847,28 @@ angular
         }
         element.Order = order;
         return element;
+    };
+
+    /* *
+     idempotent function to make sure an SEC report has a "sec:FiscalPeriodType dimension
+     * */
+    var addFiscalPeriodTypeDimension = function(report) {
+        var model = report.getModel();
+        var aspects = model.Hypercubes['xbrl:DefaultHypercube'].Aspects;
+        if(typeof aspects['sec:FiscalPeriodType'] !== 'object' || aspects['sec:FiscalPeriodType'] === null){
+            aspects['sec:FiscalPeriodType'] =
+                {
+                    'Name': 'sec:FiscalPeriodType',
+                    'Label': 'Fiscal Period Type',
+                    'Kind': 'TypedDimension',
+                    'Type': 'string',
+                    'DomainRestriction': {
+                        'Name': 'sec:FiscalPeriodTypeDomain',
+                        'Label': 'Fiscal Period Type Domain',
+                        'Enumeration': [ 'instant', 'YTD' ]
+                    }
+                };
+        }
     };
 
     /* *
@@ -1780,24 +1814,24 @@ angular
                 });
         }
 
-        // sec:Archive
-        if(aspects['sec:Archive'] && aspects['sec:Archive'].length > 0){
-            setAspect(this, 'sec:Archive',
+        // xbrl28:Archive
+        if(aspects['xbrl28:Archive'] && aspects['xbrl28:Archive'].length > 0){
+            setAspect(this, 'xbrl28:Archive',
                 {
-                    'Name': 'sec:Archive',
+                    'Name': 'xbrl28:Archive',
                     'Label': 'Archive ID',
                     'Kind': 'TypedDimension',
                     'Type': 'string',
                     'DomainRestriction': {
-                        'Name': 'sec:ArchiveDomain',
+                        'Name': 'xbrl28:ArchiveDomain',
                         'Label': 'Archive Domain',
-                        'Enumeration': aspects['sec:Archive']
+                        'Enumeration': aspects['xbrl28:Archive']
                     }
                 });
         } else {
-            setAspect(this, 'sec:Archive',
+            setAspect(this, 'xbrl28:Archive',
                 {
-                    'Name': 'sec:Archive',
+                    'Name': 'xbrl28:Archive',
                     'Label': 'Archive ID'
                 });
         }

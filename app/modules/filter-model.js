@@ -254,7 +254,7 @@ angular
                     'sec:FiscalPeriod': selection.fiscalPeriod,
                     'sec:FiscalYear': [],
                     'xbrl:Entity': [],
-                    'sec:Archive':[]
+                    'xbrl28:Archive':[]
                 };
 
                 // fiscal year
@@ -306,7 +306,7 @@ angular
                 }
 
                 if(hasLatest) {
-                    // restrict sec:Archives in case Fiscal Year is latest
+                    // restrict xbrl28:Archives in case Fiscal Year is latest
                     var parameters = {
                         $method: 'POST',
                         cik: aspects['xbrl:Entity'],
@@ -319,13 +319,13 @@ angular
                         function (filings) {
                             var archives = filings.Archives;
                             if ((archives.length || 0) > 0) {
-                                if (aspects['sec:Archive'] === undefined) {
-                                    aspects['sec:Archive'] = [];
+                                if (aspects['xbrl28:Archive'] === undefined) {
+                                    aspects['xbrl28:Archive'] = [];
                                 }
                                 archives.forEach(function (archive) {
                                     var aid = archive.AccessionNumber;
-                                    if (!arrayContains(aspects['sec:Archive'], aid)) {
-                                        aspects['sec:Archive'].push(aid);
+                                    if (!arrayContains(aspects['xbrl28:Archive'], aid)) {
+                                        aspects['xbrl28:Archive'].push(aid);
                                     }
                                 });
                             }
