@@ -141,6 +141,10 @@ angular
                 return deferred.promise;
             }
 
+            function getPeriodTypes(){
+                return ['instant', 'YTD', 'QTD'];
+            }
+
             function setSics(lSics){
                 if(lSics !== undefined && lSics !== null && typeof lSics === 'object' && lSics.length !== undefined) {
                     sics = lSics;
@@ -252,6 +256,7 @@ angular
                 var hasLatest = isLatestFiscalYearSelected();
                 var aspects = {
                     'sec:FiscalPeriod': selection.fiscalPeriod,
+                    'sec:FiscalPeriodType': selection.fiscalPeriodType,
                     'sec:FiscalYear': [],
                     'xbrl:Entity': [],
                     'xbrl28:Archive':[]
@@ -404,6 +409,7 @@ angular
                 getYears: getYears,
                 isLatestFiscalYearSelected: isLatestFiscalYearSelected,
                 getPeriods: getPeriods,
+                getPeriodTypes: getPeriodTypes,
                 getTags: getTags,
                 getSelection: getSelection,
                 resetSelection: resetSelection,

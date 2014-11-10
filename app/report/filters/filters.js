@@ -2,12 +2,13 @@
 
 angular.module('report-editor')
 .controller('FiltersCtrl',
-    function($scope, $state, $stateParams, $location, Filter, tags, entities, years, periods, sics) {
+    function($scope, $state, $stateParams, $location, Filter, tags, entities, years, periods, sics, periodTypes) {
         $scope.tags = tags;
         $scope.entities = entities;
         $scope.years = years;
         $scope.periods = periods;
         $scope.sics = sics;
+        $scope.periodTypes = periodTypes;
         var initDone = false;
 
         // for typeahead fields

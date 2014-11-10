@@ -23,6 +23,9 @@ angular
             }],
             periods: [ 'Filter', function(Filter) {
                 return Filter.getPeriods();
+            }],
+            periodTypes: [ 'Filter', function(Filter) {
+                return Filter.getPeriodTypes();
             }]
         }
     });

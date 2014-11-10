@@ -1718,6 +1718,7 @@ angular
             'tag': [ 'DOW30' ],
             'fiscalYear': [],
             'fiscalPeriod': [],
+            'fiscalPeriodType': ['instant', 'YTD'],
             'sic': []
         };
         return model.Filters;
@@ -1725,6 +1726,9 @@ angular
 
     Report.prototype.getFilters = function(){
         var model = this.getModel();
+        if(model.Filters !== undefined && model.Filters.fiscalPeriodType === undefined){
+            model.Filters.fiscalPeriodType = ['instant', 'YTD'];
+        }
         return model.Filters;
     };
 
@@ -1877,6 +1881,28 @@ angular
                 {
                     'Name': 'sec:FiscalPeriod',
                     'Label': 'Fiscal Period'
+                });
+        }
+
+        // sec:FiscalPeriodType
+        if(aspects['sec:FiscalPeriodType'] && aspects['sec:FiscalPeriodType'].length > 0){
+            setAspect(this, 'sec:FiscalPeriodType',
+                {
+                    'Name': 'sec:FiscalPeriodType',
+                    'Label': 'Fiscal Period Type',
+                    'Kind': 'TypedDimension',
+                    'Type': 'string',
+                    'DomainRestriction': {
+                        'Name': 'sec:FiscalPeriodTypeDomain',
+                        'Label': 'Fiscal Period Type Domain',
+                        'Enumeration': aspects['sec:FiscalPeriodType']
+                    }
+                });
+        } else {
+            setAspect(this, 'sec:FiscalPeriodType',
+                {
+                    'Name': 'sec:FiscalPeriodType',
+                    'Label': 'Fiscal Period Type'
                 });
         }
 
