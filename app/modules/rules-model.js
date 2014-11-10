@@ -459,7 +459,7 @@ angular.module('rules-model',['excel-parser', 'formula-parser'])
                     computedFactVariable = computedConcept.replace(/:/g, '_');
                 }
                 var allowCrossPeriod = this.model.AllowCrossPeriod;
-                var allowCrossBalance = this.model.AllowCrossBalance;
+                //var allowCrossBalance = this.model.AllowCrossBalance;
                 var factsFilter = '';
                 for(var i in facts){
                     var fact = facts[i];
