@@ -2,5 +2,5 @@
 
 exports.config = {
     testUser: 'support@28.io',
-    testPassword: 'foobar'
+    testPassword: 'foobar42'
 };
