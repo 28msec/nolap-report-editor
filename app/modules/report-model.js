@@ -184,6 +184,7 @@ angular
                         'tag' : [ 'DOW30' ],
                         'fiscalYear' : [ year ],
                         'fiscalPeriod' : [ 'FY' ],
+                        'fiscalPeriodType' : [ 'instant', 'YTD' ],
                         'sic' : [  ]
                     }
                 };
