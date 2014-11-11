@@ -157,7 +157,7 @@ module.exports = function (grunt) {
                         angularjs: true
                     },
                     {
-                        swagger: 'https://raw.githubusercontent.com/28msec/secxbrl.info/all-dow30-6/swagger/queries.json',
+                        swagger: 'https://raw.githubusercontent.com/28msec/secxbrl.info/master/swagger/queries.json',
                         moduleName: 'queries-api',
                         className: 'QueriesAPI',
                         angularjs: true
