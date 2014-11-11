@@ -1704,9 +1704,6 @@ angular
 
     Report.prototype.getFilters = function(){
         var model = this.getModel();
-        if(model.Filters !== undefined && model.Filters.fiscalPeriodType === undefined){
-            model.Filters.fiscalPeriodType = ['instant', 'YTD'];
-        }
         return model.Filters;
     };
 
