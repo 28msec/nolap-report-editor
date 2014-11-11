@@ -30,8 +30,7 @@ angular.module('report-editor')
     };*/
 
     $scope.reload = function() {
-		console.log(report);
-        var params = { report: report.model._id, token: Session.getToken(), $method: 'POST' };
+		var params = { report: report.model._id, token: Session.getToken(), $method: 'POST' };
         //params.aik = "0000021344-14-000008";
 
         $scope.data = null;     
@@ -41,8 +40,7 @@ angular.module('report-editor')
             //$scope.advanceProgress(true);
 
             API.Queries.listFactTableForReport(params).then(function (data) {
-                console.log(data);
-                $scope.data = data.FactTable;             
+                $scope.data = data.FactTable;
 
                 if ($scope.data && $scope.data.length > 0) {
                     $scope.columns.push('xbrl:Entity');
