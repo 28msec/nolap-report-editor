@@ -84,7 +84,7 @@ angular
                     'Hypercubes' : {
                         'xbrl:DefaultHypercube': {
                             'Name': 'xbrl:DefaultHypercube',
-                            'Label': 'XBRL Implicit non-dimensional Hypercube',
+                            'Label': label + ' [Table]',
                             'Aspects': {
                                 'xbrl:Concept': {
                                     'Name': 'xbrl:Concept',
@@ -122,8 +122,8 @@ angular
                                     'Name': 'sec:Accepted',
                                     'Label': 'Acceptance Date'
                                 },
-                                'sec:Archive': {
-                                    'Name': 'sec:Archive',
+                                'xbrl28:Archive': {
+                                    'Name': 'xbrl28:Archive',
                                     'Label': 'Archive ID'
                                 },
                                 'sec:FiscalYear': {
@@ -146,6 +146,17 @@ angular
                                         'Name' : 'sec:FiscalPeriodDomain',
                                         'Label' : 'Fiscal Period Domain',
                                         'Enumeration' : [ 'FY' ]
+                                    }
+                                },
+                                'sec:FiscalPeriodType': {
+                                    'Name': 'sec:FiscalPeriodType',
+                                    'Label': 'Fiscal Period Type',
+                                    'Kind': 'TypedDimension',
+                                    'Type': 'string',
+                                    'DomainRestriction': {
+                                        'Name': 'sec:FiscalPeriodTypeDomain',
+                                        'Label': 'Fiscal Period Type Domain',
+                                        'Enumeration': [ 'instant', 'YTD' ]
                                     }
                                 },
                                 'dei:LegalEntityAxis': {
@@ -173,6 +184,7 @@ angular
                         'tag' : [ 'DOW30' ],
                         'fiscalYear' : [ year ],
                         'fiscalPeriod' : [ 'FY' ],
+                        'fiscalPeriodType' : [ 'instant', 'YTD' ],
                         'sic' : [  ]
                     }
                 };
@@ -1684,6 +1696,7 @@ angular
             'tag': [ 'DOW30' ],
             'fiscalYear': [],
             'fiscalPeriod': [],
+            'fiscalPeriodType': ['instant', 'YTD'],
             'sic': []
         };
         return model.Filters;
@@ -1780,24 +1793,24 @@ angular
                 });
         }
 
-        // sec:Archive
-        if(aspects['sec:Archive'] && aspects['sec:Archive'].length > 0){
-            setAspect(this, 'sec:Archive',
+        // xbrl28:Archive
+        if(aspects['xbrl28:Archive'] && aspects['xbrl28:Archive'].length > 0){
+            setAspect(this, 'xbrl28:Archive',
                 {
-                    'Name': 'sec:Archive',
+                    'Name': 'xbrl28:Archive',
                     'Label': 'Archive ID',
                     'Kind': 'TypedDimension',
                     'Type': 'string',
                     'DomainRestriction': {
-                        'Name': 'sec:ArchiveDomain',
+                        'Name': 'xbrl28:ArchiveDomain',
                         'Label': 'Archive Domain',
-                        'Enumeration': aspects['sec:Archive']
+                        'Enumeration': aspects['xbrl28:Archive']
                     }
                 });
         } else {
-            setAspect(this, 'sec:Archive',
+            setAspect(this, 'xbrl28:Archive',
                 {
-                    'Name': 'sec:Archive',
+                    'Name': 'xbrl28:Archive',
                     'Label': 'Archive ID'
                 });
         }
@@ -1843,6 +1856,28 @@ angular
                 {
                     'Name': 'sec:FiscalPeriod',
                     'Label': 'Fiscal Period'
+                });
+        }
+
+        // sec:FiscalPeriodType
+        if(aspects['sec:FiscalPeriodType'] && aspects['sec:FiscalPeriodType'].length > 0){
+            setAspect(this, 'sec:FiscalPeriodType',
+                {
+                    'Name': 'sec:FiscalPeriodType',
+                    'Label': 'Fiscal Period Type',
+                    'Kind': 'TypedDimension',
+                    'Type': 'string',
+                    'DomainRestriction': {
+                        'Name': 'sec:FiscalPeriodTypeDomain',
+                        'Label': 'Fiscal Period Type Domain',
+                        'Enumeration': aspects['sec:FiscalPeriodType']
+                    }
+                });
+        } else {
+            setAspect(this, 'sec:FiscalPeriodType',
+                {
+                    'Name': 'sec:FiscalPeriodType',
+                    'Label': 'Fiscal Period Type'
                 });
         }
 

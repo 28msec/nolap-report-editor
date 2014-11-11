@@ -45,6 +45,15 @@
                 </ul>
             </div>
         </div>
+        <div class="row">
+            <div class="col-xs-10">
+                <h6 class="nowrap">FISCAL PERIOD TYPE</h6>
+                <div class="btn-group">
+                    <label class="btn btn-default" id="btn-YTD" ng-model="selection.fiscalPeriodType" btn-radio="[ 'instant', 'YTD' ]">Year-To-Date (YTD)</label>
+                    <label class="btn btn-default" id="btn-QTD" ng-model="selection.fiscalPeriodType" btn-radio="[ 'instant', 'QTD' ]">Quarter (QTD)</label>
+                </div>
+            </div>
+        </div>
     </block-container>
     <block-splitter></block-splitter>
     <block-container>

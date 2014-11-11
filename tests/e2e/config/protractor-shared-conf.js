@@ -26,10 +26,11 @@ exports.config = {
         });
 
         //Login
+        var config = require('./config').config;
         var Auth = require('../../../app/auth/auth-page');
         var auth = new Auth();
         auth.visitPage();
-        auth.login('support@28.io', 'foobar42');
+        auth.login(config.testUser, config.testPassword);
         browser.waitForAngular();
     },
 
