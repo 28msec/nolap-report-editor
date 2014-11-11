@@ -84,7 +84,7 @@ angular
                     'Hypercubes' : {
                         'xbrl:DefaultHypercube': {
                             'Name': 'xbrl:DefaultHypercube',
-                            'Label': 'XBRL Implicit non-dimensional Hypercube',
+                            'Label': label + ' [Table]',
                             'Aspects': {
                                 'xbrl:Concept': {
                                     'Name': 'xbrl:Concept',
