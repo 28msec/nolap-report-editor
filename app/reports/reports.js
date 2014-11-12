@@ -2,7 +2,7 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('ReportsCtrl', function($rootScope, $log, $scope, $stateParams, $state, $modal, reports){
+.controller('ReportsCtrl', function($rootScope, $log, $scope, $stateParams, $state, $modal, reports, $window, Session, API_URL){
 
     $scope.reports = reports;
     $scope.selectedReports = {};
@@ -35,21 +35,38 @@ angular.module('report-editor')
     };
 
     $scope.hasSelectedReport = false;
+    $scope.hasSingleSelectedReport = false;
 
     $scope.$watch('selectedReports', function(){
         var result = false;
+        var count = 0;
         angular.forEach($scope.selectedReports, function(value){
             if(value === true) {
+                count++;
                 result = true;
                 return false;
             }
         });
+        if(count === 1){
+            $scope.hasSingleSelectedReport = true;
+        } else {
+            $scope.hasSingleSelectedReport = false;
+        }
         if($scope.toggle === null && result === false) {
             $scope.toggle = false;
         }
         $scope.hasSelectedReport = result;
     }, true);
-    
+
+    $scope.downloadSelectedReport = function() {
+        var ids = $scope.getSelectedReportIds();
+        if(ids.length !== 1){
+            $log.error('Too many IDs: ' + JSON.stringify(ids));
+        } else {
+            $window.location.href = API_URL + '/_queries/public/reports/reports.jq?_method=POST&_id=' + ids[0] + '&export=true&token=' + Session.getToken();
+        }
+    };
+
     $scope.createReport = function(){
         var modal = $modal.open({
             controller: 'CreateReportCtrl',
@@ -60,14 +77,19 @@ angular.module('report-editor')
             $state.go('report.taxonomy.concepts', { 'reportId': report._id });
         });
     };
-    
-    $scope.deleteReports = function(){
+
+    $scope.getSelectedReportIds = function(){
         var ids = [];
         Object.keys($scope.selectedReports).forEach(function(key){
             if($scope.selectedReports[key] === true) {
                 ids.push(key);
             }
         });
+        return ids;
+    };
+
+    $scope.deleteReports = function(){
+        var ids = $scope.getSelectedReportIds();
         $modal.open({
             controller: 'DeleteReportsCtrl',
             templateUrl: '/reports/delete-reports.html',
