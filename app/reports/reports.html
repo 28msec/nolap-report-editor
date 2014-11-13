@@ -10,6 +10,7 @@
     <div class="container scrollable std-top-padding">
         <section>
             <button class="btn btn-primary" ng-click="createReport()" id="create-report">CREATE</button>
+            <button class="btn btn-default fa fa-upload" ng-click="importReport()" id="import-report"></button>
             <button class="btn btn-default fa fa-download" ng-show="hasSingleSelectedReport" ng-click="downloadSelectedReport()" id="export-report"></button>
             <button class="btn btn-default fa fa-trash-o" ng-show="hasSelectedReport" ng-click="deleteReports()" id="delete-reports"></button>
         </section>

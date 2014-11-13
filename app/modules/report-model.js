@@ -11,7 +11,32 @@ angular
     ConceptIsStillReferencedError.prototype = new Error();
     return ConceptIsStillReferencedError;
 })
-.factory('Report', function($log, $q, ConceptIsStillReferencedError){
+.factory('ReportID', function(){
+
+    //Constructor
+    var ReportID = function(){
+        // thanks to https://gist.github.com/ae6rt/7894539
+        // http://www.ietf.org/rfc/rfc4122.txt
+        var s = [];
+        var hexDigits = '0123456789abcdef';
+        for (var i = 0; i < 36; i++) {
+            s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+        }
+        s[14] = '4';  // bits 12-15 of the time_hi_and_version field to 0010
+        /* jslint bitwise: true */
+        s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
+        /* jslint bitwise: false */
+        s[8] = s[13] = s[18] = s[23] = '-';
+        this.id = s.join('');
+    };
+
+    ReportID.prototype.toString = function(){
+        return this.id;
+    };
+
+    return ReportID;
+})
+.factory('Report', function($log, $q, ConceptIsStillReferencedError, ReportID){
 
     //Constructor
     var Report = function(modelOrName, label, description, role, username, prefix){
@@ -32,7 +57,7 @@ angular
                 /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
                 'invalid username value passed "' + username + '" (its not a valid Email Address).');
             if(modelOrName === undefined || modelOrName === null){
-                modelOrName = _uuid();
+                modelOrName = new ReportID().toString();
             }
             if(prefix === undefined || prefix === null || typeof prefix !== 'string'){
                 // do a good guess
@@ -244,25 +269,8 @@ angular
         }
     };
 
-    // helper to create a unique id
-    var _uuid = function () {
-        // thanks to https://gist.github.com/ae6rt/7894539
-        // http://www.ietf.org/rfc/rfc4122.txt
-        var s = [];
-        var hexDigits = '0123456789abcdef';
-        for (var i = 0; i < 36; i++) {
-            s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
-        }
-        s[14] = '4';  // bits 12-15 of the time_hi_and_version field to 0010
-        /* jslint bitwise: true */
-        s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
-        /* jslint bitwise: false */
-        s[8] = s[13] = s[18] = s[23] = '-';
-        return s.join('');
-    };
-
     Report.prototype.uuid = function(){
-        return _uuid();
+        return new ReportID().toString();
     };
 
     Report.prototype.getPrefix = function(){
@@ -786,7 +794,7 @@ angular
             _order = order;
         }
         var element = {
-            Id: _uuid(),
+            Id: new ReportID().toString(),
             Name : concept.Name,
             Label : concept.Label,
             Order : _order
@@ -1145,7 +1153,7 @@ angular
         var toObj = {};
         if(conceptMap === undefined || conceptMap === null){
             conceptMap = {
-                'Id': _uuid(),
+                'Id': new ReportID().toString(),
                 'Name': fromConcept.Name,
                 'To': toObj
             };
@@ -1156,7 +1164,7 @@ angular
             var name = this.alignConceptPrefix(toConceptNamesArray[i]);
             ensureConceptName(name, 'toConceptNamesArray', 'updateConceptMap');
             toObj[name] = {
-                'Id': _uuid(),
+                'Id': new ReportID().toString(),
                 'Name': name,
                 'Order': parseInt(i, 10) + 1
             };
