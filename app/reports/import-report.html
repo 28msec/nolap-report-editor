@@ -34,8 +34,8 @@
                     <input type="text" class="form-control"
                            id="newReportName" name="newReportName"
                            ng-change="onChange()" ng-model="newReportName"
-                           placeholder="Report Name"
-                           ng-class="{disabled: !importWithNewName}">
+                           ng-click="importWithNewName=true"
+                           placeholder="Report Name">
 
                 </div>
                 <span class="text-danger" ng-show="importReportForm.newReportName.$error.required">

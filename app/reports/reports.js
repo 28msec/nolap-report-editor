@@ -230,9 +230,9 @@ angular.module('report-editor')
             $scope.loading = true;
 
             var newId = new ReportID().toString();
-            var uploadUrl = API_URL + '/_queries/public/reports/add-report.jq?_method=POST&import=true&token=' + Session.getToken() + '&_id=' + newId;
+            var uploadUrl = API_URL + '/_queries/public/reports/add-report.jq?_method=POST&import=true&token=' + Session.getToken() + '&private=true&_id=' + newId;
             if($scope.importWithNewName){
-                uploadUrl += '&label=' + $scope.newReportName;
+                uploadUrl += '&label=' + encodeURIComponent($scope.newReportName);
             }
             var fileReader = new FileReader();
             fileReader.readAsArrayBuffer($scope.file);
