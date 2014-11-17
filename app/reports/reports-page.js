@@ -9,9 +9,21 @@ function Reports(){
     AppPage.call(this);
     this.list = element.all(by.repeater('report in reports'));
     this.deleteBtn = element(by.id('delete-reports'));
+    this.exportBtn = element(by.id('export-report'));
     this.createBtn = element(by.id('create-report'));
     this.toggle = element(by.model('toggle'));
     this.checkboxes = element.all(by.model('selectedReports[report._id]'));
+
+    this.importBtn = element(by.id('import-report'));
+    this.import = {};
+    this.import.form = element(by.name('importReportForm'));
+    this.import.fileUpload = element(by.css('input.fileUploadBtn'));
+    this.import.newReportName = element(by.name('newReportName'));
+    this.import.newReportNameChkbx = element(by.id('newReportNameCheckbox'));
+    this.import.errorMsg = element(by.id('import-error-message'));
+    this.import.btn = {};
+    this.import.btn.ok = element(by.id('import-ok'));
+    this.import.btn.cancel = element(by.id('import-cancel'));
 }
 Reports.prototype = _.create(AppPage.prototype);
 
@@ -26,6 +38,16 @@ Reports.prototype.createReport = function(reportName){
     reportNameField.clear();
     reportNameField.sendKeys(reportName);
     form.submit();
+};
+
+Reports.prototype.fillInImportReport = function(reportFilePath, reportName){
+    this.importBtn.click();
+    this.import.fileUpload.sendKeys(reportFilePath);
+    if(reportName !== undefined){
+      this.import.newReportNameChkbx.click();
+      this.import.newReportName.clear();
+      this.import.newReportName.sendKeys(reportName);
+    }
 };
 
 Reports.prototype.getLastModified = function(report) {
