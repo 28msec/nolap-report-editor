@@ -96,7 +96,7 @@ describe('Report', function(){
 
     it('Should display the preview', function() {
         report.goToSpreadsheet();
-        expect(report.spreadsheet.getCellValueByCss('.first-row-header-row > td > span')).toBe(reportName);
+        expect(report.spreadsheet.getCellValueByCss('.constraints .header')).toBe('Component: (Network and Table)');
     });
 
     it('Should delete report', function() {
