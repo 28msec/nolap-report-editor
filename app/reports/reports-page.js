@@ -54,8 +54,21 @@ Reports.prototype.getLastModified = function(report) {
     return report.element(by.css('td[data-last-modified]')).getAttribute('data-last-modified');
 };
 
-Reports.prototype.deleteReport = function(reportName){
-    var that = this;
+Reports.prototype.findReport = function(reportName){
+    return this.list.map(function(report){
+        return {
+            name: report.element(by.binding('report.Label')).getText(),
+            checkbox: report.element(by.model('selectedReports[report._id]'))
+        };
+    })
+    .then(function(reports){
+        return reports.filter(function(report){
+            return report.name === reportName;
+        });
+    });
+};
+
+Reports.prototype.selectReport = function(reportName){
     return this.list.map(function(report){
         return {
             name: report.element(by.binding('report.Label')).getText(),
@@ -66,12 +79,19 @@ Reports.prototype.deleteReport = function(reportName){
         return reports.filter(function(report){
             return report.name === reportName;
         })[0];
-    })
-    .then(function(report){
-        report.checkbox.click();
-        that.deleteBtn.click();
-        return element(by.id('confirm-delete-reports')).click();
+    }).then(function(report){
+        if(report === undefined){
+            console.log('checkbox not found for report: ' + reportName);
+            return;
+        }
+        return report.checkbox.click();
     });
+};
+
+Reports.prototype.deleteReport = function(reportName){
+  this.selectReport(reportName);
+  this.deleteBtn.click();
+  return element(by.id('confirm-delete-reports')).click();
 };
 
 

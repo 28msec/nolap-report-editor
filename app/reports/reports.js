@@ -215,10 +215,12 @@ angular.module('report-editor')
     };
 
     $scope.onChange = function(){
-        $scope.importReportForm.newReportName.$setValidity('required', true);
-        if($scope.importWithNewName){
-            if($scope.newReportName === undefined || $scope.newReportName === '') {
-                $scope.importReportForm.newReportName.$setValidity('required', false);
+        if($scope.importReportForm !== undefined){
+            $scope.importReportForm.newReportName.$setValidity('required', true);
+            if($scope.importWithNewName){
+                if($scope.newReportName === undefined || $scope.newReportName === '') {
+                    $scope.importReportForm.newReportName.$setValidity('required', false);
+                }
             }
         }
     };
