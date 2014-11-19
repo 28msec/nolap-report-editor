@@ -1,19 +1,27 @@
-<form name="newReportForm" role="form" spellcheck="false" novalidate>
+<form id="newReportForm" name="newReportForm" role="form" spellcheck="false" novalidate>
     <div class="modal-header">
         <!--button type="button" class="close" aria-hidden="true">&times;</button-->
         <h4 class="modal-title">New Report</h4>
     </div>
     <div class="modal-body">
         <div class="form-group">
-            <label for="template">Choose a report template:</label>
-            <select id="template" name="template" class="form-control" data-ng-model="selectedTemplate">
-                <option value="_empty">- Blank Report -</option>
-                <option ng-repeat="report in reportTemplates" value="{{report._id}}" ng-bind="report.Label" title="{{report.Description}}"></option>
-            </select>
-        </div>
-        <div class="form-group">
             <label for="name">Enter a name for your report:</label>
             <input type="text" class="form-control" id="name" ng-model="report.name" placeholder="Report Name" required>
+        </div>
+        <p>Select a template:</p>
+        <div class="row templates">
+            <div class="col-xs-12">
+                <a class="thumbnail text-center" ng-click="selectTpl('_empty')" ng-class="{ selected: selectedTemplate === '_empty' }">
+                    <h3>Empty Report</h3>
+                    <p>Start from scratch.</p>
+                </a>
+            </div>
+            <div class="col-xs-12" ng-repeat="report in reportTemplates">
+                <a class="thumbnail text-center" ng-class="{ selected: selectedTemplate === report._id }" ng-click="selectTpl(report._id)">
+                    <h3 ng-bind="report.Label"></h3>
+                    <p ng-bind="report.Description"></p>
+                </a>
+            </div>
         </div>
     </div>
     <div class="modal-footer">

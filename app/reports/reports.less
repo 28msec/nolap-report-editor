@@ -1,0 +1,23 @@
+#newReportForm {
+    .templates {
+        a {
+            color: @text-color !important;
+
+            &:hover {
+                text-decoration: none !important;
+                color: @brand-primary !important;
+                border: 1px solid @brand-primary;
+            }
+
+            &.selected {
+                color: white !important;
+                background-color: @brand-primary;
+                border: 1px solid @brand-primary;
+                -webkit-transition: all 500ms ease-out;
+                -moz-transition: all 500ms ease-out;
+                -o-transition: all 500ms ease-out;
+                transition: all 500ms ease-out;
+            }
+        }
+    }
+}
