@@ -209,7 +209,7 @@ angular.module('report-editor')
         var items;
         if($event.dataTransfer !== undefined && $event.dataTransfer.items !== undefined){
             items = $event.dataTransfer.items;
-        };
+        }
         var dropOK = false;
         if (items !== undefined && items !== null && items.length === 1 && items[0].kind === 'file') {
             dropOK = true;
