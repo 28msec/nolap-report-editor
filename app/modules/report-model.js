@@ -21,6 +21,9 @@ angular
                    modelOrName !== null) {
             throw new Error('new Report creation with invalid type ' + typeof modelOrName);
         } else if (typeof modelOrName === 'object') {
+            if(modelOrName._id === undefined){
+                modelOrName._id = _uuid();
+            }
             this.model = modelOrName;
         } else if (typeof modelOrName === 'string' ||
                    modelOrName === undefined ||
@@ -44,6 +47,9 @@ angular
                     }
                 });
                 prefix = startingChars;
+                if(prefix===''){
+                    prefix = label.substring(0, 1).toLowerCase();
+                }
             }
             var date = new Date();
             var year = date.getFullYear();

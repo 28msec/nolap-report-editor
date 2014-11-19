@@ -1,18 +1,25 @@
-<form name="newReportForm" ng-submit="ok()" role="form" spellcheck="false" novalidate>
+<form name="newReportForm" role="form" spellcheck="false" novalidate>
     <div class="modal-header">
         <!--button type="button" class="close" aria-hidden="true">&times;</button-->
         <h4 class="modal-title">New Report</h4>
     </div>
     <div class="modal-body">
         <div class="form-group">
+            <label for="template">Choose a report template:</label>
+            <select id="template" name="template" class="form-control" data-ng-model="selectedTemplate">
+                <option value="_empty">- Blank Report -</option>
+                <option ng-repeat="report in reportTemplates" value="{{report._id}}" ng-bind="report.Label" title="{{report.Description}}"></option>
+            </select>
+        </div>
+        <div class="form-group">
             <label for="name">Enter a name for your report:</label>
             <input type="text" class="form-control" id="name" ng-model="report.name" placeholder="Report Name" required>
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-primary" ng-class="{ disabled: loading === true ||  !newReportForm.$valid }">
+        <button class="btn btn-primary" ng-click="ok()" ng-class="{ disabled: loading === true ||  !newReportForm.$valid }">
             <span ng-show="!loading">Create</span>
-            <span ng-show="loading"><i class="fa fa-spin fa-spinner"></i> Creating...</span>
+            <span ng-show="loading"><i class="fa fa-spin fa-spinner"></i> <span ng-bind="loadingStatus"></span></span>
         </button>
         <button class="btn btn-default" ng-click="cancel()">cancel</button>
     </div>
