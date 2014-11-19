@@ -21,7 +21,7 @@ Reports.prototype.visitPage = function(){
 
 Reports.prototype.selectTemplate = function(reportId){
   element.all(by.css('#template option'))
-      .filter(function(option, index) {
+      .filter(function(option) {
           return option.getAttribute('value')
               .then(function(value) {
                   return value === reportId;
