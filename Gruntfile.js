@@ -145,7 +145,7 @@ module.exports = function (grunt) {
             options: {
                 apis: [
                     {
-                        swagger: 'https://raw.githubusercontent.com/28msec/secxbrl.info/create-report-from-template/swagger/reports.json',
+                        swagger: 'https://raw.githubusercontent.com/28msec/secxbrl.info/master/swagger/reports.json',
                         moduleName: 'report-api',
                         className: 'ReportAPI',
                         angularjs: true
