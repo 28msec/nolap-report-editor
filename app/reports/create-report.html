@@ -17,7 +17,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="ok()" ng-class="{ disabled: loading === true ||  !newReportForm.$valid }">
+        <button class="btn btn-primary" ng-click="ok()" ng-class="{ disabled: loading === true ||  !newReportForm.$valid }" id="create-report-btn">
             <span ng-show="!loading">Create</span>
             <span ng-show="loading"><i class="fa fa-spin fa-spinner"></i> <span ng-bind="loadingStatus"></span></span>
         </button>

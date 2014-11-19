@@ -19,13 +19,33 @@ Reports.prototype.visitPage = function(){
     return browser.get('/');
 };
 
-Reports.prototype.createReport = function(reportName){
+Reports.prototype.selectTemplate = function(reportId){
+  element.all(by.css('#template option'))
+      .filter(function(option, index) {
+          return option.getAttribute('value')
+              .then(function(value) {
+                  return value === reportId;
+              });
+      }).then(function(optionsToSelect) {
+          var optionToSelect = optionsToSelect[0];
+          if(optionToSelect === undefined) {
+              console.log('option not found for report Id ' + reportId);
+              return;
+          }
+          return optionToSelect.click();
+      });
+};
+
+Reports.prototype.createReport = function(reportName, templateReportId){
     this.createBtn.click();
-    var form = element(by.name('newReportForm'));
+    var createReportBtn = element(by.id('create-report-btn'));
     var reportNameField = element(by.model('report.name'));
+    if(templateReportId !== undefined){
+        this.selectTemplate(templateReportId);
+    }
     reportNameField.clear();
     reportNameField.sendKeys(reportName);
-    form.submit();
+    createReportBtn.click();
 };
 
 Reports.prototype.getLastModified = function(report) {
