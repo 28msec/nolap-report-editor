@@ -139,6 +139,10 @@ angular.module('report-editor')
     $scope.selectedTemplate = '_empty';
     $scope.loadingStatus = '';
 
+    $scope.selectTpl = function(id){
+        $scope.selectedTemplate = id;
+    };
+
     $scope.addReport = function(report){
         API.Report.addOrReplaceOrValidateReport({
             report: report.model,
