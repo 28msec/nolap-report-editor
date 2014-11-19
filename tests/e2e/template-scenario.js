@@ -7,7 +7,7 @@ describe('Report Templates', function(){
     var Reports = require('../../app/reports/reports-page');
     var Report = require('../../app/report/report-page');
     var reports = new Reports();
-    var report, reportName, conceptName;
+    var report, reportName;
 
     it('Should create a new report from a template', function(){
         reports.visitPage();
