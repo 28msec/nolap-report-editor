@@ -193,6 +193,7 @@ module.exports = function (grunt) {
             dev: {
                 options: {
                     files: [
+                        'bower_components/ng-file-upload-shim/angular-file-upload-shim.js',
                         'bower_components/angular/angular.js',
                         'bower_components/angular-mocks-1.2.9/angular-mocks.js',
                         'bower_components/ngprogress-lite/ngprogress-lite.js',
@@ -206,6 +207,7 @@ module.exports = function (grunt) {
                         'bower_components/flexy-layout/flexy-layout.debug.js',
                         'bower_components/angular-ui-router/release/angular-ui-router.js',
                         'bower_components/angular-ui-tree/dist/angular-ui-tree.js',
+                        'bower_components/ng-file-upload/angular-file-upload.js',
 
                         'app/constants.js',
                         'app/modules/report-api.js',
