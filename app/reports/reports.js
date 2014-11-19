@@ -194,7 +194,7 @@ angular.module('report-editor')
         var file = files[0];
         $scope.error = undefined;
         if (files.length === 0) {
-            $log.error("No file selected");
+            $log.error('No file selected');
         } else if (files.length > 1) {
             $scope.error = 'Can only upload one file at a time.';
         } else if (file.name.indexOf('.xbrlb', file.name.length - '.xbrlb'.length) !== -1) {
@@ -206,12 +206,15 @@ angular.module('report-editor')
     };
 
     $scope.dragOverClass = function($event) {
-        var items = $event.dataTransfer.items;
+        var items;
+        if($event.dataTransfer !== undefined && $event.dataTransfer.items !== undefined){
+            items = $event.dataTransfer.items;
+        };
         var dropOK = false;
-        if (items != null && items.length === 1 && items[0].kind === 'file') {
+        if (items !== undefined && items !== null && items.length === 1 && items[0].kind === 'file') {
             dropOK = true;
         }
-        return dropOK ? "drag-over" : "drag-over-error";
+        return dropOK ? 'drag-over' : 'drag-over-error';
     };
 
     $scope.onChange = function(){
@@ -251,7 +254,7 @@ angular.module('report-editor')
                     $scope.loading = false;
                     $log.error(JSON.stringify(data));
                 });
-            }
+            };
         }
     };
 

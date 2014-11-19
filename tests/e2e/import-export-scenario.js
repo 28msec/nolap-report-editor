@@ -2,10 +2,8 @@
 
 //GetAttribute() returns "boolean" values and will return either "true" or null
 describe('Import-Export', function(){
-    var _ = require('lodash');
-
+    
     var Reports = require('../../app/reports/reports-page');
-    var Report = require('../../app/report/report-page');
     var reports = new Reports();
 
     var path = require('path');
