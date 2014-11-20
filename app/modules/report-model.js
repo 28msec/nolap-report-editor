@@ -53,7 +53,7 @@ angular
             throw new Error('new Report creation with invalid type ' + typeof modelOrName);
         } else if (typeof modelOrName === 'object') {
             if(modelOrName._id === undefined){
-                modelOrName._id = _uuid();
+                modelOrName._id = this.uuid();
             }
             this.model = modelOrName;
         } else if (typeof modelOrName === 'string' ||
