@@ -14,7 +14,9 @@ angular
 .factory('ReportID', function(){
 
     //Constructor
-    var ReportID = function(){
+    var ReportID = function(){};
+
+    ReportID.prototype.create = function(){
         // thanks to https://gist.github.com/ae6rt/7894539
         // http://www.ietf.org/rfc/rfc4122.txt
         var s = [];
@@ -28,9 +30,13 @@ angular
         /* jslint bitwise: false */
         s[8] = s[13] = s[18] = s[23] = '-';
         this.id = s.join('');
+        return this.id;
     };
 
     ReportID.prototype.toString = function(){
+        if(this.id === undefined){
+            return this.create();
+        }
         return this.id;
     };
 
