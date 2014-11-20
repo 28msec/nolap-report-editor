@@ -20,7 +20,7 @@ Reports.prototype.visitPage = function(){
 };
 
 Reports.prototype.selectTemplate = function(reportId){
-    element.all(by.id('template-' + reportId)).click();
+    element(by.id('template-' + reportId)).click();
 };
 
 Reports.prototype.createReport = function(reportName, templateReportId){
