@@ -187,8 +187,6 @@ angular.module('report-editor')
     $scope.progress = 0;
     $scope.filename = '';
     $scope.error = undefined;
-    $scope.importWithNewName = false;
-    $scope.newReportName = '';
 
     $scope.onFileSelect = function(files) {
         var file = files[0];
@@ -217,17 +215,6 @@ angular.module('report-editor')
         return dropOK ? 'drag-over' : 'drag-over-error';
     };
 
-    $scope.onChange = function(){
-        if($scope.importReportForm !== undefined){
-            $scope.importReportForm.newReportName.$setValidity('required', true);
-            if($scope.importWithNewName){
-                if($scope.newReportName === undefined || $scope.newReportName === '') {
-                    $scope.importReportForm.newReportName.$setValidity('required', false);
-                }
-            }
-        }
-    };
-
     $scope.ok = function() {
         if ($scope.file === undefined) {
             $scope.error = 'Please, select a file to upload';
@@ -236,9 +223,6 @@ angular.module('report-editor')
 
             var newId = new ReportID().toString();
             var uploadUrl = API_URL + '/_queries/public/reports/add-report.jq?_method=POST&import=true&token=' + Session.getToken() + '&private=true&_id=' + newId;
-            if($scope.importWithNewName){
-                uploadUrl += '&label=' + encodeURIComponent($scope.newReportName);
-            }
             var fileReader = new FileReader();
             fileReader.readAsArrayBuffer($scope.file);
             fileReader.onload = function (e) {

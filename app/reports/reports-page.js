@@ -18,8 +18,6 @@ function Reports(){
     this.import = {};
     this.import.form = element(by.name('importReportForm'));
     this.import.fileUpload = element(by.css('input.fileUploadBtn'));
-    this.import.newReportName = element(by.name('newReportName'));
-    this.import.newReportNameChkbx = element(by.id('newReportNameCheckbox'));
     this.import.errorMsg = element(by.id('import-error-message'));
     this.import.btn = {};
     this.import.btn.ok = element(by.id('import-ok'));
@@ -40,14 +38,9 @@ Reports.prototype.createReport = function(reportName){
     form.submit();
 };
 
-Reports.prototype.fillInImportReport = function(reportFilePath, reportName){
+Reports.prototype.fillInImportReport = function(reportFilePath){
     this.importBtn.click();
     this.import.fileUpload.sendKeys(reportFilePath);
-    if(reportName !== undefined){
-      this.import.newReportNameChkbx.click();
-      this.import.newReportName.clear();
-      this.import.newReportName.sendKeys(reportName);
-    }
 };
 
 Reports.prototype.getLastModified = function(report) {

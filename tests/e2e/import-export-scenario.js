@@ -21,17 +21,15 @@ describe('Import-Export', function(){
     });
 
     it('Should not import invalid report', function() {
-        reports.fillInImportReport(invalidReportFile, undefined);
+        reports.fillInImportReport(invalidReportFile);
         expect(reports.import.errorMsg.isDisplayed()).toBe(true);
         reports.import.btn.cancel.click();
         expect(reports.list.count()).toBe(reportsCount);
     });
 
     it('Should import valid report', function() {
-        reports.fillInImportReport(validReportFile, reportName);
+        reports.fillInImportReport(validReportFile);
         expect(reports.import.errorMsg.isDisplayed()).toBe(false);
-        expect(reports.import.newReportNameChkbx.isSelected()).toBe(true);
-        expect(reports.import.newReportName.getAttribute('value')).toBe(reportName);
         reports.import.btn.ok.click();
         reports.findReport(reportName).then(function(found){
           expect(found.length).toBeGreaterThan(0);

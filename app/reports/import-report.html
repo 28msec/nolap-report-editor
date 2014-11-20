@@ -26,24 +26,6 @@
              ng-file-drop-available="dropSupported=true"
              ng-show="dropSupported">or drop ".xbrlb" file here
         </div>
-        <div ng-show="file !== undefined">
-            <div class="input-group">
-                <label class="input-group-addon">
-                  <input type="checkbox" ng-change="onChange()" 
-                         ng-model="importWithNewName" id="newReportNameCheckbox">
-                    New Report Name:
-                </label>
-                <input type="text" class="form-control"
-                       id="newReportName" name="newReportName"
-                       ng-change="onChange()" ng-model="newReportName"
-                       ng-click="importWithNewName=true"
-                       placeholder="Report Name">
-
-            </div>
-            <span class="text-danger" ng-show="importReportForm.newReportName.$error.required">
-                New report name is required.
-            </span>
-        </div>
         <div class="col-lg-12" ng-show="progress !== 0">
             <progressbar max="100" id="file-upload-progress" class="full-width" value="progress"><span ng-bind="progress"></span></progressbar>
         </div>
