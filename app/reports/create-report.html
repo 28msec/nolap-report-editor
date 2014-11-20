@@ -17,7 +17,7 @@
                 </a>
             </div>
             <div class="col-xs-12" ng-repeat="report in reportTemplates">
-                <a class="thumbnail text-center" ng-class="{ selected: selectedTemplate === report._id }" ng-click="selectTpl(report._id)">
+                <a class="thumbnail text-center" id="template-{{report._id}}" ng-class="{ selected: selectedTemplate === report._id }" ng-click="selectTpl(report._id)">
                     <h3 ng-bind="report.Label"></h3>
                     <p ng-bind="report.Description"></p>
                 </a>

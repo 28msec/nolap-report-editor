@@ -20,20 +20,7 @@ Reports.prototype.visitPage = function(){
 };
 
 Reports.prototype.selectTemplate = function(reportId){
-  element.all(by.css('#template option'))
-      .filter(function(option) {
-          return option.getAttribute('value')
-              .then(function(value) {
-                  return value === reportId;
-              });
-      }).then(function(optionsToSelect) {
-          var optionToSelect = optionsToSelect[0];
-          if(optionToSelect === undefined) {
-              console.log('option not found for report Id ' + reportId);
-              return;
-          }
-          return optionToSelect.click();
-      });
+    element.all(by.id('template-' + reportId)).click();
 };
 
 Reports.prototype.createReport = function(reportName, templateReportId){
