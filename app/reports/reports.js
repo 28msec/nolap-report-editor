@@ -145,6 +145,8 @@ angular.module('report-editor')
 
     $scope.addReport = function(report){
         API.Report.addOrReplaceOrValidateReport({
+            _id: report.model._id,
+            label: report.model.Label,
             report: report.model,
             $method: 'POST',
             token: Session.getToken()
