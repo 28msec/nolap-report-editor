@@ -2,7 +2,8 @@
     .templates {
         a {
             color: @text-color !important;
-
+            margin-bottom: 0px !important;
+            
             &:hover {
                 text-decoration: none !important;
                 color: @brand-primary !important;
@@ -10,9 +11,9 @@
             }
 
             &.selected {
-                color: white !important;
-                background-color: @brand-primary;
-                border: 1px solid @brand-primary;
+                color: @gray-darker !important;
+                background-color: @gray-lighter;
+                border: 1px solid @gray-light;
                 -webkit-transition: all 500ms ease-out;
                 -moz-transition: all 500ms ease-out;
                 -o-transition: all 500ms ease-out;
