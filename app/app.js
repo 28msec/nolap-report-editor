@@ -18,7 +18,8 @@ angular.module('report-editor', [
     'formula-parser',
     'forms-ui',
     'layoutmodel',
-    'ngSanitize'
+    'ngSanitize',
+    'angularFileUpload'
 ])
 
 .factory('ConnectionHandler', function($q, $rootScope, DEBUG){

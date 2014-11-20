@@ -40,7 +40,9 @@
     "flexy-layout": "git://github.com/lorenzofox3/flexy-layout.git",
     "angular-ui-tree": "git://github.com/wcandillon/angular-ui-tree.git#master",
     "moment": "~2.7.0",
-    "lodash": "~2.4.1"
+    "lodash": "~2.4.1",
+    "ng-file-upload": "~1.6.12",
+    "ng-file-upload-shim": "~1.6.12"
   },
   "resolutions": {
     "angular": "1.2.9",
