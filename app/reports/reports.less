@@ -6,20 +6,20 @@
             
             &:hover {
                 text-decoration: none !important;
-                background-color: @clouds;//lighten(@clouds, 2.5%);
-                border: 1px solid @clouds;
+                color: @brand-primary !important;
+                border: 1px solid @brand-primary;
             }
 
             &.selected {
-                color: @brand-primary !important;
-                border: 1px solid @brand-primary;
+                background-color: @clouds;//lighten(@clouds, 2.5%);
+                border: 1px solid @clouds;
                 -webkit-transition: all 500ms ease-out;
                 -moz-transition: all 500ms ease-out;
                 -o-transition: all 500ms ease-out;
                 transition: all 500ms ease-out;
 
                 &:hover {
-                    background-color: white;
+                    color: @text-color !important;
                 }
             }
         }
