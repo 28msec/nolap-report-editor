@@ -1,0 +1,40 @@
+<form name="importReportForm" id="importReport" role="form" spellcheck="false" novalidate>
+    <div class="modal-header">
+        <!--button type="button" class="close" aria-hidden="true">&times;</button-->
+        <h4 class="modal-title">Import Report - .xbrlb" File</h4>
+    </div>
+    <div class="modal-body">
+        <div class="col-lg-12 error-message" ng-show="error">
+            <button type="button" class="close" ng-click="error=undefined">
+                <span aria-hidden="true">&times;</span>
+                <span class="sr-only">Close</span>
+            </button>
+            <span ng-bind="error" id="import-error-message"></span>
+        </div>
+        <div class="input-group">
+            <span class="input-group-btn">
+                <button class="btn btn-default fileUploadBtn" type="button"
+                          ng-file-select="onFileSelect($files)" 
+                          data-multiple="false"><i class="fa fa-folder-open-o"></i> Select File</button>
+            </span>
+            <input type="text" class="form-control file" ng-model="filename" readonly>
+        </div>
+        <div class="drop-zone text-center"
+             ng-file-drop="onFileSelect($files)"
+             ng-file-drag-over-class="dragOverClass($event)"
+             ng-file-drag-over-delay="100"
+             ng-file-drop-available="dropSupported=true"
+             ng-show="dropSupported">or drop ".xbrlb" file here
+        </div>
+        <div class="col-lg-12" ng-show="progress !== 0">
+            <progressbar max="100" id="file-upload-progress" class="full-width" value="progress"><span ng-bind="progress"></span></progressbar>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" id="import-ok" ng-click="ok()" ng-class="{ disabled: loading === true || !importReportForm.$valid || file === undefined }">
+            <span ng-show="!loading">Import</span>
+            <span ng-show="loading"><i class="fa fa-spin fa-spinner"></i> Importing...</span>
+        </button>
+        <button class="btn btn-default" id="import-cancel" ng-click="cancel()">Cancel</button>
+    </div>
+</form>

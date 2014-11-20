@@ -25,3 +25,58 @@
         }
     }
 }
+
+#importReport {
+  input.file {
+    background-color: white;
+  }
+
+  .error-message {
+    background-color: white;
+    padding: 15px;
+    margin-top: 1px;
+    margin-bottom: 10px;
+  }
+
+  #file-upload-progress {
+    margin-top: 10px;
+  }
+
+  .full-width {
+    width: 100% !important;
+  }
+
+  .drop-zone {
+    border: dotted 2px #cccccc;
+    padding: 28px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: white;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    font-weight: 300;
+  }
+
+  .drag-over {
+    border: dotted 2px @brand-success;
+    padding: 28px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: lighten(@brand-success, 30%);
+    color: @brand-success;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
+    font-weight: 300;
+  }
+
+  .drag-over-error {
+    border: dotted 2px @brand-danger;
+    padding: 28px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: white;
+    color: @brand-danger;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
+    font-weight: 300;
+  }
+}

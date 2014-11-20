@@ -2,7 +2,7 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('ReportsCtrl', function($rootScope, $log, $scope, $stateParams, $state, $modal, reports){
+.controller('ReportsCtrl', function($rootScope, $log, $scope, $stateParams, $state, $modal, reports, $window, Session, API_URL){
 
     $scope.reports = reports;
     $scope.selectedReports = {};
@@ -35,21 +35,34 @@ angular.module('report-editor')
     };
 
     $scope.hasSelectedReport = false;
+    $scope.hasSingleSelectedReport = false;
 
     $scope.$watch('selectedReports', function(){
         var result = false;
+        var count = 0;
         angular.forEach($scope.selectedReports, function(value){
             if(value === true) {
+                count++;
                 result = true;
                 return false;
             }
         });
+        $scope.hasSingleSelectedReport = count === 1;
         if($scope.toggle === null && result === false) {
             $scope.toggle = false;
         }
         $scope.hasSelectedReport = result;
     }, true);
-    
+
+    $scope.downloadSelectedReport = function() {
+        var ids = $scope.getSelectedReportIds();
+        if(ids.length !== 1){
+            $log.error('Too many IDs: ' + JSON.stringify(ids));
+        } else {
+            $window.location.href = API_URL + '/_queries/public/reports/reports.jq?_method=POST&_id=' + ids[0] + '&export=true&token=' + Session.getToken();
+        }
+    };
+
     $scope.createReport = function(){
         var modal = $modal.open({
             controller: 'CreateReportCtrl',
@@ -71,15 +84,30 @@ angular.module('report-editor')
             $state.go('report.taxonomy.concepts', { 'reportId': report._id });
         });
     };
-    
-    $scope.deleteReports = function(){
+
+    $scope.importReport = function(){
+        var modal = $modal.open({
+            controller: 'ImportReportCtrl',
+            templateUrl: '/reports/import-report.html'
+        });
+        modal.result.then(function(report){
+            $scope.reports.push(report);
+        });
+    };
+
+    $scope.getSelectedReportIds = function(){
         var ids = [];
         Object.keys($scope.selectedReports).forEach(function(key){
             if($scope.selectedReports[key] === true) {
                 ids.push(key);
             }
         });
-        $modal.open({
+        return ids;
+    };
+
+    $scope.deleteReports = function(){
+        var ids = $scope.getSelectedReportIds();
+        var modal = $modal.open({
             controller: 'DeleteReportsCtrl',
             templateUrl: '/reports/delete-reports.html',
             resolve: {
@@ -90,6 +118,9 @@ angular.module('report-editor')
                     return $scope.reports;
                 }
             }
+        });
+        modal.result.then(function(){
+            $scope.selectedReports = {};
         });
     };
 })
@@ -130,7 +161,7 @@ angular.module('report-editor')
     };
     
     $scope.cancel = function(){
-        $modalInstance.close();
+        $modalInstance.dismiss('cancel');
     };
 })
 .controller('CreateReportCtrl', function($scope, $modalInstance, $log, Report, API, Session, reportTemplates){
@@ -197,6 +228,73 @@ angular.module('report-editor')
     
     $scope.cancel = function(){
         $modalInstance.dismiss('cancel');
+    };
+})
+.controller('ImportReportCtrl', function($scope, $modalInstance, $log, API_URL, Session, ReportID, $upload /* angularFileUpload service */){
+    $scope.report = {};
+    $scope.loading = false;
+    $scope.file = undefined;
+    $scope.progress = 0;
+    $scope.filename = '';
+    $scope.error = undefined;
+
+    $scope.onFileSelect = function(files) {
+        var file = files[0];
+        $scope.error = undefined;
+        if (files.length === 0) {
+            $log.error('No file selected');
+        } else if (files.length > 1) {
+            $scope.error = 'Can only upload one file at a time.';
+        } else if (file.name.indexOf('.xbrlb', file.name.length - '.xbrlb'.length) !== -1) {
+            $scope.file = files[0];
+            $scope.filename = file.name;
+        } else {
+            $scope.error = 'Cannot upload file "' + file.name + '". Only files of type ".xbrlb" can be uploaded.';
+        }
+    };
+
+    $scope.dragOverClass = function($event) {
+        var items;
+        if($event.dataTransfer !== undefined && $event.dataTransfer.items !== undefined){
+            items = $event.dataTransfer.items;
+        }
+        var dropOK = false;
+        if (items !== undefined && items !== null && items.length === 1 && items[0].kind === 'file') {
+            dropOK = true;
+        }
+        return dropOK ? 'drag-over' : 'drag-over-error';
+    };
+
+    $scope.ok = function() {
+        if ($scope.file === undefined) {
+            $scope.error = 'Please, select a file to upload';
+        } else {
+            $scope.loading = true;
+
+            var newId = new ReportID().toString();
+            var uploadUrl = API_URL + '/_queries/public/reports/add-report.jq?_method=POST&import=true&token=' + Session.getToken() + '&private=true&_id=' + newId;
+            var fileReader = new FileReader();
+            fileReader.readAsArrayBuffer($scope.file);
+            fileReader.onload = function (e) {
+                $upload.http({
+                    url: uploadUrl,
+                    data: e.target.result
+                }).progress(function (event) {
+                    $scope.progress = parseInt(100.0 * event.loaded / event.total);
+                }).success(function (data) {
+                    $scope.loading = false;
+                    $modalInstance.close(data);
+                }).error(function (data) {
+                    $scope.loading = false;
+                    $log.error(JSON.stringify(data));
+                });
+            };
+        }
+    };
+
+    $scope.cancel = function(){
+        $modalInstance.dismiss('cancel');
+        return false;
     };
 })
 ;
