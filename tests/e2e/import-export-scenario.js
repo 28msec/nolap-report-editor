@@ -10,7 +10,7 @@ describe('Import-Export', function(){
     var invalidReportFile = path.resolve(__dirname, './data/invalid-report.json');
     var validReportFile = path.resolve(__dirname, './data/Fundamental_Accounting_Concepts.xbrlb');
     var reportsCount;
-    var reportName = 'Import test';
+    //var reportName = 'Import test';
 
     it('Should list reports', function() {
         reports.visitPage();
