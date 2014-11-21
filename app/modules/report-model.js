@@ -1826,7 +1826,7 @@ angular
     };
 
     SECReport.prototype=new AbstractReport();
-    SECReport.prototype.type="SECReport";
+    SECReport.prototype.type='SECReport';
 
     SECReport.prototype.newModel = function(id, label, description, username, role, prefix){
         var date = new Date();
@@ -2067,7 +2067,7 @@ angular
        };
 
        Report.prototype = new AbstractReport();
-       Report.prototype.type = "Report";
+       Report.prototype.type = 'Report';
    }
 
    return Report;
