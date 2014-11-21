@@ -1,4 +1,9 @@
 {
+    "cellstore": {
+        "all": {
+            "profile": "sec"
+        }
+    },
     "server": {
         "api": "secxbrl.28.io",
         "registration": "http://localhost:9001/auth",

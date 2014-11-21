@@ -1,8 +1,13 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('ReportCtrl', function($q, $rootScope, $scope, $log, Session, API, Report, report){
+.controller('ReportCtrl', function($q, $rootScope, $scope, $log, PROFILE, Session, API, Report, report){
     $scope.report = report;
+    $scope.displayFiltersPage = false;
+
+    if(PROFILE === 'sec') {
+        $scope.displayFiltersPage = true;
+    }
 
     var lastSavedModel;
     

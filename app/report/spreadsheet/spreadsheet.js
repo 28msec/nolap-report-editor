@@ -1,11 +1,15 @@
 'use strict';
 
 angular.module('report-editor')
-.controller('SpreadsheetCtrl', function($scope, $modal, $filter, Session, API, report, API_URL){
+.controller('SpreadsheetCtrl', function($scope, $modal, $filter, PROFILE, Session, API, report, API_URL){
 	$scope.mymodel = null;
 	$scope.myheaders = null;
 	  
-	$scope.preview = { constraints : true, checks : false, truncate:true, css : 'preview-style', labelidx : 0, elimination : true };	
+	$scope.preview = { constraints : true, checks : false, truncate:true, css : 'preview-style', labelidx : 0 };
+
+    if(PROFILE === 'sec'){
+        $scope.preview.elimination = true;
+    }
 	  
 	$scope.loading = false;
 
