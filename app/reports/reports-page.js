@@ -29,13 +29,20 @@ Reports.prototype.visitPage = function(){
     return browser.get('/');
 };
 
-Reports.prototype.createReport = function(reportName){
+Reports.prototype.selectTemplate = function(reportId){
+    element(by.id('template-' + reportId)).click();
+};
+
+Reports.prototype.createReport = function(reportName, templateReportId){
     this.createBtn.click();
-    var form = element(by.name('newReportForm'));
+    var createReportBtn = element(by.id('create-report-btn'));
     var reportNameField = element(by.model('report.name'));
+    if(templateReportId !== undefined){
+        this.selectTemplate(templateReportId);
+    }
     reportNameField.clear();
     reportNameField.sendKeys(reportName);
-    form.submit();
+    createReportBtn.click();
 };
 
 Reports.prototype.fillInImportReport = function(reportFilePath){
