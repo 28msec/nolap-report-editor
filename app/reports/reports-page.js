@@ -42,7 +42,7 @@ Reports.prototype.createReport = function(reportName, templateReportId){
     }
     reportNameField.clear();
     reportNameField.sendKeys(reportName);
-    createReportBtn.click();
+    return createReportBtn.click();
 };
 
 Reports.prototype.fillInImportReport = function(reportFilePath){

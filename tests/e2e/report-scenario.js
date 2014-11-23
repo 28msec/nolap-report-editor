@@ -1,14 +1,26 @@
 'use strict';
 
 //GetAttribute() returns "boolean" values and will return either "true" or null
-describe('Report', function(){
+describe('Report', function() {
+    var _ = require('lodash');
+
+    var reportName, filters;
+
+    var Reports = require('../../app/reports/reports-page');
+    var reports;
+
     var Report = require('../../app/report/report-page');
     var report;
 
-    it('should have a Report Editor title', function(){
-        // FAC report in account support@28.io:
-        report = new Report('supportFundamentalAccountingConcepts');
-        report.visitPage();
+    it('Create an fac report', function(){
+        reportName = 'supportFundamentalAccountingConcepts' + Math.floor((Math.random() * 10) + 1);
+
+        reports = new Reports();
+        reports.createReport(reportName, 'FundamentalAccountingConcepts');
+        reports.getCurrentUrl().then(function(url){
+            var id = _.last(url.split('/'));
+            report = new Report(id);
+        });
     });
 
     it('should have 107 elements', function(){
@@ -73,5 +85,106 @@ describe('Report', function(){
         // there should be 2 failing stamps for operating income
         var failingStamps = report.spreadsheet.getValidationStampsDetails(false);
         expect(failingStamps.count()).toBe(2);
+    });
+
+    it('should reset the filters', function() {
+        filters = report.filters;
+        filters.visitPage()
+            .then(function(){
+                filters.resetSelectedFilters()
+                    .then(function(){
+                        expect(filters.selectedFilters.cik.count()).toBe(0);
+                        expect(filters.selectedFilters.tag.count()).toBe(1);
+                        expect(filters.selectedFilters.sic.count()).toBe(0);
+                        expect(filters.selectedFilters.fiscalYear.count()).toBe(1);
+                        expect(filters.selectedFilters.fiscalPeriod.count()).toBe(1);
+                        expect(filters.selectedFilters.fiscalPeriodTypeYTD.getAttribute('class')).toMatch(/active/);
+                    });
+            });
+    });
+
+    it('should have filters to select', function() {
+        expect(filters.setFilters.tags.count()).toBe(4);
+        expect(filters.setFilters.fiscalYears.count()).toBeGreaterThan(2);
+        expect(filters.setFilters.fiscalPeriods.count()).toBe(4);
+    });
+
+    it('should issue a too generic filter warning', function() {
+        expect(filters.filterTooGenericWarning.count()).toBe(0);
+        filters.closeSelectedFiltersTag('DOW30')
+            .then(function(){
+                expect(filters.selectedFilters.tag.count()).toBe(0);
+                expect(filters.filterTooGenericWarning.count()).toBe(1);
+            });
+    });
+
+    it('should select COCA Cola', function() {
+        filters.setFiltersEntityName('Coca Cola', 1)
+            .then(function(){
+                expect(filters.setFilters.entity.getAttribute('value')).toBe('');
+                expect(filters.selectedFilters.cik.count()).toBe(1);
+                expect(filters.selectedFilters.cik.get(0).getText()).toMatch('COCA COLA CO');
+            });
+    });
+
+    it('should select FORTUNE100', function() {
+        filters.closeSelectedFiltersEntity('COCA COLA CO')
+            .then(function(){
+                expect(filters.filterTooGenericWarning.count()).toBe(1);
+                filters.clickFiltersTag('FORTUNE100')
+                    .then(function(){
+                        expect(filters.filterTooGenericWarning.count()).toBe(0);
+                        expect(filters.selectedFilters.tag.count()).toBe(1);
+                        expect(filters.selectedFilters.tag.get(0).getText()).toBe('\u00D7\nFORTUNE100');
+                    });
+            });
+    });
+
+    it('should select Beverages', function() {
+        filters.closeSelectedFiltersTag('FORTUNE100')
+            .then(function(){
+                expect(filters.filterTooGenericWarning.count()).toBe(1);
+                filters.setFiltersIndustryGroup('bev', 1)
+                    .then(function(){
+                        expect(filters.filterTooGenericWarning.count()).toBe(0);
+                        expect(filters.setFilters.sic.getAttribute('value')).toBe('');
+                        expect(filters.selectedFilters.sic.count()).toBe(1);
+                        expect(filters.selectedFilters.sic.get(0).getText()).toMatch('BEVERAGES');
+                    });
+            });
+    });
+
+    it('should select year', function() {
+        filters.clickFiltersYear(2012)
+            .then(function(){
+                expect(filters.selectedFilters.fiscalYear.count()).toBe(2);
+            });
+    });
+
+    it('should select period', function() {
+        filters.clickFiltersPeriod('Q3')
+            .then(function(){
+                expect(filters.selectedFilters.fiscalPeriod.count()).toBe(2);
+            });
+    });
+
+    it('should reset the filters', function() {
+        filters.resetSelectedFilters()
+            .then(function(){
+                expect(filters.selectedFilters.cik.count()).toBe(0);
+                expect(filters.selectedFilters.tag.count()).toBe(1);
+                expect(filters.selectedFilters.sic.count()).toBe(0);
+                expect(filters.selectedFilters.fiscalYear.count()).toBe(1);
+                expect(filters.selectedFilters.fiscalPeriod.count()).toBe(1);
+            });
+    });
+
+    it('Should delete report', function() {
+        reports.visitPage();
+        reports.list.count().then(function(count){
+            reports.deleteReport(reportName).then(function(){
+                expect(reports.list.count()).toBe(count - 1);
+            });
+        });
     });
 });
