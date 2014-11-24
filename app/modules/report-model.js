@@ -739,7 +739,7 @@ angular
     /*
     * @abstract: Needs to be overriden in implementing class
     * */
-    AbstractReport.prototype.newDefinitionModel = function(label, role, source) {
+    AbstractReport.prototype.newDefinitionModel = function(/* label, role, source */) {
         throw new Error('Not implemented.');
     };
 
