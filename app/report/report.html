@@ -9,7 +9,7 @@
         <div>
             <ul class="nav navbar-nav">
                 <li ui-sref-active2="active" ui-sref-active-includes="report.taxonomy"><a ui-sref2="report.taxonomy.concepts()" id="taxonomy-link">Taxonomy</a></li>
-                <li ui-sref-active2="active"><a ui-sref2="report.filters()" id="filters-link">Filters</a></li>
+                <li ui-sref-active2="active" ng-show="displayFiltersPage"><a ui-sref2="report.filters()" id="filters-link">Filters</a></li>
                 <li ui-sref-active2="active"><a ui-sref2="report.facts()" id="facts-link">Facts</a></li>
                 <li ui-sref-active2="active"><a ui-sref2="report.spreadsheet()" id="spreadsheet-link">Spreadsheet</a></li>
             </ul>

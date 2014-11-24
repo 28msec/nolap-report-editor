@@ -219,6 +219,8 @@ module.exports = function (grunt) {
                         'app/modules/formula-parser.js',
                         'app/modules/report-api.js',
                         'app/modules/report-model.js',
+                        'app/modules/report-model-generic.js',
+                        'app/modules/report-model-sec.js',
                         'app/modules/rules-model.js',
                         'app/app.js',
                         'app/modules/excel-parser.js',
@@ -258,6 +260,7 @@ module.exports = function (grunt) {
                 name: 'constants',
                 wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
                 constants: {
+                    'PROFILE': '<%= config.cellstore.all.profile %>',
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= config.server.api %>/v1',
                     'REGISTRATION_URL': '<%= config.server.registration %>',
@@ -270,6 +273,7 @@ module.exports = function (grunt) {
                 name: 'constants',
                 wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
                 constants: {
+                    'PROFILE': '<%= config.cellstore.all.profile %>',
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= config.test.api %>/v1',
                     'REGISTRATION_URL': '<%= config.test.registration %>',
@@ -282,6 +286,7 @@ module.exports = function (grunt) {
                 name: 'constants',
                 wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
                 constants: {
+                    'PROFILE': '<%= config.cellstore.all.profile %>',
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= config.beta.api %>/v1',
                     'REGISTRATION_URL': '<%= config.beta.registration %>',
@@ -294,6 +299,7 @@ module.exports = function (grunt) {
                 name: 'constants',
                 wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
                 constants: {
+                    'PROFILE': '<%= config.cellstore.all.profile %>',
                     'APPNAME': 'report-editor',
                     'API_URL': 'https://<%= config.prod.api %>/v1',
                     'REGISTRATION_URL': '<%= config.prod.registration %>',
@@ -306,6 +312,7 @@ module.exports = function (grunt) {
                 name: 'constants',
                 wrap: '/*jshint quotmark:double */\n"use strict";\n\n<%= __ngModule %>',
                 constants: {
+                    'PROFILE': '<%= config.cellstore.all.profile %>',
                     'APPNAME': 'report-editor',
                     'API_URL': '//<%= config.custom.buildId %>.28.io/v1',
                     'REGISTRATION_URL': 'http://<%= config.custom.buildId %>.s3-website-us-east-1.amazonaws.com/auth',
@@ -322,7 +329,7 @@ module.exports = function (grunt) {
                 gzipExclude: ['.jpg', '.jpeg', '.png', '.xml', '.json', '.pdf', '.txt', '.ico']
             },
             prod: {
-                bucket: 'reports.secxbrl.info',
+                bucket: '<%= config.s3.bucket %>',
                 upload: [{
                     src: 'dist/**/*',
                     dest: '',

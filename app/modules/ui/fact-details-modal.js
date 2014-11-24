@@ -2,7 +2,7 @@
 
 angular
     .module('report-editor')
-    .controller('FactDetailsCtrl', function(_, $scope, $templateCache, $compile, $modalInstance, fact){
+    .controller('FactDetailsCtrl', function(_, $scope, $templateCache, $compile, $modalInstance, PROFILE, fact){
         if(_.isArray(fact)) {
             fact = fact[0];
         }
@@ -31,7 +31,9 @@ angular
         $scope.nonKeyAspects = [];
         //var aspects = keys($scope.fact.Aspects);
         var keyAspects = angular.copy($scope.fact.KeyAspects);
-        keyAspects.push('dei:LegalEntityAxis');
+        if(PROFILE === 'sec') {
+            keyAspects.push('dei:LegalEntityAxis');
+        }
         for (var aspect in $scope.fact.Aspects){
             //var aspect = aspects[i];
             if($scope.fact.Aspects.hasOwnProperty(aspect)) {
