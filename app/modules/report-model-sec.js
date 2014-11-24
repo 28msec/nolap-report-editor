@@ -1,7 +1,7 @@
 'use strict';
 
 angular
-.module('report-model', [])
+.module('report-model')
 .factory('SECReport', function(AbstractReport) {
 
     var SECReport = function(modelOrName, label, description, role, username, prefix){
