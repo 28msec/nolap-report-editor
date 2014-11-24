@@ -219,6 +219,8 @@ module.exports = function (grunt) {
                         'app/modules/formula-parser.js',
                         'app/modules/report-api.js',
                         'app/modules/report-model.js',
+                        'app/modules/report-model-generic.js',
+                        'app/modules/report-model-sec.js',
                         'app/modules/rules-model.js',
                         'app/app.js',
                         'app/modules/excel-parser.js',
