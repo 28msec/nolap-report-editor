@@ -54,6 +54,9 @@ angular
                    modelOrName !== null) {
             throw new Error('new Report creation with invalid type ' + typeof modelOrName);
         } else if (typeof modelOrName === 'object') {
+            if(modelOrName._id === undefined){
+                modelOrName._id = this.uuid();
+            }
             this.model = modelOrName;
         } else if (typeof modelOrName === 'string' ||
                    modelOrName === undefined ||
@@ -77,6 +80,9 @@ angular
                     }
                 });
                 prefix = startingChars;
+                if(prefix===''){
+                    prefix = label.substring(0, 1).toLowerCase();
+                }
             }
             this.model = this.newModel(modelOrName, label, description, username, role, prefix);
             this.addConcept('ReportLineItems', label, true);

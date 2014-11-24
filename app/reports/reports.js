@@ -66,7 +66,18 @@ angular.module('report-editor')
     $scope.createReport = function(){
         var modal = $modal.open({
             controller: 'CreateReportCtrl',
-            templateUrl: '/reports/create-report.html'
+            templateUrl: '/reports/create-report.html',
+            resolve: {
+                reportTemplates: [ '$stateParams', 'API', 'Session', function($stateParams, API, Session) {
+                    return API.Report.listReports({
+                        publicRead: true,
+                        user: 'admin@28.io',
+                        token: Session.getToken(),
+                        $method: 'POST',
+                        onlyMetadata: true
+                    });
+                }]
+            }
         });
         modal.result.then(function(report){
             $scope.reports.push(report);
@@ -153,14 +164,17 @@ angular.module('report-editor')
         $modalInstance.dismiss('cancel');
     };
 })
-.controller('CreateReportCtrl', function($scope, $modalInstance, Report, API, Session){
+.controller('CreateReportCtrl', function($scope, $modalInstance, $log, Report, API, Session, reportTemplates){
     $scope.report = {};
-    
-    $scope.ok = function(){
-        $scope.loading = true;
-        //TODO: this will change with the new REST API
-        var user = Session.getUser();
-        var report = new Report(undefined, $scope.report.name, '', 'http://reports.28.io', user.email);
+    $scope.reportTemplates = reportTemplates;
+    $scope.selectedTemplate = '_empty';
+    $scope.loadingStatus = '';
+
+    $scope.selectTpl = function(id){
+        $scope.selectedTemplate = id;
+    };
+
+    $scope.addReport = function(report){
         API.Report.addOrReplaceOrValidateReport({
             report: report.model,
             $method: 'POST',
@@ -174,6 +188,42 @@ angular.module('report-editor')
             $scope.loading = false;
             console.error(error);
         });
+    };
+
+    $scope.ok = function(){
+        $scope.loading = true;
+
+        var user = Session.getUser();
+
+        if($scope.selectedTemplate === '_empty'){
+            $scope.loadingStatus = 'Creating Report ...';
+            var newReport = new Report(undefined, $scope.report.name, '', 'http://reports.28.io', user.email);
+            $scope.addReport(newReport);
+        } else {
+            $scope.loadingStatus = 'Loading Template ...';
+            var id = $scope.selectedTemplate;
+            API.Report.listReports({
+                _id: id,
+                user: 'admin@28.io',
+                token: Session.getToken(),
+                $method: 'POST'
+            })
+            .then(function(reportTemplates){
+                $scope.loadingStatus = 'Creating Report ...';
+
+                var reportTemplate = reportTemplates[0];
+                if(reportTemplate === undefined){
+                    $log.error('Couldnt find report with id ' + id);
+                } else {
+                    reportTemplate.Label = $scope.report.name;
+                    reportTemplate.Owner = user.email;
+                    reportTemplate.ACL = []; // make it private
+                    delete reportTemplate._id;
+                    var reportFromTemplate = new Report(reportTemplate);
+                    $scope.addReport(reportFromTemplate);
+                }
+            });
+        }
     };
     
     $scope.cancel = function(){

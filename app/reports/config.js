@@ -13,7 +13,8 @@ angular
                 return API.Report.listReports({
                     _id: $stateParams.id,
                     token: Session.getToken(),
-                    $method: 'POST'
+                    $method: 'POST',
+                    onlyMetadata: true
                 });
             }]
         }
