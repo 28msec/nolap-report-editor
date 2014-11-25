@@ -6,10 +6,6 @@ angular.module('report-editor')
 	$scope.myheaders = null;
 	  
 	$scope.preview = { constraints : true, checks : false, truncate:true, css : 'preview-style', labelidx : 0 };
-
-    if(PROFILE === 'sec'){
-        $scope.preview.elimination = true;
-    }
 	  
 	$scope.loading = false;
 
