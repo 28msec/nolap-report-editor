@@ -329,7 +329,7 @@ module.exports = function (grunt) {
                 gzipExclude: ['.jpg', '.jpeg', '.png', '.xml', '.json', '.pdf', '.txt', '.ico']
             },
             prod: {
-                bucket: '<%= config.s3.bucket %>',
+                bucket: 'reports-nttdata3.secxbrl.info',
                 upload: [{
                     src: 'dist/**/*',
                     dest: '',
