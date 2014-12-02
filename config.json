@@ -1,7 +1,7 @@
 {
     "cellstore": {
         "all": {
-            "profile": "sec"
+            "profile": "nttdata"
         }
     },
     "s3":{
